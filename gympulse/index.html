@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>GymPulse</title>
+<meta name="theme-color" content="#0f0a05"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="GymPulse"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body,#root{min-height:100%;background:#0f0a05}
+body{font-family:'DM Sans',sans-serif;color:#ede8e0;overscroll-behavior:none}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#3a2010;border-radius:2px}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
+input[type=number]{-moz-appearance:textfield}
+input[type=date]{color-scheme:dark}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.5) sepia(1) saturate(3) hue-rotate(90deg)}
+button:active{opacity:.75}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideInUp{from{opacity:0;transform:translateY(24px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes countUp{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
+@keyframes progressBar{from{width:0}to{width:var(--target-width)}}
+.fade-up{animation:fadeUp .35s cubic-bezier(.22,1,.36,1) both}
+.fade-in{animation:fadeIn .3s ease both}
+.slide-in-up{animation:slideInUp .4s cubic-bezier(.22,1,.36,1) both}
+.count-up{animation:countUp .4s cubic-bezier(.22,1,.36,1) both}
+.progress-bar-anim{animation:progressBar .7s cubic-bezier(.22,1,.36,1) forwards}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+
+const { useState, useEffect, useMemo, useRef } = React;
+
+const ACCENT  = '#ff9f43';
+const ORANGE  = '#ffcc02';
+const RED     = '#ff6b6b';
+const YELLOW  = '#ffd93d';
+const BLUE    = '#4d96ff';
+const GREEN   = '#7dff6b';
+const PURPLE  = '#c77dff';
+const MUTED   = '#806a40';
+const FAINT   = '#3e2e1a';
+const BG      = '#0f0a05';
+const BGCARD  = 'rgba(255,255,255,0.03)';
+const BGMODAL = '#1a0f06';
+const BORDER  = '#2a1a0a';
+const BORDER2 = '#301e0a';
+const TEXT    = '#ede8e0';
+
+const MUSCLE_COLORS = {
+  Poitrine:'#ff6b6b', Dos:'#4d96ff', Épaules:'#c77dff',
+  Biceps:'#ff9f43', Triceps:'#ffd93d', Jambes:'#7dff6b',
+  Abdos:'#00cec9', Cardio:'#fd79a8', 'Full Body':'#a29bfe'
+};
+const MUSCLE_GROUPS = Object.keys(MUSCLE_COLORS);
+const DAY_NAMES_FULL = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+const DAY_NAMES_SHORT = ['L','M','M','J','V','S','D'];
+
+function load(k, def) {
+  try { const v = localStorage.getItem(k); if (v !== null) return JSON.parse(v); } catch(e) {}
+  return def;
+}
+function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+
+function toKey(d) {
+  const l = new Date(d - d.getTimezoneOffset() * 60000);
+  return l.toISOString().slice(0, 10);
+}
+function today() { return new Date(); }
+function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
+function startOfWeek(d) {
+  const r = new Date(d);
+  r.setDate(r.getDate() - ((r.getDay() + 6) % 7));
+  r.setHours(0, 0, 0, 0);
+  return r;
+}
+function fmtShort(d) { return d.toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'short'}); }
+function fmtFull(d)  { return d.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long', year:'numeric'}); }
+function fmtRange(d) { return d.toLocaleDateString('fr-FR', {day:'numeric', month:'short'}); }
+function fmtMin(m) {
+  const h = Math.floor(m / 60), mn = m % 60;
+  return mn ? h + 'h' + String(mn).padStart(2,'0') : h + 'h';
+}
+function fmtKg(v) {
+  if (v <= 0) return '0kg';
+  if (v >= 1000) return (v / 1000).toFixed(1) + 't';
+  return Math.round(v) + 'kg';
+}
+function calcVol(exercises) {
+  if (!exercises) return 0;
+  let total = 0;
+  Object.values(exercises).forEach(groups => {
+    if (Array.isArray(groups)) groups.forEach(g => {
+      const s = g.sets || 1;
+      total += s * (g.reps || 0) * (g.weight || 0);
+    });
+  });
+  return total;
+}
+
+/* ─── Dumbbell Logo ──────────────────────────────────────────────────────── */
+function DumbbellLogo({ size = 28 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" style={{filter:'drop-shadow(0 0 8px rgba(255,159,67,0.7))', flexShrink:0}}>
+      <defs>
+        <linearGradient id="dbG" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#ffd080"/>
+          <stop offset="100%" stopColor="#ff7e1a"/>
+        </linearGradient>
+        <filter id="dbGlow" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="3" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <rect x="6" y="28" width="16" height="44" rx="5" fill="url(#dbG)" filter="url(#dbGlow)" opacity="0.95"/>
+      <rect x="22" y="36" width="10" height="28" rx="3" fill="url(#dbG)" opacity="0.9"/>
+      <rect x="32" y="44" width="36" height="12" rx="6" fill="url(#dbG)" opacity="0.85"/>
+      <rect x="68" y="36" width="10" height="28" rx="3" fill="url(#dbG)" opacity="0.9"/>
+      <rect x="78" y="28" width="16" height="44" rx="5" fill="url(#dbG)" filter="url(#dbGlow)" opacity="0.95"/>
+      <rect x="38" y="46" width="12" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+    </svg>
+  );
+}
+
+function Starfield() {
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let W, H, raf;
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    resize();
+    window.addEventListener('resize', resize);
+    const stars = [];
+    for (let i = 0; i < 100; i++) {
+      stars.push({ x: Math.random(), y: Math.random(), r: Math.random() * 1.1 + 0.15,
+        base: 0.1 + Math.random() * 0.45, spd: 0.5 + Math.random() * 1.0, phase: Math.random() * Math.PI * 2 });
+    }
+    const shoots = [];
+    let lastSpawn = 0, nextGap = 2000 + Math.random() * 2000;
+    let last = 0;
+    function draw(ts) {
+      raf = requestAnimationFrame(draw);
+      const dt = Math.min(ts - last, 50); last = ts;
+      ctx.clearRect(0, 0, W, H);
+      const g1 = ctx.createRadialGradient(W*0.15, H*0.2, 0, W*0.15, H*0.2, W*0.3);
+      g1.addColorStop(0, 'rgba(255,159,67,0.06)'); g1.addColorStop(1, 'transparent');
+      ctx.fillStyle = g1; ctx.fillRect(0, 0, W, H);
+      const g2 = ctx.createRadialGradient(W*0.85, H*0.75, 0, W*0.85, H*0.75, W*0.25);
+      g2.addColorStop(0, 'rgba(255,200,80,0.05)'); g2.addColorStop(1, 'transparent');
+      ctx.fillStyle = g2; ctx.fillRect(0, 0, W, H);
+      const t = ts * 0.001;
+      stars.forEach(s => {
+        const a = Math.max(0.04, s.base + Math.sin(t * s.spd + s.phase) * 0.32);
+        ctx.beginPath(); ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,220,160,' + a.toFixed(2) + ')'; ctx.fill();
+      });
+      if (ts - lastSpawn > nextGap && shoots.length < 3) {
+        const sx = Math.random() * W, angle = Math.PI / 5 + (Math.random() - 0.5) * 0.4;
+        const speed = 5 + Math.random() * 7, len = 80 + Math.random() * 150;
+        shoots.push({ x: sx, y: -20, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, len, life: 1, alpha: 0 });
+        lastSpawn = ts; nextGap = 1800 + Math.random() * 2200;
+      }
+      for (let i = shoots.length - 1; i >= 0; i--) {
+        const s = shoots[i];
+        if (s.life > 0.35) s.alpha = Math.min(1, s.alpha + 0.07);
+        else s.alpha = (s.life / 0.35) * 0.9;
+        const sp = Math.sqrt(s.vx * s.vx + s.vy * s.vy);
+        const nx = s.vx / sp, ny = s.vy / sp;
+        const tx = s.x - nx * s.len, ty = s.y - ny * s.len;
+        const gr = ctx.createLinearGradient(tx, ty, s.x, s.y);
+        gr.addColorStop(0, 'transparent');
+        gr.addColorStop(0.6, 'rgba(255,200,100,' + (s.alpha * 0.25).toFixed(2) + ')');
+        gr.addColorStop(1, 'rgba(255,220,140,' + (s.alpha * 0.9).toFixed(2) + ')');
+        ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(s.x, s.y);
+        ctx.strokeStyle = gr; ctx.lineWidth = 1.4; ctx.lineCap = 'round'; ctx.stroke();
+        ctx.beginPath(); ctx.arc(s.x, s.y, 1.4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,230,180,' + s.alpha.toFixed(2) + ')'; ctx.fill();
+        s.x += s.vx * (dt / 16); s.y += s.vy * (dt / 16); s.life -= 0.011 * (dt / 16);
+        if (s.life <= 0 || s.y > H + 50) shoots.splice(i, 1);
+      }
+    }
+    raf = requestAnimationFrame(draw);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', resize); };
+  }, []);
+  return React.createElement('canvas', {
+    ref: canvasRef,
+    style: { position:'fixed', inset:0, width:'100%', height:'100%', pointerEvents:'none', zIndex:0 }
+  });
+}
+
+/* ─── BarChart ───────────────────────────────────────────────────────────── */
+function BarChart({ data, todayKey }) {
+  const W=340, H=140, PL=36, PB=22, PT=12, PR=6;
+  const iW = W-PL-PR, iH = H-PB-PT;
+  const maxV = Math.max(...data.map(d => d.v), 0.5);
+  const bW = Math.max(Math.floor(iW / data.length * 0.52), 4);
+  const gap = iW / data.length;
+  return (
+    <svg viewBox={"0 0 " + W + " " + H} style={{width:'100%', height:H, display:'block'}}>
+      {[0, Math.ceil(maxV/2), Math.ceil(maxV)].map(v => {
+        const y = PT + iH - (v / maxV) * iH;
+        return (
+          <g key={v}>
+            <line x1={PL} y1={y} x2={W-PR} y2={y} stroke="rgba(255,255,255,0.05)" strokeWidth="1"/>
+            {v > 0 && <text x={PL-4} y={y+4} textAnchor="end" fill={MUTED} fontSize="8" fontFamily="Space Mono,monospace">{fmtKg(v)}</text>}
+          </g>
+        );
+      })}
+      {data.map((d, i) => {
+        const bH = Math.max((d.v / maxV) * iH, d.v > 0 ? 3 : 0);
+        const x = PL + gap * i + gap / 2 - bW / 2;
+        const y = PT + iH - bH;
+        const col = d.key === todayKey ? ACCENT : 'rgba(125,255,107,0.5)';
+        return (
+          <g key={i}>
+            <rect x={x} y={y} width={bW} height={bH} rx="4" fill={col} fillOpacity="0.88"/>
+            <text x={PL + gap * i + gap / 2} y={H-5} textAnchor="middle" fill={MUTED} fontSize="9" fontFamily="Space Mono,monospace">{d.name}</text>
+            {d.v > 0 && <text x={PL + gap * i + gap / 2} y={y-3} textAnchor="middle" fill={TEXT} fontSize="7" fontFamily="Space Mono,monospace">{fmtKg(d.v)}</text>}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/* ─── LineChart ──────────────────────────────────────────────────────────── */
+function LineChart({ data, color, unitLabel }) {
+  if (!data || data.length < 2) return null;
+  const W=340, H=110, PL=36, PB=18, PT=10, PR=6;
+  const iW = W-PL-PR, iH = H-PB-PT;
+  const maxV = Math.max(...data.map(d => d.v), 0.5);
+  const pts = data.map((d, i) => [PL + (i / (data.length - 1)) * iW, PT + iH - (d.v / maxV) * iH]);
+  const path = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p[0] + ',' + p[1]).join(' ');
+  const area = 'M' + pts[0][0] + ',' + (PT + iH) + ' ' + pts.map(p => 'L' + p[0] + ',' + p[1]).join(' ') + ' L' + pts[pts.length-1][0] + ',' + (PT+iH) + ' Z';
+  const step = Math.ceil(data.length / 6);
+  const id = 'lg' + (color || 'x').replace('#','');
+  const fmt = unitLabel === 'kg' ? v => v+'kg' : fmtKg;
+  return (
+    <svg viewBox={"0 0 " + W + " " + H} style={{width:'100%', height:H, display:'block'}}>
+      <defs>
+        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.22"/>
+          <stop offset="100%" stopColor={color} stopOpacity="0"/>
+        </linearGradient>
+      </defs>
+      {[0, Math.ceil(maxV/2), Math.ceil(maxV)].map(v => {
+        const y = PT + iH - (v / maxV) * iH;
+        return (
+          <g key={v}>
+            <line x1={PL} y1={y} x2={W-PR} y2={y} stroke="rgba(255,255,255,0.05)" strokeWidth="1"/>
+            {v > 0 && <text x={PL-4} y={y+4} textAnchor="end" fill={MUTED} fontSize="8" fontFamily="Space Mono,monospace">{fmt(v)}</text>}
+          </g>
+        );
+      })}
+      <path d={area} fill={"url(#" + id + ")"}/>
+      <path d={path} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      {data.map((d, i) => {
+        if (i % step !== 0 && i !== data.length - 1) return null;
+        return <text key={i} x={pts[i][0]} y={H-2} textAnchor="middle" fill={MUTED} fontSize="7" fontFamily="Space Mono,monospace">{d.key.slice(5)}</text>;
+      })}
+      {/* Last point dot */}
+      <circle cx={pts[pts.length-1][0]} cy={pts[pts.length-1][1]} r="4" fill={color} opacity="0.9"/>
+      <circle cx={pts[pts.length-1][0]} cy={pts[pts.length-1][1]} r="6" fill={color} opacity="0.2"/>
+    </svg>
+  );
+}
+
+/* ─── DonutChart ─────────────────────────────────────────────────────────── */
+function DonutChart({ data }) {
+  if (!data || !data.length) return null;
+  const CX=100, CY=88, R=70, IR=44;
+  const total = data.reduce((a, d) => a + d.v, 0);
+  let angle = -Math.PI / 2;
+  const slices = data.map((d, i) => {
+    const sw = (d.v / total) * 2 * Math.PI;
+    const a1 = angle, a2 = angle + sw; angle = a2;
+    const x1=CX+R*Math.cos(a1), y1=CY+R*Math.sin(a1);
+    const x2=CX+R*Math.cos(a2), y2=CY+R*Math.sin(a2);
+    const ix1=CX+IR*Math.cos(a2), iy1=CY+IR*Math.sin(a2);
+    const ix2=CX+IR*Math.cos(a1), iy2=CY+IR*Math.sin(a1);
+    const lg = sw > Math.PI ? 1 : 0;
+    const col = MUSCLE_COLORS[d.name] || BLUE;
+    return (
+      <path key={i}
+        d={"M"+x1+","+y1+" A"+R+","+R+" 0 "+lg+" 1 "+x2+","+y2+" L"+ix1+","+iy1+" A"+IR+","+IR+" 0 "+lg+" 0 "+ix2+","+iy2+" Z"}
+        fill={col} fillOpacity="0.85" stroke={BG} strokeWidth="2"/>
+    );
+  });
+  return (
+    <svg viewBox="0 0 210 175" style={{width:'100%', maxWidth:210, display:'block', margin:'0 auto'}}>
+      {slices}
+      <text x={CX} y={CY-4} textAnchor="middle" fill={TEXT} fontSize="18" fontWeight="700" fontFamily="Space Mono,monospace">{data.length}</text>
+      <text x={CX} y={CY+13} textAnchor="middle" fill={MUTED} fontSize="10" fontFamily="DM Sans,sans-serif">groupes</text>
+    </svg>
+  );
+}
+
+/* ─── DayBarChart (for habit distribution) ───────────────────────────────── */
+function DayBarChart({ data, favIdx }) {
+  const maxV = Math.max(...data.map(d => d.v), 1);
+  return (
+    <div style={{display:'flex', alignItems:'flex-end', gap:6, height:70, paddingBottom:4}}>
+      {data.map((d, i) => {
+        const pct = d.v / maxV;
+        const isFav = i === favIdx;
+        const col = isFav ? ACCENT : 'rgba(255,159,67,0.3)';
+        return (
+          <div key={i} style={{flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:4}}>
+            <div style={{fontSize:9, color:d.v>0?TEXT:FAINT, fontFamily:'Space Mono,monospace', lineHeight:1}}>{d.v||''}</div>
+            <div style={{width:'100%', borderRadius:4, background:col, transition:'height .4s ease', height: Math.max(pct*44, d.v>0?4:2)+'px', position:'relative', overflow:'hidden'}}>
+              {isFav && <div style={{position:'absolute',inset:0,background:'linear-gradient(to top, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 100%)'}}/>}
+            </div>
+            <div style={{fontSize:9, color:isFav?ACCENT:MUTED, fontWeight:isFav?700:400, fontFamily:'Space Mono,monospace'}}>{d.day}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ─── Chip ───────────────────────────────────────────────────────────────── */
+function Chip({ label, color, active, onClick }) {
+  return (
+    <button onClick={onClick} style={{
+      padding:'5px 11px', borderRadius:20,
+      border:'1px solid ' + (active ? color : 'rgba(255,255,255,0.08)'),
+      background: active ? color + '22' : 'transparent',
+      color: active ? color : MUTED,
+      fontSize:11, fontWeight:600, cursor:'pointer',
+      fontFamily:"'DM Sans',sans-serif", transition:'all .15s'
+    }}>{label}</button>
+  );
+}
+
+/* ─── KpiCard ────────────────────────────────────────────────────────────── */
+function KpiCard({ value, label, color, sub }) {
+  return (
+    <div style={{background:BGCARD, border:'1px solid '+BORDER, borderRadius:13, padding:'13px 8px', textAlign:'center'}}>
+      <div style={{fontSize:20, fontWeight:700, fontFamily:'Space Mono,monospace', color:color||TEXT, marginBottom:3, lineHeight:1}}>{value}</div>
+      <div style={{fontSize:9, color:MUTED, textTransform:'uppercase', letterSpacing:'.06em'}}>{label}</div>
+      {sub && <div style={{fontSize:9, color:color||MUTED, marginTop:3, fontFamily:'Space Mono,monospace'}}>{sub}</div>}
+    </div>
+  );
+}
+
+/* ─── SectionTitle ───────────────────────────────────────────────────────── */
+function ST({ children }) {
+  return <div style={{fontSize:11, fontWeight:700, color:MUTED, marginBottom:12, textTransform:'uppercase', letterSpacing:'.07em'}}>{children}</div>;
+}
+
+/* ─── Card ───────────────────────────────────────────────────────────────── */
+function Card({ children, style, className }) {
+  return (
+    <div className={className} style={{background:BGCARD, border:'1px solid '+BORDER, borderRadius:16, padding:'16px 14px', marginBottom:14, ...style}}>
+      {children}
+    </div>
+  );
+}
+
+const INP = { flex:1, padding:'9px 11px', borderRadius:8, border:'1px solid '+BORDER2, background:'rgba(255,255,255,0.04)', color:TEXT, fontSize:14, fontFamily:"'DM Sans',sans-serif", outline:'none', width:'100%' };
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WEEK VIEW
+═══════════════════════════════════════════════════════════════════════════ */
+function WeekView({ sessions, setSessions, setView, setLogDate, setLogFromSession }) {
+  const [week, setWeek] = useState(() => startOfWeek(today()));
+  const todayKey = toKey(today());
+  const days = useMemo(() => Array.from({length:7}, (_, i) => addDays(week, i)), [week]);
+  const weekData = days.map(d => {
+    const k = toKey(d), s = sessions[k] || null;
+    return { date:d, key:k, session:s, volume: s ? calcVol(s.exercises) : 0 };
+  });
+  const weekVol = weekData.reduce((a, d) => a + d.volume, 0);
+  const weekCount = weekData.filter(d => d.session).length;
+
+  function openLogger(dateKey, existing) {
+    setLogDate(dateKey);
+    setLogFromSession(existing || null);
+    setView('log');
+  }
+  function deleteSession(key) {
+    setSessions(prev => { const n = {...prev}; delete n[key]; return n; });
+  }
+
+  return (
+    <main style={{maxWidth:900, margin:'0 auto', padding:'18px 14px', position:'relative', zIndex:1}}>
+      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14}}>
+        <button onClick={() => setWeek(addDays(week, -7))} style={{width:40,height:40,borderRadius:10,border:'1px solid '+BORDER2,background:'rgba(255,255,255,0.04)',color:TEXT,cursor:'pointer',fontSize:18,display:'flex',alignItems:'center',justifyContent:'center'}}>←</button>
+        <div style={{textAlign:'center'}}>
+          <div style={{fontSize:14, fontWeight:700, color:TEXT}}>{fmtRange(week)} – {fmtRange(addDays(week,6))} <span style={{color:ACCENT,fontFamily:'Space Mono,monospace',fontWeight:700,fontSize:12}}>{week.getFullYear()}</span></div>
+          <div style={{fontSize:11,color:MUTED,marginTop:2,fontFamily:'Space Mono,monospace'}}>{weekCount} séance{weekCount>1?'s':''} · {fmtKg(weekVol)} volume</div>
+        </div>
+        <button onClick={() => setWeek(addDays(week, 7))} style={{width:40,height:40,borderRadius:10,border:'1px solid '+BORDER2,background:'rgba(255,255,255,0.04)',color:TEXT,cursor:'pointer',fontSize:18,display:'flex',alignItems:'center',justifyContent:'center'}}>→</button>
+      </div>
+      <Card className="fade-up">
+        <BarChart data={weekData.map(d => ({ name:fmtShort(d.date).slice(0,3), v:d.volume, key:d.key }))} todayKey={todayKey}/>
+      </Card>
+      <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(250px,1fr))', gap:12}}>
+        {weekData.map((d, idx) => {
+          const isToday = d.key === todayKey;
+          const s = d.session;
+          const exoList = s ? Object.keys(s.exercises || {}) : [];
+          return (
+            <div key={d.key} className="fade-up" style={{
+              background:BGCARD,
+              border:'1px solid ' + (isToday ? ACCENT+'55' : s ? ACCENT+'22' : BORDER),
+              borderRadius:16, padding:14, animationDelay:(idx*0.04)+'s'
+            }}>
+              {isToday && <span style={{float:'right', background:ACCENT+'22', color:ACCENT, border:'1px solid '+ACCENT+'44', borderRadius:6, padding:'2px 8px', fontSize:10, fontWeight:700}}>Auj.</span>}
+              <div style={{fontSize:11, color:MUTED, textTransform:'capitalize', marginBottom:2}}>{fmtShort(d.date)}</div>
+              {s ? (
+                <div>
+                  <div style={{fontSize:26, fontWeight:700, color:TEXT, fontFamily:'Space Mono,monospace', lineHeight:1, marginBottom:6}}>{fmtKg(d.volume)}</div>
+                  <div style={{height:3, background:'rgba(255,255,255,0.05)', borderRadius:2, marginBottom:8, overflow:'hidden'}}>
+                    <div style={{height:'100%', background:ACCENT, borderRadius:2, width:Math.min(100,(d.volume/5000)*100)+'%'}}/>
+                  </div>
+                  {s.muscles && s.muscles.length > 0 && (
+                    <div style={{display:'flex', gap:5, flexWrap:'wrap', marginBottom:8}}>
+                      {s.muscles.map(m => (
+                        <span key={m} style={{fontSize:10, padding:'2px 8px', borderRadius:20, background:(MUSCLE_COLORS[m]||BLUE)+'22', color:MUSCLE_COLORS[m]||BLUE, border:'1px solid '+(MUSCLE_COLORS[m]||BLUE)+'44', fontWeight:600}}>{m}</span>
+                      ))}
+                    </div>
+                  )}
+                  {exoList.length > 0 && (
+                    <div style={{display:'flex', flexDirection:'column', gap:4, maxHeight:96, overflowY:'auto', marginBottom:8}}>
+                      {exoList.map(exo => {
+                        const groups = s.exercises[exo];
+                        const fmt = groups.map(g => {
+                          const nb = g.sets || 1;
+                          if (g.weight > 0) return nb+'×'+g.reps+'×'+g.weight+'kg';
+                          return nb+'×'+g.reps+' BW';
+                        }).join('  ');
+                        return (
+                          <div key={exo} style={{display:'flex', alignItems:'center', gap:6, fontSize:12}}>
+                            <span style={{color:ACCENT, fontSize:9}}>▸</span>
+                            <span style={{flex:1, color:TEXT, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{exo}</span>
+                            <span style={{color:MUTED, fontFamily:'Space Mono,monospace', fontSize:10, flexShrink:0}}>{fmt}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                  {s.duration > 0 && <div style={{fontSize:11, color:MUTED, marginBottom:6}}>⏱ {fmtMin(s.duration)}</div>}
+                  {s.note && <div style={{fontSize:11, color:MUTED, fontStyle:'italic', marginBottom:8}}>"{s.note}"</div>}
+                  <div style={{display:'flex', gap:6}}>
+                    <button onClick={() => openLogger(d.key, s)} style={{flex:1, padding:'7px', borderRadius:9, border:'1px solid '+ACCENT+'44', background:ACCENT+'18', color:ACCENT, fontSize:12, fontWeight:600, cursor:'pointer'}}>✏️ Modifier</button>
+                    <button onClick={() => deleteSession(d.key)} style={{padding:'7px 10px', borderRadius:9, border:'1px solid rgba(255,107,107,0.3)', background:'rgba(255,107,107,0.08)', color:RED, fontSize:12, cursor:'pointer'}}>🗑</button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div style={{fontSize:22, color:FAINT, marginBottom:8}}>—</div>
+                  <div style={{fontSize:12, color:FAINT, marginBottom:12}}>Repos</div>
+                  <button onClick={() => openLogger(d.key, null)} style={{width:'100%', padding:'8px', borderRadius:9, border:'1px solid '+ACCENT+'44', background:ACCENT+'18', color:ACCENT, fontSize:12, fontWeight:600, cursor:'pointer'}}>+ Ajouter une séance</button>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </main>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LOGGER VIEW
+═══════════════════════════════════════════════════════════════════════════ */
+function LoggerView({ sessions, setSessions, myExos, logDate, setLogDate, fromSession }) {
+  const allExoNames = useMemo(() => myExos.map(e => e.name).sort((a, b) => a.localeCompare(b, 'fr')), [myExos]);
+  const initRows = () => {
+    if (!fromSession) return [{ exo:'', groups:[{ sets:'', reps:'', weight:'' }] }];
+    const entries = Object.entries(fromSession.exercises || {});
+    if (!entries.length) return [{ exo:'', groups:[{ sets:'', reps:'', weight:'' }] }];
+    return entries.map(([exo, groups]) => ({
+      exo, groups: groups.map(g => ({ sets:String(g.sets||''), reps:String(g.reps||''), weight:String(g.weight||'') }))
+    }));
+  };
+  const [rows, setRows]         = useState(initRows);
+  const [duration, setDuration] = useState(fromSession ? String(fromSession.duration||'') : '');
+  const [muscles, setMuscles]   = useState(fromSession ? (fromSession.muscles||[]) : []);
+  const [note, setNote]         = useState(fromSession ? (fromSession.note||'') : '');
+  const [done, setDone]         = useState(false);
+  const [focusRow, setFocusRow] = useState(null);
+
+  useEffect(() => {
+    setRows(initRows()); setDuration(fromSession ? String(fromSession.duration||'') : '');
+    setMuscles(fromSession ? (fromSession.muscles||[]) : []); setNote(fromSession ? (fromSession.note||'') : ''); setDone(false);
+  }, [logDate, fromSession]);
+
+  const volume = useMemo(() => rows.reduce((acc, r) => acc + r.groups.reduce((a, g) =>
+    a + (parseInt(g.sets)||1)*(parseInt(g.reps)||0)*(parseFloat(g.weight)||0), 0), 0), [rows]);
+
+  function toggleMuscle(m) { setMuscles(p => p.includes(m) ? p.filter(x => x !== m) : [...p, m]); setDone(false); }
+  function updRowExo(i, val) { setRows(p => p.map((r,j) => j===i ? {...r, exo:val} : r)); setDone(false); }
+  function updGroup(ri, gi, field, val) {
+    setRows(p => p.map((r,j) => j!==ri ? r : { ...r, groups: r.groups.map((g,k) => k!==gi ? g : {...g, [field]:val}) }));
+    setDone(false);
+  }
+  function addGroup(ri) { setRows(p => p.map((r,j) => j!==ri ? r : {...r, groups:[...r.groups,{sets:'',reps:'',weight:''}]})); }
+  function delGroup(ri, gi) { setRows(p => p.map((r,j) => j!==ri ? r : {...r, groups:r.groups.length===1?r.groups:r.groups.filter((_,k)=>k!==gi)})); }
+  function addRow() { setRows(p => [...p, {exo:'', groups:[{sets:'',reps:'',weight:''}]}]); }
+  function delRow(i) { setRows(p => p.length===1 ? p : p.filter((_,j) => j!==i)); }
+  function reset() { setRows([{exo:'',groups:[{sets:'',reps:'',weight:''}]}]); setDuration(''); setMuscles([]); setNote(''); setDone(false); }
+  function publish() {
+    const exercises = {};
+    rows.forEach(r => {
+      if (!r.exo.trim()) return;
+      const validGroups = r.groups.filter(g => g.reps || g.weight);
+      if (!validGroups.length) return;
+      exercises[r.exo.trim()] = validGroups.map(g => ({ sets:parseInt(g.sets)||1, reps:parseInt(g.reps)||0, weight:parseFloat(g.weight)||0 }));
+    });
+    setSessions(prev => ({...prev, [logDate]:{ duration:parseInt(duration)||0, muscles, exercises, note:note.trim() }}));
+    setDone(true);
+  }
+  const hasData = rows.some(r => r.exo) || duration;
+
+  return (
+    <main style={{maxWidth:680, margin:'0 auto', padding:'18px 14px', position:'relative', zIndex:1}}>
+      <Card className="fade-up">
+        <ST>💪 Enregistrer une séance</ST>
+        <div style={{display:'flex', gap:10, marginBottom:14, flexWrap:'wrap'}}>
+          <div style={{flex:1, minWidth:140}}>
+            <label style={{fontSize:11,color:MUTED,fontWeight:600,display:'block',marginBottom:5,textTransform:'uppercase',letterSpacing:'.05em'}}>Date</label>
+            <input type="date" style={{...INP, fontFamily:'Space Mono,monospace'}} value={logDate} max={toKey(today())} onChange={e => { setLogDate(e.target.value); setDone(false); }}/>
+          </div>
+          <div style={{width:120}}>
+            <label style={{fontSize:11,color:MUTED,fontWeight:600,display:'block',marginBottom:5,textTransform:'uppercase',letterSpacing:'.05em'}}>Durée (min)</label>
+            <input type="number" min="0" max="300" placeholder="60" style={{...INP,fontFamily:'Space Mono,monospace'}} value={duration} onChange={e => { setDuration(e.target.value); setDone(false); }}/>
+          </div>
+        </div>
+        <div style={{marginBottom:14}}>
+          <label style={{fontSize:11,color:MUTED,fontWeight:600,display:'block',marginBottom:8,textTransform:'uppercase',letterSpacing:'.05em'}}>Groupes musculaires</label>
+          <div style={{display:'flex', gap:6, flexWrap:'wrap'}}>
+            {MUSCLE_GROUPS.map(m => <Chip key={m} label={m} color={MUSCLE_COLORS[m]} active={muscles.includes(m)} onClick={() => toggleMuscle(m)}/>)}
+          </div>
+        </div>
+        <div style={{marginBottom:16}}>
+          <label style={{fontSize:11,color:MUTED,fontWeight:600,display:'block',marginBottom:5,textTransform:'uppercase',letterSpacing:'.05em'}}>Note</label>
+          <input style={INP} placeholder="ex : Push day, bonne séance…" value={note} onChange={e => { setNote(e.target.value); setDone(false); }}/>
+        </div>
+        <div style={{borderTop:'1px solid '+BORDER, marginBottom:16}}/>
+        <ST>Exercices</ST>
+        <div style={{display:'flex', flexDirection:'column', gap:10, marginBottom:12}}>
+          {rows.map((row, ri) => (
+            <div key={ri} style={{background:'rgba(255,255,255,0.025)', border:'1px solid '+BORDER, borderRadius:13, padding:12}}>
+              <div style={{position:'relative', marginBottom:10}}>
+                <div style={{display:'flex', gap:8, alignItems:'center'}}>
+                  <span style={{fontSize:12,color:ACCENT,fontFamily:'Space Mono,monospace',flexShrink:0,width:22,textAlign:'right'}}>{ri+1}.</span>
+                  <input style={{...INP, fontSize:13}} placeholder="Nom de l'exercice…" value={row.exo}
+                    onChange={e => { updRowExo(ri, e.target.value); setFocusRow(ri); }}
+                    onFocus={() => setFocusRow(ri)} onBlur={() => setTimeout(() => setFocusRow(null), 160)}/>
+                  <button onClick={() => delRow(ri)} style={{background:'none',border:'none',color:FAINT,cursor:'pointer',fontSize:16,flexShrink:0}}>×</button>
+                </div>
+                {focusRow === ri && row.exo && (() => {
+                  const q = row.exo.toLowerCase();
+                  const matches = allExoNames.filter(a => a.toLowerCase().includes(q)).slice(0, 6);
+                  if (!matches.length) return null;
+                  return (
+                    <div style={{position:'absolute',top:'100%',left:30,right:36,background:BGMODAL,border:'1px solid '+BORDER2,borderRadius:9,zIndex:50,marginTop:2,overflow:'hidden',boxShadow:'0 8px 24px rgba(0,0,0,0.6)'}}>
+                      {matches.map(a => (
+                        <div key={a} onMouseDown={() => { updRowExo(ri, a); setFocusRow(null); }}
+                          style={{padding:'9px 12px',fontSize:12,color:TEXT,cursor:'pointer',borderBottom:'1px solid rgba(255,255,255,0.04)'}}
+                          onMouseEnter={e => e.currentTarget.style.background='rgba(125,255,107,0.08)'}
+                          onMouseLeave={e => e.currentTarget.style.background='transparent'}>{a}</div>
+                      ))}
+                    </div>
+                  );
+                })()}
+              </div>
+              <div style={{paddingLeft:30}}>
+                <div style={{fontSize:9,color:MUTED,textTransform:'uppercase',letterSpacing:'.06em',marginBottom:8}}>Séries × Reps × Poids (kg)</div>
+                {row.groups.map((g, gi) => (
+                  <div key={gi} style={{display:'flex',alignItems:'center',gap:6,marginBottom:7}}>
+                    <span style={{fontSize:10,color:MUTED,fontFamily:'Space Mono,monospace',width:16,flexShrink:0,textAlign:'right'}}>{gi+1}</span>
+                    <input type="number" min="1" max="20" placeholder="3" style={{...INP,width:48,flex:'none',textAlign:'center',padding:'8px 4px',fontSize:14,fontFamily:'Space Mono,monospace'}} value={g.sets} onChange={e=>updGroup(ri,gi,'sets',e.target.value)}/>
+                    <span style={{color:ACCENT,fontWeight:700,fontSize:16,flexShrink:0}}>×</span>
+                    <input type="number" min="0" max="100" placeholder="5" style={{...INP,width:48,flex:'none',textAlign:'center',padding:'8px 4px',fontSize:14,fontFamily:'Space Mono,monospace'}} value={g.reps} onChange={e=>updGroup(ri,gi,'reps',e.target.value)}/>
+                    <span style={{color:ACCENT,fontWeight:700,fontSize:16,flexShrink:0}}>×</span>
+                    <input type="number" min="0" step="0.5" placeholder="50" style={{...INP,flex:1,textAlign:'center',padding:'8px 4px',fontSize:14,fontFamily:'Space Mono,monospace'}} value={g.weight} onChange={e=>updGroup(ri,gi,'weight',e.target.value)}/>
+                    <span style={{fontSize:11,color:MUTED,flexShrink:0}}>kg</span>
+                    <button onClick={()=>delGroup(ri,gi)} style={{background:'none',border:'none',color:FAINT,cursor:'pointer',fontSize:14,lineHeight:1,flexShrink:0}}>×</button>
+                  </div>
+                ))}
+                <button onClick={()=>addGroup(ri)} style={{width:'100%',padding:'6px',borderRadius:8,border:'1px solid '+ACCENT+'33',background:ACCENT+'08',color:ACCENT,fontSize:12,fontWeight:600,cursor:'pointer',marginTop:4}}>+ Ligne</button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <button onClick={addRow} style={{width:'100%',padding:'10px',borderRadius:10,border:'1px solid '+BORDER2,background:'rgba(255,255,255,0.03)',color:MUTED,fontSize:13,cursor:'pointer',marginBottom:20}}>+ Ajouter un exercice</button>
+        <div style={{borderTop:'1px solid '+BORDER, marginBottom:16}}/>
+        {volume > 0 && (
+          <div style={{background:ACCENT+'0a',border:'1px solid '+ACCENT+'33',borderRadius:13,padding:'14px 16px',marginBottom:16,display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,textAlign:'center'}}>
+            <div><div style={{fontSize:20,fontWeight:700,fontFamily:'Space Mono,monospace',color:ACCENT}}>{fmtKg(volume)}</div><div style={{fontSize:9,color:MUTED,textTransform:'uppercase',letterSpacing:'.06em',marginTop:2}}>Volume</div></div>
+            <div><div style={{fontSize:20,fontWeight:700,fontFamily:'Space Mono,monospace',color:TEXT}}>{rows.reduce((a,r)=>a+r.groups.filter(g=>g.reps||g.weight).length,0)}</div><div style={{fontSize:9,color:MUTED,textTransform:'uppercase',letterSpacing:'.06em',marginTop:2}}>Lignes</div></div>
+            <div><div style={{fontSize:20,fontWeight:700,fontFamily:'Space Mono,monospace',color:TEXT}}>{rows.filter(r=>r.exo).length}</div><div style={{fontSize:9,color:MUTED,textTransform:'uppercase',letterSpacing:'.06em',marginTop:2}}>Exercices</div></div>
+          </div>
+        )}
+        <button onClick={publish} disabled={done || !hasData} style={{
+          width:'100%',padding:'14px',borderRadius:12,border:'none',
+          background: done ? ACCENT+'22' : hasData ? ACCENT : 'rgba(255,255,255,0.05)',
+          color: done ? ACCENT : hasData ? '#0a0d0a' : FAINT,
+          fontFamily:"'Space Mono',monospace",fontWeight:700,fontSize:15,
+          cursor: done || !hasData ? 'not-allowed' : 'pointer', letterSpacing:'.04em',transition:'all .2s'
+        }}>{done ? '✅ ENREGISTRÉ !' : '💾 ENREGISTRER LA SÉANCE'}</button>
+        {done && <div style={{textAlign:'center',fontSize:12,color:ACCENT,marginTop:10,fontFamily:'Space Mono,monospace'}}>{'Séance du ' + fmtFull(new Date(logDate+'T00:00:00')) + ' enregistrée'}</div>}
+        <button onClick={reset} style={{width:'100%',padding:'10px',borderRadius:10,border:'1px solid rgba(255,107,107,0.25)',background:'rgba(255,107,107,0.07)',color:RED,fontSize:13,cursor:'pointer',marginTop:10}}>🗑 Tout effacer</button>
+      </Card>
+    </main>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STATS VIEW  ✦ VERSION AMÉLIORÉE
+═══════════════════════════════════════════════════════════════════════════ */
+function StatsView({ sessions, myExos }) {
+  const [range, setRange]       = useState(null);
+  const [picker, setPicker]     = useState(false);
+  const [rFrom, setRFrom]       = useState('');
+  const [rTo, setRTo]           = useState('');
+  const [focusExo, setFocusExo] = useState(null);
+  const [exoPicker, setExoPicker] = useState(false);
+  const [exoSearch, setExoSearch] = useState('');
+  const [fadeKey, setFadeKey]   = useState(0);
+
+  const allExoNames = useMemo(() => myExos.map(e => e.name).sort((a,b) => a.localeCompare(b,'fr')), [myExos]);
+
+  /* ── Calcul des stats globales ── */
+  const stats = useMemo(() => {
+    const entries = Object.entries(sessions);
+    const filtered = range ? entries.filter(([k]) => k >= range.from && k <= range.to) : entries;
+    const valid = filtered.filter(([,s]) => s && s.exercises);
+    const totalSessions = valid.length;
+    const totalVolume = valid.reduce((a, [,s]) => a + calcVol(s.exercises), 0);
+    const totalDuration = valid.reduce((a, [,s]) => a + (s.duration||0), 0);
+    const avgDuration = totalSessions ? Math.round(totalDuration / totalSessions) : 0;
+    const dailyVol = valid.map(([k,s]) => ({key:k, v:calcVol(s.exercises)})).sort((a,b) => a.key.localeCompare(b.key));
+
+    // Weekly frequency
+    const wmap = {};
+    valid.forEach(([k]) => {
+      const d = new Date(k+'T00:00:00');
+      const mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay()+6)%7));
+      const wk = toKey(mon); wmap[wk] = (wmap[wk]||0)+1;
+    });
+    const weeklyFreq = Object.entries(wmap).sort((a,b)=>a[0].localeCompare(b[0])).map(([k,v])=>({key:k,v}));
+    const avgFreq = weeklyFreq.length ? parseFloat((weeklyFreq.reduce((a,d)=>a+d.v,0)/weeklyFreq.length).toFixed(1)) : 0;
+
+    // Muscles
+    const mmap = {};
+    valid.forEach(([,s]) => (s.muscles||[]).forEach(m => { mmap[m] = (mmap[m]||0)+1; }));
+    const muscleData = Object.entries(mmap).sort((a,b)=>b[1]-a[1]).map(([name,v])=>({name,v}));
+    const topMuscle = muscleData[0] || null;
+
+    // PRs
+    const prmap = {};
+    valid.forEach(([k,s]) => {
+      Object.entries(s.exercises||{}).forEach(([exo,sets]) => {
+        const maxW = Math.max(...sets.map(st=>st.weight||0));
+        if (!prmap[exo] || maxW > prmap[exo].weight) prmap[exo] = {weight:maxW, date:k};
+      });
+    });
+    const prs = Object.entries(prmap).sort((a,b)=>b[1].weight-a[1].weight);
+
+    // Total reps & sets
+    let totalReps = 0, totalSets = 0;
+    valid.forEach(([,s]) => {
+      Object.values(s.exercises||{}).forEach(sets => {
+        sets.forEach(st => {
+          const nb = st.sets || 1;
+          totalSets += nb;
+          totalReps += nb * (st.reps || 0);
+        });
+      });
+    });
+
+    // Streak calc
+    const allKeys = valid.map(([k])=>k).sort().reverse();
+    let currentStreak = 0, tempStreak = 1, bestStreak = 0;
+    if (allKeys.length) {
+      const todayK = toKey(today()), yestK = toKey(addDays(today(),-1));
+      let ref = (allKeys[0] === todayK || allKeys[0] === yestK) ? new Date(allKeys[0]+'T00:00:00') : null;
+      if (ref) {
+        currentStreak = 1;
+        for (let i = 1; i < allKeys.length; i++) {
+          const prev = new Date(allKeys[i]+'T00:00:00');
+          const diff = (ref - prev) / 86400000;
+          if (diff === 1) { currentStreak++; ref = prev; } else break;
+        }
+      }
+      // Best streak
+      const asc = [...allKeys].sort();
+      tempStreak = 1;
+      for (let i = 1; i < asc.length; i++) {
+        const d1 = new Date(asc[i-1]+'T00:00:00'), d2 = new Date(asc[i]+'T00:00:00');
+        if ((d2-d1)/86400000 === 1) { tempStreak++; bestStreak = Math.max(bestStreak, tempStreak); }
+        else tempStreak = 1;
+      }
+      bestStreak = Math.max(bestStreak, currentStreak);
+    }
+
+    // Day of week distribution (0=Mon…6=Sun)
+    const dayMap = {};
+    valid.forEach(([k]) => {
+      const d = new Date(k+'T00:00:00');
+      const idx = (d.getDay()+6)%7;
+      dayMap[idx] = (dayMap[idx]||0)+1;
+    });
+    const dayDist = Array.from({length:7}, (_,i) => ({day:DAY_NAMES_SHORT[i], full:DAY_NAMES_FULL[i], v:dayMap[i]||0}));
+    const favDayIdx = dayDist.reduce((best,d,i) => d.v > dayDist[best].v ? i : best, 0);
+
+    // Best week
+    const weekVols = {};
+    valid.forEach(([k,s]) => {
+      const d = new Date(k+'T00:00:00');
+      const mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay()+6)%7));
+      const wk = toKey(mon);
+      weekVols[wk] = (weekVols[wk]||0) + calcVol(s.exercises);
+    });
+    const bestWeekEntry = Object.entries(weekVols).sort((a,b)=>b[1]-a[1])[0];
+    const bestWeek = bestWeekEntry ? {key:bestWeekEntry[0], vol:bestWeekEntry[1]} : null;
+
+    // Exercise progression ranking (need ≥2 sessions with weight)
+    const exoMap = {};
+    valid.forEach(([k,s]) => {
+      Object.entries(s.exercises||{}).forEach(([exo,sets]) => {
+        const maxW = Math.max(...sets.map(st=>st.weight||0));
+        if (maxW > 0) {
+          if (!exoMap[exo]) exoMap[exo] = [];
+          exoMap[exo].push({key:k, maxW});
+        }
+      });
+    });
+    const progressList = Object.entries(exoMap)
+      .filter(([,d]) => d.length >= 2)
+      .map(([exo,d]) => {
+        const sorted = d.sort((a,b)=>a.key.localeCompare(b.key));
+        const first = sorted[0].maxW, last = sorted[sorted.length-1].maxW;
+        const pct = first > 0 ? Math.round(((last-first)/first)*100) : 0;
+        return {exo, first, last, pct, sessions:d.length};
+      })
+      .filter(d => d.pct !== 0)
+      .sort((a,b)=>b.pct-a.pct)
+      .slice(0,8);
+
+    return {
+      totalSessions, totalVolume, avgDuration, dailyVol, weeklyFreq, avgFreq,
+      muscleData, topMuscle, prs,
+      totalReps, totalSets,
+      currentStreak, bestStreak,
+      dayDist, favDayIdx,
+      bestWeek, progressList
+    };
+  }, [sessions, range]);
+
+  /* ── Calcul des stats par exercice ── */
+  const exoStats = useMemo(() => {
+    if (!focusExo) return null;
+    const days = [];
+    Object.entries(sessions).forEach(([k,s]) => {
+      const sets = (s.exercises||{})[focusExo];
+      if (!sets || !sets.length) return;
+      const vol = sets.reduce((a,st)=>a+(st.sets||1)*(st.reps||0)*(st.weight||0),0);
+      const maxW = Math.max(...sets.map(st=>st.weight||0));
+      const totalReps = sets.reduce((a,st)=>a+(st.sets||1)*(st.reps||0),0);
+      const totalSets = sets.reduce((a,st)=>a+(st.sets||1),0);
+      days.push({key:k, vol, maxW, totalReps, totalSets});
+    });
+    if (!days.length) return null;
+
+    const chronological = [...days].sort((a,b)=>a.key.localeCompare(b.key));
+    const totalVol = days.reduce((a,d)=>a+d.vol,0);
+    const totalReps = days.reduce((a,d)=>a+d.totalReps,0);
+    const totalSets = days.reduce((a,d)=>a+d.totalSets,0);
+    const avgW = days.filter(d=>d.maxW>0).length
+      ? Math.round(days.filter(d=>d.maxW>0).reduce((a,d)=>a+d.maxW,0)/days.filter(d=>d.maxW>0).length)
+      : 0;
+
+    // Progression: first session weight → last session weight
+    const weightSessions = chronological.filter(d=>d.maxW>0);
+    const firstW = weightSessions.length ? weightSessions[0].maxW : 0;
+    const lastW  = weightSessions.length ? weightSessions[weightSessions.length-1].maxW : 0;
+    const progression = (firstW > 0 && weightSessions.length >= 2)
+      ? Math.round(((lastW - firstW) / firstW) * 100) : null;
+
+    const byWeight = [...days].sort((a,b)=>b.maxW-a.maxW);
+    const pr = byWeight[0];
+    const top10 = byWeight.slice(0,10);
+
+    const volChart = chronological.map(d=>({key:d.key, v:d.vol}));
+    const weightChart = chronological.filter(d=>d.maxW>0).map(d=>({key:d.key, v:d.maxW}));
+
+    // Muscle from myExos
+    const exoInfo = myExos.find(e=>e.name===focusExo);
+    const muscle = exoInfo?.category || null;
+
+    return { daysCount:days.length, totalVol, totalReps, totalSets, pr, top10, volChart, weightChart,
+             progression, firstW, lastW, avgW, muscle };
+  }, [focusExo, sessions, myExos]);
+
+  function quickRange(days) {
+    const t = today(), to = toKey(t), fr = toKey(addDays(t, -days+1));
+    setRFrom(fr); setRTo(to); setRange({from:fr,to:to}); setPicker(false);
+  }
+
+  const rangeLabel = range
+    ? range.from.slice(8)+'.'+range.from.slice(5,7)+'.'+range.from.slice(0,4)+' → '+range.to.slice(8)+'.'+range.to.slice(5,7)+'.'+range.to.slice(0,4)
+    : 'Depuis toujours';
+
+  return (
+    <main style={{maxWidth:900, margin:'0 auto', padding:'18px 14px', position:'relative', zIndex:1}}>
+
+      {/* ── Range picker header ── */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12,flexWrap:'wrap',gap:8}}>
+        <span style={{fontSize:14,fontWeight:600,color:TEXT}}>{rangeLabel}</span>
+        <div style={{display:'flex',gap:8}}>
+          {range && <button onClick={()=>setRange(null)} style={{padding:'5px 10px',borderRadius:7,border:'1px solid rgba(255,107,107,0.3)',background:'rgba(255,107,107,0.08)',color:RED,fontSize:12,cursor:'pointer',fontWeight:600}}>✕ Reset</button>}
+          <button onClick={()=>setPicker(v=>!v)} style={{padding:'6px 14px',borderRadius:8,border:'1px solid '+(picker?ACCENT+'55':BORDER2),background:picker?ACCENT+'18':'rgba(255,255,255,0.04)',color:picker?ACCENT:MUTED,fontSize:13,cursor:'pointer'}}>📅 Période</button>
+        </div>
+      </div>
+
+      {picker && (
+        <Card className="fade-in" style={{marginBottom:14}}>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:10}}>
+            {[[7,'7j'],[30,'30j'],[90,'3m'],[180,'6m'],[365,'1an']].map(([d,l]) => (
+              <button key={l} onClick={()=>quickRange(d)} style={{padding:'5px 12px',borderRadius:7,border:'1px solid '+BORDER2,background:'transparent',color:MUTED,fontSize:12,cursor:'pointer'}}>{l}</button>
+            ))}
+          </div>
+          <div style={{display:'flex',gap:8,alignItems:'flex-end',flexWrap:'wrap'}}>
+            <input type="date" style={{...INP,flex:1,minWidth:120}} value={rFrom} onChange={e=>setRFrom(e.target.value)} max={rTo||toKey(today())}/>
+            <span style={{color:ACCENT,fontWeight:700,paddingBottom:4}}>→</span>
+            <input type="date" style={{...INP,flex:1,minWidth:120}} value={rTo} onChange={e=>setRTo(e.target.value)} min={rFrom} max={toKey(today())}/>
+            <button onClick={()=>{if(rFrom&&rTo&&rFrom<=rTo){setRange({from:rFrom,to:rTo});setPicker(false);}}} style={{padding:'9px 16px',borderRadius:9,border:'1px solid '+ACCENT+'55',background:ACCENT+'18',color:ACCENT,fontSize:13,fontWeight:600,cursor:'pointer'}}>OK</button>
+          </div>
+        </Card>
+      )}
+
+      {/* ── KPIs Row 1 ── */}
+      <div className="fade-up" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:10}}>
+        <KpiCard value={stats.totalSessions} label="Séances" color={ACCENT}/>
+        <KpiCard value={fmtKg(stats.totalVolume)} label="Volume total" color={ORANGE}/>
+        <KpiCard value={stats.avgDuration ? fmtMin(stats.avgDuration) : '–'} label="Durée moy." color={BLUE}/>
+        <KpiCard value={stats.avgFreq ? stats.avgFreq+'/sem' : '–'} label="Fréquence" color={YELLOW}/>
+      </div>
+
+      {/* ── KPIs Row 2 ── */}
+      <div className="fade-up" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10,marginBottom:14,animationDelay:'.05s'}}>
+        <KpiCard
+          value={stats.topMuscle ? stats.topMuscle.name : '–'}
+          label="Muscle #1"
+          color={stats.topMuscle ? (MUSCLE_COLORS[stats.topMuscle.name]||BLUE) : MUTED}
+          sub={stats.topMuscle ? stats.topMuscle.v+' séance'+(stats.topMuscle.v>1?'s':'') : null}
+        />
+        <KpiCard value={stats.totalSets||'–'} label="Séries totales" color={GREEN}/>
+        <KpiCard value={stats.dayDist[stats.favDayIdx]?.v > 0 ? stats.dayDist[stats.favDayIdx].full.slice(0,3)+'. 📅' : '–'} label="Jour favori" color={PURPLE} sub={stats.dayDist[stats.favDayIdx]?.v > 0 ? stats.dayDist[stats.favDayIdx].v+' fois' : null}/>
+      </div>
+
+      {/* ── Volume journalier ── */}
+      {stats.dailyVol.length > 1 && (
+        <Card className="fade-up">
+          <ST>📦 Volume journalier</ST>
+          <LineChart data={stats.dailyVol} color={ACCENT}/>
+        </Card>
+      )}
+
+      {/* ══ VOIR UN EXO — section standalone ══ */}
+      <div className="fade-up" style={{marginBottom:14}}>
+        {/* Bouton principal */}
+        <button
+          onClick={()=>setExoPicker(v=>!v)}
+          style={{
+            width:'100%', padding:'14px 20px', borderRadius:14,
+            border:'1px solid '+(exoPicker||focusExo ? ACCENT+'88' : ACCENT+'44'),
+            background: exoPicker||focusExo
+              ? 'linear-gradient(135deg,'+ACCENT+'22 0%,rgba(255,204,2,0.08) 100%)'
+              : 'linear-gradient(135deg,'+ACCENT+'10 0%,rgba(255,204,2,0.03) 100%)',
+            color:ACCENT, fontSize:14, fontWeight:700, cursor:'pointer',
+            display:'flex', alignItems:'center', justifyContent:'center', gap:10,
+            fontFamily:"'Space Mono',monospace", letterSpacing:'.04em',
+            boxShadow: exoPicker||focusExo ? '0 0 24px rgba(255,159,67,0.12)' : 'none',
+            transition:'all .2s'
+          }}
+        >
+          <span style={{fontSize:18}}>🔍</span>
+          {focusExo ? '📊 '+focusExo : 'VOIR UN EXERCICE EN DÉTAIL'}
+          {focusExo && <span style={{fontSize:11,color:MUTED,fontWeight:400,marginLeft:4}}>· changer</span>}
+        </button>
+
+        {/* Reset */}
+        {focusExo && !exoPicker && (
+          <button onClick={()=>{setFocusExo(null);setExoPicker(false);}} style={{
+            width:'100%',marginTop:6,padding:'8px',borderRadius:10,
+            border:'1px solid rgba(255,107,107,0.25)',background:'rgba(255,107,107,0.06)',
+            color:RED,fontSize:12,fontWeight:600,cursor:'pointer'
+          }}>✕ Fermer l'analyse</button>
+        )}
+
+        {/* Picker dropdown */}
+        {exoPicker && (
+          <div className="fade-in" style={{
+            marginTop:8, border:'1px solid '+ACCENT+'44', borderRadius:14,
+            overflow:'hidden', boxShadow:'0 12px 40px rgba(0,0,0,0.5)',
+            background:'rgba(20,12,4,0.97)', backdropFilter:'blur(16px)'
+          }}>
+            <div style={{position:'relative', borderBottom:'1px solid '+BORDER}}>
+              <span style={{position:'absolute',left:16,top:'50%',transform:'translateY(-50%)',fontSize:16,color:ACCENT,pointerEvents:'none'}}>🔍</span>
+              <input autoFocus
+                style={{...INP,border:'none',borderRadius:0,background:'transparent',paddingLeft:44,height:50,fontSize:14,color:TEXT}}
+                placeholder="Nom de l'exercice…"
+                value={exoSearch} onChange={e=>setExoSearch(e.target.value)}/>
+            </div>
+            <div style={{maxHeight:260,overflowY:'auto'}}>
+              {allExoNames.filter(a => {
+                if (exoSearch && !a.toLowerCase().includes(exoSearch.toLowerCase())) return false;
+                return Object.values(sessions).some(s => (s.exercises||{})[a]);
+              }).length === 0 && (
+                <div style={{padding:'20px',textAlign:'center',color:MUTED,fontSize:13}}>Aucun exercice avec des séances</div>
+              )}
+              {allExoNames.filter(a => {
+                if (exoSearch && !a.toLowerCase().includes(exoSearch.toLowerCase())) return false;
+                return Object.values(sessions).some(s => (s.exercises||{})[a]);
+              }).map(a => {
+                const cnt = Object.values(sessions).filter(s=>(s.exercises||{})[a]).length;
+                const exoInfo = myExos.find(e=>e.name===a);
+                const mColor = exoInfo ? (MUSCLE_COLORS[exoInfo.category]||BLUE) : MUTED;
+                return (
+                  <div key={a}
+                    onClick={()=>{setFocusExo(a);setExoPicker(false);setExoSearch('');setFadeKey(k=>k+1);}}
+                    style={{
+                      display:'flex',alignItems:'center',gap:12,padding:'12px 16px',cursor:'pointer',
+                      background:a===focusExo?ACCENT+'14':'transparent',
+                      borderBottom:'1px solid rgba(255,255,255,0.04)',transition:'background .12s'
+                    }}
+                    onMouseEnter={e=>e.currentTarget.style.background=ACCENT+'0e'}
+                    onMouseLeave={e=>e.currentTarget.style.background=a===focusExo?ACCENT+'14':'transparent'}>
+                    {exoInfo && <span style={{width:8,height:8,borderRadius:2,background:mColor,display:'inline-block',flexShrink:0}}/>}
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:13,color:a===focusExo?ACCENT:TEXT,fontWeight:a===focusExo?700:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a}</div>
+                      {exoInfo && <div style={{fontSize:10,color:mColor,marginTop:1}}>{exoInfo.category}</div>}
+                    </div>
+                    <div style={{textAlign:'right',flexShrink:0}}>
+                      <div style={{fontSize:11,color:MUTED,fontFamily:'Space Mono,monospace'}}>{cnt} séance{cnt>1?'s':''}</div>
+                    </div>
+                    {a===focusExo&&<span style={{color:ACCENT,fontSize:14,flexShrink:0}}>✓</span>}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ═══ FOCUS EXERCICE — CARTE DÉTAILLÉE ═══ */}
+      {focusExo && exoStats && (
+        <div key={fadeKey} className="slide-in-up" style={{
+          background:'linear-gradient(135deg, rgba(255,159,67,0.06) 0%, rgba(0,0,0,0) 60%)',
+          border:'1px solid '+ACCENT+'55',
+          borderRadius:18, padding:'18px 16px', marginBottom:14,
+          boxShadow:'0 0 40px rgba(255,159,67,0.06), inset 0 1px 0 rgba(255,255,255,0.04)'
+        }}>
+          {/* Header */}
+          <div style={{display:'flex',alignItems:'flex-start',gap:12,marginBottom:18}}>
+            <div style={{width:48,height:48,borderRadius:14,background:ACCENT+'18',border:'1px solid '+ACCENT+'44',display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,flexShrink:0,boxShadow:'0 0 20px rgba(255,159,67,0.2)'}}>🏋️</div>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:17,fontWeight:700,color:TEXT,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',marginBottom:4}}>{focusExo}</div>
+              <div style={{display:'flex',gap:6,flexWrap:'wrap',alignItems:'center'}}>
+                {exoStats.muscle && (
+                  <span style={{
+                    fontSize:10,padding:'3px 10px',borderRadius:20,fontWeight:700,letterSpacing:'.04em',
+                    background:(MUSCLE_COLORS[exoStats.muscle]||BLUE)+'22',
+                    color:MUSCLE_COLORS[exoStats.muscle]||BLUE,
+                    border:'1px solid '+(MUSCLE_COLORS[exoStats.muscle]||BLUE)+'44'
+                  }}>💪 {exoStats.muscle}</span>
+                )}
+                <span style={{fontSize:10,padding:'3px 10px',borderRadius:20,fontWeight:700,background:ACCENT+'15',color:ACCENT,border:'1px solid '+ACCENT+'33',letterSpacing:'.04em'}}>ANALYSE DÉTAILLÉE</span>
+              </div>
+            </div>
+            {/* Progression badge */}
+            {exoStats.progression !== null && (
+              <div style={{
+                flexShrink:0,textAlign:'center',
+                padding:'8px 12px',borderRadius:12,
+                background: exoStats.progression >= 0 ? GREEN+'18' : RED+'18',
+                border:'1px solid '+(exoStats.progression >= 0 ? GREEN+'44' : RED+'44'),
+              }}>
+                <div style={{fontSize:18,fontWeight:700,fontFamily:'Space Mono,monospace',color:exoStats.progression>=0?GREEN:RED,lineHeight:1}}>
+                  {exoStats.progression>=0?'+':''}{exoStats.progression}%
+                </div>
+                <div style={{fontSize:9,color:MUTED,textTransform:'uppercase',letterSpacing:'.05em',marginTop:3}}>progression</div>
+              </div>
+            )}
+          </div>
+
+          {/* ── Progression visuelle (première → dernière charge) ── */}
+          {exoStats.progression !== null && exoStats.firstW > 0 && (
+            <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid '+BORDER,borderRadius:12,padding:'12px 14px',marginBottom:14}}>
+              <div style={{fontSize:10,color:MUTED,textTransform:'uppercase',letterSpacing:'.06em',marginBottom:10}}>Évolution du poids</div>
+              <div style={{display:'flex',alignItems:'center',gap:10}}>
+                <div style={{textAlign:'center',minWidth:52}}>
+                  <div style={{fontSize:15,fontWeight:700,fontFamily:'Space Mono,monospace',color:MUTED}}>{exoStats.firstW}kg</div>
+                  <div style={{fontSize:9,color:FAINT,marginTop:2}}>1ère séance</div>
+                </div>
+                <div style={{flex:1,position:'relative',height:8,background:'rgba(255,255,255,0.05)',borderRadius:4,overflow:'hidden'}}>
+                  <div style={{
+                    height:'100%',borderRadius:4,
+                    background: exoStats.progression>=0
+                      ? 'linear-gradient(to right, rgba(125,255,107,0.4), #7dff6b)'
+                      : 'linear-gradient(to right, rgba(255,107,107,0.4), #ff6b6b)',
+                    width: Math.min(100, Math.abs(exoStats.progression)/2+50)+'%',
+                    transition:'width .8s cubic-bezier(.22,1,.36,1)'
+                  }}/>
+                  <div style={{
+                    position:'absolute',top:'50%',transform:'translateY(-50%)',
+                    left: Math.min(94, Math.abs(exoStats.progression)/2+45)+'%',
+                    width:10,height:10,borderRadius:'50%',
+                    background:exoStats.progression>=0?GREEN:RED,
+                    boxShadow:'0 0 8px '+(exoStats.progression>=0?GREEN:RED),
+                    marginLeft:-5
+                  }}/>
+                </div>
+                <div style={{textAlign:'center',minWidth:52}}>
+                  <div style={{fontSize:15,fontWeight:700,fontFamily:'Space Mono,monospace',color:exoStats.progression>=0?GREEN:RED}}>{exoStats.lastW}kg</div>
+                  <div style={{fontSize:9,color:MUTED,marginTop:2}}>Dernière</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── KPIs exercice ── */}
+          <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:8,marginBottom:14}}>
+            <div style={{gridColumn:'1/-1'}}>
+              <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8}}>
+                <KpiCard value={exoStats.pr ? exoStats.pr.maxW+'kg' : '–'} label="Record (PR)" color={YELLOW}/>
+                <KpiCard value={fmtKg(exoStats.totalVol)} label="Vol. total" color={ACCENT}/>
+                <KpiCard value={exoStats.totalReps > 999 ? Math.round(exoStats.totalReps/1000)+'k' : exoStats.totalReps} label="Reps totales" color={GREEN}/>
+                <KpiCard value={exoStats.daysCount} label="Séances" color={ORANGE}/>
+              </div>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,gridColumn:'1/-1'}}>
+              <KpiCard value={exoStats.totalSets} label="Séries totales" color={BLUE}/>
+              <KpiCard value={exoStats.avgW > 0 ? exoStats.avgW+'kg' : '–'} label="Poids moy." color={PURPLE}/>
+            </div>
+          </div>
+
+          {/* ── Graphique évolution du poids max ── */}
+          {exoStats.weightChart.length >= 2 && (
+            <div style={{marginBottom:16}}>
+              <ST>📈 Évolution charge maximale (kg)</ST>
+              <LineChart data={exoStats.weightChart} color={YELLOW} unitLabel="kg"/>
+            </div>
+          )}
+
+          {/* ── Graphique volume ── */}
+          {exoStats.volChart.length >= 2 && (
+            <div style={{marginBottom:16}}>
+              <ST>📦 Volume par séance</ST>
+              <LineChart data={exoStats.volChart} color={ACCENT}/>
+            </div>
+          )}
+
+          {/* ── Top séances ── */}
+          <ST>🏆 Top {exoStats.top10.length} séances (charge max)</ST>
+          <div style={{display:'flex',flexDirection:'column',gap:6}}>
+            {exoStats.top10.map((d, i) => {
+              const medals = ['🥇','🥈','🥉'];
+              const pct = Math.round((d.maxW / exoStats.top10[0].maxW) * 100);
+              return (
+                <div key={d.key} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 12px',background:i===0?ACCENT+'0c':'rgba(255,255,255,0.02)',borderRadius:11,border:'1px solid '+(i===0?ACCENT+'30':BORDER)}}>
+                  <span style={{fontSize:i<3?15:12,width:26,textAlign:'center',flexShrink:0,color:MUTED,fontFamily:'Space Mono,monospace'}}>{i<3?medals[i]:'#'+(i+1)}</span>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:13,fontWeight:i===0?700:500,color:TEXT,textTransform:'capitalize'}}>{fmtFull(new Date(d.key+'T00:00:00'))}</div>
+                    <div style={{fontSize:11,color:MUTED,marginTop:1}}>{d.totalSets} série{d.totalSets>1?'s':''} · {d.totalReps} reps</div>
+                  </div>
+                  <div style={{display:'flex',alignItems:'center',gap:8,flexShrink:0}}>
+                    <div style={{width:50,height:4,background:'rgba(255,255,255,0.06)',borderRadius:2,overflow:'hidden'}}>
+                      <div style={{height:'100%',background:i===0?ACCENT:ORANGE,borderRadius:2,width:pct+'%'}}/>
+                    </div>
+                    <span style={{fontSize:13,fontFamily:'Space Mono,monospace',color:i===0?ACCENT:TEXT,fontWeight:i===0?700:400,minWidth:44,textAlign:'right'}}>{d.maxW}kg</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ═══ HABITUDES D'ENTRAÎNEMENT ═══ */}
+      {stats.totalSessions > 0 && (
+        <Card className="fade-up">
+          <ST>📅 Habitudes d'entraînement</ST>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+            {/* Jours favoris */}
+            <div>
+              <div style={{fontSize:11,color:MUTED,marginBottom:10,textTransform:'uppercase',letterSpacing:'.05em',fontWeight:700}}>Jours d'entraînement</div>
+              <DayBarChart data={stats.dayDist} favIdx={stats.favDayIdx}/>
+              {stats.dayDist[stats.favDayIdx]?.v > 0 && (
+                <div style={{fontSize:11,color:MUTED,marginTop:8,textAlign:'center'}}>
+                  Jour favori : <span style={{color:ACCENT,fontWeight:700}}>{stats.dayDist[stats.favDayIdx].full}</span> ({stats.dayDist[stats.favDayIdx].v} fois)
+                </div>
+              )}
+            </div>
+            {/* Streak + meilleure semaine */}
+            <div style={{display:'flex',flexDirection:'column',gap:10}}>
+              {/* Streak */}
+              <div style={{background:'rgba(255,107,107,0.07)',border:'1px solid rgba(255,107,107,0.2)',borderRadius:12,padding:'12px 14px'}}>
+                <div style={{fontSize:10,color:MUTED,textTransform:'uppercase',letterSpacing:'.06em',marginBottom:8,fontWeight:700}}>🔥 Streak</div>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                  <div>
+                    <div style={{fontSize:22,fontWeight:700,fontFamily:'Space Mono,monospace',color:RED,lineHeight:1}}>{stats.currentStreak}j</div>
+                    <div style={{fontSize:10,color:MUTED,marginTop:2}}>actuel</div>
+                  </div>
+                  <div style={{width:1,height:36,background:BORDER}}/>
+                  <div style={{textAlign:'right'}}>
+                    <div style={{fontSize:22,fontWeight:700,fontFamily:'Space Mono,monospace',color:ORANGE,lineHeight:1}}>{stats.bestStreak}j</div>
+                    <div style={{fontSize:10,color:MUTED,marginTop:2}}>record</div>
+                  </div>
+                </div>
+              </div>
+              {/* Meilleure semaine */}
+              {stats.bestWeek && (
+                <div style={{background:'rgba(255,204,2,0.07)',border:'1px solid rgba(255,204,2,0.2)',borderRadius:12,padding:'12px 14px'}}>
+                  <div style={{fontSize:10,color:MUTED,textTransform:'uppercase',letterSpacing:'.06em',marginBottom:6,fontWeight:700}}>🏅 Meilleure semaine</div>
+                  <div style={{fontSize:19,fontWeight:700,fontFamily:'Space Mono,monospace',color:ORANGE,lineHeight:1,marginBottom:3}}>{fmtKg(stats.bestWeek.vol)}</div>
+                  <div style={{fontSize:10,color:MUTED}}>
+                    Semaine du {new Date(stats.bestWeek.key+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'2-digit'})}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* ═══ PROGRESSION DES EXERCICES ═══ */}
+      {stats.progressList.length > 0 && (
+        <Card className="fade-up">
+          <ST>🚀 Exercices en progression</ST>
+          <div style={{fontSize:11,color:MUTED,marginBottom:12,lineHeight:1.5}}>
+            Évolution entre la 1ère et la dernière séance (min. 2 séances avec poids).
+          </div>
+          <div style={{display:'flex',flexDirection:'column',gap:7}}>
+            {stats.progressList.map((d, i) => {
+              const isPos = d.pct >= 0;
+              const col = isPos ? GREEN : RED;
+              const barW = Math.min(100, Math.abs(d.pct) * 1.5);
+              const exoInfo = myExos.find(e=>e.name===d.exo);
+              const mColor = exoInfo ? (MUSCLE_COLORS[exoInfo.category]||BLUE) : MUTED;
+              return (
+                <div key={d.exo} style={{padding:'11px 13px',background:'rgba(255,255,255,0.025)',borderRadius:12,border:'1px solid '+BORDER}}>
+                  <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}>
+                    <span style={{fontSize:12,color:MUTED,fontFamily:'Space Mono,monospace',width:22,textAlign:'right',flexShrink:0}}>{'#'+(i+1)}</span>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:13,color:TEXT,fontWeight:600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.exo}</div>
+                      {exoInfo && <span style={{fontSize:9,color:mColor,fontWeight:700}}>{exoInfo.category}</span>}
+                    </div>
+                    <div style={{display:'flex',alignItems:'center',gap:6,flexShrink:0}}>
+                      <span style={{fontSize:11,color:MUTED,fontFamily:'Space Mono,monospace'}}>{d.first}→{d.last}kg</span>
+                      <span style={{fontSize:13,fontFamily:'Space Mono,monospace',fontWeight:700,color:col,minWidth:48,textAlign:'right'}}>
+                        {isPos?'+':''}{d.pct}%
+                      </span>
+                    </div>
+                  </div>
+                  {/* Progress bar */}
+                  <div style={{marginLeft:32,height:4,background:'rgba(255,255,255,0.05)',borderRadius:2,overflow:'hidden'}}>
+                    <div style={{height:'100%',borderRadius:2,background:col,width:barW+'%',opacity:0.7,transition:'width .6s ease'}}/>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      )}
+
+      {/* ═══ PRs ═══ */}
+      {stats.prs.length > 0 && (
+        <Card className="fade-up">
+          <ST>🏅 Records personnels (PRs)</ST>
+          <div style={{display:'flex',flexDirection:'column',gap:6}}>
+            {stats.prs.slice(0,15).map(([exo,pr],i) => (
+              <div key={exo} style={{display:'flex',alignItems:'center',gap:10,padding:'9px 12px',background:'rgba(255,255,255,0.02)',borderRadius:10,border:'1px solid '+BORDER}}>
+                <span style={{fontSize:12,color:MUTED,fontFamily:'Space Mono,monospace',width:24,textAlign:'right',flexShrink:0}}>{'#'+(i+1)}</span>
+                <span style={{flex:1,fontSize:13,color:TEXT,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{exo}</span>
+                <span style={{fontSize:13,fontFamily:'Space Mono,monospace',color:i===0?YELLOW:ORANGE,fontWeight:i<3?700:400,flexShrink:0}}>{pr.weight}kg</span>
+                <span style={{fontSize:10,color:MUTED,fontFamily:'Space Mono,monospace',flexShrink:0,minWidth:58,textAlign:'right'}}>{new Date(pr.date+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'2-digit'})}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* ═══ RÉPARTITION MUSCULAIRE ═══ */}
+      {stats.muscleData.length > 0 && (
+        <Card className="fade-up">
+          <ST>💪 Répartition musculaire</ST>
+          {/* Barres horizontales + donut */}
+          <div style={{display:'grid',gridTemplateColumns:'1fr auto',gap:16,alignItems:'center'}}>
+            <div style={{display:'flex',flexDirection:'column',gap:8}}>
+              {stats.muscleData.map((d,i) => {
+                const maxV = stats.muscleData[0].v;
+                const col = MUSCLE_COLORS[d.name]||BLUE;
+                return (
+                  <div key={d.name}>
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
+                      <div style={{display:'flex',alignItems:'center',gap:6}}>
+                        <span style={{width:8,height:8,borderRadius:2,background:col,display:'inline-block',flexShrink:0}}/>
+                        <span style={{fontSize:12,color:i===0?TEXT:MUTED,fontWeight:i===0?700:400}}>{d.name}</span>
+                      </div>
+                      <span style={{fontSize:11,fontFamily:'Space Mono,monospace',color:i===0?col:MUTED}}>{d.v}</span>
+                    </div>
+                    <div style={{height:5,background:'rgba(255,255,255,0.04)',borderRadius:3,overflow:'hidden'}}>
+                      <div style={{height:'100%',borderRadius:3,background:col,width:Math.round((d.v/maxV)*100)+'%',opacity:0.8}}/>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <DonutChart data={stats.muscleData}/>
+          </div>
+        </Card>
+      )}
+
+      {stats.totalSessions === 0 && (
+        <div style={{textAlign:'center',color:FAINT,padding:'60px 20px',fontSize:14,lineHeight:1.8}}>
+          Aucune séance enregistrée.<br/>Commence depuis le Logger 💪
+        </div>
+      )}
+    </main>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EXERCISES VIEW
+═══════════════════════════════════════════════════════════════════════════ */
+function ExosView({ myExos, setMyExos }) {
+  const [name, setName] = useState('');
+  const [cat, setCat]   = useState('Poitrine');
+  function addExo() {
+    const n = name.trim();
+    if (!n || myExos.find(e => e.name === n)) return;
+    setMyExos(p => [...p, { name:n, category:cat }]);
+    setName('');
+  }
+  const byCategory = useMemo(() => {
+    const map = {};
+    MUSCLE_GROUPS.forEach(g => { map[g] = []; });
+    myExos.forEach(e => { if (map[e.category]) map[e.category].push(e); else map['Full Body'].push(e); });
+    return map;
+  }, [myExos]);
+
+  return (
+    <main style={{maxWidth:680, margin:'0 auto', padding:'18px 14px', position:'relative', zIndex:1}}>
+      <Card className="fade-up">
+        <ST>➕ Créer un exercice</ST>
+        <div style={{display:'flex', gap:10, flexWrap:'wrap'}}>
+          <select value={cat} onChange={e=>setCat(e.target.value)} style={{...INP,flex:'none',width:'auto',background:BGMODAL,fontSize:13,cursor:'pointer'}}>
+            {MUSCLE_GROUPS.map(m => <option key={m} value={m}>{m}</option>)}
+          </select>
+          <input style={{...INP,flex:1}} placeholder="Nom de l'exercice…" value={name} onChange={e=>setName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addExo()}/>
+          <button onClick={addExo} style={{padding:'9px 18px',borderRadius:9,border:'1px solid '+ACCENT+'55',background:ACCENT+'22',color:ACCENT,fontSize:13,fontWeight:700,cursor:'pointer',flexShrink:0}}>Créer</button>
+        </div>
+        {myExos.length === 0 && (
+          <div style={{marginTop:14,padding:'12px 14px',borderRadius:10,background:'rgba(255,255,255,0.02)',border:'1px solid '+BORDER,fontSize:12,color:MUTED,lineHeight:1.6,textAlign:'center'}}>
+            Aucun exercice créé.<br/>Choisis un groupe musculaire et crée tes premiers exercices !
+          </div>
+        )}
+      </Card>
+      {MUSCLE_GROUPS.map((cat, idx) => {
+        const exos = byCategory[cat];
+        if (!exos.length) return null;
+        return (
+          <Card key={cat} className="fade-up" style={{marginBottom:10, animationDelay:(idx*0.04)+'s'}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
+              <div style={{display:'flex',alignItems:'center',gap:8}}>
+                <span style={{width:10,height:10,borderRadius:3,background:MUSCLE_COLORS[cat],display:'inline-block'}}/>
+                <span style={{fontSize:11,fontWeight:700,color:MUSCLE_COLORS[cat],textTransform:'uppercase',letterSpacing:'.07em'}}>{cat}</span>
+              </div>
+              <span style={{fontSize:11,color:MUTED,fontFamily:'Space Mono,monospace'}}>{exos.length}</span>
+            </div>
+            <div style={{display:'flex',flexDirection:'column',gap:7}}>
+              {exos.map(e => (
+                <div key={e.name} style={{display:'flex',alignItems:'center',gap:10,padding:'9px 12px',background:(MUSCLE_COLORS[e.category]||BLUE)+'0f',border:'1px solid '+(MUSCLE_COLORS[e.category]||BLUE)+'30',borderRadius:10}}>
+                  <span style={{flex:1,fontSize:13,color:TEXT}}>{e.name}</span>
+                  <button onClick={()=>setMyExos(p=>p.filter(x=>x.name!==e.name))} style={{background:'none',border:'none',color:FAINT,cursor:'pointer',fontSize:16,lineHeight:1,flexShrink:0,padding:'2px 4px'}}>×</button>
+                </div>
+              ))}
+            </div>
+          </Card>
+        );
+      })}
+    </main>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SETTINGS VIEW
+═══════════════════════════════════════════════════════════════════════════ */
+function SettingsView({ sessions, myExos, setMyExos, setSessions }) {
+  const [importTxt, setImportTxt]   = useState('');
+  const [importStatus, setImportStatus] = useState(null);
+  const [resetConfirm, setResetConfirm] = useState(false);
+
+  const totalVol = useMemo(() => Object.values(sessions).reduce((a,s) => a + calcVol(s?.exercises||{}), 0), [sessions]);
+
+  function doExport() {
+    const backup = { version:2, exportedAt:new Date().toISOString(), sessions, myExos };
+    try {
+      const blob = new Blob([JSON.stringify(backup)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'gympulse-backup-'+toKey(today())+'.json';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+      setImportStatus('exported'); setTimeout(()=>setImportStatus(null),3000);
+    } catch(e) { setImportStatus('err'); }
+  }
+
+  function processImport(txt) {
+    try {
+      const p = JSON.parse(txt.replace(/^\uFEFF/,'').trim());
+      if (!p.sessions && !p.myExos) throw new Error();
+      if (p.sessions) setSessions(prev=>({...prev,...p.sessions}));
+      if (p.myExos) setMyExos(p.myExos);
+      setImportStatus('ok'); setImportTxt(''); setTimeout(()=>setImportStatus(null),4000);
+    } catch(e) { setImportStatus('err'); setTimeout(()=>setImportStatus(null),4000); }
+  }
+
+  function handleFile(file) {
+    if (!file) return;
+    setImportStatus('loading');
+    const r = new FileReader();
+    r.onload = e => processImport(e.target.result);
+    r.onerror = () => { setImportStatus('err'); setTimeout(()=>setImportStatus(null),4000); };
+    r.readAsText(file,'utf-8');
+  }
+
+  function doReset() {
+    setSessions({}); setMyExos([]);
+    ['gp_sessions','gp_exos'].forEach(k => { try{ localStorage.removeItem(k); }catch(e){} });
+    setResetConfirm(false);
+  }
+
+  return (⚠️
+    <main style={{maxWidth:680, margin:'0 auto', padding:'18px 14px', position:'relative', zIndex:1}}>
+      <div className="fade-up" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10,marginBottom:14}}>
+        <KpiCard value={Object.keys(sessions).filter(k=>sessions[k]).length} label="Séances" color={ACCENT}/>
+        <KpiCard value={fmtKg(totalVol)} label="Volume total" color={ORANGE}/>
+        <KpiCard value={myExos.length} label="Exos perso" color={BLUE}/>
+      </div>
+      <Card className="fade-up">
+        <ST>💾 Données & Sauvegarde</ST>
+        <button onClick={doExport} style={{width:'100%',padding:'12px',borderRadius:11,border:'1px solid '+ACCENT+'44',background:ACCENT+'18',color:ACCENT,fontSize:13,fontWeight:700,cursor:'pointer',marginBottom:12}}>
+          📦 Exporter toutes les données (.json)
+        </button>
+        <div style={{background:'rgba(255,255,255,0.02)',border:'1px solid '+BORDER,borderRadius:12,padding:14}}>
+          <div style={{fontSize:11,fontWeight:700,color:MUTED,marginBottom:10,textTransform:'uppercase',letterSpacing:'.06em'}}>📥 Importer</div>
+          <label style={{display:'block',marginBottom:8}}>
+            <div style={{width:'100%',padding:'12px',borderRadius:11,border:'2px dashed '+ACCENT+'55',background:ACCENT+'06',color:ACCENT,fontSize:13,cursor:'pointer',fontWeight:600,textAlign:'center'}}>
+              {importStatus==='loading' ? '⏳ Lecture…' : '📂 Sélectionner un fichier .json'}
+            </div>
+            <input type="file" accept=".json" style={{display:'none'}} onChange={e=>{if(e.target.files[0])handleFile(e.target.files[0]);e.target.value='';}}/>
+          </label>
+          <div style={{marginBottom:8}}>
+            <div style={{fontSize:11,color:MUTED,marginBottom:6}}>Ou coller le JSON :</div>
+            <textarea style={{width:'100%',minHeight:70,background:'rgba(255,255,255,0.04)',border:'1px solid '+BORDER2,borderRadius:9,color:TEXT,fontFamily:'monospace',fontSize:10,padding:'8px 10px',resize:'vertical',outline:'none'}}
+              placeholder='{"version":2,"sessions":{…}}' value={importTxt} onChange={e=>{setImportTxt(e.target.value);setImportStatus(null);}}/>
+            <button onClick={()=>processImport(importTxt)} disabled={!importTxt.trim()}
+              style={{marginTop:6,width:'100%',padding:'8px',borderRadius:9,border:'none',background:importTxt.trim()?ACCENT:'rgba(255,255,255,0.05)',color:importTxt.trim()?'#0a0d0a':FAINT,fontSize:12,fontWeight:700,cursor:importTxt.trim()?'pointer':'not-allowed'}}>
+              Importer le JSON
+            </button>
+          </div>
+          {importStatus==='ok' && <div style={{padding:'9px 12px',borderRadius:9,background:ACCENT+'0f',border:'1px solid '+ACCENT+'44',fontSize:12,color:ACCENT,fontWeight:600}}>✅ Import réussi !</div>}
+          {importStatus==='exported' && <div style={{padding:'9px 12px',borderRadius:9,background:ACCENT+'0f',border:'1px solid '+ACCENT+'44',fontSize:12,color:ACCENT,fontWeight:600}}>✅ Fichier téléchargé !</div>}
+          {importStatus==='err' && <div style={{padding:'9px 12px',borderRadius:9,background:'rgba(255,107,107,0.06)',border:'1px solid rgba(255,107,107,0.3)',fontSize:12,color:RED,fontWeight:600}}>❌ Fichier non reconnu.</div>}
+        </div>
+      </Card>
+      <Card className="fade-up" style={{border:'1px solid rgba(255,107,107,0.2)'}}>
+        <ST>⚠️ Zone dangereuse</ST>
+        {!resetConfirm ? (
+          <button onClick={()=>setResetConfirm(true)} style={{width:'100%',padding:'11px',borderRadius:10,border:'1px solid rgba(255,107,107,0.35)',background:'rgba(255,107,107,0.08)',color:RED,fontSize:13,fontWeight:600,cursor:'pointer'}}>
+            🗑 Effacer toutes les données
+          </button>
+        ) : (
+          <div style={{background:'rgba(255,107,107,0.06)',border:'1px solid rgba(255,107,107,0.3)',borderRadius:11,padding:14}}>
+            <div style={{fontSize:13,color:TEXT,fontWeight:600,marginBottom:4}}>⚠️ Action irréversible !</div>
+            <div style={{fontSize:12,color:MUTED,marginBottom:12,lineHeight:1.6}}>Toutes tes séances et exercices personnalisés seront supprimés.</div>
+            <div style={{display:'flex',gap:8}}>
+              <button onClick={doReset} style={{flex:1,padding:'10px',borderRadius:9,border:'none',background:RED,color:'#fff',fontSize:13,fontWeight:700,cursor:'pointer'}}>Oui, tout effacer</button>
+              <button onClick={()=>setResetConfirm(false)} style={{flex:1,padding:'10px',borderRadius:9,border:'1px solid '+BORDER2,background:'transparent',color:MUTED,fontSize:13,cursor:'pointer'}}>Annuler</button>
+            </div>
+          </div>
+        )}
+      </Card>
+      <Card className="fade-up">
+        <ST>📲 Installer l'application</ST>
+        <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:12}}>
+          {[['🌐','Ouvrir dans Chrome ou Safari','Ouvre ce fichier dans le navigateur de ta tablette (pas dans un éditeur).'],
+            ['⋮','Menu du navigateur','Chrome : 3 points en haut à droite. Safari : bouton Partager (⬆).'],
+            ['🏠','Ajouter à l\'écran d\'accueil','Choisis "Ajouter à l\'écran d\'accueil" ou "Installer l\'application".']
+          ].map(([icon,title,desc],i) => (
+            <div key={i} style={{display:'flex',gap:10,padding:'10px 12px',background:'rgba(255,255,255,0.02)',borderRadius:11,border:'1px solid '+BORDER}}>
+              <div style={{width:30,height:30,borderRadius:9,background:ACCENT+'18',border:'1px solid '+ACCENT+'33',display:'flex',alignItems:'center',justifyContent:'center',fontSize:15,flexShrink:0}}>{icon}</div>
+              <div><div style={{fontSize:12,fontWeight:700,color:TEXT,marginBottom:2}}>{title}</div><div style={{fontSize:11,color:MUTED,lineHeight:1.5}}>{desc}</div></div>
+            </div>
+          ))}
+        </div>
+        <button id="gp-pwa-btn" style={{display:'none',width:'100%',padding:'13px',borderRadius:11,border:'none',background:ACCENT,color:'#0f0a05',fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:"'DM Sans',sans-serif"}}>
+          📲 Installer GymPulse maintenant
+        </button>
+        <div style={{marginTop:10,padding:'9px 12px',borderRadius:9,background:'rgba(255,159,67,0.06)',border:'1px solid rgba(255,159,67,0.2)',fontSize:11,color:ACCENT,lineHeight:1.6}}>
+          ⚠️ Lance toujours GymPulse depuis son icône sur l'écran d'accueil pour que le temps soit compté séparément.
+        </div>
+      </Card>
+      <Card className="fade-up">
+        <ST>ℹ️ À propos</ST>
+        {[['Application','GymPulse'],['Version','v5'],['Basée sur','ScreenPulse'],['Technologie','React 18 · localStorage']].map(([l,v],i,arr) => (
+          <div key={l} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:i<arr.length-1?'1px solid '+BORDER:'none'}}>
+            <span style={{fontSize:13,color:MUTED}}>{l}</span>
+            <span style={{fontSize:13,fontFamily:'Space Mono,monospace',color:TEXT}}>{v}</span>
+          </div>
+        ))}
+        <div style={{marginTop:22}}>
+          <div style={{
+            borderRadius:16, overflow:'hidden',
+            background:'linear-gradient(135deg, #1a0e02 0%, #0f0a05 100%)',
+            border:'1px solid '+BORDER,
+            padding:'28px 20px',
+            display:'flex', flexDirection:'column', alignItems:'center', gap:14
+          }}>
+            {/* Dumbbell logo grande taille */}
+            <div style={{filter:'drop-shadow(0 0 20px rgba(255,159,67,0.5))'}}>
+              <svg width="72" height="72" viewBox="0 0 100 100">
+                <defs>
+                  <linearGradient id="wdbG" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#ffd080"/>
+                    <stop offset="100%" stopColor="#ff7e1a"/>
+                  </linearGradient>
+                  <filter id="wdbGlow" x="-40%" y="-40%" width="180%" height="180%">
+                    <feGaussianBlur stdDeviation="4" result="b"/>
+                    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                  </filter>
+                </defs>
+                <rect x="6" y="28" width="16" height="44" rx="5" fill="url(#wdbG)" filter="url(#wdbGlow)" opacity="0.95"/>
+                <rect x="22" y="36" width="10" height="28" rx="3" fill="url(#wdbG)" opacity="0.9"/>
+                <rect x="32" y="44" width="36" height="12" rx="6" fill="url(#wdbG)" opacity="0.85"/>
+                <rect x="68" y="36" width="10" height="28" rx="3" fill="url(#wdbG)" opacity="0.9"/>
+                <rect x="78" y="28" width="16" height="44" rx="5" fill="url(#wdbG)" filter="url(#wdbGlow)" opacity="0.95"/>
+                <rect x="38" y="46" width="12" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+              </svg>
+            </div>
+            {/* Nom */}
+            <div style={{textAlign:'center'}}>
+              <div style={{fontFamily:"'Space Mono',monospace",fontSize:28,fontWeight:700,color:TEXT,letterSpacing:'-1px',lineHeight:1}}>GymPulse</div>
+              <div style={{fontFamily:"'Space Mono',monospace",fontSize:11,color:ACCENT,letterSpacing:'6px',marginTop:5,opacity:0.85}}>PULSE</div>
+            </div>
+            {/* Badge version */}
+            <div style={{background:ACCENT+'18',border:'1px solid '+ACCENT+'44',borderRadius:8,padding:'4px 14px'}}>
+              <span style={{fontFamily:"'Space Mono',monospace",fontSize:11,fontWeight:700,color:ACCENT,letterSpacing:'2px'}}>v5</span>
+            </div>
+          </div>
+        </div>
+        <div style={{display:'flex',justifyContent:'center',gap:16,marginTop:18}}>
+          {[['🔒','100% local'],['📡','Hors-ligne'],['🚫','Sans pub']].map(([e,t]) => (
+            <div key={t} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
+              <div style={{width:38,height:38,borderRadius:11,background:'rgba(255,255,255,0.03)',border:'1px solid '+BORDER,display:'flex',alignItems:'center',justifyContent:'center',fontSize:17}}>{e}</div>
+              <span style={{fontSize:10,color:MUTED}}>{t}</span>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </main>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ROOT APP
+═══════════════════════════════════════════════════════════════════════════ */
+function App() {
+  const [sessions, setSessions] = useState(() => load('gp_sessions', {}));
+  const [myExos, setMyExos]     = useState(() => load('gp_exos', []));
+  const [view, setView]         = useState('week');
+  const [logDate, setLogDate]   = useState(() => toKey(today()));
+  const [logFromSession, setLogFromSession] = useState(null);
+
+  useEffect(() => save('gp_sessions', sessions), [sessions]);
+  useEffect(() => save('gp_exos', myExos), [myExos]);
+
+  const tabs = [['week','📅 Semaines'],['log','💪 Logger'],['stats','📊 Stats'],['exos','🏋️ Exercices'],['settings','⚙️ Réglages']];
+
+  return (
+    <div style={{minHeight:'100vh',background:BG,color:TEXT,fontFamily:"'DM Sans',sans-serif",position:'relative',overflowX:'hidden'}}>
+      <Starfield/>
+      <header style={{display:'flex',flexDirection:'column',padding:'14px 18px',borderBottom:'1px solid '+BORDER,background:'rgba(10,13,10,0.94)',backdropFilter:'blur(12px)',position:'sticky',top:0,zIndex:10,gap:10}}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <div style={{display:'flex',alignItems:'center',gap:10}}>
+            <DumbbellLogo size={28}/>
+            <span style={{fontFamily:"'Space Mono',monospace",fontSize:17,fontWeight:700,color:TEXT,letterSpacing:'-.5px'}}>GymPulse</span>
+          </div>
+          <span style={{fontFamily:"'Space Mono',monospace",fontSize:11,fontWeight:700,color:ACCENT,letterSpacing:'.08em',filter:'drop-shadow(0 0 5px rgba(255,159,67,.7))'}}>v5</span>
+        </div>
+        <div style={{display:'flex',gap:7,overflowX:'auto',paddingBottom:2}}>
+          {tabs.map(([v,l]) => (
+            <button key={v} onClick={() => setView(v)} style={{
+              padding:'7px 13px', borderRadius:8, flexShrink:0,
+              border:'1px solid '+(view===v ? ACCENT : BORDER2),
+              background: view===v ? ACCENT+'22' : 'transparent',
+              color: view===v ? ACCENT : MUTED,
+              cursor:'pointer', fontSize:13, fontFamily:"'DM Sans',sans-serif",
+              fontWeight: view===v ? 700 : 400, transition:'all .15s'
+            }}>{l}</button>
+          ))}
+        </div>
+      </header>
+
+      {view==='week'    && <WeekView sessions={sessions} setSessions={setSessions} setView={setView} setLogDate={setLogDate} setLogFromSession={setLogFromSession}/>}
+      {view==='log'     && <LoggerView sessions={sessions} setSessions={setSessions} myExos={myExos} logDate={logDate} setLogDate={setLogDate} fromSession={logFromSession}/>}
+      {view==='stats'   && <StatsView sessions={sessions} myExos={myExos}/>}
+      {view==='exos'    && <ExosView myExos={myExos} setMyExos={setMyExos}/>}
+      {view==='settings'&& <SettingsView sessions={sessions} myExos={myExos} setMyExos={setMyExos} setSessions={setSessions}/>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  const SW = `const C='gympulse-v5';
+self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>Promise.allSettled([
+  'https://unpkg.com/react@18/umd/react.production.min.js',
+  'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
+  'https://unpkg.com/@babel/standalone/babel.min.js'
+].map(u=>c.add(new Request(u,{mode:'no-cors'}))))).then(()=>self.skipWaiting())));
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
+self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>new Response('',{status:503}))));});`;
+  try {
+    const blob = new Blob([SW], {type:'application/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+  } catch(e) {}
+}
+(function() {
+  function makeIcon(s) {
+    try {
+      const c = document.createElement('canvas'); c.width = c.height = s;
+      const ctx = c.getContext('2d'), r = s * 0.22;
+      ctx.beginPath(); ctx.moveTo(r,0); ctx.lineTo(s-r,0); ctx.arcTo(s,0,s,r,r);
+      ctx.lineTo(s,s-r); ctx.arcTo(s,s,s-r,s,r); ctx.lineTo(r,s); ctx.arcTo(0,s,0,s-r,r);
+      ctx.lineTo(0,r); ctx.arcTo(0,0,r,0,r); ctx.closePath();
+      const bg = ctx.createLinearGradient(0,0,s,s);
+      bg.addColorStop(0,'#1a0e02'); bg.addColorStop(1,'#0f0a05'); ctx.fillStyle = bg; ctx.fill();
+      const grad = ctx.createLinearGradient(0,0,s,s);
+      grad.addColorStop(0,'#ffd080'); grad.addColorStop(1,'#ff7e1a'); ctx.fillStyle = grad;
+      const p = s/100;
+      function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();ctx.fill();}
+      rr(8*p,28*p,16*p,44*p,5*p); rr(24*p,36*p,10*p,28*p,3*p); rr(34*p,44*p,32*p,12*p,6*p); rr(66*p,36*p,10*p,28*p,3*p); rr(76*p,28*p,16*p,44*p,5*p);
+      return c.toDataURL('image/png');
+    } catch(e) { return null; }
+  }
+  const i192 = makeIcon(192), i512 = makeIcon(512);
+  const icons = [];
+  if (i192) icons.push({src:i192, sizes:'192x192', type:'image/png', purpose:'any maskable'});
+  if (i512) icons.push({src:i512, sizes:'512x512', type:'image/png', purpose:'any maskable'});
+  const mf = {name:'GymPulse',short_name:'GymPulse',description:'Tracker d\'entraînement musculaire',start_url:location.href,scope:location.href,display:'standalone',orientation:'any',background_color:'#0f0a05',theme_color:'#0f0a05',lang:'fr',categories:['health','fitness'],icons};
+  try {
+    const blob = new Blob([JSON.stringify(mf)],{type:'application/manifest+json'});
+    const link = document.createElement('link'); link.rel='manifest'; link.href=URL.createObjectURL(blob); document.head.appendChild(link);
+  } catch(e) {}
+})();
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); window.__gpInstall = e;
+  const wrap = document.getElementById('gp-pwa-btn');
+  if (wrap) { wrap.style.display='block'; wrap.onclick=()=>{e.prompt();e.userChoice.then(r=>{if(r.outcome==='accepted'){wrap.textContent='✅ Installation lancée !';wrap.style.background='#6bcb77';wrap.disabled=true;}});}; }
+});
+window.addEventListener('appinstalled', () => { const w=document.getElementById('gp-pwa-btn'); if(w){w.textContent='✅ GymPulse installée !';w.disabled=true;} });
+</script>
+</body>
+</html>
