@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#080808">
 <meta name="mobile-web-app-capable" content="yes">
 <title>MonsterTracker</title>
-<link rel="apple-touch-icon" href="icon.png"/>
+<link rel="apple-touch-icon" href="favicon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--g:#39ff14;--glow:rgba(57,255,20,.18);--g-r:57;--g-g:255;--g-b:20;--g-hov:#50ff2a;--bk:#080808;--dk:#0f0f0f;--c1:#111;--c2:#1a1a1a;--br:#222;--tx:#f0f0f0;--mu:#555;--rd:#ff3535;}
@@ -423,7 +423,7 @@ body{background:var(--bk);color:var(--tx);font-family:'Barlow',sans-serif;min-he
 
   <button onclick="doLogout()" style="position:absolute;top:18px;right:18px;background:none;border:1px solid var(--br);color:var(--mu);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;padding:7px 14px;cursor:pointer;text-transform:uppercase;z-index:10;transition:all .2s;" onmouseover="this.style.color='var(--rd)';this.style.borderColor='var(--rd)'" onmouseout="this.style.color='var(--mu)';this.style.borderColor='var(--br)'">✕ Log out</button>
 
-  <img src="icon.png" alt="" width="72" height="72" style="margin-bottom:18px;opacity:.95;position:relative;z-index:1;" onerror="this.style.display='none'"/>
+  <img src="favicon.png" alt="" width="72" height="72" style="margin-bottom:18px;opacity:.95;position:relative;z-index:1;" onerror="this.style.display='none'"/>
   <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:5px;color:var(--g);text-transform:uppercase;margin-bottom:8px;position:relative;z-index:1;">Welcome to</div>
   <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(46px,12vw,80px);letter-spacing:4px;line-height:.9;margin-bottom:6px;position:relative;z-index:1;">MONSTER<span style="color:var(--g);">TRACKER</span></h1>
   <p style="font-size:13px;color:#666;max-width:320px;line-height:1.65;margin:12px 0 32px;position:relative;z-index:1;">Install the app to access your Monster Energy collection.</p>
@@ -543,7 +543,7 @@ body{background:var(--bk);color:var(--tx);font-family:'Barlow',sans-serif;min-he
 <div class="page" id="page-app">
 <nav class="app-nav">
   <div class="logo" onclick="go('landing')">
-    <img class="logo-icon" src="nocolor-icon.png" alt="" onerror="this.src='icon.png'" style="width:18px;height:18px;"/>
+    <img class="logo-icon" src="nocolor-icon.png" alt="" onerror="this.src='icon.png'" style="width:40px;height:40px;"/>
     <span class="logo-t" style="font-size:20px;">MONSTER<em>TRACKER</em></span>
   </div>
   <div class="ntabs" id="user-tabs">
@@ -565,14 +565,14 @@ body{background:var(--bk);color:var(--tx);font-family:'Barlow',sans-serif;min-he
   <div class="app-nav-r">
     <div class="nav-who">Hello, <b id="nav-name">-</b></div>
     <button id="pwa-install-btn" onclick="doInstall()" style="display:none;background:var(--g);color:#000;border:none;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;letter-spacing:2px;padding:7px 14px;cursor:pointer;text-transform:uppercase;animation:pwa-pulse 2s ease-in-out infinite;flex-shrink:0;">⬇ INSTALL</button>
-    <button class="btn-rd" onclick="doLogout()">Sign out</button>
+    <button class="btn-rd" onclick="doLogout()">Log out</button>
   </div>
 </nav>
 <div class="app-main">
 
 <!-- ACCUEIL -->
 <div class="sec on" id="sec-home">
-  <div class="sec-hd"><h1>Dashboard</h1><p>Your monster energy progress</p></div>
+  <div class="sec-hd"><h1>Dashboard</h1></div>
   <div class="srow">
     <div class="sbox"><div class="sval" id="h-owned">-</div><div class="slbl2">Owned</div></div>
     <div class="sbox"><div class="sval" id="h-total">-</div><div class="slbl2">Total Available</div></div>
@@ -595,14 +595,14 @@ body{background:var(--bk);color:var(--tx);font-family:'Barlow',sans-serif;min-he
 
 <!-- CATALOGUE -->
 <div class="sec" id="sec-catalogue">
-  <div class="sec-hd"><h1>CATALOG</h1><p>All available cans</p></div>
-  <input class="sinput" id="search" type="text" placeholder="Rechercher par nom, serie, variante..." oninput="filterCans()"/>
+  <div class="sec-hd"><h1>CATALOG</h1><p><font color="limegreen">Contact us if you know of other cans that are not in the catalog</font></p></div>
+  <input class="sinput" id="search" type="text" placeholder="Search by name, series, variants..." oninput="filterCans()"/>
   <div id="cat-ct"></div>
 </div>
 
 <!-- MA COLLECTION -->
 <div class="sec" id="sec-collection">
-  <div class="sec-hd"><h1>MY COLLECTION</h1><p>The cans you own</p></div>
+  <div class="sec-hd"><h1>MY COLLECTION</h1></div>
   <div class="srow">
     <div class="sbox"><div class="sval" id="c-owned">-</div><div class="slbl2">Owned</div></div>
     <div class="sbox"><div class="sval" id="c-total">-</div><div class="slbl2">Total</div></div>
@@ -614,7 +614,7 @@ body{background:var(--bk);color:var(--tx);font-family:'Barlow',sans-serif;min-he
 
 <!-- AMIS -->
 <div class="sec" id="sec-friends">
-  <div class="sec-hd"><h1>FRIENDS</h1><p>Add collectors by username</p></div>
+  <div class="sec-hd"><h1>FRIENDS</h1></div>
   <div class="fr-add"><input type="text" id="friend-input" placeholder="Search someone..." oninput="friendSearch()"/></div>
   <div class="errmsg" id="friend-err" style="margin-bottom:13px;"></div>
   <div class="okmsg"  id="friend-ok"  style="margin-bottom:13px;"></div>
@@ -623,14 +623,14 @@ body{background:var(--bk);color:var(--tx);font-family:'Barlow',sans-serif;min-he
 
 <!-- MISES A JOUR -->
 <div class="sec" id="sec-updates">
-  <div class="sec-hd"><h1>NOTIFICATIONS</h1><p>Notifications and replies to your messages</p></div>
+  <div class="sec-hd"><h1>NOTIFICATIONS</h1></div>
   <div id="updates-ct"></div>
 </div>
 
 <!-- PARAMETRES -->
 <div class="sec" id="sec-settings">
   <div class="sec-hd" style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px;">
-    <div><h1>SETTINGS</h1><p>Customize your account</p></div>
+    <div><h1>SETTINGS</h1><p></div>
     <button class="btn-o" onclick="goContact()" style="margin-bottom:4px;font-size:12px;padding:9px 18px;">&#9993; CONTACT US</button>
   </div>
   <div class="sg">
@@ -647,7 +647,7 @@ body{background:var(--bk);color:var(--tx);font-family:'Barlow',sans-serif;min-he
     <div class="scard"><div class="scard-t">My Profile</div><div class="errmsg" id="set-err"></div><div class="okmsg" id="set-ok"></div><div class="field"><label>Username</label><input type="text" id="set-user"/></div><div class="field"><label>Mail</label><input type="text" id="set-email" disabled style="opacity:.4;cursor:not-allowed;"/></div><button class="btn-g" style="width:100%;margin-top:4px;" onclick="saveProfile()">SAVE</button></div>
     <div class="scard"><div class="scard-t">Password</div><div class="errmsg" id="pw-err"></div><div class="okmsg" id="pw-ok"></div><div class="field"><label>New</label><div class="fpw"><input type="password" id="pw-new" placeholder="Min. 6 characters"/><span class="feye" onclick="tpw('pw-new',this)">&#128065;</span></div></div><button class="btn-g" style="width:100%;margin-top:4px;" onclick="savePw()">CHANGE</button></div>
     <div class="scard"><div class="scard-t">Theme</div><div class="theme-btns"><button class="theme-btn on" id="th-dark" onclick="setTheme('dark')">Dark</button><button class="theme-btn" id="th-green" onclick="setTheme('green')">Green</button><button class="theme-btn" id="th-red" onclick="setTheme('red')">Red</button><button class="theme-btn" id="th-blue" onclick="setTheme('blue')">Blue</button></div></div>
-    <div class="scard"><div class="scard-t">Session</div><p style="font-size:12px;color:var(--mu);margin-bottom:4px;">Signed in as</p><p style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--g);margin-bottom:16px;" id="set-name">-</p><button class="btn-rd" style="width:100%;padding:12px;font-size:13px;letter-spacing:2px;" onclick="doLogout()">Sign Out</button></div>
+    <div class="scard"><div class="scard-t">Session</div><p style="font-size:12px;color:var(--mu);margin-bottom:4px;">Signed in as</p><p style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--g);margin-bottom:16px;" id="set-name">-</p><button class="btn-rd" style="width:100%;padding:12px;font-size:13px;letter-spacing:2px;" onclick="doLogout()">Log Out</button></div>
     <div class="scard"><div class="scard-t">Favourite Cans</div><p style="font-size:12px;color:var(--mu);margin-bottom:11px;">3 favourite cans</p><div class="fav-slots" id="fav-slots"><div class="fav-slot" id="fav-1" onclick="openPicker('fav',1)"><span class="fav-num">1</span></div><div class="fav-slot" id="fav-2" onclick="openPicker('fav',2)"><span class="fav-num">2</span></div><div class="fav-slot" id="fav-3" onclick="openPicker('fav',3)"><span class="fav-num">3</span></div></div></div>
     <div class="scard"><div class="scard-t">Wishlist</div><p style="font-size:12px;color:var(--mu);margin-bottom:11px;">3 cans on your wishlist</p><div class="fav-slots" id="wish-slots"><div class="fav-slot" id="wish-1" onclick="openPicker('wish',1)"><span class="fav-num">1</span></div><div class="fav-slot" id="wish-2" onclick="openPicker('wish',2)"><span class="fav-num">2</span></div><div class="fav-slot" id="wish-3" onclick="openPicker('wish',3)"><span class="fav-num">3</span></div></div></div>
   </div>
@@ -774,7 +774,7 @@ body{background:var(--bk);color:var(--tx);font-family:'Barlow',sans-serif;min-he
 
 <!-- ADMIN MA COLLECTION -->
 <div class="sec" id="sec-adm-col">
-  <div class="sec-hd"><h1>MY COLLECTION</h1><p>Track your collection (published and drafts)</p></div>
+  <div class="sec-hd"><h1>MY COLLECTION</h1></div>
   <div class="srow">
     <div class="sbox"><div class="sval" id="adm-c-owned">-</div><div class="slbl2">Owned</div></div>
     <div class="sbox"><div class="sval" id="adm-c-total">-</div><div class="slbl2">Total</div></div>
@@ -786,13 +786,13 @@ body{background:var(--bk);color:var(--tx);font-family:'Barlow',sans-serif;min-he
 
 <!-- ADMIN RECEPTION -->
 <div class="sec" id="sec-adm-inbox">
-  <div class="adm-hdr"><div><h2>RÉCEPTION</h2><p>Users's requests</p></div></div>
+  <div class="adm-hdr"><div><h2>RÉCEPTION</h2></div></div>
   <div id="inbox-ct"></div>
 </div>
 
 <!-- ADMIN PARAMETRES -->
 <div class="sec" id="sec-adm-settings">
-  <div class="sec-hd"><h1>SETTINGS</h1><p>Manage your admin account</p></div>
+  <div class="sec-hd"><h1>SETTINGS</h1></div>
   <div style="max-width:520px;">
     <div style="background:var(--c1);border:1px solid var(--br);padding:22px;margin-bottom:14px;">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--mu);margin-bottom:14px;">Profile</div>
@@ -819,14 +819,13 @@ body{background:var(--bk);color:var(--tx);font-family:'Barlow',sans-serif;min-he
     </div>
     <div style="background:var(--c1);border:1px solid var(--br);padding:22px;margin-bottom:14px;">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--mu);margin-bottom:14px;">&#9888; Mode Maintenance</div>
-      <p style="font-size:13px;color:#888;margin-bottom:16px;line-height:1.6;">Enable maintenance to block access for all users (not the admin).</p>
       <div id="maint-status" style="font-size:13px;margin-bottom:14px;"></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button id="maint-on-btn" class="btn-full" onclick="setMaintenance(true)" style="background:rgba(255,150,0,.1);border:1px solid rgba(255,150,0,.3);color:#ff9600;">&#9888; ACTIVER LA MAINTENANCE</button>
         <button id="maint-off-btn" class="btn-full" onclick="setMaintenance(false)" style="background:rgba(57,255,20,.08);border:1px solid rgba(57,255,20,.2);color:var(--g);">&#9654; RELANCER L'APPLICATION</button>
       </div>
     </div>
-    <button class="btn-full" onclick="doLogout()" style="background:rgba(255,53,53,.1);border:1px solid rgba(255,53,53,.3);color:var(--rd);">SIGN OUT</button>
+    <button class="btn-full" onclick="doLogout()" style="background:rgba(255,53,53,.1);border:1px solid rgba(255,53,53,.3);color:var(--rd);">LOG OUT</button>
   </div>
 </div>
 </div><!-- /app-main -->
@@ -1018,7 +1017,7 @@ var _installPrompt = null;
 (function() {
   // Calcule l'URL de base du dossier contenant index.html
   var base = location.href.replace(/[?#].*$/, '').replace(/\/[^\/]*$/, '/');
-  var iconUrl = base + 'icon.png';
+  var iconUrl = base + 'favicon.png';
 
   // On charge icon.png via un Image + canvas pour générer les tailles nécessaires
   function buildManifestWithIcon(src192, src512) {
