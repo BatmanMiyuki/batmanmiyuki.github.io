@@ -220,7 +220,7 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
       <div class="page-header" style="padding-bottom:0">
         <div class="page-title" style="display:flex;align-items:center;gap:10px;">
           <span style="color:var(--blue)">Plat<span style="color:white">ina</span></span>
-          <img src="platine.png" width="44" height="44" style="object-fit:contain;filter:drop-shadow(0 0 10px rgba(28,176,246,0.6))" onerror="this.outerHTML='💎'"/>
+          <img src="platine.png" width="44" height="44" style="object-fit:contain;filter:drop-shadow(0 0 10px rgba(28,176,246,0.6))" onerror="this.outerHTML=''"/>
         </div>
       </div>
       <div style="padding:14px 20px 6px">
@@ -229,7 +229,7 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
             <div class="streak-title" id="dash-streak-title">Continuez comme ça !</div>
             <div class="streak-sub" id="dash-streak-sub">Vous progressez bien</div>
           </div>
-          <div class="streak-icon">💎</div>
+          <div class="streak-icon"></div>
         </div>
       </div>
       <div style="display:flex;gap:10px;padding:12px 20px">
@@ -308,6 +308,35 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
           </div>
         </div>
 
+        <!-- HALL OF FAME PLATINE -->
+        <div class="settings-section">
+          <div class="settings-section-label">Derniers jeux platinés</div>
+          <div id="settings-plat-list"></div>
+        </div>
+
+        <!-- HALL OF FAME 100% -->
+        <div class="settings-section">
+          <div class="settings-section-label">Derniers jeux 100%</div>
+          <div id="settings-100-list"></div>
+        </div>
+
+        <!-- À PROPOS -->
+        <div class="settings-section">
+          <div class="settings-section-label">À propos</div>
+          <div class="card" style="padding:0;overflow:hidden">
+            <div class="info-row"><span class="info-label">Application</span><span class="info-val">Platina</span></div>
+            <div class="info-row"><span class="info-label">Version</span><span class="info-val" style="color:var(--green)">15</span></div>
+            <div class="info-row"><span class="info-label">Créé le</span><span class="info-val">14 avril 2026</span></div>
+            <div class="info-row"><span class="info-label">Jeux trackés</span><span class="info-val" id="settings-game-count" style="color:var(--blue)">—</span></div>
+            <div class="info-row"><span class="info-label">Trophées trackés</span><span class="info-val" id="settings-trophy-count" style="color:var(--gold)">—</span></div>
+            <div class="info-row"><span class="info-label">Platinés</span><span class="info-val" id="settings-plat-count" style="color:var(--plat-c)">—</span></div>
+            <div class="info-row"><span class="info-label">Jeux 100%</span><span class="info-val" id="settings-100-count" style="color:var(--green)">—</span></div>
+            <div class="info-row"><span class="info-label">Technologie</span><span class="info-val">HTML / CSS / JS</span></div>
+            <div class="info-row"><span class="info-label">Stockage</span><span class="info-val">LocalStorage</span></div>
+            <div class="info-row"><span class="info-label">Format</span><span class="info-val">PWA 📲</span></div>
+            <div class="info-row"><span class="info-label">Développeur</span><span class="info-val">Batman Miyuki</span></div>
+          </div>
+        </div>
         <!-- ═══ DONNÉES — Import / Export ═══ -->
         <div class="settings-section">
           <div class="settings-section-label">Données</div>
@@ -338,37 +367,6 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
           <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(this)"/>
           <div id="io-status" class="io-status"></div>
         </div>
-
-        <!-- HALL OF FAME PLATINE -->
-        <div class="settings-section">
-          <div class="settings-section-label">Derniers jeux platinés</div>
-          <div id="settings-plat-list"></div>
-        </div>
-
-        <!-- HALL OF FAME 100% -->
-        <div class="settings-section">
-          <div class="settings-section-label">Derniers jeux 100%</div>
-          <div id="settings-100-list"></div>
-        </div>
-
-        <!-- À PROPOS -->
-        <div class="settings-section">
-          <div class="settings-section-label">À propos</div>
-          <div class="card" style="padding:0;overflow:hidden">
-            <div class="info-row"><span class="info-label">Application</span><span class="info-val">Platina</span></div>
-            <div class="info-row"><span class="info-label">Version</span><span class="info-val" style="color:var(--green)">15</span></div>
-            <div class="info-row"><span class="info-label">Créé le</span><span class="info-val">14 avril 2026</span></div>
-            <div class="info-row"><span class="info-label">Jeux trackés</span><span class="info-val" id="settings-game-count" style="color:var(--blue)">—</span></div>
-            <div class="info-row"><span class="info-label">Trophées trackés</span><span class="info-val" id="settings-trophy-count" style="color:var(--gold)">—</span></div>
-            <div class="info-row"><span class="info-label">Platinés</span><span class="info-val" id="settings-plat-count" style="color:var(--plat-c)">—</span></div>
-            <div class="info-row"><span class="info-label">Jeux 100%</span><span class="info-val" id="settings-100-count" style="color:var(--green)">—</span></div>
-            <div class="info-row"><span class="info-label">Technologie</span><span class="info-val">HTML / CSS / JS</span></div>
-            <div class="info-row"><span class="info-label">Stockage</span><span class="info-val">LocalStorage</span></div>
-            <div class="info-row"><span class="info-label">Format</span><span class="info-val">PWA 📲</span></div>
-            <div class="info-row"><span class="info-label">Développeur</span><span class="info-val">Batman Miyuki</span></div>
-          </div>
-        </div>
-
       </div>
     </div>
   </div>
@@ -667,7 +665,7 @@ function renderDashboard(){
   var totalPts=earned.reduce(function(s,t){return s+TC[t.type].pts;},0);
   var pt=games.filter(function(g){return catGame(g)==='platinum'||catGame(g)==='100';}).length;
   var pct100=games.length?Math.round(completedG.length/games.length*100):0;
-  document.getElementById('dash-streak-title').textContent=pt>0?pt+' jeu'+(pt>1?'x':'')+' platiné'+(pt>1?'s':'')+'  💎':'Continuez comme ça !';
+  document.getElementById('dash-streak-title').textContent=pt>0?pt+' jeu'+(pt>1?'x':'')+' platiné'+(pt>1?'s':'')+'  ':'Continuez comme ça !';
   document.getElementById('dash-streak-sub').textContent=earned.length+' trophées · '+pct100+'% complétion';
   var tPct=allT.length?Math.round(earned.length/allT.length*100):0;
   var gPct=games.length?Math.round(completedG.length/games.length*100):0;
@@ -693,7 +691,7 @@ function renderDashboard(){
 function setGamesFilter(f){gamesFilter=f;['progress','platinum','100'].forEach(function(k){document.getElementById('btn-filter-'+k).classList.remove('actif');});document.getElementById('btn-filter-'+f).classList.add('actif');renderGamesList();}
 function renderGames(){document.getElementById('games-count').textContent=games.length+' jeu'+(games.length!==1?'x':'');setGamesFilter(gamesFilter);}
 function renderGamesList(){var html='';if(!games.length){html='<div class="empty"><div class="empty-icon">🎮</div><div class="empty-title">Aucun jeu ajouté</div><div class="empty-sub">Commencez votre collection !</div></div>';}else{var fg=games.filter(function(g){var cat=catGame(g);if(gamesFilter==='platinum')return cat==='platinum';if(gamesFilter==='100')return cat==='100';return cat==='progress';});fg.sort(function(a,b){return a.name.localeCompare(b.name);});if(!fg.length){html='<div class="empty"><div class="empty-title">Aucun jeu ici</div><div class="empty-sub">Pas de jeu dans cette catégorie.</div></div>';}else{html=fg.map(renderGameCard).join('');}}document.getElementById('games-list').innerHTML=html;}
-function renderGameCard(g){var s=statGame(g),cat=catGame(g);var barColor=cat==='platinum'?'var(--plat-c)':cat==='100'?'var(--green)':'var(--blue)';var pctColor=barColor;var badge=cat==='platinum'?'<span style="background:var(--plat-bg);color:var(--plat-c);border:2px solid var(--plat-border);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;">💎 Platine</span>':cat==='100'?'<span style="background:var(--green-bg);color:var(--green);border:2px solid var(--green);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;">👑 100%</span>':'';return '<div class="game-card" onclick="openDetail(\''+g.id+'\')">'+'<div class="game-cover-placeholder" style="'+getCoverStyle(g)+';">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">':'')+(badge?'<div style="position:absolute;bottom:10px;right:10px;z-index:2;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8));">'+badge+'</div>':'')+'<div style="position:absolute;top:10px;left:10px;z-index:2;">'+platformBadge(g.platform)+'</div>'+'<span class="cover-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,3).toUpperCase()+'</span>'+'</div>'+'<div class="game-card-body">'+'<div class="game-name">'+esc(g.name)+'</div>'+'<div class="game-prog-row"><span style="font-size:13px;font-weight:700;color:var(--text-mid)">'+s.earned+' / '+s.total+'</span><span class="game-pct" style="color:'+pctColor+';">'+s.pct+'%</span></div>'+'<div class="prog-bar"><div class="prog-fill" style="width:'+s.pct+'%;background:'+barColor+';"></div></div>'+'</div></div>';}
+function renderGameCard(g){var s=statGame(g),cat=catGame(g);var barColor=cat==='platinum'?'var(--plat-c)':cat==='100'?'var(--green)':'var(--blue)';var pctColor=barColor;var badge=cat==='platinum'?'<span style="background:var(--plat-bg);color:var(--plat-c);border:2px solid var(--plat-border);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;">Platine</span>':cat==='100'?'<span style="background:var(--green-bg);color:var(--green);border:2px solid var(--green);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;">👑 100%</span>':'';return '<div class="game-card" onclick="openDetail(\''+g.id+'\')">'+'<div class="game-cover-placeholder" style="'+getCoverStyle(g)+';">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">':'')+(badge?'<div style="position:absolute;bottom:10px;right:10px;z-index:2;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8));">'+badge+'</div>':'')+'<div style="position:absolute;top:10px;left:10px;z-index:2;">'+platformBadge(g.platform)+'</div>'+'<span class="cover-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,3).toUpperCase()+'</span>'+'</div>'+'<div class="game-card-body">'+'<div class="game-name">'+esc(g.name)+'</div>'+'<div class="game-prog-row"><span style="font-size:13px;font-weight:700;color:var(--text-mid)">'+s.earned+' / '+s.total+'</span><span class="game-pct" style="color:'+pctColor+';">'+s.pct+'%</span></div>'+'<div class="prog-bar"><div class="prog-fill" style="width:'+s.pct+'%;background:'+barColor+';"></div></div>'+'</div></div>';}
 
 /* ══ DETAIL ══ */
 function renderDetail(id){
@@ -702,13 +700,13 @@ function renderDetail(id){
   var allByType={bronze:0,silver:0,gold:0,platinum:0},allEarnedByType={bronze:0,silver:0,gold:0,platinum:0};
   [...(g.trophies||[]),...(g.dlcs||[]).flatMap(function(d){return d.trophies||[];})].forEach(function(t){allByType[t.type]++;if(t.earned)allEarnedByType[t.type]++;});
   var barColor=cat==='platinum'?'var(--plat-c)':cat==='100'?'var(--green)':'var(--blue)';
-  var pctLabel=cat==='platinum'?'<span class="badge badge-purple">💎 PLATINE OBTENU</span>':cat==='100'?'<span class="badge badge-green">👑 100% COMPLÉTÉ</span>':'';
+  var pctLabel=cat==='platinum'?'<span class="badge badge-purple"> PLATINE OBTENU</span>':cat==='100'?'<span class="badge badge-green"> 100% COMPLÉTÉ</span>':'';
   var statsGrid=ORDER.map(function(type){return '<div class="stat-mini"><div class="stat-mini-val" style="color:'+TC[type].c+';">'+allEarnedByType[type]+'<span style="font-size:14px;color:var(--text-dim)"> / '+allByType[type]+'</span></div><div class="stat-mini-lbl">'+TC[type].label+'</div></div>';}).join('');
   var filterPills=[['all','Tout'],['earned','✓ Acquis'],['notearned','✗ Verrouillés']].map(function(f){return '<button class="filter-pill'+(detailFilter===f[0]?' active':'')+'" onclick="setDetailFilter(\''+id+'\',\''+f[0]+'\')">'+f[1]+'</button>';}).join('');
-  var dlcCount=(g.dlcs||[]).length,dlcBadge=dlcCount?'<span class="badge badge-orange">📦 '+dlcCount+' DLC'+(dlcCount>1?'S':'')+'</span>':'';
+  var dlcCount=(g.dlcs||[]).length,dlcBadge=dlcCount?'<span class="badge badge-orange"> '+dlcCount+' DLC'+(dlcCount>1?'S':'')+'</span>':'';
   var baseTrophies=renderTrophyRows(g.trophies,id,null,detailFilter);
   var dlcHtml='';
-  if(g.dlcs&&g.dlcs.length){dlcHtml=g.dlcs.map(function(dlc){var ds=statDlc(dlc);var dlcColor=ds.pct===100?'var(--green)':'var(--orange)';return '<div class="dlc-box"><div class="dlc-header"><div><div class="dlc-title">📦 '+esc(dlc.name)+'</div><div class="dlc-sub">'+ds.earned+' / '+ds.total+' acquis · '+ds.pct+'%</div></div><div class="dlc-actions"><button class="btn btn-outline" style="padding:8px 12px;font-size:11px;border-radius:999px;" onclick="openAddTrophyModal(\''+id+'\',\''+dlc.id+'\')">+ Trophée</button><button onclick="deleteDlc(\''+id+'\',\''+dlc.id+'\')" style="background:transparent;border:2px solid var(--border-mid);border-radius:999px;color:var(--text-dim);cursor:pointer;width:34px;height:34px;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.color=\'var(--red)\';this.style.borderColor=\'var(--red)\'" onmouseout="this.style.color=\'var(--text-dim)\';this.style.borderColor=\'var(--border-mid)\'">✕</button></div></div><div class="prog-bar" style="margin-bottom:16px"><div class="prog-fill" style="width:'+ds.pct+'%;background:'+dlcColor+';"></div></div>'+renderTrophyRows(dlc.trophies,id,dlc.id,'all')+'</div>';}).join('');}
+  if(g.dlcs&&g.dlcs.length){dlcHtml=g.dlcs.map(function(dlc){var ds=statDlc(dlc);var dlcColor=ds.pct===100?'var(--green)':'var(--orange)';return '<div class="dlc-box"><div class="dlc-header"><div><div class="dlc-title"> '+esc(dlc.name)+'</div><div class="dlc-sub">'+ds.earned+' / '+ds.total+' acquis · '+ds.pct+'%</div></div><div class="dlc-actions"><button class="btn btn-outline" style="padding:8px 12px;font-size:11px;border-radius:999px;" onclick="openAddTrophyModal(\''+id+'\',\''+dlc.id+'\')">+ Trophée</button><button onclick="deleteDlc(\''+id+'\',\''+dlc.id+'\')" style="background:transparent;border:2px solid var(--border-mid);border-radius:999px;color:var(--text-dim);cursor:pointer;width:34px;height:34px;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.color=\'var(--red)\';this.style.borderColor=\'var(--red)\'" onmouseout="this.style.color=\'var(--text-dim)\';this.style.borderColor=\'var(--border-mid)\'">✕</button></div></div><div class="prog-bar" style="margin-bottom:16px"><div class="prog-fill" style="width:'+ds.pct+'%;background:'+dlcColor+';"></div></div>'+renderTrophyRows(dlc.trophies,id,dlc.id,'all')+'</div>';}).join('');}
   document.getElementById('detail-content').innerHTML=
     '<div class="detail-header" style="'+getCoverStyle(g)+'">'
     +(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.4">':'')
@@ -724,7 +722,7 @@ function renderDetail(id){
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="font-size:16px;font-weight:900;color:var(--text);">⭐ Jeu de base</div><button class="btn btn-outline" style="padding:8px 16px;font-size:12px;border-radius:999px;" onclick="openAddTrophyModal(\''+id+'\',\'main\')">+ Ajouter</button></div>'
     +'<div class="filter-row" style="padding:0 0 16px">'+filterPills+'</div>'
     +'<div id="trophy-list-inner">'+baseTrophies+'</div>'
-    +(dlcHtml?'<div style="margin-top:24px;padding-top:20px;border-top:2px solid var(--border)"><div style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:16px;">📦 Extensions</div>'+dlcHtml+'</div>':'')
+    +(dlcHtml?'<div style="margin-top:24px;padding-top:20px;border-top:2px solid var(--border)"><div style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:16px;"> DLCs</div>'+dlcHtml+'</div>':'')
     +'<div style="margin-top:20px"><button class="btn btn-ghost" style="width:100%;border-radius:var(--radius-xs);" onclick="openAddDlcModal(\''+id+'\')">+ Ajouter une extension</button></div>'
     +'<div style="margin-top:20px;padding-top:20px;border-top:2px solid var(--border)"><button class="btn btn-ghost" style="width:100%;color:var(--red);border-color:var(--red-bg);border-radius:var(--radius-xs);" onclick="deleteGame(\''+id+'\')">Supprimer ce jeu</button></div>'
     +'<div style="height:32px"></div></div>';
@@ -743,7 +741,7 @@ function renderSettings(){
   if(gc)gc.textContent=games.length;if(tc)tc.textContent=allT.length;if(pc)pc.textContent=platCount;if(hc)hc.textContent=count100;
   var platGames=games.filter(function(g){var pt=(g.trophies||[]).find(function(t){return t.type==='platinum';});return pt&&pt.earned;}).sort(function(a,b){var pa=(a.trophies||[]).find(function(t){return t.type==='platinum';});var pb=(b.trophies||[]).find(function(t){return t.type==='platinum';});return ((pb&&pb.at)||0)-((pa&&pa.at)||0);}).slice(0,6);
   var platEl=document.getElementById('settings-plat-list');
-  if(platEl){if(!platGames.length){platEl.innerHTML='<div class="hof-empty">Aucun jeu platiné pour l\'instant</div>';}else{platEl.innerHTML='<div class="hof-grid">'+platGames.map(function(g){return '<div class="hof-card" onclick="openDetail(\''+g.id+'\')"><div class="hof-cover" style="'+getCoverStyle(g)+'">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5" onerror="this.remove()">':'')+'<span class="hof-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()+'</span><span class="hof-badge">💎</span></div><div class="hof-name">'+esc(g.name)+'</div></div>';}).join('')+'</div>';}}
+  if(platEl){if(!platGames.length){platEl.innerHTML='<div class="hof-empty">Aucun jeu platiné pour l\'instant</div>';}else{platEl.innerHTML='<div class="hof-grid">'+platGames.map(function(g){return '<div class="hof-card" onclick="openDetail(\''+g.id+'\')"><div class="hof-cover" style="'+getCoverStyle(g)+'">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5" onerror="this.remove()">':'')+'<span class="hof-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()+'</span><span class="hof-badge"></span></div><div class="hof-name">'+esc(g.name)+'</div></div>';}).join('')+'</div>';}}
   var games100=games.filter(function(g){var s=statAll(g);return s.total>0&&s.earned===s.total;}).sort(function(a,b){function lastAt(g){var all=(g.trophies||[]).concat((g.dlcs||[]).flatMap(function(d){return d.trophies||[];}));var e=all.filter(function(t){return t.earned&&t.at;}).map(function(t){return t.at;});return e.length?Math.max.apply(null,e):0;}return lastAt(b)-lastAt(a);}).slice(0,6);
   var el100=document.getElementById('settings-100-list');
   if(el100){if(!games100.length){el100.innerHTML='<div class="hof-empty">Aucun jeu 100% pour l\'instant</div>';}else{el100.innerHTML='<div class="hof-grid">'+games100.map(function(g){return '<div class="hof-card" onclick="openDetail(\''+g.id+'\')"><div class="hof-cover" style="'+getCoverStyle(g)+'">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5" onerror="this.remove()">':'')+'<span class="hof-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()+'</span><span class="hof-badge">👑</span></div><div class="hof-name">'+esc(g.name)+'</div></div>';}).join('')+'</div>';}}
