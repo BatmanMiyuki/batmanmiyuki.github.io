@@ -668,7 +668,7 @@ function renderDashboard(){
   var totalPts=earned.reduce(function(s,t){return s+TC[t.type].pts;},0);
   var pt=games.filter(function(g){var plat=(g.trophies||[]).find(function(t){return t.type==='platinum';});return plat&&plat.earned;}).length;
   var pct100=games.length?Math.round(completedG.length/games.length*100):0;
-  document.getElementById('dash-streak-title').textContent=pt>0?pt+' jeu'+(pt>1?'x':'')+' platiné'+(pt>1?'s':'')+'  💎':'Continuez comme ça !';
+  document.getElementById('dash-streak-title').textContent=pt>0?pt+' jeu'+(pt>1?'x':'')+' platiné'+(pt>1?'s':'')+'  💎':'0 jeu platiné';
   document.getElementById('dash-streak-sub').textContent=earned.length+' trophées · '+pct100+'% complétion';
   var tPct=allT.length?Math.round(earned.length/allT.length*100):0;
   var gPct=games.length?Math.round(completedG.length/games.length*100):0;
