@@ -673,7 +673,7 @@ function renderDashboard(){
   var gPct=games.length?Math.round(completedG.length/games.length*100):0;
   var sPct=Math.min(Math.round(totalPts/5000*100),100);
   document.getElementById('ring-trophies').innerHTML=makeRing(tPct,90,'var(--green)',earned.length,'/ '+allT.length);
-  document.getElementById('ring-games').innerHTML=makeRing(gPct,90,'var(--blue)',completedG.length,'/ '+games.length);
+  document.getElementById('ring-games').innerHTML=makeRing(gPct,90,'#00D600',completedG.length,'/ '+games.length);
   document.getElementById('ring-score').innerHTML=makeRing(sPct,90,'var(--gold)',totalPts>=1000?((totalPts/1000).toFixed(1)+'k'):totalPts,'pts');
   var chartColors={platinum:'var(--plat-c)',gold:'var(--gold)',silver:'var(--silver-c)',bronze:'var(--bronze-c)'};
   var chartMax=Math.max.apply(null,[1].concat(ORDER.map(function(t){return allT.filter(function(x){return x.type===t;}).length;})));
