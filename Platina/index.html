@@ -724,7 +724,7 @@ function renderDetail(id){
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="font-size:16px;font-weight:900;color:var(--text);">⭐ Jeu de base</div><button class="btn btn-outline" style="padding:8px 16px;font-size:12px;border-radius:999px;" onclick="openAddTrophyModal(\''+id+'\',\'main\')">+ Ajouter</button></div>'
     +'<div class="filter-row" style="padding:0 0 16px">'+filterPills+'</div>'
     +'<div id="trophy-list-inner">'+baseTrophies+'</div>'
-    +(dlcHtml?'<div style="margin-top:24px;padding-top:20px;border-top:2px solid var(--border)"><div style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:16px;">📦 Extensions</div>'+dlcHtml+'</div>':'')
+    +(dlcHtml?'<div style="margin-top:24px;padding-top:20px;border-top:2px solid var(--border)"><div style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:16px;">DLCs</div>'+dlcHtml+'</div>':'')
     +'<div style="margin-top:20px"><button class="btn btn-ghost" style="width:100%;border-radius:var(--radius-xs);" onclick="openAddDlcModal(\''+id+'\')">+ Ajouter une extension</button></div>'
     +'<div style="margin-top:20px;padding-top:20px;border-top:2px solid var(--border)"><button class="btn btn-ghost" style="width:100%;color:var(--red);border-color:var(--red-bg);border-radius:var(--radius-xs);" onclick="deleteGame(\''+id+'\')">Supprimer ce jeu</button></div>'
     +'<div style="height:32px"></div></div>';
