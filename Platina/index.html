@@ -204,6 +204,20 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
 .io-status{display:none;margin-top:10px;padding:12px 16px;border-radius:var(--radius-xs);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;}
 .io-status.ok{background:var(--green-bg);border:2px solid var(--green);color:var(--green);}
 .io-status.err{background:var(--red-bg);border:2px solid var(--red);color:var(--red);}
+/* ── LIGHTBOX ── */
+.lightbox-overlay{position:fixed;inset:0;background:rgba(0,0,0,.95);display:flex;align-items:center;justify-content:center;z-index:500;opacity:0;pointer-events:none;transition:opacity .3s;}
+.lightbox-overlay.open{opacity:1;pointer-events:all}
+.lightbox-img{max-width:95vw;max-height:90vh;object-fit:contain;border-radius:16px;box-shadow:0 0 60px rgba(28,176,246,0.25);cursor:zoom-out;}
+.lightbox-close{position:absolute;top:16px;right:16px;width:48px;height:48px;border-radius:999px;background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.2);cursor:pointer;font-size:22px;color:#fff;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);transition:background .2s,transform .15s;z-index:10;}
+.lightbox-close:hover{background:rgba(255,255,255,0.25);transform:scale(1.1);}
+.lightbox-hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:700;color:rgba(255,255,255,0.5);white-space:nowrap;}
+/* ── TOAST NOTIFICATIONS ── */
+.toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none;}
+.toast{background:var(--surface);border:2px solid var(--green);border-radius:var(--radius-sm);padding:14px 24px;box-shadow:0 8px 32px rgba(28,176,246,0.25);display:flex;align-items:center;gap:10px;animation:toastIn .35s cubic-bezier(.4,0,.2,1),toastOut .35s ease .28s forwards;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:var(--green);max-width:90vw;}
+.toast-icon{font-size:22px;flex-shrink:0;}
+.toast-text{flex:1}
+@keyframes toastIn{0%{opacity:0;transform:translateY(-20px) scale(.85);}100%{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes toastOut{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-10px) scale(.9);}}
 /* ── LIGHT THEME ── */
 #root.theme-light{--bg:#f4f4f5;--surface:#ffffff;--surface-2:#f0f0f1;--border:#e4e4e7;--border-mid:#d4d4d8;--text:#09090b;--text-mid:#52525b;--text-dim:#a1a1aa;--green-bg:rgba(28,176,246,0.08);--green-mid:rgba(28,176,246,0.2);--blue-bg:#eff8fe;--gold-bg:#fffbeb;--red-bg:#fef2f2;--bronze-bg:#fdf6f0;--bronze-border:#d4956a;--silver-bg:#f8fafc;--silver-border:#b0b8c8;--gold-bg2:#fffbeb;--gold-border:#d4a800;--plat-bg:#eff8ff;--plat-border:#7dd0f5;--shadow:0 2px 8px rgba(0,0,0,0.06);--shadow-md:0 6px 20px rgba(0,0,0,0.09);}
 #root.theme-light .streak-banner{background:linear-gradient(135deg,#cbeeff,#9adaff);border-color:var(--green-dark);}
@@ -474,6 +488,26 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
   </div>
 </div>
 
+<!-- CONFIRM DELETE GAME -->
+<div class="modal-overlay" id="modal-confirm-delete" onclick="closeConfirmDelete()">
+  <div class="modal-sheet" onclick="event.stopPropagation()" style="border:2px solid var(--red);box-shadow:0 0 40px rgba(255,75,75,0.2);max-width:420px;">
+    <div class="modal-handle" style="background:var(--red);opacity:0.5"></div>
+    <div class="modal-header" style="border-bottom-color:var(--red);">
+      <div class="modal-title" style="color:var(--red);">⚠️ Supprimer ce jeu ?</div>
+      <button class="btn-close" onclick="closeConfirmDelete()" style="color:var(--red);border-color:var(--red);">✕</button>
+    </div>
+    <div class="modal-body" style="text-align:center;padding:24px 20px;">
+      <div style="font-size:48px;margin-bottom:16px;">🗑️</div>
+      <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">"<span id="confirm-delete-name"></span>"</div>
+      <div style="font-size:13px;color:var(--text-mid);margin-bottom:24px;">Cette action est irréversible.<br>Tous les trophées seront supprimés.</div>
+      <div style="display:flex;gap:12px;">
+        <button onclick="confirmDeleteGame()" class="btn btn-red" style="flex:1;">Supprimer</button>
+        <button onclick="closeConfirmDelete()" class="btn btn-outline" style="flex:1;">Annuler</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL DATE TROPHÉE -->
 <div class="date-modal-overlay" id="modal-trophy-date">
   <div class="date-modal-sheet">
@@ -489,6 +523,16 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
   </div>
 </div>
 
+<!-- IMAGE LIGHTBOX -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img class="lightbox-img" id="lightbox-img" src="" alt="Image du jeu" onclick="event.stopPropagation()">
+  <div class="lightbox-hint">Cliquez sur l'image ou ✕ pour fermer</div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
 <!-- INSTALL BANNER -->
 <div id="tt-install-banner">
   <span style="font-size:22px"><img src="platine.png" width="35" height="35" style="object-fit:contain; transform: scale(1.25); transform-origin: center; vertical-align: middle; filter:drop-shadow(0 0 10px rgba(28,176,246,0.6))" onerror="this.outerHTML=''"/></span>
@@ -499,6 +543,14 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
 <script>
 /* ══ HELPERS ══ */
 function uid(){return Math.random().toString(36).slice(2,11);}
+
+/* ══ LIGHTBOX ══ */
+function openLightbox(url){var lb=document.getElementById('lightbox');var img=document.getElementById('lightbox-img');img.src=url;lb.classList.add('open');document.body.style.overflow='hidden';}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(document.getElementById('lightbox').classList.contains('open'))closeLightbox();}});
+
+/* ══ TOAST ══ */
+function showToast(message,icon){var c=document.getElementById('toast-container');var t=document.createElement('div');t.className='toast';t.innerHTML='<span class="toast-icon">'+icon+'</span><span class="toast-text">'+message+'</span>';c.appendChild(t);setTimeout(function(){t.remove();},3200);}
 var GRADS=[['#1a3a5c','#0a1e30'],['#3a0a0a','#220404'],['#0a3a10','#041506'],['#2d0a3a','#130418'],['#3a200a','#160b04'],['#0a1e3a','#040b18'],['#2a0a20','#10040c'],['#1a3a0a','#0a1604'],['#3a2a0a','#150f04'],['#0a2a3a','#041018']];
 var TC={bronze:{c:'#cd7f32',bg:'#1e0e04',border:'#7a4920',pts:15,label:'Bronze'},silver:{c:'#b0c4de',bg:'#161c24',border:'#3a4a5c',pts:30,label:'Argent'},gold:{c:'#ffd700',bg:'#1e1600',border:'#7a6000',pts:90,label:'Or'},platinum:{c:'#1cb0f6',bg:'#001a2e',border:'#0a5070',pts:300,label:'Platine'}};
 var TROPHY_FILES={platinum:'platine',gold:'or',silver:'argent',bronze:'bronze'};
@@ -610,8 +662,11 @@ function cancelTrophyDate(){document.getElementById('modal-trophy-date').classLi
 function applyToggle(gameId,trophyId,dlcId,earn,at){var g=games.find(function(x){return x.id===gameId;});if(!g)return;var t;if(dlcId){var dlc=g.dlcs.find(function(x){return x.id===dlcId;});if(!dlc)return;t=dlc.trophies.find(function(x){return x.id===trophyId;});}else{t=g.trophies.find(function(x){return x.id===trophyId;});}if(!t)return;t.earned=earn;t.at=earn?at:null;saveGames();if(earn)showConfetti();renderDetail(gameId);}
 
 /* ══ CRUD ══ */
+var _deleteGameId=null;
+function closeConfirmDelete(){document.getElementById('modal-confirm-delete').classList.remove('open');_deleteGameId=null;}
+function confirmDeleteGame(){if(!_deleteGameId)return;var gameName='';var g=games.find(function(x){return x.id===_deleteGameId;});if(g)gameName=g.name;games=games.filter(function(x){return x.id!==_deleteGameId;});saveGames();_deleteGameId=null;closeConfirmDelete();switchTab('games');showToast('"'+gameName+'" a été supprimé','🗑️');}
 function validateAddGame(){document.getElementById('ag-submit').disabled=!document.getElementById('ag-name').value.trim();}
-function submitAddGame(){var name=document.getElementById('ag-name').value.trim();if(!name)return;var platform=getSegVal('ag-platform-group');var coverData=document.getElementById('ag-cover-data').value;var coverUrl=coverData||document.getElementById('ag-cover-url').value.trim();var dlcNames=document.getElementById('ag-dlcs').value.split(',').map(function(s){return s.trim();}).filter(Boolean);var nB=parseInt(document.getElementById('ag-bronze').value)||0;var nS=parseInt(document.getElementById('ag-silver').value)||0;var nG=parseInt(document.getElementById('ag-gold').value)||0;var hasPt=document.getElementById('ag-platinum').checked;var trophies=[];if(hasPt)trophies.push({id:uid(),name:'Platine',desc:'Obtenir tous les trophées',type:'platinum',earned:false,at:null});for(var i=1;i<=nG;i++)trophies.push({id:uid(),name:'Trophée Or '+i,desc:'',type:'gold',earned:false,at:null});for(var i=1;i<=nS;i++)trophies.push({id:uid(),name:'Trophée Argent '+i,desc:'',type:'silver',earned:false,at:null});for(var i=1;i<=nB;i++)trophies.push({id:uid(),name:'Trophée Bronze '+i,desc:'',type:'bronze',earned:false,at:null});var dlcs=dlcNames.map(function(n){return{id:uid(),name:n,trophies:[]};});games.push({id:uid(),name:name,platform:platform,coverUrl:coverUrl,grad:GRADS[Math.floor(Math.random()*GRADS.length)],trophies:trophies,dlcs:dlcs,addedAt:Date.now()});saveGames();closeModal('add-game');['ag-name','ag-cover-url','ag-dlcs','ag-bronze','ag-silver','ag-gold','ag-cover-data'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('ag-platinum').checked=true;document.getElementById('ag-submit').disabled=true;document.getElementById('ag-cover-file').value='';document.getElementById('ag-cover-preview').style.display='none';renderGames();}
+function submitAddGame(){var name=document.getElementById('ag-name').value.trim();if(!name)return;var platform=getSegVal('ag-platform-group');var coverData=document.getElementById('ag-cover-data').value;var coverUrl=coverData||document.getElementById('ag-cover-url').value.trim();var dlcNames=document.getElementById('ag-dlcs').value.split(',').map(function(s){return s.trim();}).filter(Boolean);var nB=parseInt(document.getElementById('ag-bronze').value)||0;var nS=parseInt(document.getElementById('ag-silver').value)||0;var nG=parseInt(document.getElementById('ag-gold').value)||0;var hasPt=document.getElementById('ag-platinum').checked;var trophies=[];if(hasPt)trophies.push({id:uid(),name:'Platine',desc:'Obtenir tous les trophées',type:'platinum',earned:false,at:null});for(var i=1;i<=nG;i++)trophies.push({id:uid(),name:'Trophée Or '+i,desc:'',type:'gold',earned:false,at:null});for(var i=1;i<=nS;i++)trophies.push({id:uid(),name:'Trophée Argent '+i,desc:'',type:'silver',earned:false,at:null});for(var i=1;i<=nB;i++)trophies.push({id:uid(),name:'Trophée Bronze '+i,desc:'',type:'bronze',earned:false,at:null});var dlcs=dlcNames.map(function(n){return{id:uid(),name:n,trophies:[]};});games.push({id:uid(),name:name,platform:platform,coverUrl:coverUrl,grad:GRADS[Math.floor(Math.random()*GRADS.length)],trophies:trophies,dlcs:dlcs,addedAt:Date.now()});saveGames();closeModal('add-game');['ag-name','ag-cover-url','ag-dlcs','ag-bronze','ag-silver','ag-gold','ag-cover-data'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('ag-platinum').checked=true;document.getElementById('ag-submit').disabled=true;document.getElementById('ag-cover-file').value='';document.getElementById('ag-cover-preview').style.display='none';renderGames();switchTab('games');showToast('Jeu ajouté avec succès ! 🎮','✅');}
 function validateAddTrophy(){document.getElementById('at-submit').disabled=!document.getElementById('at-name').value.trim();}
 function openAddTrophyModal(gameId,sectionId){sectionId=sectionId||'main';addTrophyContext={gameId:gameId,sectionId:sectionId};var g=games.find(function(x){return x.id===gameId;});var sel=document.getElementById('at-section');sel.innerHTML='<option value="main">⭐ Jeu de base</option>';if(g&&g.dlcs&&g.dlcs.length){g.dlcs.forEach(function(d){sel.innerHTML+='<option value="'+d.id+'"> '+esc(d.name)+'</option>';});}sel.value=sectionId;document.getElementById('at-section-field').style.display=(g&&g.dlcs&&g.dlcs.length)?'flex':'none';document.getElementById('at-name').value='';document.getElementById('at-desc').value='';document.getElementById('at-submit').disabled=true;openModal('add-trophy');}
 function submitAddTrophy(){var name=document.getElementById('at-name').value.trim();if(!name||!addTrophyContext.gameId)return;var desc=document.getElementById('at-desc').value.trim();var type=getSegVal('at-type-group');var sectionId=document.getElementById('at-section').value;var g=games.find(function(x){return x.id===addTrophyContext.gameId;});if(!g)return;var trophy={id:uid(),name:name,desc:desc,type:type,earned:false,at:null};if(sectionId==='main'){g.trophies.push(trophy);}else{var dlc=g.dlcs.find(function(d){return d.id===sectionId;});if(dlc)dlc.trophies.push(trophy);}saveGames();closeModal('add-trophy');renderDetail(addTrophyContext.gameId);}
@@ -624,7 +679,7 @@ function openEditCoverModal(gameId){document.getElementById('ec-game-id').value=
 function submitEditCover(){var gameId=document.getElementById('ec-game-id').value;var coverData=document.getElementById('ec-data').value;var coverUrl=coverData||document.getElementById('ec-url').value.trim();var g=games.find(function(x){return x.id===gameId;});if(!g)return;g.coverUrl=coverUrl;saveGames();closeModal('edit-cover');renderDetail(gameId);}
 function toggleTrophy(gameId,trophyId){var g=games.find(function(x){return x.id===gameId;});if(!g)return;var t=g.trophies.find(function(x){return x.id===trophyId;});if(!t)return;if(!t.earned){openDateModal(gameId,trophyId,null,t.name);}else{t.earned=false;t.at=null;saveGames();renderDetail(gameId);}}
 function toggleDlcTrophy(gameId,dlcId,trophyId){var g=games.find(function(x){return x.id===gameId;});if(!g)return;var dlc=g.dlcs.find(function(x){return x.id===dlcId;});if(!dlc)return;var t=dlc.trophies.find(function(x){return x.id===trophyId;});if(!t)return;if(!t.earned){openDateModal(gameId,trophyId,dlcId,t.name);}else{t.earned=false;t.at=null;saveGames();renderDetail(gameId);}}
-function deleteGame(id){if(!confirm('Supprimer ce jeu ?'))return;games=games.filter(function(g){return g.id!==id;});saveGames();backFromDetail();}
+function deleteGame(id){_deleteGameId=id;var g=games.find(function(x){return x.id===id;});document.getElementById('confirm-delete-name').textContent=g?g.name:'ce jeu';document.getElementById('modal-confirm-delete').classList.add('open');}
 function deleteTrophy(gameId,trophyId){var g=games.find(function(x){return x.id===gameId;});if(!g)return;g.trophies=g.trophies.filter(function(t){return t.id!==trophyId;});saveGames();renderDetail(gameId);}
 function deleteDlcTrophy(gameId,dlcId,trophyId){var g=games.find(function(x){return x.id===gameId;});if(!g)return;var dlc=g.dlcs.find(function(x){return x.id===dlcId;});if(!dlc)return;dlc.trophies=dlc.trophies.filter(function(t){return t.id!==trophyId;});saveGames();renderDetail(gameId);}
 function deleteDlc(gameId,dlcId){if(!confirm('Supprimer ce DLC et tous ses trophées ?'))return;var g=games.find(function(x){return x.id===gameId;});if(!g)return;g.dlcs=g.dlcs.filter(function(d){return d.id!==dlcId;});saveGames();renderDetail(gameId);}
@@ -711,7 +766,7 @@ function renderDetail(id){
   if(g.dlcs&&g.dlcs.length){dlcHtml=g.dlcs.map(function(dlc){var ds=statDlc(dlc);var dlcColor=ds.pct===100?'var(--green)':'var(--orange)';return '<div class="dlc-box"><div class="dlc-header"><div><div class="dlc-title"> '+esc(dlc.name)+'</div><div class="dlc-sub">'+ds.earned+' / '+ds.total+' acquis · '+ds.pct+'%</div></div><div class="dlc-actions"><button class="btn btn-outline" style="padding:8px 12px;font-size:11px;border-radius:999px;" onclick="openAddTrophyModal(\''+id+'\',\''+dlc.id+'\')">+ Trophée</button><button onclick="deleteDlc(\''+id+'\',\''+dlc.id+'\')" style="background:transparent;border:2px solid var(--border-mid);border-radius:999px;color:var(--text-dim);cursor:pointer;width:34px;height:34px;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.color=\'var(--red)\';this.style.borderColor=\'var(--red)\'" onmouseout="this.style.color=\'var(--text-dim)\';this.style.borderColor=\'var(--border-mid)\'">✕</button></div></div><div class="prog-bar" style="margin-bottom:16px"><div class="prog-fill" style="width:'+ds.pct+'%;background:'+dlcColor+';"></div></div>'+renderTrophyRows(dlc.trophies,id,dlc.id,'all')+'</div>';}).join('');}
   document.getElementById('detail-content').innerHTML=
     '<div class="detail-header" style="'+getCoverStyle(g)+'">'
-    +(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.4">':'')
+    +(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.4;cursor:zoom-in" onclick="openLightbox(\''+esc(g.coverUrl).replace(/'/g,"\\'")+'\')" title="Cliquer pour agrandir">':'')
     +'<div style="position:absolute;inset:0;background:linear-gradient(to top,#000000 0%,rgba(0,0,0,0.4) 55%,rgba(0,0,0,0) 100%)"></div>'
     +'<button class="detail-back" onclick="backFromDetail()">‹</button>'
     +'<div class="detail-platform">'+platformBadge(g.platform)+'</div>'
@@ -813,5 +868,5 @@ loadData();
 renderDashboard();
 renderSettings();
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a04dd0f9b8a4d618',t:'MTc4MDMxMjY5Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
