@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
@@ -563,7 +563,7 @@ function trophyImg(type,size){size=size||24;return '<img src="'+TROPHY_FILES[typ
 function imgErr(el){var fb=el.getAttribute('data-fb')||'bronze';el.outerHTML='<span style="font-size:'+Math.round(parseInt(el.width)*0.75)+'px;line-height:1">'+TROPHY_EMOJIS[fb]+'</span>';}
 function platformBadge(plat,extraStyle){var cls='platform-ps3';if(plat==='PS5')cls='platform-ps5';else if(plat==='PS4')cls='platform-ps4';return '<span class="platform-badge '+cls+'"'+(extraStyle?' style="'+extraStyle+'"':'')+'>'+esc(plat)+'</span>';}
 function getCoverStyle(g){return 'background:linear-gradient(135deg,'+g.grad[0]+','+g.grad[1]+')';}
-function handleCoverFile(input,previewId,dataId){var file=input.files[0];if(!file)return;var r=new FileReader();r.onload=function(e){document.getElementById(dataId).value=e.target.result;var p=document.getElementById(previewId);p.src=e.target.result;p.style.display='block';};r.readAsDataURL(file);}
+function handleCoverFile(input,previewId,dataId){var file=input.files[0];if(!file)return;var maxSize=500*1024;if(file.size>maxSize){showToast('Image trop grande ! Max 500 KB','⚠️');return;}var r=new FileReader();r.onload=function(e){document.getElementById(dataId).value=e.target.result;var p=document.getElementById(previewId);p.src=e.target.result;p.style.display='block';};r.readAsDataURL(file);}
 function previewCoverUrl(inputId,previewId){var url=document.getElementById(inputId).value.trim();var p=document.getElementById(previewId);if(url){p.src=url;p.style.display='block';}else{p.style.display='none';}}
 
 /* ══ STATS ══ */
@@ -620,10 +620,13 @@ function exportData(){
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showIOStatus('✓ Export réussi ! '+games.length+' jeu'+(games.length>1?'x':'')+' sauvegardé'+(games.length>1?'s':'')+'.', true);
+  var sizeKB=Math.round(blob.size/1024);
+  showIOStatus('✓ Export réussi ! '+games.length+' jeu'+(games.length>1?'x':'')+' ('+sizeKB+' KB)', true);
 }
 function importData(input){
   var file=input.files[0]; if(!file)return;
+  var sizeMB=(file.size/1024/1024).toFixed(2);
+  if(file.size>5*1024*1024){showIOStatus('⚠️ Fichier trop volumineux ('+sizeMB+' MB). Images trop lourdes ?', false);input.value='';return;}
   var reader=new FileReader();
   reader.onload=function(e){
     try{
@@ -868,5 +871,5 @@ loadData();
 renderDashboard();
 renderSettings();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a04dd0f9b8a4d618',t:'MTc4MDMxMjY5Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a06f3049cf6beedf',t:'MTc4MDY2MjYyNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
