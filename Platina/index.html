@@ -224,6 +224,20 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
 #root.theme-light .streak-title{color:var(--green-dark);}
 #root.theme-light .streak-sub{color:#1482b5;}
 #root,#root *{transition:background-color .2s,border-color .2s,color .15s;}
+/* ── LIGHTBOX ── */
+.lightbox-overlay{position:fixed;inset:0;background:rgba(0,0,0,.95);display:flex;align-items:center;justify-content:center;z-index:500;opacity:0;pointer-events:none;transition:opacity .3s;}
+.lightbox-overlay.open{opacity:1;pointer-events:all}
+.lightbox-img{max-width:95vw;max-height:90vh;object-fit:contain;border-radius:16px;box-shadow:0 0 60px rgba(28,176,246,0.25);cursor:zoom-out;}
+.lightbox-close{position:absolute;top:16px;right:16px;width:48px;height:48px;border-radius:999px;background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.2);cursor:pointer;font-size:22px;color:#fff;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);transition:background .2s,transform .15s;z-index:10;}
+.lightbox-close:hover{background:rgba(255,255,255,0.25);transform:scale(1.1);}
+.lightbox-hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:700;color:rgba(255,255,255,0.5);white-space:nowrap;}
+/* ── TOAST ── */
+.toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none;}
+.toast{background:var(--surface);border:2px solid var(--green);border-radius:var(--radius-sm);padding:14px 24px;box-shadow:0 8px 32px rgba(28,176,246,0.25);display:flex;align-items:center;gap:10px;animation:toastIn .35s cubic-bezier(.4,0,.2,1),toastOut .35s ease .45s forwards;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:var(--green);max-width:90vw;}
+.toast-icon{font-size:22px;flex-shrink:0;}
+.toast-text{flex:1}
+@keyframes toastIn{0%{opacity:0;transform:translateY(-20px) scale(.85);}100%{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes toastOut{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-10px) scale(.9);}}
 </style>
 </head>
 <body>
@@ -541,8 +555,30 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
   <button onclick="document.getElementById('tt-install-banner').classList.remove('show')" style="background:none;border:none;color:var(--text-mid);font-size:20px;cursor:pointer;line-height:1">✕</button>
 </div>
 <script>
+/* ══ HTML ELEMENTS ══ */
+/* CONFIRM DELETE GAME */
+document.write('<div class="modal-overlay" id="modal-confirm-delete" onclick="closeConfirmDelete()"><div class="modal-sheet" onclick="event.stopPropagation()" style="border:2px solid var(--red);box-shadow:0 0 40px rgba(255,75,75,0.2);max-width:420px;"><div class="modal-handle" style="background:var(--red);opacity:0.5"></div><div class="modal-header" style="border-bottom-color:var(--red);"><div class="modal-title" style="color:var(--red);">⚠️ Supprimer ce jeu ?</div><button class="btn-close" onclick="closeConfirmDelete()" style="color:var(--red);border-color:var(--red);">✕</button></div><div class="modal-body" style="text-align:center;padding:24px 20px;"><div style="font-size:48px;margin-bottom:16px;">🗑️</div><div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">"<span id="confirm-delete-name"></span>"</div><div style="font-size:13px;color:var(--text-mid);margin-bottom:24px;">Cette action est irréversible.<br>Tous les trophées seront supprimés.</div><div style="display:flex;gap:12px;"><button onclick="confirmDeleteGame()" class="btn btn-red" style="flex:1;">Supprimer</button><button onclick="closeConfirmDelete()" class="btn btn-outline" style="flex:1;">Annuler</button></div></div></div></div>');
+/* IMAGE LIGHTBOX */
+document.write('<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()"><button class="lightbox-close" onclick="closeLightbox()">✕</button><img class="lightbox-img" id="lightbox-img" src="" alt="Image du jeu" onclick="event.stopPropagation()"><div class="lightbox-hint">Cliquez sur limage ou ✕ pour fermer</div></div>');
+/* TOAST CONTAINER */
+document.write('<div class="toast-container" id="toast-container"></div>');
+
 /* ══ HELPERS ══ */
 function uid(){return Math.random().toString(36).slice(2,11);}
+
+/* ══ LIGHTBOX ══ */
+function openLightbox(url){var lb=document.getElementById('lightbox');var img=document.getElementById('lightbox-img');img.src=url;lb.classList.add('open');document.body.style.overflow='hidden';}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(document.getElementById('lightbox')&&document.getElementById('lightbox').classList.contains('open'))closeLightbox();}});
+
+/* ══ TOAST ══ */
+function showToast(message,icon){var c=document.getElementById('toast-container');if(!c)return;var t=document.createElement('div');t.className='toast';t.innerHTML='<span class="toast-icon">'+icon+'</span><span class="toast-text">'+message+'</span>';c.appendChild(t);setTimeout(function(){if(t.parentNode)t.remove();},5000);}
+
+/* ══ DELETE CONFIRMATION ══ */
+var _deleteGameId=null;
+function closeConfirmDelete(){var m=document.getElementById('modal-confirm-delete');if(m)m.classList.remove('open');_deleteGameId=null;}
+function confirmDeleteGame(){if(!_deleteGameId)return;var gameName='';var g=games.find(function(x){return x.id===_deleteGameId;});if(g)gameName=g.name;games=games.filter(function(x){return x.id!==_deleteGameId;});saveGames();_deleteGameId=null;closeConfirmDelete();switchTab('games');setTimeout(function(){showToast('"'+gameName+'" a été supprimé','🗑️');},100);}
+function deleteGame(id){_deleteGameId=id;var g=games.find(function(x){return x.id===id;});var n=document.getElementById('confirm-delete-name');if(n)n.textContent=g?g.name:'ce jeu';var m=document.getElementById('modal-confirm-delete');if(m)m.classList.add('open');}
 
 /* ══ LIGHTBOX ══ */
 function openLightbox(url){var lb=document.getElementById('lightbox');var img=document.getElementById('lightbox-img');img.src=url;lb.classList.add('open');document.body.style.overflow='hidden';}
@@ -564,7 +600,7 @@ function imgErr(el){var fb=el.getAttribute('data-fb')||'bronze';el.outerHTML='<s
 function platformBadge(plat,extraStyle){var cls='platform-ps3';if(plat==='PS5')cls='platform-ps5';else if(plat==='PS4')cls='platform-ps4';return '<span class="platform-badge '+cls+'"'+(extraStyle?' style="'+extraStyle+'"':'')+'>'+esc(plat)+'</span>';}
 function getCoverStyle(g){return 'background:linear-gradient(135deg,'+g.grad[0]+','+g.grad[1]+')';}
 function handleCoverFile(input,previewId,dataId){var file=input.files[0];if(!file)return;var maxSize=500*1024;if(file.size>maxSize){showToast('Image trop grande ! Max 500 KB','⚠️');return;}var r=new FileReader();r.onload=function(e){document.getElementById(dataId).value=e.target.result;var p=document.getElementById(previewId);p.src=e.target.result;p.style.display='block';};r.readAsDataURL(file);}
-function previewCoverUrl(inputId,previewId){var url=document.getElementById(inputId).value.trim();var p=document.getElementById(previewId);if(url){p.src=url;p.style.display='block';}else{p.style.display='none';}}
+function previewCoverUrl(inputId,previewId){var url=document.getElementById(inputId).value.trim();var p=document.getElementById(previewId);if(url){p.onerror=function(){p.style.display='none';var hint=document.createElement('div');hint.style.cssText='font-size:11px;color:var(--red);margin-top:4px;text-align:center;font-weight:700;';hint.textContent='⚠️ Image inaccessible. Utilisez imgur, discord ou imgbb';var existing=document.querySelector('.cover-url-hint');if(existing)existing.remove();var inp=document.getElementById(inputId);if(inp&&inp.nextSibling&&inp.nextSibling.className!=='cover-url-hint'){inp.parentNode.insertBefore(hint,inp.nextSibling);hint.className='cover-url-hint';setTimeout(function(){hint.remove();},6000);}};p.onload=function(){p.style.display='block';var h=document.querySelector('.cover-url-hint');if(h)h.remove();};p.src=url;}else{p.style.display='none';var h=document.querySelector('.cover-url-hint');if(h)h.remove();}}
 
 /* ══ STATS ══ */
 function catGame(g){var sAll=statAll(g);if(sAll.total>0&&sAll.earned===sAll.total)return '100';var platTrophy=(g.trophies||[]).find(function(x){return x.type==='platinum';});if(platTrophy&&platTrophy.earned)return 'platinum';return 'progress';}
@@ -606,7 +642,7 @@ function showIOStatus(msg, isOk){
   el.textContent=msg;
   el.className='io-status '+(isOk?'ok':'err');
   el.style.display='block';
-  setTimeout(function(){el.style.display='none';},4000);
+  setTimeout(function(){el.style.display='none';},6000);
 }
 function exportData(){
   var data={version:2,exportDate:new Date().toISOString(),games:games,wishlist:wishlist};
@@ -692,28 +728,59 @@ function deleteWish(id){wishlist=wishlist.filter(function(w){return w.id!==id;})
 function showConfetti(){var colors=['#1cb0f6','#5de8ff','#ffffff','#ffd700','#88e4ff'];for(var i=0;i<14;i++){var el=document.createElement('div');el.style.cssText='position:fixed;top:45%;left:'+(15+Math.random()*70)+'%;width:10px;height:10px;border-radius:50%;background:'+colors[i%5]+';z-index:999;pointer-events:none;animation:confetti .8s ease forwards '+(Math.random()*.35)+'s;box-shadow:0 0 10px '+colors[i%5];document.body.appendChild(el);setTimeout(function(){el.remove();},1200);}}
 
 /* ══ TROPHY ROWS ══ */
-function renderTrophyRows(trophies,gameId,dlcId,filterStr){
-  var sorted=[...trophies].sort(function(a,b){var oi=ORDER.indexOf(a.type)-ORDER.indexOf(b.type);if(oi!==0)return oi;if(a.earned!==b.earned)return a.earned?-1:1;return 0;});
-  if(filterStr==='earned')sorted=sorted.filter(function(t){return t.earned;});
-  else if(filterStr==='notearned')sorted=sorted.filter(function(t){return !t.earned;});
-  else if(filterStr&&filterStr!=='all')sorted=sorted.filter(function(t){return t.type===filterStr;});
-  if(!sorted.length)return '<div style="text-align:center;padding:16px;color:var(--text-mid);font-size:13px;font-weight:700;">Aucun trophée à afficher</div>';
-  var toggleFn=dlcId?"toggleDlcTrophy('"+gameId+"','"+dlcId+"',":"toggleTrophy('"+gameId+"',";
-  var deleteFn=dlcId?"deleteDlcTrophy('"+gameId+"','"+dlcId+"',":"deleteTrophy('"+gameId+"',";
-  return sorted.map(function(t){
-    var tc=TC[t.type];
-    return '<div class="trophy-row'+(t.earned?' earned':'')+'">'
-      +'<div class="check-box'+(t.earned?' done':'')+'" onclick="'+toggleFn+"'"+t.id+"')\">"
-      +(t.earned?'<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>':'')
-      +'</div>'
-      +'<div style="width:34px;height:34px;border-radius:10px;background:'+tc.bg+';border:2px solid '+tc.border+';display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">'+trophyImg(t.type,22)+'</div>'
-      +'<div style="flex:1;min-width:0"><div class="trophy-name">'+esc(t.name)+'</div>'+(t.desc?'<div class="trophy-desc">'+esc(t.desc)+'</div>':'')+'</div>'
-      +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">'
-      +makeTrophyPill(t.type)
-      +(t.earned&&t.at?'<div style="font-size:11px;color:var(--text-dim);font-weight:700;">'+timeAgo(t.at)+'</div>':'<div style="font-size:11px;font-weight:800;color:'+tc.c+';">+'+tc.pts+'</div>')
-      +'</div>'
-      +'<button onclick="'+deleteFn+"'"+t.id+"')\" style=\"background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:14px;padding:4px 4px;border-radius:50%;transition:background .15s;\" onmouseover=\"this.style.background=\'var(--red-bg)\';this.style.color=\'var(--red)\'\" onmouseout=\"this.style.background=\'none\';this.style.color=\'var(--text-dim)\'\">✕</button>"
-      +'</div>';
+function renderTrophyRows(trophies, gameId, dlcId, filterStr) {
+  let sorted = [...trophies].sort((a, b) => {
+    let oi = ORDER.indexOf(a.type) - ORDER.indexOf(b.type);
+    if (oi !== 0) return oi;
+    if (a.earned !== b.earned) return a.earned ? -1 : 1;
+    return 0;
+  });
+
+  if (filterStr === 'earned') sorted = sorted.filter(t => t.earned);
+  else if (filterStr === 'notearned') sorted = sorted.filter(t => !t.earned);
+  else if (filterStr && filterStr !== 'all') sorted = sorted.filter(t => t.type === filterStr);
+
+  if (!sorted.length) {
+    return `<div style="text-align:center;padding:16px;color:var(--text-mid);font-size:13px;font-weight:700;">Aucun trophée à afficher</div>`;
+  }
+
+  const toggleFn = dlcId ? `toggleDlcTrophy('${gameId}','${dlcId}',` : `toggleTrophy('${gameId}',`;
+  const deleteFn = dlcId ? `deleteDlcTrophy('${gameId}','${dlcId}',` : `deleteTrophy('${gameId}',`;
+
+  return sorted.map(t => {
+    const tc = TC[t.type];
+    
+    return `
+      <div class="trophy-row ${t.earned ? 'earned' : ''}" style="padding:0; overflow:hidden;">
+        
+        <div class="check-box ${t.earned ? 'done' : ''}" style="margin-left:14px;" onclick="${toggleFn}'${t.id}')">
+          ${t.earned ? `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>` : ''}
+        </div>
+        
+        <div style="width:34px;height:34px;border-radius:10px;background:${tc.bg};border:2px solid ${tc.border};display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">
+          ${trophyImg(t.type, 22)}
+        </div>
+        
+        <div style="flex:1;min-width:0;padding:12px 0;">
+          <div class="trophy-name">${esc(t.name)}</div>
+          ${t.desc ? `<div class="trophy-desc">${esc(t.desc)}</div>` : ''}
+        </div>
+        
+        <div style="align-self:stretch; background:${tc.bg}; border-left:2px solid ${tc.border}; display:flex; align-items:center; justify-content:flex-start; gap:12px; padding:0 14px; flex-shrink:0; width:200px; position:relative;">
+          
+          <button onclick="${deleteFn}'${t.id}')" style="position:absolute; top:4px; right:4px; background:none; border:none; cursor:pointer; color:var(--text-dim); font-size:13px; width:20px; height:20px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:all .15s; line-height:1;" onmouseover="this.style.background='var(--red-bg)';this.style.color='var(--red)'" onmouseout="this.style.background='none';this.style.color='var(--text-dim)'">✕</button>
+          
+                <!-- Image bien grande -->
+  <div style="width:50px; height:40px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+    ${trophyImg(t.type, t.type === 'platinum' ? 50 : 35)}
+  </div>
+          
+      <div style="font-size:12px; font-weight:900; color:${tc.c}; text-transform:uppercase; letter-spacing:0.5px;">
+    ${tc.label}
+  </div>
+    </div>
+    </div>
+    `;
   }).join('');
 }
 
