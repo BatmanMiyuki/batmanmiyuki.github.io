@@ -554,7 +554,7 @@ function showToast(message,icon){var c=document.getElementById('toast-container'
 var GRADS=[['#1a3a5c','#0a1e30'],['#3a0a0a','#220404'],['#0a3a10','#041506'],['#2d0a3a','#130418'],['#3a200a','#160b04'],['#0a1e3a','#040b18'],['#2a0a20','#10040c'],['#1a3a0a','#0a1604'],['#3a2a0a','#150f04'],['#0a2a3a','#041018']];
 var TC={bronze:{c:'#cd7f32',bg:'#1e0e04',border:'#7a4920',pts:15,label:'Bronze'},silver:{c:'#b0c4de',bg:'#161c24',border:'#3a4a5c',pts:30,label:'Argent'},gold:{c:'#ffd700',bg:'#1e1600',border:'#7a6000',pts:90,label:'Or'},platinum:{c:'#1cb0f6',bg:'#001a2e',border:'#0a5070',pts:300,label:'Platine'}};
 var TROPHY_FILES={platinum:'platine',gold:'or',silver:'argent',bronze:'bronze'};
-var TROPHY_EMOJIS={platinum:'💎',gold:'🥇',silver:'🥈',bronze:'🥉'};
+var TROPHY_EMOJIS={platinum:'',gold:'',silver:'',bronze:''};
 var ORDER=['platinum','gold','silver','bronze'];
 
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
