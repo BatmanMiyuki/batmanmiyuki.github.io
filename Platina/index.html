@@ -39,17 +39,19 @@ html,body{width:100vw;height:100dvh;overflow:hidden;background:var(--bg);font-fa
 body{display:flex;justify-content:center;align-items:stretch}
 #root{width:100%;height:100%;display:flex;flex-direction:column;position:relative;background:var(--bg);overflow:hidden;}
 #screens{flex:1;overflow:hidden;position:relative}
-.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--nav-h) + 20px);opacity:0;pointer-events:none;transform:translateY(12px);transition:opacity .22s ease,transform .22s ease}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 24px);opacity:0;pointer-events:none;transform:translateY(12px);transition:opacity .22s ease,transform .22s ease}
 .screen.active{opacity:1;pointer-events:all;transform:translateY(0)}
 ::-webkit-scrollbar{width:0;height:0}
-nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--border);display:flex;align-items:center;flex-shrink:0;position:relative;z-index:50;padding:0 8px;padding-bottom:env(safe-area-inset-bottom,0);}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:none;border:none;cursor:pointer;position:relative;padding:6px 4px 4px;}
-.nav-icon{width:44px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-xs);transition:background .2s,transform .15s;}
+nav{height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));background:rgba(18,18,18,.96);border-top:2px solid var(--border);display:flex;align-items:flex-start;flex-shrink:0;position:fixed;left:0;right:0;bottom:0;z-index:50;padding:6px 8px env(safe-area-inset-bottom,0px);box-shadow:0 -10px 30px rgba(0,0,0,.45);backdrop-filter:blur(14px);}
+.nav-btn{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;position:relative;padding:4px 3px;}
+.nav-icon{width:46px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-xs);transition:background .2s,transform .15s;color:var(--text-mid);}
 .nav-btn:active .nav-icon{transform:scale(.88);}
 .nav-btn span.label{font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;color:var(--text-dim);transition:color .2s;text-transform:uppercase;letter-spacing:0.5px;}
 .nav-btn.active .nav-icon{background:var(--green-bg);}
 .nav-btn.active span.label{color:var(--green);}
 .nav-btn.active .nav-icon svg{color:var(--green);}
+nav svg{display:block;width:24px;height:24px;stroke-linecap:round;stroke-linejoin:round;}
+@media(max-width:600px){:root{--nav-h:74px}.nav-btn span.label{font-size:9px;letter-spacing:.35px}.nav-icon{width:42px;height:34px}nav svg{width:23px;height:23px}}
 .nav-indicator{position:absolute;top:0;left:50%;transform:translateX(-50%);width:36px;height:3px;background:var(--green);display:none;border-radius:0 0 4px 4px;box-shadow:0 0 8px var(--green);}
 .nav-btn.active .nav-indicator{display:block;}
 .page-header{padding:24px 20px 10px;display:flex;align-items:center;justify-content:space-between;}
@@ -119,14 +121,24 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
 .platform-ps5{background:var(--ps5-bg);color:var(--ps5-text);}
 .platform-ps4{background:var(--ps4-bg);color:var(--ps4-text);}
 .platform-ps3{background:var(--ps3-bg);color:var(--ps3-text);border:1px solid #444;}
-.trophy-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--surface);margin-bottom:8px;transition:border-color .15s,background .15s;}
-.trophy-row.earned{background:var(--surface-2);border-color:var(--green);}
-.check-box{width:26px;height:26px;border-radius:50%;border:2.5px solid var(--border-mid);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .2s;background:var(--bg);}
+.trophy-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--surface);margin-bottom:8px;transition:border-color .15s,background .15s,transform .15s,box-shadow .15s;position:relative;overflow:hidden;cursor:pointer;min-height:66px;}
+.trophy-row:hover{border-color:var(--border-mid);transform:translateX(2px)}
+.trophy-row.earned{background:linear-gradient(135deg,rgba(28,176,246,.22),rgba(28,176,246,.08) 46%,var(--surface-2));border-color:var(--green);box-shadow:0 0 0 1px rgba(28,176,246,.22) inset;}
+.trophy-row.earned::after{content:'Possédé';position:absolute;left:-22%;top:50%;width:144%;height:28px;transform:translateY(-50%) rotate(-9deg);background:linear-gradient(90deg,transparent 0%,rgba(28,176,246,.15) 10%,rgba(28,176,246,.92) 28%,rgba(28,176,246,.98) 50%,rgba(28,176,246,.92) 72%,rgba(28,176,246,.15) 90%,transparent 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:1000;text-transform:uppercase;letter-spacing:1.6px;text-shadow:0 1px 4px rgba(0,0,0,.55);pointer-events:none;z-index:4;}
+.check-box{width:30px;height:30px;border-radius:50%;border:2.5px solid var(--border-mid);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .2s;background:var(--bg);position:relative;z-index:6;padding:0;color:#fff;}
 .check-box:hover{border-color:var(--green);background:var(--green-bg);}
 .check-box.done{background:var(--green);border-color:var(--green);}
 .check-box.done svg{color:#fff;}
+.trophy-icon-box{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;position:relative;z-index:2;}
+.trophy-main{flex:1;min-width:0;padding:2px 0;position:relative;z-index:2;}
 .trophy-name{font-size:15px;font-weight:800;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
 .trophy-desc{font-size:12px;color:var(--text-mid);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trophy-type-panel{align-self:stretch;border-left:2px solid;display:flex;align-items:center;justify-content:flex-start;gap:10px;padding:0 46px 0 12px;flex-shrink:0;width:190px;position:relative;z-index:2;margin:-10px -12px -10px 0;}
+.trophy-type-img{width:46px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.trophy-type-label{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:0.5px;}
+.trophy-delete-btn{position:absolute;top:50%;right:8px;transform:translateY(-50%);background:rgba(0,0,0,.12);border:2px solid transparent;cursor:pointer;color:var(--text-dim);font-size:15px;font-weight:900;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .15s;line-height:1;z-index:7;}
+.trophy-delete-btn:hover,.trophy-delete-btn:focus{background:var(--red-bg);color:var(--red);border-color:var(--red);outline:none;}
+@media(max-width:600px){.trophy-row{gap:9px;padding:10px;min-height:68px;}.trophy-row:hover{transform:none}.trophy-icon-box{width:36px;height:36px}.trophy-name{font-size:14px}.trophy-desc{font-size:11px}.trophy-type-panel{width:auto;align-self:center;margin:0;padding:0;background:transparent!important;border-left:none!important}.trophy-type-img,.trophy-type-label{display:none}.trophy-delete-btn{position:relative;top:auto;right:auto;transform:none;width:44px;height:44px;flex-shrink:0;background:rgba(255,75,75,.08);border-color:rgba(255,75,75,.22);color:var(--red);}.check-box{width:34px;height:34px}.trophy-row.earned::after{height:24px;font-size:10px;letter-spacing:1.2px;}}
 .wish-card{background:var(--surface);border-radius:var(--radius-sm);border:2px solid var(--border);border-left:4px solid var(--blue);padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:12px;}
 .wish-icon{width:44px;height:44px;border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:var(--surface-2);border:2px solid var(--border-mid);}
 .stat-mini{background:var(--surface-2);border-radius:var(--radius-sm);border:2px solid var(--border);padding:14px 8px;text-align:center;flex:1;}
@@ -147,6 +159,23 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
 .last-trophy-name{font-size:14px;font-weight:800;color:var(--text)}
 .near-row{background:var(--surface);border-radius:var(--radius-sm);border:2px solid var(--border);padding:12px;display:flex;align-items:center;gap:12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,transform .15s,box-shadow .15s}
 .near-row:hover{border-color:var(--green);transform:translateX(3px);box-shadow:0 2px 12px rgba(28,176,246,0.15)}
+.near-cover{width:46px;height:46px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:rgba(255,255,255,.2);overflow:hidden;border:2px solid var(--border-mid);position:relative;background:#050505;}
+.near-cover-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border-radius:10px;background:rgba(0,0,0,.25);}
+.trophy-info-hero{display:flex;align-items:center;gap:14px;padding:16px;border:2px solid var(--border);background:var(--surface-2);border-radius:var(--radius-sm);margin-bottom:14px;}
+.trophy-info-icon{width:58px;height:58px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
+.trophy-info-name{font-size:20px;font-weight:900;color:var(--text);line-height:1.12;}
+.trophy-info-desc{font-size:14px;font-weight:700;color:var(--text-mid);line-height:1.35;margin-top:6px;}
+.trophy-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;}
+.trophy-info-stat{background:var(--surface-2);border:2px solid var(--border);border-radius:var(--radius-sm);padding:12px;}
+.trophy-info-stat-label{font-size:10px;font-weight:900;color:var(--text-dim);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
+.trophy-info-stat-value{font-size:14px;font-weight:900;color:var(--text);}
+.sync-status{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:2px solid var(--border-mid);font-size:11px;font-weight:900;text-transform:uppercase;color:var(--text-mid);}
+.sync-status.ok{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+.sync-status.warn{border-color:var(--gold);color:var(--gold);background:var(--gold-bg)}
+.sync-status.err{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+.sync-auth-form{padding:14px 16px;border-top:1px solid var(--border);}
+.sync-auth-form .field{margin-bottom:10px}.sync-actions{display:flex;gap:10px;flex-wrap:wrap}.sync-actions .btn{flex:1;min-width:135px;padding:11px 14px;font-size:12px}.sync-help{font-size:12px;color:var(--text-dim);font-weight:700;line-height:1.35;margin-top:10px}
+@media(max-width:600px){.trophy-info-grid{grid-template-columns:1fr}.trophy-info-name{font-size:18px}}
 .filter-row{display:flex;gap:8px;padding:4px 20px 12px;overflow-x:auto;scrollbar-width:none}
 .filter-row::-webkit-scrollbar{display:none}
 .filter-pill{flex-shrink:0;padding:8px 18px;border-radius:999px;border:2px solid var(--border-mid);background:var(--surface);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s;color:var(--text-mid);}
@@ -170,7 +199,7 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
 .date-modal-overlay.open{opacity:1;pointer-events:all}
 @media(max-width:600px){.date-modal-overlay{align-items:flex-end;}.date-modal-sheet{border-radius:24px 24px 0 0!important;border-bottom:none!important;}}
 .date-modal-sheet{background:var(--surface);border:2px solid var(--green);border-radius:var(--radius);width:100%;max-width:420px;padding:24px;box-shadow:0 0 40px rgba(28,176,246,0.2);}
-#tt-install-banner{position:fixed;bottom:env(safe-area-inset-bottom,16px);left:16px;right:16px;z-index:200;background:var(--surface);border:2px solid var(--green);border-radius:var(--radius);padding:16px;display:none;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(28,176,246,0.2);}
+#tt-install-banner{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 12px);left:16px;right:16px;z-index:200;background:var(--surface);border:2px solid var(--green);border-radius:var(--radius);padding:16px;display:none;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(28,176,246,0.2);}
 #tt-install-banner.show{display:flex;}
 @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.22)}100%{transform:scale(1)}}
 @keyframes confetti{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(-70px) rotate(360deg);opacity:0}}
@@ -385,6 +414,37 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
           <div id="io-status" class="io-status"></div>
         </div>
         <div class="settings-section">
+          <div class="settings-section-label">Synchronisation cloud</div>
+          <div class="card" style="padding:0;overflow:hidden">
+            <div class="settings-row">
+              <div style="display:flex;align-items:center;gap:12px;min-width:0;flex:1">
+                <div class="settings-row-icon" style="background:rgba(28,176,246,0.12);font-size:20px;">☁️</div>
+                <div style="min-width:0">
+                  <div style="font-size:15px;font-weight:800;color:var(--text);">Firebase</div>
+                  <div style="font-size:12px;font-weight:600;color:var(--text-mid);margin-top:2px;" id="sync-sub">Connecte-toi pour synchroniser ordinateur ↔ téléphone</div>
+                </div>
+              </div>
+              <span id="sync-status" class="sync-status warn">Non configuré</span>
+            </div>
+            <div id="sync-auth-form" class="sync-auth-form">
+              <div class="field"><label>Email</label><input id="sync-email" type="email" autocomplete="email" placeholder="ton@email.com"/></div>
+              <div class="field"><label>Mot de passe</label><input id="sync-password" type="password" autocomplete="current-password" placeholder="Minimum 6 caractères"/></div>
+              <div class="sync-actions">
+                <button class="btn btn-green" onclick="platinaSignIn()">Connexion</button>
+                <button class="btn btn-outline" onclick="platinaSignUp()">Créer compte</button>
+              </div>
+              <div class="sync-help">À remplir dans le code : <b>window.PlatinaFirebaseConfig</b>. Active aussi Firebase Auth Email/Password + Firestore.</div>
+            </div>
+            <div id="sync-user-box" class="sync-auth-form" style="display:none">
+              <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:10px;">Connecté : <span id="sync-user-email" style="color:var(--green)"></span></div>
+              <div class="sync-actions">
+                <button class="btn btn-outline" onclick="platinaForceSyncNow()">Forcer la sauvegarde</button>
+                <button class="btn btn-red" onclick="platinaSignOut()">Déconnexion</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-section">
           <div class="settings-section-label">Derniers jeux platinés</div>
           <div id="settings-plat-list"></div>
         </div>
@@ -396,14 +456,14 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
           <div class="settings-section-label">À propos</div>
           <div class="card" style="padding:0;overflow:hidden">
             <div class="info-row"><span class="info-label">Application</span><span class="info-val">Platina</span></div>
-            <div class="info-row"><span class="info-label">Version</span><span class="info-val" style="color:var(--green)">16</span></div>
+            <div class="info-row"><span class="info-label">Version</span><span class="info-val" style="color:var(--green)">17</span></div>
             <div class="info-row"><span class="info-label">Créé le</span><span class="info-val">14 avril 2026</span></div>
             <div class="info-row"><span class="info-label">Jeux trackés</span><span class="info-val" id="settings-game-count" style="color:var(--blue)">—</span></div>
             <div class="info-row"><span class="info-label">Trophées trackés</span><span class="info-val" id="settings-trophy-count" style="color:var(--gold)">—</span></div>
             <div class="info-row"><span class="info-label">Platinés</span><span class="info-val" id="settings-plat-count" style="color:var(--plat-c)">—</span></div>
             <div class="info-row"><span class="info-label">Jeux 100%</span><span class="info-val" id="settings-100-count" style="color:var(--green)">—</span></div>
             <div class="info-row"><span class="info-label">Technologie</span><span class="info-val">HTML / CSS / JS</span></div>
-            <div class="info-row"><span class="info-label">Stockage</span><span class="info-val">LocalStorage</span></div>
+            <div class="info-row"><span class="info-label">Stockage</span><span class="info-val">LocalStorage + Firebase</span></div>
             <div class="info-row"><span class="info-label">Format</span><span class="info-val">PWA 📲</span></div>
             <div class="info-row"><span class="info-label">Développeur</span><span class="info-val">Batman Miyuki</span></div>
           </div>
@@ -547,6 +607,15 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
   </div>
 </div>
 
+<!-- INFOS TROPHÉE -->
+<div class="modal-overlay" id="modal-trophy-info" onclick="closeTrophyInfo()">
+  <div class="modal-sheet trophy-info-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><div class="modal-title">Détails du trophée</div><button class="btn-close" onclick="closeTrophyInfo()">✕</button></div>
+    <div class="modal-body" id="trophy-info-body"></div>
+  </div>
+</div>
+
 <!-- IMAGE LIGHTBOX -->
 <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
@@ -606,13 +675,16 @@ function makeRing(pct,size,color,val,sub){var stroke=7,r=(size-stroke)/2,circ=2*
 /* ══ STATE ══ */
 var games=[],wishlist=[],currentDetailId=null,prevTab='games',currentTab='dashboard';
 var detailFilter='all',addTrophyContext={gameId:null,sectionId:'main'};
-var gamesFilter='progress',_deferredPrompt=null,_pendingToggle=null;
+var gamesFilter='progress',_deferredPrompt=null,_pendingToggle=null,_activeTrophyInfo=null;
 
 /* ══ DATA ══ */
-function migrateGames(gs){return gs.map(function(g){if(!g.dlcs)g.dlcs=[];if(g.dlcs.length&&typeof g.dlcs[0]==='string'){g.dlcs=g.dlcs.map(function(name){return{id:uid(),name:name,trophies:[]};});}return g;});}
+function migrateGames(gs){return (gs||[]).map(function(g){if(!g.dlcs)g.dlcs=[];if(!g.trophies)g.trophies=[];if(!g.grad)g.grad=GRADS[Math.floor(Math.random()*GRADS.length)];if(g.dlcs.length&&typeof g.dlcs[0]==='string'){g.dlcs=g.dlcs.map(function(name){return{id:uid(),name:name,trophies:[]};});}g.dlcs.forEach(function(d){if(!d.trophies)d.trophies=[];});return g;});}
 function loadData(){try{var sg=localStorage.getItem('tt-games-v5');games=sg?migrateGames(JSON.parse(sg)):SAMPLE_GAMES;}catch(e){games=SAMPLE_GAMES;}try{var sw=localStorage.getItem('tt-wish-v5');wishlist=sw?JSON.parse(sw):SAMPLE_WISH;}catch(e){wishlist=SAMPLE_WISH;}}
-function saveGames(){localStorage.setItem('tt-games-v5',JSON.stringify(games));}
-function saveWish(){localStorage.setItem('tt-wish-v5',JSON.stringify(wishlist));}
+function getSyncState(){return{version:3,updatedAt:Date.now(),games:games,wishlist:wishlist};}
+function queueCloudSave(){if(window.__platinaApplyingRemote)return;if(typeof window.__platinaQueueCloudSave==='function')window.__platinaQueueCloudSave(getSyncState());}
+function applyRemoteState(data){if(!data)return;window.__platinaApplyingRemote=true;games=migrateGames(data.games||[]);wishlist=Array.isArray(data.wishlist)?data.wishlist:[];localStorage.setItem('tt-games-v5',JSON.stringify(games));localStorage.setItem('tt-wish-v5',JSON.stringify(wishlist));window.__platinaApplyingRemote=false;if(currentTab==='dashboard')renderDashboard();if(currentTab==='games')renderGames();if(currentTab==='wishlist')renderWishlist();if(currentTab==='settings')renderSettings();if(currentTab==='detail'&&currentDetailId)renderDetail(currentDetailId);}
+function saveGames(){localStorage.setItem('tt-games-v5',JSON.stringify(games));queueCloudSave();}
+function saveWish(){localStorage.setItem('tt-wish-v5',JSON.stringify(wishlist));queueCloudSave();}
 
 /* ══ IMPORT / EXPORT ══ */
 function showIOStatus(msg,isOk){var el=document.getElementById('io-status');if(!el)return;el.textContent=msg;el.className='io-status '+(isOk?'ok':'err');el.style.display='block';setTimeout(function(){el.style.display='none';},6000);}
@@ -663,32 +735,38 @@ function deleteWish(id){wishlist=wishlist.filter(function(w){return w.id!==id;})
 /* ══ CONFETTI ══ */
 function showConfetti(){var colors=['#1cb0f6','#5de8ff','#ffffff','#ffd700','#88e4ff'];for(var i=0;i<14;i++){var el=document.createElement('div');el.style.cssText='position:fixed;top:45%;left:'+(15+Math.random()*70)+'%;width:10px;height:10px;border-radius:50%;background:'+colors[i%5]+';z-index:999;pointer-events:none;animation:confetti .8s ease forwards '+(Math.random()*.35)+'s;box-shadow:0 0 10px '+colors[i%5];document.body.appendChild(el);setTimeout(function(){el.remove();},1200);}}
 
+/* ══ INFOS TROPHÉE ══ */
+function formatFullDate(ts){if(!ts)return '—';try{return new Date(ts).toLocaleString('fr-FR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch(e){return '—';}}
+function findTrophyData(gameId,trophyId,dlcId){var g=games.find(function(x){return x.id===gameId;});if(!g)return null;var dlc=null,t=null;if(dlcId){dlc=(g.dlcs||[]).find(function(d){return d.id===dlcId;});if(dlc)t=(dlc.trophies||[]).find(function(x){return x.id===trophyId;});}else{t=(g.trophies||[]).find(function(x){return x.id===trophyId;});}return t?{game:g,dlc:dlc,trophy:t}:null;}
+function openTrophyInfo(gameId,trophyId,dlcId){var data=findTrophyData(gameId,trophyId,dlcId);if(!data)return;_activeTrophyInfo={gameId:gameId,trophyId:trophyId,dlcId:dlcId||null};var t=data.trophy,tc=TC[t.type];var status=t.earned?'<span class="badge badge-green">✓ Possédé</span>':'<span class="badge badge-blue">Non possédé</span>';document.getElementById('trophy-info-body').innerHTML='<div class="trophy-info-hero"><div class="trophy-info-icon" style="background:'+tc.bg+';border:2px solid '+tc.border+';">'+trophyImg(t.type,t.type==='platinum'?58:48)+'</div><div style="min-width:0;flex:1"><div class="trophy-info-name">'+esc(t.name)+'</div><div class="trophy-info-desc">'+(t.desc?esc(t.desc):'Aucune description renseignée.')+'</div></div></div>'+'<div class="trophy-info-grid"><div class="trophy-info-stat"><div class="trophy-info-stat-label">Statut</div><div class="trophy-info-stat-value">'+status+'</div></div><div class="trophy-info-stat"><div class="trophy-info-stat-label">Rareté</div><div class="trophy-info-stat-value">'+makeTrophyPill(t.type)+'</div></div><div class="trophy-info-stat"><div class="trophy-info-stat-label">Date d\'obtention</div><div class="trophy-info-stat-value">'+(t.earned?formatFullDate(t.at):'Pas encore obtenu')+'</div></div><div class="trophy-info-stat"><div class="trophy-info-stat-label">Jeu / section</div><div class="trophy-info-stat-value">'+esc(data.game.name)+(data.dlc?' · '+esc(data.dlc.name):' · Jeu de base')+'</div></div></div>'+'<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px"><button class="btn btn-green" style="flex:1;min-width:170px" onclick="toggleTrophyFromInfo()">'+(t.earned?'Marquer non possédé':'Marquer possédé')+'</button><button class="btn btn-red" style="flex:1;min-width:150px" onclick="deleteTrophyFromInfo()">Supprimer</button></div>';
+  document.getElementById('modal-trophy-info').classList.add('open');}
+function closeTrophyInfo(){document.getElementById('modal-trophy-info').classList.remove('open');_activeTrophyInfo=null;}
+function toggleTrophyFromInfo(){var c=_activeTrophyInfo;if(!c)return;document.getElementById('modal-trophy-info').classList.remove('open');if(c.dlcId)toggleDlcTrophy(c.gameId,c.dlcId,c.trophyId);else toggleTrophy(c.gameId,c.trophyId);_activeTrophyInfo=null;}
+function deleteTrophyFromInfo(){var c=_activeTrophyInfo;if(!c)return;if(!confirm('Supprimer ce trophée ?'))return;document.getElementById('modal-trophy-info').classList.remove('open');if(c.dlcId)deleteDlcTrophy(c.gameId,c.dlcId,c.trophyId);else deleteTrophy(c.gameId,c.trophyId);_activeTrophyInfo=null;showToast('Trophée supprimé','🗑️');}
+
 /* ══ TROPHY ROWS ══ */
 function renderTrophyRows(trophies,gameId,dlcId,filterStr){
-  var sorted=[...trophies].sort(function(a,b){var oi=ORDER.indexOf(a.type)-ORDER.indexOf(b.type);if(oi!==0)return oi;if(a.earned!==b.earned)return a.earned?-1:1;return 0;});
+  var sorted=(trophies||[]).slice();
   if(filterStr==='earned')sorted=sorted.filter(function(t){return t.earned;});
   else if(filterStr==='notearned')sorted=sorted.filter(function(t){return !t.earned;});
   else if(filterStr&&filterStr!=='all')sorted=sorted.filter(function(t){return t.type===filterStr;});
   if(!sorted.length){return '<div style="text-align:center;padding:16px;color:var(--text-mid);font-size:13px;font-weight:700;">Aucun trophée à afficher</div>';}
-  var toggleFn=dlcId?'toggleDlcTrophy(\''+gameId+'\',\''+dlcId+'\',':'toggleTrophy(\''+gameId+'\',';
-  var deleteFn=dlcId?'deleteDlcTrophy(\''+gameId+'\',\''+dlcId+'\',':'deleteTrophy(\''+gameId+'\',';
   return sorted.map(function(t){
-    var tc=TC[t.type];
-    return '<div class="trophy-row '+(t.earned?'earned':'')+'" style="padding:0;overflow:hidden;">'
-      +'<div class="check-box '+(t.earned?'done':'')+'" style="margin-left:14px;" onclick="'+toggleFn+'\''+t.id+'\')">'
-      +(t.earned?'<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>':'')
-      +'</div>'
-      +'<div style="width:34px;height:34px;border-radius:10px;background:'+tc.bg+';border:2px solid '+tc.border+';display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">'+trophyImg(t.type,22)+'</div>'
-      +'<div style="flex:1;min-width:0;padding:12px 0;">'
-      +'<div class="trophy-name">'+esc(t.name)+'</div>'
-      +(t.desc?'<div class="trophy-desc">'+esc(t.desc)+'</div>':'')
-      +'</div>'
-      +'<div style="align-self:stretch;background:'+tc.bg+';border-left:2px solid '+tc.border+';display:flex;align-items:center;justify-content:flex-start;gap:12px;padding:0 14px;flex-shrink:0;width:200px;position:relative;">'
-      +'<button onclick="'+deleteFn+'\''+t.id+'\')" style="position:absolute;top:4px;right:4px;background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:13px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .15s;line-height:1;" onmouseover="this.style.background=\'var(--red-bg)\';this.style.color=\'var(--red)\'" onmouseout="this.style.background=\'none\';this.style.color=\'var(--text-dim)\'">✕</button>'
-      +'<div style="width:50px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+trophyImg(t.type,t.type==='platinum'?50:35)+'</div>'
-      +'<div style="font-size:12px;font-weight:900;color:'+tc.c+';text-transform:uppercase;letter-spacing:0.5px;">'+tc.label+'</div>'
-      +'</div></div>';
-  }).join('');}
+    var tc=TC[t.type]||TC.bronze;
+    var infoCall="openTrophyInfo('"+gameId+"','"+t.id+"',"+(dlcId?"'"+dlcId+"'":"null")+")";
+    var toggleCall=dlcId?"toggleDlcTrophy('"+gameId+"','"+dlcId+"','"+t.id+"')":"toggleTrophy('"+gameId+"','"+t.id+"')";
+    var deleteCall=dlcId?"deleteDlcTrophy('"+gameId+"','"+dlcId+"','"+t.id+"')":"deleteTrophy('"+gameId+"','"+t.id+"')";
+    return '<div class="trophy-row '+(t.earned?'earned':'')+'" onclick="'+infoCall+'">'
+      +'<button type="button" class="check-box '+(t.earned?'done':'')+'" onclick="event.stopPropagation();'+toggleCall+'" aria-label="'+(t.earned?'Retirer':'Marquer')+' '+esc(t.name)+'">'
+      +(t.earned?'<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>':'')
+      +'</button>'
+      +'<div class="trophy-icon-box" style="background:'+tc.bg+';border:2px solid '+tc.border+';">'+trophyImg(t.type,23)+'</div>'
+      +'<div class="trophy-main"><div class="trophy-name">'+esc(t.name)+'</div>'+(t.desc?'<div class="trophy-desc">'+esc(t.desc)+'</div>':'')+'</div>'
+      +'<div class="trophy-type-panel" style="background:'+tc.bg+';border-left-color:'+tc.border+';"><div class="trophy-type-img">'+trophyImg(t.type,t.type==='platinum'?48:34)+'</div><div class="trophy-type-label" style="color:'+tc.c+';">'+tc.label+'</div></div>'
+      +'<button type="button" class="trophy-delete-btn" onclick="event.stopPropagation();'+deleteCall+'" aria-label="Supprimer '+esc(t.name)+'">✕</button>'
+      +'</div>';
+  }).join('');} 
+
 
 /* ══ ACTIVITÉ PAR PÉRIODE ══ */
 var _actChart=null, _actPeriod='month';
@@ -843,7 +921,7 @@ function renderDashboard(){
   var near=games.filter(function(g){return catGame(g)==='progress'&&g.trophies.length>0;}).map(function(g){var s=statAll(g);return Object.assign({},g,s);}).sort(function(a,b){return b.pct-a.pct;}).slice(0,5);
   var nearEl=document.getElementById('near-complete-list');
   if(!near.length){nearEl.innerHTML='<div style="text-align:center;padding:16px;color:var(--text-mid);font-size:13px;font-weight:700;">Aucun jeu en cours</div>';}
-  else{nearEl.innerHTML=near.map(function(g){var c=g.pct>=75?'var(--green)':g.pct>=50?'var(--gold)':'var(--blue)';return '<div class="near-row" onclick="openDetail(\''+g.id+'\')"><div style="'+getCoverStyle(g)+';width:46px;height:46px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:rgba(255,255,255,.2);overflow:hidden;border:2px solid var(--border-mid);">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="width:100%;height:100%;object-fit:cover;border-radius:10px;" onerror="this.style.display=\'none\'">':'')+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()+'</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:6px;color:var(--text);">'+esc(g.name)+'</div><div class="prog-bar"><div class="prog-fill" style="width:'+g.pct+'%;background:'+c+';"></div></div></div><div style="font-size:16px;font-weight:900;color:'+c+';flex-shrink:0;margin-left:10px">'+g.pct+'%</div></div>';}).join('');}
+  else{nearEl.innerHTML=near.map(function(g){var c=g.pct>=75?'var(--green)':g.pct>=50?'var(--gold)':'var(--blue)';return '<div class="near-row" onclick="openDetail(\''+g.id+'\')"><div class="near-cover" style="'+getCoverStyle(g)+';">'+(g.coverUrl?'<img class="near-cover-img" src="'+esc(g.coverUrl)+'" onerror="this.style.display=\'none\'">':'')+'<span style="position:relative;z-index:1">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()+'</span></div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:6px;color:var(--text);">'+esc(g.name)+'</div><div class="prog-bar"><div class="prog-fill" style="width:'+g.pct+'%;background:'+c+';"></div></div></div><div style="font-size:16px;font-weight:900;color:'+c+';flex-shrink:0;margin-left:10px">'+g.pct+'%</div></div>';}).join('');}
   var last=games.flatMap(function(g){var mt=(g.trophies||[]).filter(function(t){return t.earned;}).map(function(t){return Object.assign({},t,{gameName:g.name,dlcName:null,sortDate:t.at||0});});var dt=(g.dlcs||[]).flatMap(function(dlc){return (dlc.trophies||[]).filter(function(t){return t.earned;}).map(function(t){return Object.assign({},t,{gameName:g.name,dlcName:dlc.name,sortDate:t.at||0});});});return mt.concat(dt);}).sort(function(a,b){return b.sortDate-a.sortDate;}).slice(0,5);
   var lastEl=document.getElementById('last-trophies-list');
   if(!last.length){lastEl.innerHTML='<div class="empty"><div class="empty-icon">🏅</div><div class="empty-title">Pas encore de trophées</div></div>';}
@@ -935,5 +1013,64 @@ loadData();
 renderDashboard();
 renderSettings();
 </script>
-</body>
+
+<script>
+/* Remplace ces valeurs par la configuration de ton projet Firebase (Project settings > Web app). */
+window.PlatinaFirebaseConfig = window.PlatinaFirebaseConfig || {
+  apiKey: "REMPLACE_MOI",
+  authDomain: "REMPLACE_MOI.firebaseapp.com",
+  projectId: "REMPLACE_MOI",
+  storageBucket: "REMPLACE_MOI.appspot.com",
+  messagingSenderId: "REMPLACE_MOI",
+  appId: "REMPLACE_MOI"
+};
+window.platinaSignIn = window.platinaSignIn || function(){showToast('Firebase non chargé ou non configuré','⚠️');};
+window.platinaSignUp = window.platinaSignUp || function(){showToast('Firebase non chargé ou non configuré','⚠️');};
+window.platinaSignOut = window.platinaSignOut || function(){showToast('Firebase non chargé','⚠️');};
+window.platinaForceSyncNow = window.platinaForceSyncNow || function(){showToast('Firebase non chargé','⚠️');};
+</script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js';
+import { getFirestore, doc, onSnapshot, setDoc, getDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+
+let app=null,auth=null,db=null,user=null,unsub=null,saveTimer=null,lastCloudUpdatedAt=0;
+const cfg=window.PlatinaFirebaseConfig||{};
+function configured(){return cfg.apiKey&&cfg.apiKey!=='REMPLACE_MOI'&&cfg.projectId&&cfg.projectId!=='REMPLACE_MOI';}
+function $(id){return document.getElementById(id);}
+function setStatus(txt,cls){const el=$('sync-status');if(el){el.textContent=txt;el.className='sync-status '+(cls||'');}const sub=$('sync-sub');if(sub)sub.textContent=txt;}
+function showAuthForm(show){const f=$('sync-auth-form'),b=$('sync-user-box');if(f)f.style.display=show?'block':'none';if(b)b.style.display=show?'none':'block';}
+function userDoc(){return user&&db?doc(db,'platinaUsers',user.uid):null;}
+async function pushStateNow(){if(!userDoc())return;const state=window.getSyncState?window.getSyncState():null;if(!state)return;lastCloudUpdatedAt=state.updatedAt;await setDoc(userDoc(),{...state,serverUpdatedAt:serverTimestamp()},{merge:true});setStatus('Synchronisé','ok');}
+window.__platinaQueueCloudSave=function(){if(!userDoc())return;setStatus('Sauvegarde…','warn');clearTimeout(saveTimer);saveTimer=setTimeout(function(){pushStateNow().catch(function(e){console.error(e);setStatus('Erreur sync','err');});},650);};
+window.platinaForceSyncNow=function(){pushStateNow().then(function(){showToast('Sauvegarde cloud envoyée','☁️');}).catch(function(e){console.error(e);showToast('Erreur Firebase','⚠️');setStatus('Erreur sync','err');});};
+window.platinaSignIn=function(){if(!configured()){showToast('Configure Firebase dans le code avant la connexion','⚠️');return;}const email=($('sync-email')||{}).value||'',pass=($('sync-password')||{}).value||'';signInWithEmailAndPassword(auth,email.trim(),pass).catch(function(e){showToast(e.message,'⚠️');});};
+window.platinaSignUp=function(){if(!configured()){showToast('Configure Firebase dans le code avant la création de compte','⚠️');return;}const email=($('sync-email')||{}).value||'',pass=($('sync-password')||{}).value||'';createUserWithEmailAndPassword(auth,email.trim(),pass).catch(function(e){showToast(e.message,'⚠️');});};
+window.platinaSignOut=function(){if(auth)signOut(auth);};
+
+if(!configured()){
+  setStatus('Non configuré','warn');
+}else{
+  try{
+    app=initializeApp(cfg);auth=getAuth(app);db=getFirestore(app);setStatus('Déconnecté','warn');showAuthForm(true);
+    onAuthStateChanged(auth,async function(u){
+      user=u;
+      if(unsub){unsub();unsub=null;}
+      if(!u){showAuthForm(true);setStatus('Déconnecté','warn');return;}
+      showAuthForm(false);const mail=$('sync-user-email');if(mail)mail.textContent=u.email||u.uid;setStatus('Connexion cloud…','warn');
+      const ref=userDoc();const snap=await getDoc(ref);
+      if(!snap.exists()||!snap.data().games){await pushStateNow();}
+      unsub=onSnapshot(ref,function(snap){
+        if(!snap.exists())return;const data=snap.data();
+        if(!data||!data.games)return;
+        if(data.updatedAt&&data.updatedAt===lastCloudUpdatedAt)return;
+        lastCloudUpdatedAt=data.updatedAt||0;
+        if(typeof window.applyRemoteState==='function')window.applyRemoteState(data);
+        setStatus('Synchronisé','ok');
+      },function(e){console.error(e);setStatus('Erreur sync','err');});
+    });
+  }catch(e){console.error(e);setStatus('Erreur config','err');}
+}
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a089e9d63b4614ab',t:'MTc4MDk0Mjg1Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
