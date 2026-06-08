@@ -603,20 +603,6 @@ function statAll(g){var allT=[...(g.trophies||[]),...(g.dlcs||[]).flatMap(functi
 function makeTrophyPill(type){return '<span class="trophy-pill tp-'+type+'">'+TROPHY_EMOJIS[type]+' '+TC[type].label+'</span>';}
 function makeRing(pct,size,color,val,sub){var stroke=7,r=(size-stroke)/2,circ=2*Math.PI*r;var offset=circ*(1-Math.min(pct,100)/100);return '<svg width="'+size+'" height="'+size+'" style="transform:rotate(-90deg)"><circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="var(--border-mid)" stroke-width="'+stroke+'"/><circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+stroke+'" stroke-dasharray="'+circ+'" stroke-dashoffset="'+offset+'" stroke-linecap="round" style="transition:stroke-dashoffset .9s cubic-bezier(.4,0,.2,1)"/></svg><div class="ring-inner" style="width:'+size+'px;height:'+size+'px"><div style="font-family:\'Nunito\',sans-serif;font-size:'+(size>90?22:18)+'px;font-weight:900;line-height:1;color:var(--text)">'+val+'</div>'+(sub?'<div style="font-size:11px;font-weight:700;color:var(--text-mid)">'+sub+'</div>':'')+'</div>';}
 
-/* ══ SAMPLE DATA ══ */
-var SAMPLE_GAMES=[
-  {id:'g1',name:"God of War Ragnarök",platform:'PS5',coverUrl:'',grad:GRADS[0],addedAt:Date.now()-86400000*15,
-   trophies:[{id:'t10',name:'Père et Fils',desc:'Obtenir tous les trophées',type:'platinum',earned:true,at:Date.now()-86400000*2},{id:'t11',name:'Dieu de la Guerre',desc:'Premier ennemi vaincu',type:'bronze',earned:true,at:Date.now()-86400000*14},{id:'t12',name:'Voyageur des Royaumes',desc:'Visiter les 9 royaumes',type:'silver',earned:true,at:Date.now()-86400000*10},{id:'t13',name:'Arsenal Complet',desc:'Toutes les armes débloquées',type:'gold',earned:true,at:Date.now()-86400000*7},{id:'t14',name:'Exterminateur',desc:"Tuer tous types d'ennemis",type:'silver',earned:true,at:Date.now()-86400000*5}],
-   dlcs:[{id:'dlc_gow1',name:'Valhalla',trophies:[{id:'dg1',name:'Guerrier du Valhalla',desc:'Compléter Valhalla',type:'gold',earned:false,at:null},{id:'dg2',name:'Explorateur',desc:'Toutes les zones découvertes',type:'bronze',earned:true,at:Date.now()-86400000*1}]}]},
-  {id:'g2',name:"Marvel's Spider-Man 2",platform:'PS5',coverUrl:'',grad:GRADS[1],addedAt:Date.now()-86400000*8,
-   trophies:[{id:'t20',name:'Le Tisseneur Ultime',desc:'Obtenir tous les trophées',type:'platinum',earned:true,at:Date.now()-86400000*1},{id:'t21',name:'Grande Responsabilité',desc:'Terminer le prologue',type:'bronze',earned:true,at:Date.now()-86400000*8},{id:'t22',name:'Double Danger',desc:'Alterner les deux Spider-Men',type:'bronze',earned:true,at:Date.now()-86400000*7},{id:'t23',name:'Le Symbiote',desc:"Équiper l'armure symbiote",type:'silver',earned:true,at:Date.now()-86400000*6}],
-   dlcs:[]},
-  {id:'g4',name:'Elden Ring',platform:'PS4',coverUrl:'',grad:GRADS[4],addedAt:Date.now()-86400000*30,
-   trophies:[{id:'t40',name:"Seigneur d'Elden",desc:'Obtenir tous les trophées',type:'platinum',earned:false,at:null},{id:'t41',name:'Lumière de Grâce',desc:'Première grâce trouvée',type:'bronze',earned:true,at:Date.now()-86400000*30},{id:'t42',name:'Dragon Terrassé',desc:'Vaincre Agheel',type:'silver',earned:true,at:Date.now()-86400000*27},{id:'t43',name:'Seigneur de Stormveil',desc:"Vaincre Godrick",type:'gold',earned:true,at:Date.now()-86400000*25},{id:'t44',name:'Malenia Terrassée',desc:'Vaincre Malenia',type:'gold',earned:false,at:null}],
-   dlcs:[{id:'dlc_er1',name:'Shadow of the Erdtree',trophies:[{id:'er1',name:'Premier Contact',desc:"Entrer dans la Terre des Ombres",type:'bronze',earned:true,at:Date.now()-86400000*15},{id:'er2',name:'Tueur de Messmer',desc:"Vaincre Messmer",type:'gold',earned:false,at:null}]}]}
-];
-var SAMPLE_WISH=[{id:'w1',name:'Final Fantasy VII Rebirth',platform:'PS5',notes:'Suite très attendue',addedAt:Date.now()-86400000*5},{id:'w2',name:'Silent Hill 2 Remake',platform:'PS5',notes:"Classique de l'horreur",addedAt:Date.now()-86400000*3}];
-
 /* ══ STATE ══ */
 var games=[],wishlist=[],currentDetailId=null,prevTab='games',currentTab='dashboard';
 var detailFilter='all',addTrophyContext={gameId:null,sectionId:'main'};
