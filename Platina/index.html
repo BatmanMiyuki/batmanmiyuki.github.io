@@ -151,7 +151,7 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
 .filter-row::-webkit-scrollbar{display:none}
 .filter-pill{flex-shrink:0;padding:8px 18px;border-radius:999px;border:2px solid var(--border-mid);background:var(--surface);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s;color:var(--text-mid);}
 .filter-pill.active{background:var(--green-bg);border-color:var(--green);color:var(--green)}
-.dlc-box{background:var(--surface-2);border:2px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:150px;border-top:3px solid var(--orange);}
+.dlc-box{background:var(--surface-2);border:2px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:160px;border-top:3px solid var(--orange);}
 .dlc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .dlc-title{font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:var(--text);display:flex;align-items:center;gap:8px;}
 .dlc-sub{font-size:12px;color:var(--text-mid);font-weight:700;margin-top:4px;}
@@ -174,7 +174,6 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
 #tt-install-banner.show{display:flex;}
 @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.22)}100%{transform:scale(1)}}
 @keyframes confetti{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(-70px) rotate(360deg);opacity:0}}
-@keyframes glowMiyuki{0%{filter:drop-shadow(0 0 2px #fff);}100%{filter:drop-shadow(0 0 8px #1cb0f6) drop-shadow(0 0 14px #1cb0f6);}}
 @keyframes bounceIn{0%{transform:scale(0.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
 .check-box.done{animation:bounceIn .3s ease;}
 /* ── SETTINGS ── */
@@ -211,26 +210,6 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
 .lightbox-close{position:absolute;top:16px;right:16px;width:48px;height:48px;border-radius:999px;background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.2);cursor:pointer;font-size:22px;color:#fff;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);transition:background .2s,transform .15s;z-index:10;}
 .lightbox-close:hover{background:rgba(255,255,255,0.25);transform:scale(1.1);}
 .lightbox-hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:700;color:rgba(255,255,255,0.5);white-space:nowrap;}
-/* ── TOAST NOTIFICATIONS ── */
-.toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none;}
-.toast{background:var(--surface);border:2px solid var(--green);border-radius:var(--radius-sm);padding:14px 24px;box-shadow:0 8px 32px rgba(28,176,246,0.25);display:flex;align-items:center;gap:10px;animation:toastIn .35s cubic-bezier(.4,0,.2,1),toastOut .35s ease .28s forwards;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:var(--green);max-width:90vw;}
-.toast-icon{font-size:22px;flex-shrink:0;}
-.toast-text{flex:1}
-@keyframes toastIn{0%{opacity:0;transform:translateY(-20px) scale(.85);}100%{opacity:1;transform:translateY(0) scale(1);}}
-@keyframes toastOut{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-10px) scale(.9);}}
-/* ── LIGHT THEME ── */
-#root.theme-light{--bg:#f4f4f5;--surface:#ffffff;--surface-2:#f0f0f1;--border:#e4e4e7;--border-mid:#d4d4d8;--text:#09090b;--text-mid:#52525b;--text-dim:#a1a1aa;--green-bg:rgba(28,176,246,0.08);--green-mid:rgba(28,176,246,0.2);--blue-bg:#eff8fe;--gold-bg:#fffbeb;--red-bg:#fef2f2;--bronze-bg:#fdf6f0;--bronze-border:#d4956a;--silver-bg:#f8fafc;--silver-border:#b0b8c8;--gold-bg2:#fffbeb;--gold-border:#d4a800;--plat-bg:#eff8ff;--plat-border:#7dd0f5;--shadow:0 2px 8px rgba(0,0,0,0.06);--shadow-md:0 6px 20px rgba(0,0,0,0.09);}
-#root.theme-light .streak-banner{background:linear-gradient(135deg,#cbeeff,#9adaff);border-color:var(--green-dark);}
-#root.theme-light .streak-title{color:var(--green-dark);}
-#root.theme-light .streak-sub{color:#1482b5;}
-#root,#root *{transition:background-color .2s,border-color .2s,color .15s;}
-/* ── LIGHTBOX ── */
-.lightbox-overlay{position:fixed;inset:0;background:rgba(0,0,0,.95);display:flex;align-items:center;justify-content:center;z-index:500;opacity:0;pointer-events:none;transition:opacity .3s;}
-.lightbox-overlay.open{opacity:1;pointer-events:all}
-.lightbox-img{max-width:95vw;max-height:90vh;object-fit:contain;border-radius:16px;box-shadow:0 0 60px rgba(28,176,246,0.25);cursor:zoom-out;}
-.lightbox-close{position:absolute;top:16px;right:16px;width:48px;height:48px;border-radius:999px;background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.2);cursor:pointer;font-size:22px;color:#fff;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);transition:background .2s,transform .15s;z-index:10;}
-.lightbox-close:hover{background:rgba(255,255,255,0.25);transform:scale(1.1);}
-.lightbox-hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:700;color:rgba(255,255,255,0.5);white-space:nowrap;}
 /* ── TOAST ── */
 .toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none;}
 .toast{background:var(--surface);border:2px solid var(--green);border-radius:var(--radius-sm);padding:14px 24px;box-shadow:0 8px 32px rgba(28,176,246,0.25);display:flex;align-items:center;gap:10px;animation:toastIn .35s cubic-bezier(.4,0,.2,1),toastOut .35s ease .45s forwards;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:var(--green);max-width:90vw;}
@@ -238,13 +217,23 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
 .toast-text{flex:1}
 @keyframes toastIn{0%{opacity:0;transform:translateY(-20px) scale(.85);}100%{opacity:1;transform:translateY(0) scale(1);}}
 @keyframes toastOut{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-10px) scale(.9);}}
+/* ── ACTIVITÉ CHART ── */
+.act-period-btn{padding:5px 10px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;border-radius:999px;border:2px solid var(--border-mid);background:var(--surface-2);color:var(--text-mid);cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:0.3px;}
+.act-period-btn:active{transform:scale(.94);}
+.act-period-active{border-color:var(--blue)!important;background:var(--blue-bg)!important;color:var(--blue)!important;}
+/* ── LIGHT THEME ── */
+#root.theme-light{--bg:#f4f4f5;--surface:#ffffff;--surface-2:#f0f0f1;--border:#e4e4e7;--border-mid:#d4d4d8;--text:#09090b;--text-mid:#52525b;--text-dim:#a1a1aa;--green-bg:rgba(28,176,246,0.08);--green-mid:rgba(28,176,246,0.2);--blue-bg:#eff8fe;--gold-bg:#fffbeb;--red-bg:#fef2f2;--bronze-bg:#fdf6f0;--bronze-border:#d4956a;--silver-bg:#f8fafc;--silver-border:#b0b8c8;--gold-bg2:#fffbeb;--gold-border:#d4a800;--plat-bg:#eff8ff;--plat-border:#7dd0f5;--shadow:0 2px 8px rgba(0,0,0,0.06);--shadow-md:0 6px 20px rgba(0,0,0,0.09);}
+#root.theme-light .streak-banner{background:linear-gradient(135deg,#cbeeff,#9adaff);border-color:var(--green-dark);}
+#root.theme-light .streak-title{color:var(--green-dark);}
+#root.theme-light .streak-sub{color:#1482b5;}
+#root,#root *{transition:background-color .2s,border-color .2s,color .15s;}
 </style>
 </head>
 <body>
 <div id="root">
   <div id="screens">
 
-        <!-- DASHBOARD -->
+    <!-- DASHBOARD -->
     <div class="screen active" id="screen-dashboard">
       <div class="page-header" style="padding-bottom:0">
         <div class="page-title" style="display:flex;align-items:center;gap:10px;">
@@ -257,8 +246,7 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
             <div class="streak-title" id="dash-streak-title">0 jeu platiné</div>
             <div class="streak-sub" id="dash-streak-sub">Vous progressez bien</div>
           </div>
-          <div class="streak-icon"><img src="platine.png" width="44" height="44" style="object-fit:contain; transform: scale(1.75); transform-origin: center; vertical-align: middle; filter:drop-shadow(0 0 10px rgba(28,176,246,0.6))" onerror="this.outerHTML=''"/>
-</div>
+          <div class="streak-icon"><img src="platine.png" width="44" height="44" style="object-fit:contain; transform: scale(1.75); transform-origin: center; vertical-align: middle; filter:drop-shadow(0 0 10px rgba(28,176,246,0.6))" onerror="this.outerHTML=''"/></div>
         </div>
       </div>
       <div style="display:flex;gap:10px;padding:12px 20px">
@@ -273,6 +261,36 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
           <div id="trophy-chart-labels" style="display:flex;gap:8px;margin-top:10px"></div>
         </div>
       </div>
+
+      <!-- ══ BLOC ACTIVITÉ PAR PÉRIODE ══ -->
+      <div style="padding:16px 20px 0">
+        <div class="card" style="padding:18px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+            <div style="font-size:14px;font-weight:900;color:var(--text);"> Activité des trophées</div>
+            <div style="display:flex;gap:5px;">
+              <button onclick="setActPeriod('day')" id="act-btn-day" class="act-period-btn">Jour</button>
+              <button onclick="setActPeriod('week')" id="act-btn-week" class="act-period-btn">Semaine</button>
+              <button onclick="setActPeriod('month')" id="act-btn-month" class="act-period-btn act-period-active">Mois</button>
+              <button onclick="setActPeriod('year')" id="act-btn-year" class="act-period-btn">Année</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+            <div class="stat-mini" style="flex:1;min-width:70px;"><div class="stat-mini-val" id="act-stat-total">—</div><div class="stat-mini-lbl">Total</div></div>
+            <div class="stat-mini" style="flex:1;min-width:70px;"><div class="stat-mini-val" id="act-stat-best" style="color:var(--gold)">—</div><div class="stat-mini-lbl" id="act-stat-best-lbl">Meilleur mois</div></div>
+            <div class="stat-mini" style="flex:1;min-width:70px;"><div class="stat-mini-val" id="act-stat-avg" style="color:var(--blue)">—</div><div class="stat-mini-lbl" id="act-stat-avg-lbl">Moy / mois</div></div>
+          </div>
+          <div style="position:relative;width:100%;height:200px;">
+            <canvas id="act-chart" role="img" aria-label="Graphique d'activité des trophées par période">Activité des trophées dans le temps.</canvas>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:12px;font-size:11px;color:var(--text-mid);flex-wrap:wrap;">
+            <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#8b6c42;display:inline-block;"></span>Bronze</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#b0c4de;display:inline-block;"></span>Argent</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#eea320;display:inline-block;"></span>Or</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#1cb0f6;display:inline-block;"></span>Platine</span>
+          </div>
+        </div>
+      </div>
+
       <div style="padding:20px 20px 0">
         <div style="font-size:16px;font-weight:900;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--text);">⚡ Proches du 100%</div>
         <div id="near-complete-list"></div>
@@ -292,10 +310,10 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
         <button class="duo-bouton vert" id="btn-filter-100" onclick="setGamesFilter('100')">100%</button>
       </div>
       <div style="padding:0 20px 12px">
-  <input id="games-search" placeholder="🔍 Rechercher un jeu…" oninput="renderGamesList()"
-    style="width:100%;padding:12px 16px;border:2px solid var(--border-mid);border-radius:var(--radius-xs);background:var(--surface-2);color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;outline:none;transition:border-color .15s;"
-    onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border-mid)'"/>
-</div>
+        <input id="games-search" placeholder="🔍 Rechercher un jeu…" oninput="renderGamesList()"
+          style="width:100%;padding:12px 16px;border:2px solid var(--border-mid);border-radius:var(--radius-xs);background:var(--surface-2);color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;outline:none;transition:border-color .15s;"
+          onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border-mid)'"/>
+      </div>
       <div style="padding:0 20px 16px">
         <button class="btn btn-green" style="width:100%" onclick="openModal('add-game')">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -324,8 +342,6 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
     <div class="screen" id="screen-settings">
       <div class="page-header"><div class="page-title">Paramètres ⚙️</div></div>
       <div style="padding:0 20px 8px">
-
-        <!-- APPARENCE -->
         <div class="settings-section">
           <div class="settings-section-label">Apparence</div>
           <div class="card" style="padding:0;overflow:hidden">
@@ -341,12 +357,9 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
             </div>
           </div>
         </div>
-
-        <!-- ═══ DONNÉES — Import / Export ═══ -->
         <div class="settings-section">
           <div class="settings-section-label">Données</div>
           <div class="card" style="padding:0;overflow:hidden">
-            <!-- Export -->
             <div class="settings-row">
               <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
                 <div class="settings-row-icon" style="background:rgba(28,176,246,0.12);font-size:20px;">📤</div>
@@ -357,7 +370,6 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
               </div>
               <button onclick="exportData()" style="flex-shrink:0;padding:9px 16px;border:2px solid var(--blue);border-bottom:4px solid #0a5080;background:rgba(28,176,246,0.1);color:var(--blue);font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;border-radius:999px;cursor:pointer;white-space:nowrap;transition:all .1s;">EXPORTER</button>
             </div>
-            <!-- Import -->
             <div class="settings-row" style="border-top:1px solid var(--border)">
               <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
                 <div class="settings-row-icon" style="background:rgba(28,176,246,0.08);font-size:20px;">📥</div>
@@ -372,25 +384,19 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
           <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(this)"/>
           <div id="io-status" class="io-status"></div>
         </div>
-
-        <!-- HALL OF FAME PLATINE -->
         <div class="settings-section">
           <div class="settings-section-label">Derniers jeux platinés</div>
           <div id="settings-plat-list"></div>
         </div>
-
-        <!-- HALL OF FAME 100% -->
         <div class="settings-section">
           <div class="settings-section-label">Derniers jeux 100%</div>
           <div id="settings-100-list"></div>
         </div>
-
-        <!-- À PROPOS -->
         <div class="settings-section">
           <div class="settings-section-label">À propos</div>
           <div class="card" style="padding:0;overflow:hidden">
             <div class="info-row"><span class="info-label">Application</span><span class="info-val">Platina</span></div>
-            <div class="info-row"><span class="info-label">Version</span><span class="info-val" style="color:var(--green)">15</span></div>
+            <div class="info-row"><span class="info-label">Version</span><span class="info-val" style="color:var(--green)">16</span></div>
             <div class="info-row"><span class="info-label">Créé le</span><span class="info-val">14 avril 2026</span></div>
             <div class="info-row"><span class="info-label">Jeux trackés</span><span class="info-val" id="settings-game-count" style="color:var(--blue)">—</span></div>
             <div class="info-row"><span class="info-label">Trophées trackés</span><span class="info-val" id="settings-trophy-count" style="color:var(--gold)">—</span></div>
@@ -402,7 +408,6 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
             <div class="info-row"><span class="info-label">Développeur</span><span class="info-val">Batman Miyuki</span></div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
@@ -559,31 +564,15 @@ nav{height:var(--nav-h);background:var(--surface);border-top:2px solid var(--bor
   <button id="tt-install-btn" style="padding:8px 16px;border:2px solid var(--green);border-bottom:4px solid var(--green-dark);background:transparent;color:var(--green);font-family:'Nunito',sans-serif;font-weight:900;font-size:12px;cursor:pointer;border-radius:999px;">INSTALLER</button>
   <button onclick="document.getElementById('tt-install-banner').classList.remove('show')" style="background:none;border:none;color:var(--text-mid);font-size:20px;cursor:pointer;line-height:1">✕</button>
 </div>
-<script>
-/* ══ HTML ELEMENTS ══ */
-/* CONFIRM DELETE GAME */
-document.write('<div class="modal-overlay" id="modal-confirm-delete" onclick="closeConfirmDelete()"><div class="modal-sheet" onclick="event.stopPropagation()" style="border:2px solid var(--red);box-shadow:0 0 40px rgba(255,75,75,0.2);max-width:420px;"><div class="modal-handle" style="background:var(--red);opacity:0.5"></div><div class="modal-header" style="border-bottom-color:var(--red);"><div class="modal-title" style="color:var(--red);">⚠️ Supprimer ce jeu ?</div><button class="btn-close" onclick="closeConfirmDelete()" style="color:var(--red);border-color:var(--red);">✕</button></div><div class="modal-body" style="text-align:center;padding:24px 20px;"><div style="font-size:48px;margin-bottom:16px;">🗑️</div><div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">"<span id="confirm-delete-name"></span>"</div><div style="font-size:13px;color:var(--text-mid);margin-bottom:24px;">Cette action est irréversible.<br>Tous les trophées seront supprimés.</div><div style="display:flex;gap:12px;"><button onclick="confirmDeleteGame()" class="btn btn-red" style="flex:1;">Supprimer</button><button onclick="closeConfirmDelete()" class="btn btn-outline" style="flex:1;">Annuler</button></div></div></div></div>');
-/* IMAGE LIGHTBOX */
-document.write('<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()"><button class="lightbox-close" onclick="closeLightbox()">✕</button><img class="lightbox-img" id="lightbox-img" src="" alt="Image du jeu" onclick="event.stopPropagation()"><div class="lightbox-hint">Cliquez sur limage ou ✕ pour fermer</div></div>');
-/* TOAST CONTAINER */
-document.write('<div class="toast-container" id="toast-container"></div>');
 
+<!-- CHART.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<script>
 /* ══ HELPERS ══ */
 function uid(){return Math.random().toString(36).slice(2,11);}
-
-/* ══ LIGHTBOX ══ */
-function openLightbox(url){var lb=document.getElementById('lightbox');var img=document.getElementById('lightbox-img');img.src=url;lb.classList.add('open');document.body.style.overflow='hidden';}
-function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(document.getElementById('lightbox')&&document.getElementById('lightbox').classList.contains('open'))closeLightbox();}});
-
-/* ══ TOAST ══ */
-function showToast(message,icon){var c=document.getElementById('toast-container');if(!c)return;var t=document.createElement('div');t.className='toast';t.innerHTML='<span class="toast-icon">'+icon+'</span><span class="toast-text">'+message+'</span>';c.appendChild(t);setTimeout(function(){if(t.parentNode)t.remove();},5000);}
-
-/* ══ DELETE CONFIRMATION ══ */
-var _deleteGameId=null;
-function closeConfirmDelete(){var m=document.getElementById('modal-confirm-delete');if(m)m.classList.remove('open');_deleteGameId=null;}
-function confirmDeleteGame(){if(!_deleteGameId)return;var gameName='';var g=games.find(function(x){return x.id===_deleteGameId;});if(g)gameName=g.name;games=games.filter(function(x){return x.id!==_deleteGameId;});saveGames();_deleteGameId=null;closeConfirmDelete();switchTab('games');setTimeout(function(){showToast('"'+gameName+'" a été supprimé','🗑️');},100);}
-function deleteGame(id){_deleteGameId=id;var g=games.find(function(x){return x.id===id;});var n=document.getElementById('confirm-delete-name');if(n)n.textContent=g?g.name:'ce jeu';var m=document.getElementById('modal-confirm-delete');if(m)m.classList.add('open');}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function timeAgo(ts){var d=Date.now()-ts;if(d<3600000)return Math.max(1,Math.floor(d/60000))+'m';if(d<86400000)return Math.floor(d/3600000)+'h';if(d<2592000000)return Math.floor(d/86400000)+'j';return Math.floor(d/2592000000)+'mois';}
 
 /* ══ LIGHTBOX ══ */
 function openLightbox(url){var lb=document.getElementById('lightbox');var img=document.getElementById('lightbox-img');img.src=url;lb.classList.add('open');document.body.style.overflow='hidden';}
@@ -592,20 +581,19 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(document
 
 /* ══ TOAST ══ */
 function showToast(message,icon){var c=document.getElementById('toast-container');var t=document.createElement('div');t.className='toast';t.innerHTML='<span class="toast-icon">'+icon+'</span><span class="toast-text">'+message+'</span>';c.appendChild(t);setTimeout(function(){t.remove();},3200);}
+
 var GRADS=[['#1a3a5c','#0a1e30'],['#3a0a0a','#220404'],['#0a3a10','#041506'],['#2d0a3a','#130418'],['#3a200a','#160b04'],['#0a1e3a','#040b18'],['#2a0a20','#10040c'],['#1a3a0a','#0a1604'],['#3a2a0a','#150f04'],['#0a2a3a','#041018']];
 var TC={bronze:{c:'#cd7f32',bg:'#1e0e04',border:'#7a4920',pts:15,label:'Bronze'},silver:{c:'#b0c4de',bg:'#161c24',border:'#3a4a5c',pts:30,label:'Argent'},gold:{c:'#ffd700',bg:'#1e1600',border:'#7a6000',pts:90,label:'Or'},platinum:{c:'#1cb0f6',bg:'#001a2e',border:'#0a5070',pts:300,label:'Platine'}};
 var TROPHY_FILES={platinum:'platine',gold:'or',silver:'argent',bronze:'bronze'};
 var TROPHY_EMOJIS={platinum:'',gold:'',silver:'',bronze:''};
 var ORDER=['platinum','gold','silver','bronze'];
 
-function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-function timeAgo(ts){var d=Date.now()-ts;if(d<3600000)return Math.max(1,Math.floor(d/60000))+'m';if(d<86400000)return Math.floor(d/3600000)+'h';if(d<2592000000)return Math.floor(d/86400000)+'j';return Math.floor(d/2592000000)+'mois';}
 function trophyImg(type,size){size=size||24;return '<img src="'+TROPHY_FILES[type]+'.png" width="'+size+'" height="'+size+'" style="object-fit:contain;display:block" data-fb="'+type+'" onerror="imgErr(this)">';}
 function imgErr(el){var fb=el.getAttribute('data-fb')||'bronze';el.outerHTML='<span style="font-size:'+Math.round(parseInt(el.width)*0.75)+'px;line-height:1">'+TROPHY_EMOJIS[fb]+'</span>';}
 function platformBadge(plat,extraStyle){var cls='platform-ps3';if(plat==='PS5')cls='platform-ps5';else if(plat==='PS4')cls='platform-ps4';return '<span class="platform-badge '+cls+'"'+(extraStyle?' style="'+extraStyle+'"':'')+'>'+esc(plat)+'</span>';}
 function getCoverStyle(g){return 'background:linear-gradient(135deg,'+g.grad[0]+','+g.grad[1]+')';}
 function handleCoverFile(input,previewId,dataId){var file=input.files[0];if(!file)return;var maxSize=500*1024;if(file.size>maxSize){showToast('Image trop grande ! Max 500 KB','⚠️');return;}var r=new FileReader();r.onload=function(e){document.getElementById(dataId).value=e.target.result;var p=document.getElementById(previewId);p.src=e.target.result;p.style.display='block';};r.readAsDataURL(file);}
-function previewCoverUrl(inputId,previewId){var url=document.getElementById(inputId).value.trim();var p=document.getElementById(previewId);if(url){p.onerror=function(){p.style.display='none';var hint=document.createElement('div');hint.style.cssText='font-size:11px;color:var(--red);margin-top:4px;text-align:center;font-weight:700;';hint.textContent='⚠️ Image inaccessible. Utilisez imgur, discord ou imgbb';var existing=document.querySelector('.cover-url-hint');if(existing)existing.remove();var inp=document.getElementById(inputId);if(inp&&inp.nextSibling&&inp.nextSibling.className!=='cover-url-hint'){inp.parentNode.insertBefore(hint,inp.nextSibling);hint.className='cover-url-hint';setTimeout(function(){hint.remove();},6000);}};p.onload=function(){p.style.display='block';var h=document.querySelector('.cover-url-hint');if(h)h.remove();};p.src=url;}else{p.style.display='none';var h=document.querySelector('.cover-url-hint');if(h)h.remove();}}
+function previewCoverUrl(inputId,previewId){var url=document.getElementById(inputId).value.trim();var p=document.getElementById(previewId);if(url){p.onerror=function(){p.style.display='none';};p.onload=function(){p.style.display='block';};p.src=url;}else{p.style.display='none';}}
 
 /* ══ STATS ══ */
 function catGame(g){var sAll=statAll(g);if(sAll.total>0&&sAll.earned===sAll.total)return '100';var platTrophy=(g.trophies||[]).find(function(x){return x.type==='platinum';});if(platTrophy&&platTrophy.earned)return 'platinum';return 'progress';}
@@ -641,52 +629,9 @@ function saveGames(){localStorage.setItem('tt-games-v5',JSON.stringify(games));}
 function saveWish(){localStorage.setItem('tt-wish-v5',JSON.stringify(wishlist));}
 
 /* ══ IMPORT / EXPORT ══ */
-function showIOStatus(msg, isOk){
-  var el=document.getElementById('io-status');
-  if(!el) return;
-  el.textContent=msg;
-  el.className='io-status '+(isOk?'ok':'err');
-  el.style.display='block';
-  setTimeout(function(){el.style.display='none';},6000);
-}
-function exportData(){
-  var data={version:2,exportDate:new Date().toISOString(),games:games,wishlist:wishlist};
-  var json=JSON.stringify(data,null,2);
-  var blob=new Blob([json],{type:'application/json'});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement('a');
-  a.href=url;
-  a.download='platina-backup-'+new Date().toISOString().slice(0,10)+'.json';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  var sizeKB=Math.round(blob.size/1024);
-  showIOStatus('✓ Export réussi ! '+games.length+' jeu'+(games.length>1?'x':'')+' ('+sizeKB+' KB)', true);
-}
-function importData(input){
-  var file=input.files[0]; if(!file)return;
-  var sizeMB=(file.size/1024/1024).toFixed(2);
-  if(file.size>5*1024*1024){showIOStatus('⚠️ Fichier trop volumineux ('+sizeMB+' MB). Images trop lourdes ?', false);input.value='';return;}
-  var reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      var data=JSON.parse(e.target.result);
-      if(!data.games||!Array.isArray(data.games)) throw new Error('Format invalide');
-      games=migrateGames(data.games);
-      saveGames();
-      if(data.wishlist&&Array.isArray(data.wishlist)){wishlist=data.wishlist;saveWish();}
-      renderSettings();
-      if(currentTab==='dashboard')renderDashboard();
-      if(currentTab==='games')renderGames();
-      showIOStatus('✓ Import réussi ! '+games.length+' jeu'+(games.length>1?'x':'')+' chargé'+(games.length>1?'s':'')+'.', true);
-    }catch(err){
-      showIOStatus('✗ Erreur : fichier JSON invalide ou corrompu.', false);
-    }
-    input.value='';
-  };
-  reader.readAsText(file);
-}
+function showIOStatus(msg,isOk){var el=document.getElementById('io-status');if(!el)return;el.textContent=msg;el.className='io-status '+(isOk?'ok':'err');el.style.display='block';setTimeout(function(){el.style.display='none';},6000);}
+function exportData(){var data={version:2,exportDate:new Date().toISOString(),games:games,wishlist:wishlist};var json=JSON.stringify(data,null,2);var blob=new Blob([json],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='platina-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);var sizeKB=Math.round(blob.size/1024);showIOStatus('✓ Export réussi ! '+games.length+' jeu'+(games.length>1?'x':'')+' ('+sizeKB+' KB)',true);}
+function importData(input){var file=input.files[0];if(!file)return;var sizeMB=(file.size/1024/1024).toFixed(2);if(file.size>5*1024*1024){showIOStatus('⚠️ Fichier trop volumineux ('+sizeMB+' MB). Images trop lourdes ?',false);input.value='';return;}var reader=new FileReader();reader.onload=function(e){try{var data=JSON.parse(e.target.result);if(!data.games||!Array.isArray(data.games))throw new Error('Format invalide');games=migrateGames(data.games);saveGames();if(data.wishlist&&Array.isArray(data.wishlist)){wishlist=data.wishlist;saveWish();}renderSettings();if(currentTab==='dashboard')renderDashboard();if(currentTab==='games')renderGames();showIOStatus('✓ Import réussi ! '+games.length+' jeu'+(games.length>1?'x':'')+' chargé'+(games.length>1?'s':'')+'.', true);}catch(err){showIOStatus('✗ Erreur : fichier JSON invalide ou corrompu.',false);}input.value='';};reader.readAsText(file);}
 
 /* ══ NAV ══ */
 function switchTab(tab){if(tab===currentTab&&tab!=='detail')return;document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});document.getElementById('screen-'+tab).classList.add('active');var btn=document.querySelector('.nav-btn[data-tab="'+tab+'"]');if(btn)btn.classList.add('active');currentTab=tab;if(tab==='dashboard')renderDashboard();if(tab==='games')renderGames();if(tab==='wishlist')renderWishlist();if(tab==='settings')renderSettings();}
@@ -733,60 +678,156 @@ function deleteWish(id){wishlist=wishlist.filter(function(w){return w.id!==id;})
 function showConfetti(){var colors=['#1cb0f6','#5de8ff','#ffffff','#ffd700','#88e4ff'];for(var i=0;i<14;i++){var el=document.createElement('div');el.style.cssText='position:fixed;top:45%;left:'+(15+Math.random()*70)+'%;width:10px;height:10px;border-radius:50%;background:'+colors[i%5]+';z-index:999;pointer-events:none;animation:confetti .8s ease forwards '+(Math.random()*.35)+'s;box-shadow:0 0 10px '+colors[i%5];document.body.appendChild(el);setTimeout(function(){el.remove();},1200);}}
 
 /* ══ TROPHY ROWS ══ */
-function renderTrophyRows(trophies, gameId, dlcId, filterStr) {
-  let sorted = [...trophies].sort((a, b) => {
-    let oi = ORDER.indexOf(a.type) - ORDER.indexOf(b.type);
-    if (oi !== 0) return oi;
-    if (a.earned !== b.earned) return a.earned ? -1 : 1;
-    return 0;
-  });
+function renderTrophyRows(trophies,gameId,dlcId,filterStr){
+  var sorted=[...trophies].sort(function(a,b){var oi=ORDER.indexOf(a.type)-ORDER.indexOf(b.type);if(oi!==0)return oi;if(a.earned!==b.earned)return a.earned?-1:1;return 0;});
+  if(filterStr==='earned')sorted=sorted.filter(function(t){return t.earned;});
+  else if(filterStr==='notearned')sorted=sorted.filter(function(t){return !t.earned;});
+  else if(filterStr&&filterStr!=='all')sorted=sorted.filter(function(t){return t.type===filterStr;});
+  if(!sorted.length){return '<div style="text-align:center;padding:16px;color:var(--text-mid);font-size:13px;font-weight:700;">Aucun trophée à afficher</div>';}
+  var toggleFn=dlcId?'toggleDlcTrophy(\''+gameId+'\',\''+dlcId+'\',':'toggleTrophy(\''+gameId+'\',';
+  var deleteFn=dlcId?'deleteDlcTrophy(\''+gameId+'\',\''+dlcId+'\',':'deleteTrophy(\''+gameId+'\',';
+  return sorted.map(function(t){
+    var tc=TC[t.type];
+    return '<div class="trophy-row '+(t.earned?'earned':'')+'" style="padding:0;overflow:hidden;">'
+      +'<div class="check-box '+(t.earned?'done':'')+'" style="margin-left:14px;" onclick="'+toggleFn+'\''+t.id+'\')">'
+      +(t.earned?'<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>':'')
+      +'</div>'
+      +'<div style="width:34px;height:34px;border-radius:10px;background:'+tc.bg+';border:2px solid '+tc.border+';display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">'+trophyImg(t.type,22)+'</div>'
+      +'<div style="flex:1;min-width:0;padding:12px 0;">'
+      +'<div class="trophy-name">'+esc(t.name)+'</div>'
+      +(t.desc?'<div class="trophy-desc">'+esc(t.desc)+'</div>':'')
+      +'</div>'
+      +'<div style="align-self:stretch;background:'+tc.bg+';border-left:2px solid '+tc.border+';display:flex;align-items:center;justify-content:flex-start;gap:12px;padding:0 14px;flex-shrink:0;width:200px;position:relative;">'
+      +'<button onclick="'+deleteFn+'\''+t.id+'\')" style="position:absolute;top:4px;right:4px;background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:13px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .15s;line-height:1;" onmouseover="this.style.background=\'var(--red-bg)\';this.style.color=\'var(--red)\'" onmouseout="this.style.background=\'none\';this.style.color=\'var(--text-dim)\'">✕</button>'
+      +'<div style="width:50px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+trophyImg(t.type,t.type==='platinum'?50:35)+'</div>'
+      +'<div style="font-size:12px;font-weight:900;color:'+tc.c+';text-transform:uppercase;letter-spacing:0.5px;">'+tc.label+'</div>'
+      +'</div></div>';
+  }).join('');}
 
-  if (filterStr === 'earned') sorted = sorted.filter(t => t.earned);
-  else if (filterStr === 'notearned') sorted = sorted.filter(t => !t.earned);
-  else if (filterStr && filterStr !== 'all') sorted = sorted.filter(t => t.type === filterStr);
+/* ══ ACTIVITÉ PAR PÉRIODE ══ */
+var _actChart=null, _actPeriod='month';
 
-  if (!sorted.length) {
-    return `<div style="text-align:center;padding:16px;color:var(--text-mid);font-size:13px;font-weight:700;">Aucun trophée à afficher</div>`;
+function _actGetData(period){
+  var allT=games.flatMap(function(g){return (g.trophies||[]).concat((g.dlcs||[]).flatMap(function(d){return d.trophies||[];}));}).filter(function(t){return t.earned&&t.at;});
+  var labels=[],bD=[],sD=[],gD=[],pD=[];
+  var now=new Date();now.setHours(23,59,59,999);
+
+  if(period==='day'){
+    for(var i=29;i>=0;i--){
+      var d=new Date(now);d.setDate(d.getDate()-i);
+      labels.push(d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}));
+      var s=new Date(d);s.setHours(0,0,0,0);
+      var e=new Date(d);e.setHours(23,59,59,999);
+      bD.push(allT.filter(function(t){return t.type==='bronze'&&t.at>=s&&t.at<=e;}).length);
+      sD.push(allT.filter(function(t){return t.type==='silver'&&t.at>=s&&t.at<=e;}).length);
+      gD.push(allT.filter(function(t){return t.type==='gold'&&t.at>=s&&t.at<=e;}).length);
+      pD.push(allT.filter(function(t){return t.type==='platinum'&&t.at>=s&&t.at<=e;}).length);
+    }
+  }else if(period==='week'){
+    for(var i=11;i>=0;i--){
+      var wE=new Date(now);wE.setDate(wE.getDate()-i*7);
+      var wS=new Date(wE);wS.setDate(wS.getDate()-6);wS.setHours(0,0,0,0);
+      labels.push('S'+wE.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}));
+      bD.push(allT.filter(function(t){return t.type==='bronze'&&t.at>=wS&&t.at<=wE;}).length);
+      sD.push(allT.filter(function(t){return t.type==='silver'&&t.at>=wS&&t.at<=wE;}).length);
+      gD.push(allT.filter(function(t){return t.type==='gold'&&t.at>=wS&&t.at<=wE;}).length);
+      pD.push(allT.filter(function(t){return t.type==='platinum'&&t.at>=wS&&t.at<=wE;}).length);
+    }
+  }else if(period==='month'){
+    var MO=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+    for(var i=11;i>=0;i--){
+      var d=new Date(now.getFullYear(),now.getMonth()-i,1);
+      labels.push(MO[d.getMonth()]+' '+String(d.getFullYear()).slice(2));
+      var mS=new Date(d.getFullYear(),d.getMonth(),1);
+      var mE=new Date(d.getFullYear(),d.getMonth()+1,0,23,59,59,999);
+      bD.push(allT.filter(function(t){return t.type==='bronze'&&t.at>=mS&&t.at<=mE;}).length);
+      sD.push(allT.filter(function(t){return t.type==='silver'&&t.at>=mS&&t.at<=mE;}).length);
+      gD.push(allT.filter(function(t){return t.type==='gold'&&t.at>=mS&&t.at<=mE;}).length);
+      pD.push(allT.filter(function(t){return t.type==='platinum'&&t.at>=mS&&t.at<=mE;}).length);
+    }
+  }else{
+    for(var i=4;i>=0;i--){
+      var yr=now.getFullYear()-i;
+      labels.push(String(yr));
+      var yS=new Date(yr,0,1);var yE=new Date(yr,11,31,23,59,59,999);
+      bD.push(allT.filter(function(t){return t.type==='bronze'&&t.at>=yS&&t.at<=yE;}).length);
+      sD.push(allT.filter(function(t){return t.type==='silver'&&t.at>=yS&&t.at<=yE;}).length);
+      gD.push(allT.filter(function(t){return t.type==='gold'&&t.at>=yS&&t.at<=yE;}).length);
+      pD.push(allT.filter(function(t){return t.type==='platinum'&&t.at>=yS&&t.at<=yE;}).length);
+    }
   }
+  return{labels:labels,bD:bD,sD:sD,gD:gD,pD:pD};
+}
 
-  const toggleFn = dlcId ? `toggleDlcTrophy('${gameId}','${dlcId}',` : `toggleTrophy('${gameId}',`;
-  const deleteFn = dlcId ? `deleteDlcTrophy('${gameId}','${dlcId}',` : `deleteTrophy('${gameId}',`;
+function _actUpdateStats(period,bD,sD,gD,pD){
+  var totals=bD.map(function(v,i){return v+sD[i]+gD[i]+pD[i];});
+  var total=totals.reduce(function(a,b){return a+b;},0);
+  var best=Math.max.apply(null,totals.concat([0]));
+  var nz=totals.filter(function(v){return v>0;});
+  var avg=nz.length?Math.round(total/nz.length):0;
+  var t=document.getElementById('act-stat-total');if(t)t.textContent=total;
+  var b=document.getElementById('act-stat-best');if(b)b.textContent=best;
+  var a=document.getElementById('act-stat-avg');if(a)a.textContent=avg;
+  var lblB={day:'Meilleur jour',week:'Meilleure semaine',month:'Meilleur mois',year:'Meilleure année'};
+  var lblA={day:'Moy / jour',week:'Moy / semaine',month:'Moy / mois',year:'Moy / année'};
+  var bl=document.getElementById('act-stat-best-lbl');if(bl)bl.textContent=lblB[period];
+  var al=document.getElementById('act-stat-avg-lbl');if(al)al.textContent=lblA[period];
+}
 
-  return sorted.map(t => {
-    const tc = TC[t.type];
-    
-    return `
-      <div class="trophy-row ${t.earned ? 'earned' : ''}" style="padding:0; overflow:hidden;">
-        
-        <div class="check-box ${t.earned ? 'done' : ''}" style="margin-left:14px;" onclick="${toggleFn}'${t.id}')">
-          ${t.earned ? `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>` : ''}
-        </div>
-        
-        <div style="width:34px;height:34px;border-radius:10px;background:${tc.bg};border:2px solid ${tc.border};display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">
-          ${trophyImg(t.type, 22)}
-        </div>
-        
-        <div style="flex:1;min-width:0;padding:12px 0;">
-          <div class="trophy-name">${esc(t.name)}</div>
-          ${t.desc ? `<div class="trophy-desc">${esc(t.desc)}</div>` : ''}
-        </div>
-        
-        <div style="align-self:stretch; background:${tc.bg}; border-left:2px solid ${tc.border}; display:flex; align-items:center; justify-content:flex-start; gap:12px; padding:0 14px; flex-shrink:0; width:200px; position:relative;">
-          
-          <button onclick="${deleteFn}'${t.id}')" style="position:absolute; top:4px; right:4px; background:none; border:none; cursor:pointer; color:var(--text-dim); font-size:13px; width:20px; height:20px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:all .15s; line-height:1;" onmouseover="this.style.background='var(--red-bg)';this.style.color='var(--red)'" onmouseout="this.style.background='none';this.style.color='var(--text-dim)'">✕</button>
-          
-                <!-- Image bien grande -->
-  <div style="width:50px; height:40px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-    ${trophyImg(t.type, t.type === 'platinum' ? 50 : 35)}
-  </div>
-          
-      <div style="font-size:12px; font-weight:900; color:${tc.c}; text-transform:uppercase; letter-spacing:0.5px;">
-    ${tc.label}
-  </div>
-    </div>
-    </div>
-    `;
-  }).join('');
+function setActPeriod(period){
+  _actPeriod=period;
+  ['day','week','month','year'].forEach(function(p){
+    var btn=document.getElementById('act-btn-'+p);
+    if(!btn)return;
+    if(p===period){btn.classList.add('act-period-active');}
+    else{btn.classList.remove('act-period-active');}
+  });
+  var d=_actGetData(period);
+  _actUpdateStats(period,d.bD,d.sD,d.gD,d.pD);
+  if(_actChart){
+    _actChart.data.labels=d.labels;
+    _actChart.data.datasets[0].data=d.bD;
+    _actChart.data.datasets[1].data=d.sD;
+    _actChart.data.datasets[2].data=d.gD;
+    _actChart.data.datasets[3].data=d.pD;
+    _actChart.update();
+  }
+}
+
+function renderActChart(){
+  var canvas=document.getElementById('act-chart');
+  if(!canvas||typeof Chart==='undefined')return;
+  if(_actChart){_actChart.destroy();_actChart=null;}
+  var d=_actGetData(_actPeriod);
+  _actUpdateStats(_actPeriod,d.bD,d.sD,d.gD,d.pD);
+  _actChart=new Chart(canvas,{
+    type:'bar',
+    data:{
+      labels:d.labels,
+      datasets:[
+        {label:'Bronze',data:d.bD,backgroundColor:'#8b6c42',borderColor:'#6b4e2c',borderWidth:1,borderRadius:3},
+        {label:'Argent',data:d.sD,backgroundColor:'#b0c4de',borderColor:'#8ca8c8',borderWidth:1,borderRadius:3},
+        {label:'Or',    data:d.gD,backgroundColor:'#eea320',borderColor:'#c47d00',borderWidth:1,borderRadius:3},
+        {label:'Platine',data:d.pD,backgroundColor:'#1cb0f6',borderColor:'#0a90d4',borderWidth:1,borderRadius:3}
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            footer:function(items){var t=items.reduce(function(s,i){return s+i.raw;},0);return 'Total : '+t;}
+          }
+        }
+      },
+      scales:{
+        x:{stacked:true,ticks:{autoSkip:true,maxRotation:45,font:{size:10},color:'#71717a'},grid:{display:false}},
+        y:{stacked:true,beginAtZero:true,ticks:{stepSize:1,precision:0,font:{size:10},color:'#71717a'},grid:{color:'rgba(128,128,128,0.08)'}}
+      }
+    }
+  });
 }
 
 /* ══ DASHBOARD ══ */
@@ -809,11 +850,15 @@ function renderDashboard(){
   var chartMax=Math.max.apply(null,[1].concat(ORDER.map(function(t){return allT.filter(function(x){return x.type===t;}).length;})));
   document.getElementById('trophy-chart').innerHTML=ORDER.map(function(type){var tot=allT.filter(function(t){return t.type===type;}).length;var ern=earned.filter(function(t){return t.type===type;}).length;var hPct=Math.round(tot/chartMax*100);return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="font-size:12px;font-weight:900;color:'+chartColors[type]+'">'+ern+'</div><div style="flex:1;width:100%;background:var(--surface-2);border-radius:8px 8px 0 0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;min-height:50px;border:1px solid var(--border);border-bottom:none;"><div style="width:100%;background:'+chartColors[type]+';border-radius:6px 6px 0 0;height:'+hPct+'%;min-height:'+(tot?4:0)+'px;box-shadow:0 0 8px '+chartColors[type]+'"></div></div></div>';}).join('');
   document.getElementById('trophy-chart-labels').innerHTML=ORDER.map(function(type){var tot=allT.filter(function(t){return t.type===type;}).length;var ern=earned.filter(function(t){return t.type===type;}).length;return '<div style="flex:1;text-align:center"><div style="font-size:10px;font-weight:800;color:'+chartColors[type]+';text-transform:uppercase;">'+TC[type].label.slice(0,3)+'.</div><div style="font-size:11px;color:var(--text-dim);font-weight:700;">'+ern+'/'+tot+'</div></div>';}).join('');
+
+  /* Graphique Activité */
+  renderActChart();
+
   var near=games.filter(function(g){return catGame(g)==='progress'&&g.trophies.length>0;}).map(function(g){var s=statAll(g);return Object.assign({},g,s);}).sort(function(a,b){return b.pct-a.pct;}).slice(0,5);
   var nearEl=document.getElementById('near-complete-list');
   if(!near.length){nearEl.innerHTML='<div style="text-align:center;padding:16px;color:var(--text-mid);font-size:13px;font-weight:700;">Aucun jeu en cours</div>';}
   else{nearEl.innerHTML=near.map(function(g){var c=g.pct>=75?'var(--green)':g.pct>=50?'var(--gold)':'var(--blue)';return '<div class="near-row" onclick="openDetail(\''+g.id+'\')"><div style="'+getCoverStyle(g)+';width:46px;height:46px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:rgba(255,255,255,.2);overflow:hidden;border:2px solid var(--border-mid);">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="width:100%;height:100%;object-fit:cover;border-radius:10px;" onerror="this.style.display=\'none\'">':'')+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()+'</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:6px;color:var(--text);">'+esc(g.name)+'</div><div class="prog-bar"><div class="prog-fill" style="width:'+g.pct+'%;background:'+c+';"></div></div></div><div style="font-size:16px;font-weight:900;color:'+c+';flex-shrink:0;margin-left:10px">'+g.pct+'%</div></div>';}).join('');}
-  var last=games.flatMap(function(g){var mt=(g.trophies||[]).filter(function(t){return t.earned;}).map(function(t){return Object.assign({},t,{gameName:g.name,dlcName:null,sortDate:t.at||0});});var dt=(g.dlcs||[]).flatMap(function(dlc){return (dlc.trophies||[]).filter(function(t){return t.earned;}).map(function(t){return Object.assign({},t,{gameName:g.name,dlcName:dlc.name,sortDate:t.at||0});});});return mt.concat(dt);}).sort(function(a,b){return b.sortDate-a.sortDate;}).slice(0,10);
+  var last=games.flatMap(function(g){var mt=(g.trophies||[]).filter(function(t){return t.earned;}).map(function(t){return Object.assign({},t,{gameName:g.name,dlcName:null,sortDate:t.at||0});});var dt=(g.dlcs||[]).flatMap(function(dlc){return (dlc.trophies||[]).filter(function(t){return t.earned;}).map(function(t){return Object.assign({},t,{gameName:g.name,dlcName:dlc.name,sortDate:t.at||0});});});return mt.concat(dt);}).sort(function(a,b){return b.sortDate-a.sortDate;}).slice(0,5);
   var lastEl=document.getElementById('last-trophies-list');
   if(!last.length){lastEl.innerHTML='<div class="empty"><div class="empty-icon">🏅</div><div class="empty-title">Pas encore de trophées</div></div>';}
   else{lastEl.innerHTML=last.map(function(t){var tc=TC[t.type];return '<div class="last-row"><div style="width:36px;height:36px;border-radius:10px;background:'+tc.bg+';border:2px solid '+tc.border+';display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">'+trophyImg(t.type,22)+'</div><div style="flex:1;min-width:0"><div class="last-trophy-name">'+esc(t.name)+'</div><div class="last-game-name">'+esc(t.gameName)+(t.dlcName?' — '+esc(t.dlcName):'')+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">'+makeTrophyPill(t.type)+(t.at?'<div style="font-size:11px;color:var(--text-dim);font-weight:700;">'+timeAgo(t.at)+'</div>':'')+'</div></div>';}).join('');}
@@ -822,14 +867,12 @@ function renderDashboard(){
 /* ══ GAMES ══ */
 function setGamesFilter(f){gamesFilter=f;['progress','platinum','100'].forEach(function(k){document.getElementById('btn-filter-'+k).classList.remove('actif');});document.getElementById('btn-filter-'+f).classList.add('actif');renderGamesList();}
 function renderGames(){document.getElementById('games-count').textContent=games.length+' jeu'+(games.length!==1?'x':'');setGamesFilter(gamesFilter);}
-function renderGamesList(){var html='';if(!games.length){html='<div class="empty"><div class="empty-icon">🎮</div><div class="empty-title">Aucun jeu ajouté</div><div class="empty-sub">Commencez votre collection !</div></div>';}else{var fg=games.filter(function(g){var cat=catGame(g);if(gamesFilter==='platinum')return cat==='platinum';if(gamesFilter==='100')return cat==='100';return cat==='progress';});var q=document.getElementById('games-search');var search=q?q.value.trim().toLowerCase():'';
-if(search)fg=fg.filter(function(g){return g.name.toLowerCase().includes(search);});
-fg.sort(function(a,b){return a.name.localeCompare(b.name);});if(!fg.length){html='<div class="empty"><div class="empty-title">Aucun jeu ici</div><div class="empty-sub">Pas de jeu dans cette catégorie.</div></div>';}else{html=fg.map(renderGameCard).join('');}}document.getElementById('games-list').innerHTML=html;}
-function renderGameCard(g){var s=statAll(g),cat=catGame(g);var barColor=cat==='platinum'?'var(--plat-c)':cat==='100'?'var(--green)':'var(--blue)';var pctColor=barColor;var badge=cat==='platinum'?'<span style="background:var(--plat-bg);color:var(--plat-c);border:2px solid var(--plat-border);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;">💎 Platine</span>':cat==='100'?'<span style="background:var(--green-bg);color:var(--green);border:2px solid var(--green);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;">👑 100%</span>':'';return '<div class="game-card" onclick="openDetail(\''+g.id+'\')">'+'<div class="game-cover-placeholder" style="'+getCoverStyle(g)+';">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">':'')+(badge?'<div style="position:absolute;bottom:10px;right:10px;z-index:2;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8));">'+badge+'</div>':'')+'<div style="position:absolute;top:10px;left:10px;z-index:2;">'+platformBadge(g.platform)+'</div>'+'<span class="cover-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,3).toUpperCase()+'</span>'+'</div>'+'<div class="game-card-body">'+'<div class="game-name">'+esc(g.name)+'</div>'+'<div class="game-prog-row"><span style="font-size:13px;font-weight:700;color:var(--text-mid)">'+s.earned+' / '+s.total+'</span><span class="game-pct" style="color:'+pctColor+';">'+s.pct+'%</span></div>'+'<div class="prog-bar"><div class="prog-fill" style="width:'+s.pct+'%;background:'+barColor+';"></div></div>'+'</div></div>';}
+function renderGamesList(){var html='';if(!games.length){html='<div class="empty"><div class="empty-icon">🎮</div><div class="empty-title">Aucun jeu ajouté</div><div class="empty-sub">Commencez votre collection !</div></div>';}else{var fg=games.filter(function(g){var cat=catGame(g);if(gamesFilter==='platinum')return cat==='platinum';if(gamesFilter==='100')return cat==='100';return cat==='progress';});var q=document.getElementById('games-search');var search=q?q.value.trim().toLowerCase():'';if(search)fg=fg.filter(function(g){return g.name.toLowerCase().includes(search);});fg.sort(function(a,b){return a.name.localeCompare(b.name);});if(!fg.length){html='<div class="empty"><div class="empty-title">Aucun jeu ici</div><div class="empty-sub">Pas de jeu dans cette catégorie.</div></div>';}else{html=fg.map(renderGameCard).join('');}}document.getElementById('games-list').innerHTML=html;}
+function renderGameCard(g){var s=statAll(g),cat=catGame(g);var barColor=cat==='platinum'?'var(--plat-c)':cat==='100'?'var(--green)':'var(--blue)';var badge=cat==='platinum'?'<span style="background:var(--plat-bg);color:var(--plat-c);border:2px solid var(--plat-border);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;">💎 Platine</span>':cat==='100'?'<span style="background:var(--green-bg);color:var(--green);border:2px solid var(--green);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;">👑 100%</span>':'';return '<div class="game-card" onclick="openDetail(\''+g.id+'\')"><div class="game-cover-placeholder" style="'+getCoverStyle(g)+';">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">':'')+(badge?'<div style="position:absolute;bottom:10px;right:10px;z-index:2;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8));">'+badge+'</div>':'')+'<div style="position:absolute;top:10px;left:10px;z-index:2;">'+platformBadge(g.platform)+'</div><span class="cover-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,3).toUpperCase()+'</span></div><div class="game-card-body"><div class="game-name">'+esc(g.name)+'</div><div class="game-prog-row"><span style="font-size:13px;font-weight:700;color:var(--text-mid)">'+s.earned+' / '+s.total+'</span><span class="game-pct" style="color:'+barColor+';">'+s.pct+'%</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+s.pct+'%;background:'+barColor+';"></div></div></div></div>';}
 
 /* ══ DETAIL ══ */
 function renderDetail(id){
-  var g=games.find(function(x){return x.id===id;}); if(!g){backFromDetail();return;}
+  var g=games.find(function(x){return x.id===id;});if(!g){backFromDetail();return;}
   var s=statGame(g),cat=catGame(g),sAll=statAll(g);
   var allByType={bronze:0,silver:0,gold:0,platinum:0},allEarnedByType={bronze:0,silver:0,gold:0,platinum:0};
   [...(g.trophies||[]),...(g.dlcs||[]).flatMap(function(d){return d.trophies||[];})].forEach(function(t){allByType[t.type]++;if(t.earned)allEarnedByType[t.type]++;});
@@ -873,7 +916,7 @@ function renderSettings(){
   var count100=games.filter(function(g){var s=statAll(g);return s.total>0&&s.earned===s.total;}).length;
   var gc=document.getElementById('settings-game-count'),tc=document.getElementById('settings-trophy-count'),pc=document.getElementById('settings-plat-count'),hc=document.getElementById('settings-100-count');
   if(gc)gc.textContent=games.length;if(tc)tc.textContent=allT.length;if(pc)pc.textContent=platCount;if(hc)hc.textContent=count100;
-  var platGames=games.filter(function(g){var pt=(g.trophies||[]).find(function(t){return t.type==='platinum';});return pt&&pt.earned;}).sort(function(a,b){var pa=(a.trophies||[]).find(function(t){return t.type==='platinum';});var pb=(b.trophies||[]).find(function(t){return t.type==='platinum';});return ((pb&&pb.at)||0)-((pa&&pa.at)||0);}).slice(0,6);
+  var platGames=games.filter(function(g){var pt=(g.trophies||[]).find(function(t){return t.type==='platinum';});return pt&&pt.earned;}).sort(function(a,b){var pa=(a.trophies||[]).find(function(t){return t.type==='platinum';});var pb=(b.trophies||[]).find(function(t){return t.type==='platinum';});return((pb&&pb.at)||0)-((pa&&pa.at)||0);}).slice(0,6);
   var platEl=document.getElementById('settings-plat-list');
   if(platEl){if(!platGames.length){platEl.innerHTML='<div class="hof-empty">Aucun jeu platiné pour l\'instant</div>';}else{platEl.innerHTML='<div class="hof-grid">'+platGames.map(function(g){return '<div class="hof-card" onclick="openDetail(\''+g.id+'\')"><div class="hof-cover" style="'+getCoverStyle(g)+'">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5" onerror="this.remove()">':'')+'<span class="hof-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()+'</span><span class="hof-badge">💎</span></div><div class="hof-name">'+esc(g.name)+'</div></div>';}).join('')+'</div>';}}
   var games100=games.filter(function(g){var s=statAll(g);return s.total>0&&s.earned===s.total;}).sort(function(a,b){function lastAt(g){var all=(g.trophies||[]).concat((g.dlcs||[]).flatMap(function(d){return d.trophies||[];}));var e=all.filter(function(t){return t.earned&&t.at;}).map(function(t){return t.at;});return e.length?Math.max.apply(null,e):0;}return lastAt(b)-lastAt(a);}).slice(0,6);
@@ -885,53 +928,14 @@ function renderSettings(){
 function toggleTheme(){var root=document.getElementById('root');var isLight=root.classList.toggle('theme-light');document.getElementById('theme-toggle-btn').classList.toggle('on',isLight);document.getElementById('theme-icon').textContent=isLight?'☀️':'🌙';document.getElementById('theme-sub').textContent=isLight?'Mode clair':'Mode sombre';localStorage.setItem('tt-theme',isLight?'light':'dark');}
 (function(){var t=localStorage.getItem('tt-theme');if(t==='light'){document.getElementById('root').classList.add('theme-light');document.getElementById('theme-toggle-btn').classList.add('on');document.getElementById('theme-icon').textContent='☀️';document.getElementById('theme-sub').textContent='Mode clair';}})();
 
-/* ══ PWA — icône trophée platine PS5 ══ */
+/* ══ PWA ══ */
 if('serviceWorker' in navigator){var SW='var CACHE="tt-v4";self.addEventListener("install",function(e){e.waitUntil(self.skipWaiting());});self.addEventListener("activate",function(e){e.waitUntil(clients.claim());});self.addEventListener("fetch",function(e){if(e.request.method!=="GET")return;e.respondWith(caches.match(e.request).then(function(r){return r||fetch(e.request).catch(function(){return new Response("",{status:503});});}));});';try{var swBlob=new Blob([SW],{type:'application/javascript'});navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(function(){});}catch(e){}}
 (function(){
-  /* Dessine un trophée platine PS5 sur canvas */
-  function makePlatIcon(size){
-    try{
-      var c=document.createElement('canvas');c.width=c.height=size;
-      var ctx=c.getContext('2d');
-      var s=size/192;
-      /* Fond arrondi dégradé sombre */
-      var r=size*0.18;
-      ctx.beginPath();ctx.moveTo(r,0);ctx.lineTo(size-r,0);ctx.quadraticCurveTo(size,0,size,r);ctx.lineTo(size,size-r);ctx.quadraticCurveTo(size,size,size-r,size);ctx.lineTo(r,size);ctx.quadraticCurveTo(0,size,0,size-r);ctx.lineTo(0,r);ctx.quadraticCurveTo(0,0,r,0);ctx.closePath();
-      var bgGrad=ctx.createRadialGradient(size*0.35,size*0.35,0,size/2,size/2,size*0.7);
-      bgGrad.addColorStop(0,'#001c36');bgGrad.addColorStop(1,'#000820');
-      ctx.fillStyle=bgGrad;ctx.fill();
-      /* Halo derrière le trophée */
-      var halo=ctx.createRadialGradient(size/2,size*0.44,0,size/2,size*0.44,size*0.38);
-      halo.addColorStop(0,'rgba(28,176,246,0.22)');halo.addColorStop(1,'rgba(28,176,246,0)');
-      ctx.fillStyle=halo;ctx.beginPath();ctx.arc(size/2,size*0.44,size*0.38,0,Math.PI*2);ctx.fill();
-      /* Dégradé trophée platine */
-      var tg=ctx.createLinearGradient(size*0.28,size*0.15,size*0.72,size*0.82);
-      tg.addColorStop(0,'#7eeeff');tg.addColorStop(0.4,'#1cb0f6');tg.addColorStop(1,'#0a80b5');
-      ctx.fillStyle=tg;ctx.strokeStyle=tg;ctx.lineWidth=size*0.055;ctx.lineCap='round';
-      /* Coupe du trophée */
-      ctx.beginPath();ctx.moveTo(size*0.33,size*0.17);ctx.lineTo(size*0.67,size*0.17);ctx.lineTo(size*0.635,size*0.525);ctx.lineTo(size*0.365,size*0.525);ctx.closePath();ctx.fill();
-      /* Poignée gauche */
-      ctx.beginPath();ctx.moveTo(size*0.33,size*0.225);ctx.bezierCurveTo(size*0.13,size*0.23,size*0.13,size*0.49,size*0.33,size*0.49);ctx.stroke();
-      /* Poignée droite */
-      ctx.beginPath();ctx.moveTo(size*0.67,size*0.225);ctx.bezierCurveTo(size*0.87,size*0.23,size*0.87,size*0.49,size*0.67,size*0.49);ctx.stroke();
-      /* Tige */
-      ctx.fillStyle=tg;ctx.fillRect(size*0.455,size*0.525,size*0.09,size*0.115);
-      /* Socle */
-      ctx.beginPath();var bx=size*0.3,by=size*0.64,bw=size*0.4,bh=size*0.09,br2=size*0.045;ctx.moveTo(bx+br2,by);ctx.lineTo(bx+bw-br2,by);ctx.quadraticCurveTo(bx+bw,by,bx+bw,by+br2);ctx.lineTo(bx+bw,by+bh-br2);ctx.quadraticCurveTo(bx+bw,by+bh,bx+bw-br2,by+bh);ctx.lineTo(bx+br2,by+bh);ctx.quadraticCurveTo(bx,by+bh,bx,by+bh-br2);ctx.lineTo(bx,by+br2);ctx.quadraticCurveTo(bx,by,bx+br2,by);ctx.closePath();ctx.fill();
-      /* Éclat sur la coupe */
-      ctx.save();ctx.globalAlpha=0.3;ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(size*0.415,size*0.30,size*0.038,size*0.09,-0.22,0,Math.PI*2);ctx.fill();ctx.restore();
-      /* Étoiles / reflets */
-      ctx.save();ctx.globalAlpha=0.55;ctx.fillStyle='#88e8ff';
-      [[0.5,0.81,3],[0.38,0.87,2],[0.62,0.87,2]].forEach(function(p){ctx.beginPath();ctx.arc(size*p[0],size*p[1],size*p[2]/100,0,Math.PI*2);ctx.fill();});
-      ctx.restore();
-      return c.toDataURL('image/png');
-    }catch(e){return null;}
-  }
+  function makePlatIcon(size){try{var c=document.createElement('canvas');c.width=c.height=size;var ctx=c.getContext('2d');var r=size*0.18;ctx.beginPath();ctx.moveTo(r,0);ctx.lineTo(size-r,0);ctx.quadraticCurveTo(size,0,size,r);ctx.lineTo(size,size-r);ctx.quadraticCurveTo(size,size,size-r,size);ctx.lineTo(r,size);ctx.quadraticCurveTo(0,size,0,size-r);ctx.lineTo(0,r);ctx.quadraticCurveTo(0,0,r,0);ctx.closePath();var bgGrad=ctx.createRadialGradient(size*0.35,size*0.35,0,size/2,size/2,size*0.7);bgGrad.addColorStop(0,'#001c36');bgGrad.addColorStop(1,'#000820');ctx.fillStyle=bgGrad;ctx.fill();var halo=ctx.createRadialGradient(size/2,size*0.44,0,size/2,size*0.44,size*0.38);halo.addColorStop(0,'rgba(28,176,246,0.22)');halo.addColorStop(1,'rgba(28,176,246,0)');ctx.fillStyle=halo;ctx.beginPath();ctx.arc(size/2,size*0.44,size*0.38,0,Math.PI*2);ctx.fill();var tg=ctx.createLinearGradient(size*0.28,size*0.15,size*0.72,size*0.82);tg.addColorStop(0,'#7eeeff');tg.addColorStop(0.4,'#1cb0f6');tg.addColorStop(1,'#0a80b5');ctx.fillStyle=tg;ctx.strokeStyle=tg;ctx.lineWidth=size*0.055;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(size*0.33,size*0.17);ctx.lineTo(size*0.67,size*0.17);ctx.lineTo(size*0.635,size*0.525);ctx.lineTo(size*0.365,size*0.525);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(size*0.33,size*0.225);ctx.bezierCurveTo(size*0.13,size*0.23,size*0.13,size*0.49,size*0.33,size*0.49);ctx.stroke();ctx.beginPath();ctx.moveTo(size*0.67,size*0.225);ctx.bezierCurveTo(size*0.87,size*0.23,size*0.87,size*0.49,size*0.67,size*0.49);ctx.stroke();ctx.fillStyle=tg;ctx.fillRect(size*0.455,size*0.525,size*0.09,size*0.115);ctx.beginPath();var bx=size*0.3,by=size*0.64,bw=size*0.4,bh=size*0.09,br2=size*0.045;ctx.moveTo(bx+br2,by);ctx.lineTo(bx+bw-br2,by);ctx.quadraticCurveTo(bx+bw,by,bx+bw,by+br2);ctx.lineTo(bx+bw,by+bh-br2);ctx.quadraticCurveTo(bx+bw,by+bh,bx+bw-br2,by+bh);ctx.lineTo(bx+br2,by+bh);ctx.quadraticCurveTo(bx,by+bh,bx,by+bh-br2);ctx.lineTo(bx,by+br2);ctx.quadraticCurveTo(bx,by,bx+br2,by);ctx.closePath();ctx.fill();ctx.save();ctx.globalAlpha=0.3;ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(size*0.415,size*0.30,size*0.038,size*0.09,-0.22,0,Math.PI*2);ctx.fill();ctx.restore();return c.toDataURL('image/png');}catch(e){return null;}}
   var i192=makePlatIcon(192),i512=makePlatIcon(512);
   var icons=[];
   if(i192)icons.push({src:i192,sizes:'192x192',type:'image/png',purpose:'any maskable'});
   if(i512)icons.push({src:i512,sizes:'512x512',type:'image/png',purpose:'any maskable'});
-  /* SVG fallback trophée platine */
   icons.push({src:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="34" fill="%23000820"/><defs><linearGradient id="g" x1="30%" y1="15%" x2="70%" y2="85%"><stop offset="0%" stop-color="%237eeeff"/><stop offset="45%" stop-color="%231cb0f6"/><stop offset="100%" stop-color="%230a80b5"/></linearGradient></defs><path d="M63 33h66L119 100H73Z" fill="url(%23g)"/><path d="M63 43Q26 44 26 72Q26 96 63 94" stroke="url(%23g)" stroke-width="11" fill="none" stroke-linecap="round"/><path d="M129 43Q166 44 166 72Q166 96 129 94" stroke="url(%23g)" stroke-width="11" fill="none" stroke-linecap="round"/><rect x="87" y="100" width="18" height="22" fill="url(%23g)"/><rect x="61" y="122" width="70" height="18" rx="9" fill="url(%23g)"/><ellipse cx="80" cy="58" rx="7" ry="16" fill="rgba(255,255,255,0.25)" transform="rotate(-12,80,58)"/></svg>'),sizes:'192x192',type:'image/svg+xml',purpose:'any'});
   var manifest={name:'Platina',short_name:'Platina',description:'Tracker de trophées PlayStation',start_url:location.href,scope:location.href,display:'standalone',orientation:'any',background_color:'#000820',theme_color:'#000820',lang:'fr',categories:['games','utilities'],icons:icons};
   try{var mBlob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});var lnk=document.createElement('link');lnk.rel='manifest';lnk.href=URL.createObjectURL(mBlob);document.head.appendChild(lnk);}catch(e){}
@@ -945,5 +949,5 @@ loadData();
 renderDashboard();
 renderSettings();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a06f3049cf6beedf',t:'MTc4MDY2MjYyNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
