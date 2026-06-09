@@ -1222,25 +1222,50 @@ window.PlatinaFirebaseConfig = window.PlatinaFirebaseConfig || {
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
-import { getFirestore, doc, onSnapshot, setDoc, getDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+import { getFirestore, doc, onSnapshot, setDoc, getDoc, serverTimestamp, collection, getDocs, writeBatch, deleteField } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 
 let app=null,auth=null,db=null,user=null,unsub=null,lastCloudUpdatedAt=0,saveTimer=null;
 const cfg=window.PlatinaFirebaseConfig||{};
+const CHUNK_SIZE=260000; // marge sous la limite Firestore 1 Mo/document
 function configured(){return cfg.apiKey&&cfg.apiKey!=='REMPLACE_MOI'&&cfg.projectId&&cfg.projectId!=='REMPLACE_MOI';}
 function $(id){return document.getElementById(id);}
 function status(txt,cls){if(typeof window.setSyncStatus==='function')window.setSyncStatus(txt,cls);}
 function showAuthForm(show){const f=$('sync-auth-form'),b=$('sync-user-box');if(f)f.style.display=show?'block':'none';if(b)b.style.display=show?'none':'block';}
 function ref(){return user&&db?doc(db,'platinaUsers',user.uid):null;}
+function chunksCollection(){return user&&db?collection(db,'platinaUsers',user.uid,'gameChunks'):null;}
+function splitGames(games){const raw=JSON.stringify(games||[]);const out=[];for(let i=0;i<raw.length;i+=CHUNK_SIZE)out.push(raw.slice(i,i+CHUNK_SIZE));return out.length?out:['[]'];}
+async function readCloudData(data){
+  if(!data)return null;
+  if(data.gamesStorage==='chunks'){
+    const col=chunksCollection();if(!col)return null;
+    const snap=await getDocs(col);
+    const docs=[];snap.forEach(d=>docs.push({id:d.id,...d.data()}));
+    docs.sort((a,b)=>(a.i||0)-(b.i||0));
+    const raw=docs.map(d=>d.data||'').join('');
+    let games=[];try{games=JSON.parse(raw||'[]');}catch(e){console.error('Erreur lecture chunks Firestore',e);games=[];}
+    return {...data,games};
+  }
+  return data;
+}
+async function writeCloudData(data){
+  const r=ref();const col=chunksCollection();if(!r||!col||!data)return;
+  const pieces=splitGames(data.games||[]);
+  const existing=await getDocs(col);
+  const batch=writeBatch(db);
+  pieces.forEach((piece,i)=>batch.set(doc(col,'chunk_'+String(i).padStart(4,'0')),{i,data:piece,updatedAt:data.updatedAt}));
+  existing.forEach(d=>{const i=Number((d.data()||{}).i);if(!Number.isFinite(i)||i>=pieces.length)batch.delete(d.ref);});
+  batch.set(r,{version:data.version||3,updatedAt:data.updatedAt,wishlist:data.wishlist||[],gamesStorage:'chunks',chunkCount:pieces.length,games:deleteField(),serverUpdatedAt:serverTimestamp()},{merge:true});
+  await batch.commit();
+}
 async function pushNow(payload){
-  const r=ref();if(!r)return;
   const data=payload||(typeof window._cloudPayload==='function'?window._cloudPayload():null);if(!data)return;
   lastCloudUpdatedAt=data.updatedAt;
-  await setDoc(r,{...data,serverUpdatedAt:serverTimestamp()},{merge:true});
+  await writeCloudData(data);
   localStorage.setItem('platina-sync-ts',Date.now());
   status('Synchronisé','ok');
 }
-window.__platinaQueueCloudSave=function(payload){if(!ref())return;status('Sauvegarde…','warn');clearTimeout(saveTimer);saveTimer=setTimeout(()=>pushNow(payload).catch(e=>{console.error(e);status('Erreur sync','err');}),650);};
-window.__platinaForceCloudSave=function(payload){pushNow(payload).then(()=>showToast('Sauvegarde cloud envoyée','☁️')).catch(e=>{console.error(e);showToast('Erreur Firebase','⚠️');status('Erreur sync','err');});};
+window.__platinaQueueCloudSave=function(payload){if(!ref())return;status('Sauvegarde…','warn');clearTimeout(saveTimer);saveTimer=setTimeout(()=>pushNow(payload).catch(e=>{console.error(e);showToast((e&&e.message)||'Erreur Firebase','⚠️');status('Erreur sync','err');}),650);};
+window.__platinaForceCloudSave=function(payload){pushNow(payload).then(()=>showToast('Sauvegarde cloud envoyée','☁️')).catch(e=>{console.error(e);showToast((e&&e.message)||'Erreur Firebase','⚠️');status('Erreur sync','err');});};
 window.__platinaSignIn=function(){if(!configured()){showToast('Configure Firebase dans le code avant la connexion','⚠️');return;}const email=($('sync-email')||{}).value||'',pass=($('sync-password')||{}).value||'';signInWithEmailAndPassword(auth,email.trim(),pass).catch(e=>showToast(e.message,'⚠️'));};
 window.__platinaSignUp=function(){if(!configured()){showToast('Configure Firebase dans le code avant la création de compte','⚠️');return;}const email=($('sync-email')||{}).value||'',pass=($('sync-password')||{}).value||'';createUserWithEmailAndPassword(auth,email.trim(),pass).catch(e=>showToast(e.message,'⚠️'));};
 window.__platinaSignOut=function(){if(auth)signOut(auth);};
@@ -1256,19 +1281,21 @@ if(!configured()){
       if(!u){showAuthForm(true);status('Déconnecté','warn');return;}
       showAuthForm(false);const mail=$('sync-user-email');if(mail)mail.textContent=u.email||u.uid;status('Connexion cloud…','warn');
       const r=ref();const snap=await getDoc(r);
-      if(!snap.exists()||!snap.data().games){await pushNow();}
-      else{const data=snap.data();lastCloudUpdatedAt=data.updatedAt||0;if(typeof window.applyCloudPayload==='function')window.applyCloudPayload(data);status('Synchronisé','ok');}
-      unsub=onSnapshot(r,function(snap){
-        if(!snap.exists())return;const data=snap.data();
-        if(!data||!data.games)return;
-        if(data.updatedAt&&data.updatedAt===lastCloudUpdatedAt)return;
+      const raw=snap.exists()?snap.data():null;
+      if(!snap.exists()||(!raw.games&&raw.gamesStorage!=='chunks')){await pushNow();}
+      else{const data=await readCloudData(raw);lastCloudUpdatedAt=data.updatedAt||0;if(typeof window.applyCloudPayload==='function')window.applyCloudPayload(data);status('Synchronisé','ok');}
+      unsub=onSnapshot(r,async function(snap){
+        if(!snap.exists())return;const raw=snap.data();
+        if(!raw||(!raw.games&&raw.gamesStorage!=='chunks'))return;
+        if(raw.updatedAt&&raw.updatedAt===lastCloudUpdatedAt)return;
+        const data=await readCloudData(raw);
         lastCloudUpdatedAt=data.updatedAt||0;
         if(typeof window.applyCloudPayload==='function')window.applyCloudPayload(data);
         status('Synchronisé','ok');
-      },function(e){console.error(e);status('Erreur sync','err');});
+      },function(e){console.error(e);showToast((e&&e.message)||'Erreur Firebase','⚠️');status('Erreur sync','err');});
     });
   }catch(e){console.error(e);status('Erreur config','err');}
 }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a09324caf89cd618',t:'MTc4MTAzOTY0Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a093638e3dce046d',t:'MTc4MTA0MjIxNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
