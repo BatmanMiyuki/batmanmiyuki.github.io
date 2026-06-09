@@ -35,7 +35,7 @@ jobs:
       - name: Fetch PlayStation trophies
         env:
           NPSSO: ${{ secrets.PSN_NPSSO }}
-          MAX_GAMES: ${{ github.event.inputs.maxGames || '50' }}
+          MAX_GAMES: ${{ github.event.inputs.maxGames || '0' }}
         run: node scripts/fetch-psn-data.mjs
 
       - name: Commit psn-data.json
