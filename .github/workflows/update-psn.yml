@@ -1,1 +1,45 @@
+name: Update PlayStation trophies
 
+on:
+  workflow_dispatch:
+    inputs:
+      maxGames:
+        description: "Nombre de jeux à importer (0 = tous, 50 conseillé pour tester)"
+        required: true
+        default: "50"
+      mode:
+        description: "Info seulement : le mode fusion/remplacement se choisit dans Platina"
+        required: false
+        default: "generate-json"
+  schedule:
+    - cron: "30 4 * * 0"
+
+permissions:
+  contents: write
+
+jobs:
+  update-psn:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install psn-api
+        run: npm install psn-api@^2.18.0
+
+      - name: Fetch PlayStation trophies
+        env:
+          NPSSO: ${{ secrets.PSN_NPSSO }}
+          MAX_GAMES: ${{ github.event.inputs.maxGames || '50' }}
+        run: node scripts/fetch-psn-data.mjs
+
+      - name: Commit psn-data.json
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update PlayStation trophy data"
+          file_pattern: "Platina/psn-data.json"
