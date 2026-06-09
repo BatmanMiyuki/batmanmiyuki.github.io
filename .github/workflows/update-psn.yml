@@ -6,7 +6,7 @@ on:
       maxGames:
         description: "Nombre de jeux à importer (0 = tous, 50 conseillé pour tester)"
         required: true
-        default: "50"
+        default: "0"
       mode:
         description: "Info seulement : le mode fusion/remplacement se choisit dans Platina"
         required: false
