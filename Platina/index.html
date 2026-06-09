@@ -1014,7 +1014,7 @@ function renderDashboard(){
 
   /* Graphique Activité */
   renderActChart();
-  _updateSyncBar();
+  if(typeof _updateSyncBar==='function')_updateSyncBar();
 
   var near=games.filter(function(g){return catGame(g)==='progress'&&g.trophies.length>0;}).map(function(g){var s=statAll(g);return Object.assign({},g,s);}).sort(function(a,b){return b.pct-a.pct;}).slice(0,5);
   var nearEl=document.getElementById('near-complete-list');
@@ -1140,6 +1140,16 @@ function setSyncStatus(txt,cls){
   }
 }
 function loadSyncSettings(){setSyncStatus('Non configuré','warn');}
+function _updateSyncBar(){
+  var bar=document.getElementById('sync-status-bar');
+  if(!bar)return;
+  var st=document.getElementById('sync-status');
+  if(st&&st.textContent&&st.textContent!=='Non configuré'&&st.textContent!=='Déconnecté'){
+    var cls=st.classList.contains('err')?'sync-err':'sync-ok';
+    bar.innerHTML='<div class="sync-bar '+cls+'"><span class="sync-dot"></span>Cloud Firebase : '+esc(st.textContent)+'</div>';
+  }
+}
+
 function _autoPush(){
   if(window.__platinaApplyingRemote)return;
   if(typeof window.__platinaQueueCloudSave==='function'){
@@ -1260,5 +1270,5 @@ if(!configured()){
   }catch(e){console.error(e);status('Erreur config','err');}
 }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a092f276c951b5ef',t:'MTc4MTAzNzU4MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a09324caf89cd618',t:'MTc4MTAzOTY0Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
