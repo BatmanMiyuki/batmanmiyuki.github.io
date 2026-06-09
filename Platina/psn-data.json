@@ -1,7 +1,7 @@
 {
   "version": 3,
   "source": "psn-github-actions",
-  "generatedAt": "2026-06-09T21:20:03.342Z",
+  "generatedAt": "2026-06-09T21:30:20.332Z",
   "maxGames": 0,
   "gamesImported": 160,
   "trophiesImported": 6598,
@@ -9003,7 +9003,7 @@
           "earned": false,
           "at": null,
           "rarity": 2,
-          "earnedRate": 18.8,
+          "earnedRate": 18.7,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/700f16d9-3f84-4e84-9161-2963ad8ea12c.png"
         },
         {
@@ -9593,7 +9593,7 @@
           "earned": true,
           "at": 1772130570000,
           "rarity": 2,
-          "earnedRate": 23.6,
+          "earnedRate": 23.5,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR58325_00/1e3aae71-43fd-4ef0-9eaf-bb825e5f48fb.png"
         },
         {
@@ -61608,7 +61608,7 @@
           "earned": false,
           "at": null,
           "rarity": 2,
-          "earnedRate": 15.9,
+          "earnedRate": 16,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR18434_00_008C93E3E408BD5116DE04ED0A4083FF12797AD437/1A7A68F262E7B7EF8A73521018E2A7B88225D3CA.PNG"
         },
         {
