@@ -200,33 +200,6 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
 .hof-badge{position:absolute;bottom:5px;right:5px;z-index:2;font-size:15px;}
 .hof-empty{text-align:center;padding:18px;color:var(--text-dim);font-size:13px;font-weight:700;background:var(--surface);border-radius:var(--radius-sm);border:2px dashed var(--border-mid);}
 
-
-/* ── TROPHÉES - STYLE PRÉCÉDENT CONSERVÉ ── */
-.trophy-row{display:flex!important;align-items:center!important;gap:12px!important;padding:10px 12px!important;border-radius:var(--radius-sm)!important;border:2px solid var(--border)!important;background:var(--surface)!important;margin-bottom:8px!important;transition:border-color .15s,background .15s,transform .15s,box-shadow .15s!important;position:relative!important;overflow:hidden!important;cursor:pointer!important;min-height:66px!important;}
-.trophy-row:hover{border-color:var(--border-mid)!important;transform:translateX(2px)}
-.trophy-row.earned{background:linear-gradient(135deg,rgba(28,176,246,.22),rgba(28,176,246,.08) 46%,var(--surface-2))!important;border-color:var(--green)!important;box-shadow:0 0 0 1px rgba(28,176,246,.22) inset!important;}
-.trophy-row.earned::after{content:'Possédé';position:absolute;left:-22%;top:50%;width:144%;height:28px;transform:translateY(-50%) rotate(-9deg);background:linear-gradient(90deg,transparent 0%,rgba(28,176,246,.15) 10%,rgba(28,176,246,.92) 28%,rgba(28,176,246,.98) 50%,rgba(28,176,246,.92) 72%,rgba(28,176,246,.15) 90%,transparent 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:1000;text-transform:uppercase;letter-spacing:1.6px;text-shadow:0 1px 4px rgba(0,0,0,.55);pointer-events:none;z-index:4;}
-.check-box{width:30px!important;height:30px!important;border-radius:50%;border:2.5px solid var(--border-mid);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .2s;background:var(--bg);position:relative;z-index:6;padding:0;color:#fff;}
-.check-box:hover{border-color:var(--green);background:var(--green-bg);}
-.check-box.done{background:var(--green);border-color:var(--green);}
-.check-box.done svg{color:#fff;}
-.trophy-icon-box{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;position:relative;z-index:2;}
-.trophy-main{flex:1;min-width:0;padding:2px 0;position:relative;z-index:2;}
-.trophy-type-panel{align-self:stretch;border-left:2px solid;display:flex;align-items:center;justify-content:flex-start;gap:10px;padding:0 46px 0 12px;flex-shrink:0;width:190px;position:relative;z-index:2;margin:-10px -12px -10px 0;}
-.trophy-type-img{width:46px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.trophy-type-label{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:0.5px;}
-.trophy-delete-btn{position:absolute;top:50%;right:8px;transform:translateY(-50%);background:rgba(0,0,0,.12);border:2px solid transparent;cursor:pointer;color:var(--text-dim);font-size:15px;font-weight:900;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .15s;line-height:1;z-index:7;}
-.trophy-delete-btn:hover,.trophy-delete-btn:focus{background:var(--red-bg);color:var(--red);border-color:var(--red);outline:none;}
-.trophy-info-hero{display:flex;align-items:center;gap:14px;padding:16px;border:2px solid var(--border);background:var(--surface-2);border-radius:var(--radius-sm);margin-bottom:14px;}
-.trophy-info-icon{width:58px;height:58px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
-.trophy-info-name{font-size:20px;font-weight:900;color:var(--text);line-height:1.12;}
-.trophy-info-desc{font-size:14px;font-weight:700;color:var(--text-mid);line-height:1.35;margin-top:6px;}
-.trophy-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;}
-.trophy-info-stat{background:var(--surface-2);border:2px solid var(--border);border-radius:var(--radius-sm);padding:12px;}
-.trophy-info-stat-label{font-size:10px;font-weight:900;color:var(--text-dim);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
-.trophy-info-stat-value{font-size:14px;font-weight:900;color:var(--text);}
-@media(max-width:600px){.trophy-row{gap:9px!important;padding:10px!important;min-height:68px!important;}.trophy-row:hover{transform:none}.trophy-icon-box{width:36px;height:36px}.trophy-name{font-size:14px}.trophy-desc{font-size:11px}.trophy-type-panel{width:auto;align-self:center;margin:0;padding:0;background:transparent!important;border-left:none!important}.trophy-type-img,.trophy-type-label{display:none}.trophy-delete-btn{position:relative;top:auto;right:auto;transform:none;width:44px;height:44px;flex-shrink:0;background:rgba(255,75,75,.08);border-color:rgba(255,75,75,.22);color:var(--red);}.check-box{width:34px!important;height:34px!important}.trophy-row.earned::after{height:24px;font-size:10px;letter-spacing:1.2px;}.trophy-info-grid{grid-template-columns:1fr}.trophy-info-name{font-size:18px}}
-
 /* ── TROPHY DETAIL MODAL ── */
 .trophy-detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;z-index:400;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(14px);}
 .trophy-detail-overlay.open{opacity:1;pointer-events:all;}
@@ -728,27 +701,43 @@ function showConfetti(){var colors=['#1cb0f6','#5de8ff','#ffffff','#ffd700','#88
 
 /* ══ TROPHY ROWS ══ */
 function renderTrophyRows(trophies,gameId,dlcId,filterStr){
-  // Tri par rareté uniquement : Platine > Or > Argent > Bronze.
-  // Les trophées possédés ne remontent pas au-dessus des autres.
-  var list=(trophies||[]).map(function(t,i){return Object.assign({_pos:i},t);}).sort(function(a,b){var oi=ORDER.indexOf(a.type)-ORDER.indexOf(b.type);if(oi!==0)return oi;return a._pos-b._pos;});
+  // Ordre original conservé : les trophées obtenus ne remontent pas tout seuls.
+  var list=(trophies||[]).slice();
   if(filterStr==='earned')list=list.filter(function(t){return t.earned;});
   else if(filterStr==='notearned')list=list.filter(function(t){return !t.earned;});
   else if(filterStr&&filterStr!=='all')list=list.filter(function(t){return t.type===filterStr;});
   if(!list.length)return '<div style="text-align:center;padding:16px;color:var(--text-mid);font-size:13px;font-weight:700;">Aucun trophée à afficher</div>';
   return list.map(function(t){
     var tc=TC[t.type]||TC.bronze;
+    var toggleAction=dlcId
+      ? "toggleDlcTrophy('"+gameId+"','"+dlcId+"','"+t.id+"')"
+      : "toggleTrophy('"+gameId+"','"+t.id+"')";
+    var deleteAction=dlcId
+      ? "deleteDlcTrophy('"+gameId+"','"+dlcId+"','"+t.id+"')"
+      : "deleteTrophy('"+gameId+"','"+t.id+"')";
     var detailAction="openTrophyDetail('"+gameId+"','"+t.id+"',"+(dlcId?"'"+dlcId+"'":"null")+")";
-    var toggleAction=dlcId?"toggleDlcTrophy('"+gameId+"','"+dlcId+"','"+t.id+"')":"toggleTrophy('"+gameId+"','"+t.id+"')";
-    var deleteAction=dlcId?"deleteDlcTrophy('"+gameId+"','"+dlcId+"','"+t.id+"')":"deleteTrophy('"+gameId+"','"+t.id+"')";
-    return '<div class="trophy-row '+(t.earned?'earned':'')+'" onclick="'+detailAction+'">'
-      +'<button type="button" class="check-box '+(t.earned?'done':'')+'" onclick="event.stopPropagation();'+toggleAction+'" aria-label="'+(t.earned?'Retirer':'Marquer')+' '+esc(t.name)+'">'
-      +(t.earned?'<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>':'')
-      +'</button>'
-      +'<div class="trophy-icon-box" style="background:'+tc.bg+';border:2px solid '+tc.border+';">'+trophyImg(t.type,23)+'</div>'
-      +'<div class="trophy-main"><div class="trophy-name">'+esc(t.name)+'</div>'+(t.desc?'<div class="trophy-desc">'+esc(t.desc)+'</div>':'')+'</div>'
-      +'<div class="trophy-type-panel" style="background:'+tc.bg+';border-left-color:'+tc.border+';"><div class="trophy-type-img">'+trophyImg(t.type,t.type==='platinum'?48:34)+'</div><div class="trophy-type-label" style="color:'+tc.c+';">'+tc.label+'</div></div>'
-      +'<button type="button" class="trophy-delete-btn" onclick="event.stopPropagation();'+deleteAction+'" aria-label="Supprimer '+esc(t.name)+'">✕</button>'
-      +'</div>';
+    var earnedOverlay=t.earned
+      ? '<div style="position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent,transparent 5px,rgba(28,176,246,0.08) 5px,rgba(28,176,246,0.08) 7px);pointer-events:none;z-index:1;"></div>'
+        +'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-25deg);background:rgba(28,176,246,0.2);border:1.5px solid rgba(28,176,246,0.5);color:var(--plat-c);font-size:9px;font-weight:900;letter-spacing:0.8px;padding:2px 6px;border-radius:4px;white-space:nowrap;z-index:2;text-shadow:0 0 6px var(--plat-c);">Possédé</div>'
+      : '';
+    return '<div class="trophy-row'+(t.earned?' earned':'')+'" style="overflow:hidden;margin-bottom:8px;border-radius:var(--radius-sm);border:2px solid '+(t.earned?'var(--green)':'var(--border)')+';background:var(--surface);">'
+      +'<div style="display:flex;align-items:stretch;min-height:64px;">'
+      +'<div style="width:54px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--surface-2);border-right:2px solid var(--border);cursor:pointer;touch-action:manipulation;" onclick="event.stopPropagation();'+toggleAction+'">'
+      +'<div class="check-box'+(t.earned?' done':'')+'"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"'+(t.earned?'':' style="display:none"')+'><polyline points="20 6 9 17 4 12"/></svg></div>'
+      +'</div>'
+      +'<div style="flex:1;min-width:0;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;touch-action:manipulation;" onclick="'+detailAction+'">'
+      +'<div style="font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(t.name)+'</div>'
+      +(t.desc?'<div style="font-size:11px;color:var(--text-mid);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(t.desc)+'</div>':'')
+      +'</div>'
+      +'<div style="flex-shrink:0;width:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:'+tc.bg+';border-left:2px solid '+tc.border+';position:relative;overflow:hidden;">'
+      +earnedOverlay
+      +'<div style="position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 6px;">'
+      +'<div style="width:34px;height:34px;display:flex;align-items:center;justify-content:center;">'+trophyImg(t.type,t.type==='platinum'?32:26)+'</div>'
+      +'<div style="font-size:10px;font-weight:900;color:'+tc.c+';text-transform:uppercase;letter-spacing:0.5px;">'+tc.label+'</div>'
+      +'</div>'
+      +'<button onclick="event.stopPropagation();'+deleteAction+'" style="position:absolute;top:0;right:0;background:rgba(0,0,0,0.45);border:none;border-radius:0 0 0 8px;cursor:pointer;color:rgba(255,255,255,0.75);font-size:13px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;z-index:4;touch-action:manipulation;line-height:1;">✕</button>'
+      +'</div>'
+      +'</div></div>';
   }).join('');
 }
 
@@ -894,17 +883,44 @@ function openTrophyDetail(gameId, trophyId, dlcId) {
   }
   if(!t) return;
   var tc = TC[t.type]||TC.bronze;
-  var status=t.earned?'<span class="badge badge-green">✓ Possédé</span>':'<span class="badge badge-blue">Non possédé</span>';
   var toggleAction="closeTrophyDetail();_trophyDetailToggle('"+gameId+"','"+trophyId+"',"+(dlcId?"'"+dlcId+"'":"null")+","+t.earned+")";
   var deleteAction=dlcId
     ? "closeTrophyDetail();deleteDlcTrophy('"+gameId+"','"+dlcId+"','"+trophyId+"')"
     : "closeTrophyDetail();deleteTrophy('"+gameId+"','"+trophyId+"')";
   document.getElementById('trophy-detail-content').innerHTML =
-    '<div style="padding:0 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--border)"><div class="modal-title">Détails du trophée</div><button class="btn-close" onclick="closeTrophyDetail()">✕</button></div>'
-    +'<div style="padding:20px">'
-    +'<div class="trophy-info-hero"><div class="trophy-info-icon" style="background:'+tc.bg+';border:2px solid '+tc.border+';">'+trophyImg(t.type,t.type==='platinum'?58:48)+'</div><div style="min-width:0;flex:1"><div class="trophy-info-name">'+esc(t.name)+'</div><div class="trophy-info-desc">'+(t.desc?esc(t.desc):'Aucune description renseignée.')+'</div></div></div>'
-    +'<div class="trophy-info-grid"><div class="trophy-info-stat"><div class="trophy-info-stat-label">Statut</div><div class="trophy-info-stat-value">'+status+'</div></div><div class="trophy-info-stat"><div class="trophy-info-stat-label">Rareté</div><div class="trophy-info-stat-value">'+makeTrophyPill(t.type)+'</div></div><div class="trophy-info-stat"><div class="trophy-info-stat-label">Date d\'obtention</div><div class="trophy-info-stat-value">'+(t.earned&&t.at?fmt(t.at):(t.earned?'Date inconnue':'Pas encore obtenu'))+'</div></div><div class="trophy-info-stat"><div class="trophy-info-stat-label">Jeu / section</div><div class="trophy-info-stat-value">'+esc(g.name)+(dlcName?' · '+esc(dlcName):' · Jeu de base')+'</div></div></div>'
-    +'<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px"><button class="btn '+(t.earned?'btn-outline':'btn-green')+'" style="flex:1;min-width:170px" onclick="'+toggleAction+'">'+(t.earned?'Marquer non possédé':'Marquer possédé')+'</button><button class="btn btn-red" style="flex:1;min-width:150px" onclick="'+deleteAction+'">Supprimer</button></div>'
+    '<div style="padding:16px 20px 0;background:'+tc.bg+';border-bottom:2px solid '+tc.border+';">'
+    +'<div style="display:flex;align-items:center;gap:14px;padding-bottom:16px;">'
+    +'<div style="width:58px;height:58px;border-radius:14px;background:rgba(0,0,0,0.3);border:2px solid '+tc.border+';display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+trophyImg(t.type,42)+'</div>'
+    +'<div style="flex:1;min-width:0;">'
+    +'<div style="font-size:17px;font-weight:900;color:var(--text);line-height:1.2;">'+esc(t.name)+'</div>'
+    +(t.desc?'<div style="font-size:12px;color:var(--text-mid);margin-top:4px;line-height:1.4;">'+esc(t.desc)+'</div>':'')
+    +'</div>'
+    +'<button onclick="closeTrophyDetail()" style="width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,0.4);border:1.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">✕</button>'
+    +'</div></div>'
+    +'<div style="padding:16px 20px 20px;">'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">'
+    +'<div style="background:var(--surface-2);border-radius:10px;border:2px solid var(--border);padding:12px;text-align:center;">'
+    +'<div style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Type</div>'
+    +'<div style="font-size:14px;font-weight:900;color:'+tc.c+';">'+tc.label+'</div>'
+    +'</div>'
+    +'<div style="background:var(--surface-2);border-radius:10px;border:2px solid var(--border);padding:12px;text-align:center;">'
+    +'<div style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Points</div>'
+    +'<div style="font-size:14px;font-weight:900;color:var(--gold);">+'+tc.pts+' pts</div>'
+    +'</div>'
+    +'<div style="background:var(--surface-2);border-radius:10px;border:2px solid '+(t.earned?'var(--green)':'var(--border)')+';padding:12px;text-align:center;">'
+    +'<div style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Statut</div>'
+    +'<div style="font-size:14px;font-weight:900;color:'+(t.earned?'var(--green)':'var(--text-mid)')+';">'+(t.earned?'✅ Obtenu':'🔒 Verrouillé')+'</div>'
+    +'</div>'
+    +'<div style="background:var(--surface-2);border-radius:10px;border:2px solid var(--border);padding:12px;text-align:center;">'
+    +'<div style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Date</div>'
+    +'<div style="font-size:11px;font-weight:800;color:var(--text);">'+(t.earned&&t.at?fmt(t.at):'—')+'</div>'
+    +'</div>'
+    +'</div>'
+    +(dlcName?'<div style="background:var(--surface-2);border-radius:10px;border:2px solid var(--border);padding:10px 12px;margin-bottom:12px;font-size:12px;font-weight:700;color:var(--text-mid);"> DLC : <span style="color:var(--orange);">'+esc(dlcName)+'</span></div>':'')
+    +'<div style="display:flex;gap:8px;">'
+    +'<button onclick="'+toggleAction+'" class="btn '+(t.earned?'btn-outline':'btn-green')+'" style="flex:1;font-size:12px;padding:12px 8px;">'+(t.earned?'🔒 Décocher':'✅ Marquer obtenu')+'</button>'
+    +'<button onclick="'+deleteAction+'" class="btn btn-ghost" style="padding:12px 14px;color:var(--red);border-color:rgba(255,75,75,0.3);">🗑️</button>'
+    +'</div>'
     +'</div>';
   document.getElementById('modal-trophy-detail').classList.add('open');
 }
@@ -1168,5 +1184,5 @@ renderSettings();
 // Auto-pull si sync configuré
 if(_getSyncId()&&_getBinId(_getSyncId())){setTimeout(function(){pullFromCloud();},1800);}
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a08f62699b2d7011',t:'MTc4MTAwMDIyNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
