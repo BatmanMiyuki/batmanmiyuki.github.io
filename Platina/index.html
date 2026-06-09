@@ -261,6 +261,12 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
 .sync-ok{background:rgba(28,176,246,0.08);border:1.5px solid rgba(28,176,246,0.25);color:#42b2ec;}
 .sync-err{background:rgba(255,75,75,0.08);border:1.5px solid rgba(255,75,75,0.25);color:var(--red);}
 .sync-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.sync-status{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:2px solid var(--border-mid);font-size:11px;font-weight:900;text-transform:uppercase;color:var(--text-mid);white-space:nowrap;}
+.sync-status.ok{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+.sync-status.warn{border-color:var(--gold);color:var(--gold);background:var(--gold-bg)}
+.sync-status.err{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+.sync-auth-form{padding:14px 16px;border-top:1px solid var(--border);}
+.sync-auth-form .field{margin-bottom:10px}.sync-actions{display:flex;gap:10px;flex-wrap:wrap}.sync-actions .btn{flex:1;min-width:135px;padding:11px 14px;font-size:12px}.sync-help{font-size:12px;color:var(--text-dim);font-weight:700;line-height:1.35;margin-top:10px}
 /* ── LIGHT THEME ── */
 #root.theme-light{--bg:#f4f4f5;--surface:#ffffff;--surface-2:#f0f0f1;--border:#e4e4e7;--border-mid:#d4d4d8;--text:#09090b;--text-mid:#52525b;--text-dim:#a1a1aa;--green-bg:rgba(28,176,246,0.08);--green-mid:rgba(28,176,246,0.2);--blue-bg:#eff8fe;--gold-bg:#fffbeb;--red-bg:#fef2f2;--bronze-bg:#fdf6f0;--bronze-border:#d4956a;--silver-bg:#f8fafc;--silver-border:#b0b8c8;--gold-bg2:#fffbeb;--gold-border:#d4a800;--plat-bg:#eff8ff;--plat-border:#7dd0f5;--shadow:0 2px 8px rgba(0,0,0,0.06);--shadow-md:0 6px 20px rgba(0,0,0,0.09);}
 #root.theme-light .streak-banner{background:linear-gradient(135deg,#cbeeff,#9adaff);border-color:var(--green-dark);}
@@ -426,6 +432,37 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
           <div id="io-status" class="io-status"></div>
         </div>
         <div class="settings-section">
+          <div class="settings-section-label">Synchronisation cloud</div>
+          <div class="card" style="padding:0;overflow:hidden">
+            <div class="settings-row">
+              <div style="display:flex;align-items:center;gap:12px;min-width:0;flex:1">
+                <div class="settings-row-icon" style="background:rgba(28,176,246,0.12);font-size:20px;">☁️</div>
+                <div style="min-width:0">
+                  <div style="font-size:15px;font-weight:800;color:var(--text);">Firebase</div>
+                  <div style="font-size:12px;font-weight:600;color:var(--text-mid);margin-top:2px;" id="sync-sub">Connecte-toi pour retrouver tes données sur téléphone et ordinateur</div>
+                </div>
+              </div>
+              <span id="sync-status" class="sync-status warn">Non configuré</span>
+            </div>
+            <div id="sync-auth-form" class="sync-auth-form">
+              <div class="field"><label>Email</label><input id="sync-email" type="email" autocomplete="email" placeholder="ton@email.com"/></div>
+              <div class="field"><label>Mot de passe</label><input id="sync-password" type="password" autocomplete="current-password" placeholder="Minimum 6 caractères"/></div>
+              <div class="sync-actions">
+                <button class="btn btn-green" onclick="platinaSignIn()">Connexion</button>
+                <button class="btn btn-outline" onclick="platinaSignUp()">Créer compte</button>
+              </div>
+              <div class="sync-help">À configurer une fois dans le code : <b>window.PlatinaFirebaseConfig</b>. Ensuite tu te connectes avec le même compte sur chaque appareil.</div>
+            </div>
+            <div id="sync-user-box" class="sync-auth-form" style="display:none">
+              <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:10px;">Connecté : <span id="sync-user-email" style="color:var(--green)"></span></div>
+              <div class="sync-actions">
+                <button class="btn btn-outline" onclick="platinaForceSyncNow()">Forcer la sauvegarde</button>
+                <button class="btn btn-red" onclick="platinaSignOut()">Déconnexion</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-section">
           <div class="settings-section-label">Derniers jeux platinés</div>
           <div id="settings-plat-list"></div>
         </div>
@@ -437,14 +474,14 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
           <div class="settings-section-label">À propos</div>
           <div class="card" style="padding:0;overflow:hidden">
             <div class="info-row"><span class="info-label">Application</span><span class="info-val">Platina</span></div>
-            <div class="info-row"><span class="info-label">Version</span><span class="info-val" style="color:var(--green)">16</span></div>
+            <div class="info-row"><span class="info-label">Version</span><span class="info-val" style="color:var(--green)">17</span></div>
             <div class="info-row"><span class="info-label">Créé le</span><span class="info-val">14 avril 2026</span></div>
             <div class="info-row"><span class="info-label">Jeux trackés</span><span class="info-val" id="settings-game-count" style="color:var(--blue)">—</span></div>
             <div class="info-row"><span class="info-label">Trophées trackés</span><span class="info-val" id="settings-trophy-count" style="color:var(--gold)">—</span></div>
             <div class="info-row"><span class="info-label">Platinés</span><span class="info-val" id="settings-plat-count" style="color:var(--plat-c)">—</span></div>
             <div class="info-row"><span class="info-label">Jeux 100%</span><span class="info-val" id="settings-100-count" style="color:var(--green)">—</span></div>
             <div class="info-row"><span class="info-label">Technologie</span><span class="info-val">HTML / CSS / JS</span></div>
-            <div class="info-row"><span class="info-label">Stockage</span><span class="info-val">LocalStorage</span></div>
+            <div class="info-row"><span class="info-label">Stockage</span><span class="info-val">LocalStorage + Firebase</span></div>
             <div class="info-row"><span class="info-label">Format</span><span class="info-val">PWA 📲</span></div>
             <div class="info-row"><span class="info-label">Développeur</span><span class="info-val">Batman Miyuki</span></div>
           </div>
@@ -937,7 +974,7 @@ function renderDashboard(){
   var totalPts=earned.reduce(function(s,t){return s+TC[t.type].pts;},0);
   var pt=games.filter(function(g){var plat=(g.trophies||[]).find(function(t){return t.type==='platinum';});return plat&&plat.earned;}).length;
   var pct100=games.length?Math.round(completedG.length/games.length*100):0;
-  document.getElementById('dash-streak-title').textContent=pt>0?pt+' jeu'+(pt>1?'x':'')+' platiné'+(pt>1?'s':'')+'  ':'0 jeu platiné';
+  document.getElementById('dash-streak-title').textContent=pt>0?pt+' jeu'+(pt>1?'x':'')+' platiné'+(pt>1?'s':'')+'  💎':'0 jeu platiné';
   document.getElementById('dash-streak-sub').textContent=earned.length+' trophées · '+pct100+'% complétion';
   var tPct=allT.length?Math.round(earned.length/allT.length*100):0;
   var gPct=games.length?Math.round(completedG.length/games.length*100):0;
@@ -968,7 +1005,7 @@ function renderDashboard(){
 function setGamesFilter(f){gamesFilter=f;['progress','platinum','100'].forEach(function(k){document.getElementById('btn-filter-'+k).classList.remove('actif');});document.getElementById('btn-filter-'+f).classList.add('actif');renderGamesList();}
 function renderGames(){document.getElementById('games-count').textContent=games.length+' jeu'+(games.length!==1?'x':'');setGamesFilter(gamesFilter);}
 function renderGamesList(){var html='';if(!games.length){html='<div class="empty"><div class="empty-icon">🎮</div><div class="empty-title">Aucun jeu ajouté</div><div class="empty-sub">Commencez votre collection !</div></div>';}else{var fg=games.filter(function(g){var cat=catGame(g);if(gamesFilter==='platinum')return cat==='platinum';if(gamesFilter==='100')return cat==='100';return cat==='progress';});var q=document.getElementById('games-search');var search=q?q.value.trim().toLowerCase():'';if(search)fg=fg.filter(function(g){return g.name.toLowerCase().includes(search);});fg.sort(function(a,b){return a.name.localeCompare(b.name);});if(!fg.length){html='<div class="empty"><div class="empty-title">Aucun jeu ici</div><div class="empty-sub">Pas de jeu dans cette catégorie.</div></div>';}else{html=fg.map(renderGameCard).join('');}}document.getElementById('games-list').innerHTML=html;}
-function renderGameCard(g){var s=statAll(g),cat=catGame(g);var barColor=cat==='platinum'?'var(--plat-c)':cat==='100'?'var(--green)':'var(--blue)';var badge=cat==='platinum'?'<span style="background:var(--plat-bg);color:var(--plat-c);border:2px solid var(--plat-border);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;"> Platine</span>':cat==='100'?'<span style="background:var(--green-bg);color:var(--green);border:2px solid var(--green);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;"> 100%</span>':'';return '<div class="game-card" onclick="openDetail(\''+g.id+'\')"><div class="game-cover-placeholder" style="'+getCoverStyle(g)+';">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">':'')+(badge?'<div style="position:absolute;bottom:10px;right:10px;z-index:2;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8));">'+badge+'</div>':'')+'<div style="position:absolute;top:10px;left:10px;z-index:2;">'+platformBadge(g.platform)+'</div><span class="cover-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,3).toUpperCase()+'</span></div><div class="game-card-body"><div class="game-name">'+esc(g.name)+'</div><div class="game-prog-row"><span style="font-size:13px;font-weight:700;color:var(--text-mid)">'+s.earned+' / '+s.total+'</span><span class="game-pct" style="color:'+barColor+';">'+s.pct+'%</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+s.pct+'%;background:'+barColor+';"></div></div></div></div>';}
+function renderGameCard(g){var s=statAll(g),cat=catGame(g);var barColor=cat==='platinum'?'var(--plat-c)':cat==='100'?'var(--green)':'var(--blue)';var badge=cat==='platinum'?'<span style="background:var(--plat-bg);color:var(--plat-c);border:2px solid var(--plat-border);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;">💎 Platine</span>':cat==='100'?'<span style="background:var(--green-bg);color:var(--green);border:2px solid var(--green);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;">👑 100%</span>':'';return '<div class="game-card" onclick="openDetail(\''+g.id+'\')"><div class="game-cover-placeholder" style="'+getCoverStyle(g)+';">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">':'')+(badge?'<div style="position:absolute;bottom:10px;right:10px;z-index:2;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8));">'+badge+'</div>':'')+'<div style="position:absolute;top:10px;left:10px;z-index:2;">'+platformBadge(g.platform)+'</div><span class="cover-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,3).toUpperCase()+'</span></div><div class="game-card-body"><div class="game-name">'+esc(g.name)+'</div><div class="game-prog-row"><span style="font-size:13px;font-weight:700;color:var(--text-mid)">'+s.earned+' / '+s.total+'</span><span class="game-pct" style="color:'+barColor+';">'+s.pct+'%</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+s.pct+'%;background:'+barColor+';"></div></div></div></div>';}
 
 /* ══ DETAIL ══ */
 function renderDetail(id){
@@ -977,7 +1014,7 @@ function renderDetail(id){
   var allByType={bronze:0,silver:0,gold:0,platinum:0},allEarnedByType={bronze:0,silver:0,gold:0,platinum:0};
   [...(g.trophies||[]),...(g.dlcs||[]).flatMap(function(d){return d.trophies||[];})].forEach(function(t){allByType[t.type]++;if(t.earned)allEarnedByType[t.type]++;});
   var barColor=cat==='platinum'?'var(--plat-c)':cat==='100'?'var(--green)':'var(--blue)';
-  var pctLabel=cat==='platinum'?'<span class="badge badge-purple"> PLATINE OBTENU</span>':cat==='100'?'<span class="badge badge-green"> 100% COMPLÉTÉ</span>':'';
+  var pctLabel=cat==='platinum'?'<span class="badge badge-purple">💎 PLATINE OBTENU</span>':cat==='100'?'<span class="badge badge-green">👑 100% COMPLÉTÉ</span>':'';
   var statsGrid=ORDER.map(function(type){return '<div class="stat-mini"><div class="stat-mini-val" style="color:'+TC[type].c+';">'+allEarnedByType[type]+'<span style="font-size:14px;color:var(--text-dim)"> / '+allByType[type]+'</span></div><div class="stat-mini-lbl">'+TC[type].label+'</div></div>';}).join('');
   var filterPills=[['all','Tout'],['earned','✓ Acquis'],['notearned','✗ Verrouillés']].map(function(f){return '<button class="filter-pill'+(detailFilter===f[0]?' active':'')+'" onclick="setDetailFilter(\''+id+'\',\''+f[0]+'\')">'+f[1]+'</button>';}).join('');
   var dlcCount=(g.dlcs||[]).length,dlcBadge=dlcCount?'<span class="badge badge-orange"> '+dlcCount+' DLC'+(dlcCount>1?'S':'')+'</span>':'';
@@ -1018,10 +1055,10 @@ function renderSettings(){
   if(gc)gc.textContent=games.length;if(tc)tc.textContent=allT.length;if(pc)pc.textContent=platCount;if(hc)hc.textContent=count100;
   var platGames=games.filter(function(g){var pt=(g.trophies||[]).find(function(t){return t.type==='platinum';});return pt&&pt.earned;}).sort(function(a,b){var pa=(a.trophies||[]).find(function(t){return t.type==='platinum';});var pb=(b.trophies||[]).find(function(t){return t.type==='platinum';});return((pb&&pb.at)||0)-((pa&&pa.at)||0);}).slice(0,6);
   var platEl=document.getElementById('settings-plat-list');
-  if(platEl){if(!platGames.length){platEl.innerHTML='<div class="hof-empty">Aucun jeu platiné pour l\'instant</div>';}else{platEl.innerHTML='<div class="hof-grid">'+platGames.map(function(g){return '<div class="hof-card" onclick="openDetail(\''+g.id+'\')"><div class="hof-cover" style="'+getCoverStyle(g)+'">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5" onerror="this.remove()">':'')+'<span class="hof-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()+'</span><span class="hof-badge"></span></div><div class="hof-name">'+esc(g.name)+'</div></div>';}).join('')+'</div>';}}
+  if(platEl){if(!platGames.length){platEl.innerHTML='<div class="hof-empty">Aucun jeu platiné pour l\'instant</div>';}else{platEl.innerHTML='<div class="hof-grid">'+platGames.map(function(g){return '<div class="hof-card" onclick="openDetail(\''+g.id+'\')"><div class="hof-cover" style="'+getCoverStyle(g)+'">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5" onerror="this.remove()">':'')+'<span class="hof-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()+'</span><span class="hof-badge">💎</span></div><div class="hof-name">'+esc(g.name)+'</div></div>';}).join('')+'</div>';}}
   var games100=games.filter(function(g){var s=statAll(g);return s.total>0&&s.earned===s.total;}).sort(function(a,b){function lastAt(g){var all=(g.trophies||[]).concat((g.dlcs||[]).flatMap(function(d){return d.trophies||[];}));var e=all.filter(function(t){return t.earned&&t.at;}).map(function(t){return t.at;});return e.length?Math.max.apply(null,e):0;}return lastAt(b)-lastAt(a);}).slice(0,6);
   var el100=document.getElementById('settings-100-list');
-  if(el100){if(!games100.length){el100.innerHTML='<div class="hof-empty">Aucun jeu 100% pour l\'instant</div>';}else{el100.innerHTML='<div class="hof-grid">'+games100.map(function(g){return '<div class="hof-card" onclick="openDetail(\''+g.id+'\')"><div class="hof-cover" style="'+getCoverStyle(g)+'">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5" onerror="this.remove()">':'')+'<span class="hof-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()+'</span><span class="hof-badge"></span></div><div class="hof-name">'+esc(g.name)+'</div></div>';}).join('')+'</div>';}}
+  if(el100){if(!games100.length){el100.innerHTML='<div class="hof-empty">Aucun jeu 100% pour l\'instant</div>';}else{el100.innerHTML='<div class="hof-grid">'+games100.map(function(g){return '<div class="hof-card" onclick="openDetail(\''+g.id+'\')"><div class="hof-cover" style="'+getCoverStyle(g)+'">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5" onerror="this.remove()">':'')+'<span class="hof-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()+'</span><span class="hof-badge">👑</span></div><div class="hof-name">'+esc(g.name)+'</div></div>';}).join('')+'</div>';}}
 }
 
 /* ══ THEME ══ */
@@ -1045,128 +1082,120 @@ window.addEventListener('appinstalled',function(){_deferredPrompt=null;var b=doc
 document.addEventListener('DOMContentLoaded',function(){var btn=document.getElementById('tt-install-btn');if(btn)btn.addEventListener('click',function(){if(_deferredPrompt){_deferredPrompt.prompt();_deferredPrompt.userChoice.then(function(r){if(r.outcome==='accepted'){var b=document.getElementById('tt-install-banner');if(b)b.classList.remove('show');}_deferredPrompt=null;});}});});
 
 
-/* ══ CLOUD SYNC — JSONBin.io public bins ══ */
-var _syncId='',_binId='',_pushTimer=null;
+/* ══ CLOUD SYNC — FIREBASE BRIDGE ══ */
+var _pushTimer=null;
+window.__platinaApplyingRemote=false;
 
-function _getSyncId(){return localStorage.getItem('platina-sync-id')||'';}
-function _getBinId(sid){return localStorage.getItem('platina-bin-'+sid)||'';}
-function _setBinId(sid,bid){localStorage.setItem('platina-bin-'+sid,bid);}
-
-function loadSyncSettings(){
-  _syncId=_getSyncId();
-  _binId=_syncId?_getBinId(_syncId):'';
-  var inp=document.getElementById('sync-id-input');
-  if(inp&&_syncId)inp.value=_syncId;
-  _updateSyncInfo();
+function _cloudPayload(){return{version:3,updatedAt:Date.now(),games:games,wishlist:wishlist};}
+function _renderAfterRemote(){
+  if(currentTab==='dashboard')renderDashboard();
+  if(currentTab==='games')renderGames();
+  if(currentTab==='wishlist')renderWishlist();
+  if(currentTab==='settings')renderSettings();
+  if(currentTab==='detail'&&currentDetailId)renderDetail(currentDetailId);
 }
-
-function _updateSyncInfo(){
-  var el=document.getElementById('sync-info');if(!el)return;
-  if(!_syncId){el.textContent='Aucun identifiant configuré.';return;}
-  var ts=localStorage.getItem('platina-sync-ts');
-  el.textContent='ID : '+_syncId+(_binId?' · Bin OK':' · Pas encore synchronisé')+(ts?' · Sync : '+_fmt_ts(parseInt(ts)):'');
-  _updateSyncBar();
+function applyCloudPayload(data){
+  if(!data||!Array.isArray(data.games))return;
+  window.__platinaApplyingRemote=true;
+  games=migrateGames(data.games||[]);
+  wishlist=Array.isArray(data.wishlist)?data.wishlist:[];
+  localStorage.setItem('tt-games-v5',JSON.stringify(games));
+  localStorage.setItem('tt-wish-v5',JSON.stringify(wishlist));
+  localStorage.setItem('platina-sync-ts',Date.now());
+  window.__platinaApplyingRemote=false;
+  _renderAfterRemote();
 }
-
-function _fmt_ts(ts){var d=new Date(ts);return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}
-
-function _updateSyncBar(){
-  var bar=document.getElementById('sync-status-bar');if(!bar)return;
-  if(!_syncId){bar.innerHTML='';return;}
-  var ts=localStorage.getItem('platina-sync-ts');
-  var ago=ts?timeAgo(parseInt(ts)):'jamais';
-  bar.innerHTML='<div class="sync-bar sync-ok"><span class="sync-dot"></span>Cloud : '+esc(_syncId)+' — dernière sync : '+ago+'</div>';
-}
-
-function saveAndSync(){
-  var inp=document.getElementById('sync-id-input');
-  var rawId=inp?inp.value.trim():'';
-  var id=rawId.replace(/[^a-zA-Z0-9_\-]/g,'');
-  if(id.length<3){showToast('ID trop court (min 3 caractères)','⚠️');return;}
-  localStorage.setItem('platina-sync-id',id);
-  _syncId=id;
-  _binId=_getBinId(id);
-  _updateSyncInfo();
-  if(!_binId){pushToCloud();}
-  else{pullFromCloud();}
-}
-
-function _getPayload(){return JSON.stringify({version:2,exportDate:new Date().toISOString(),syncId:_syncId,games:games,wishlist:wishlist});}
-
-function pushToCloud(){
-  if(!_syncId){showToast('Activez la sync d\'abord (Paramètres)','⚠️');return;}
-  var payload=_getPayload();
-  if(!_binId){
-    // Créer un nouveau bin public sur jsonbin.io
-    fetch('https://api.jsonbin.io/v3/b',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','X-Bin-Name':'platina-'+_syncId,'X-Bin-Private':'false'},
-      body:payload
-    }).then(function(r){return r.json();}).then(function(d){
-      if(d&&d.metadata&&d.metadata.id){
-        _binId=d.metadata.id;
-        _setBinId(_syncId,_binId);
-        localStorage.setItem('platina-sync-ts',Date.now());
-        _updateSyncInfo();
-        showToast('Données envoyées ! Bin créé 🎉','☁️');
-      } else {
-        showToast('Erreur création bin cloud','❌');
-      }
-    }).catch(function(){showToast('Erreur réseau','❌');});
-  } else {
-    fetch('https://api.jsonbin.io/v3/b/'+_binId,{
-      method:'PUT',
-      headers:{'Content-Type':'application/json'},
-      body:payload
-    }).then(function(r){return r.json();}).then(function(d){
-      if(d&&d.metadata){
-        localStorage.setItem('platina-sync-ts',Date.now());
-        _updateSyncInfo();
-        showToast('Cloud mis à jour !','☁️');
-      } else {
-        showToast('Erreur mise à jour cloud','❌');
-      }
-    }).catch(function(){showToast('Erreur réseau','❌');});
+function setSyncStatus(txt,cls){
+  var st=document.getElementById('sync-status');if(st){st.textContent=txt;st.className='sync-status '+(cls||'warn');}
+  var sub=document.getElementById('sync-sub');if(sub)sub.textContent=txt;
+  var bar=document.getElementById('sync-status-bar');
+  if(bar){
+    if(!txt||txt==='Non configuré'||txt==='Déconnecté'){bar.innerHTML='';}
+    else{bar.innerHTML='<div class="sync-bar '+(cls==='err'?'sync-err':'sync-ok')+'"><span class="sync-dot"></span>Cloud Firebase : '+esc(txt)+'</div>';}
   }
 }
-
-function pullFromCloud(){
-  if(!_syncId){showToast('Activez la sync d\'abord','⚠️');return;}
-  if(!_binId){showToast('Aucune donnée cloud pour cet ID','ℹ️');return;}
-  showToast('Récupération en cours…','⬇️');
-  fetch('https://api.jsonbin.io/v3/b/'+_binId+'/latest',{
-    headers:{'X-Bin-Meta':'false'}
-  }).then(function(r){return r.json();}).then(function(data){
-    if(data&&data.games&&Array.isArray(data.games)){
-      games=migrateGames(data.games);
-      localStorage.setItem('tt-games-v5',JSON.stringify(games));
-      if(data.wishlist&&Array.isArray(data.wishlist)){
-        wishlist=data.wishlist;
-        localStorage.setItem('tt-wish-v5',JSON.stringify(wishlist));
-      }
-      localStorage.setItem('platina-sync-ts',Date.now());
-      _updateSyncInfo();
-      renderDashboard();renderSettings();
-      showToast('Données reçues du cloud !','⬇️');
-    } else {
-      showToast('Données cloud invalides','❌');
-    }
-  }).catch(function(){showToast('Impossible de récupérer les données','❌');});
-}
-
+function loadSyncSettings(){setSyncStatus('Non configuré','warn');}
 function _autoPush(){
-  if(!_syncId||!_binId)return;
-  if(_pushTimer)clearTimeout(_pushTimer);
-  _pushTimer=setTimeout(function(){pushToCloud();},25000);
+  if(window.__platinaApplyingRemote)return;
+  if(typeof window.__platinaQueueCloudSave==='function'){
+    if(_pushTimer)clearTimeout(_pushTimer);
+    _pushTimer=setTimeout(function(){window.__platinaQueueCloudSave(_cloudPayload());},650);
+  }
 }
+function platinaSignIn(){if(typeof window.__platinaSignIn==='function')window.__platinaSignIn();else showToast('Firebase non configuré','⚠️');}
+function platinaSignUp(){if(typeof window.__platinaSignUp==='function')window.__platinaSignUp();else showToast('Firebase non configuré','⚠️');}
+function platinaSignOut(){if(typeof window.__platinaSignOut==='function')window.__platinaSignOut();else showToast('Firebase non chargé','⚠️');}
+function platinaForceSyncNow(){if(typeof window.__platinaForceCloudSave==='function')window.__platinaForceCloudSave(_cloudPayload());else showToast('Firebase non chargé','⚠️');}
 
 /* ══ INIT ══ */
 loadData();
 loadSyncSettings();
 renderDashboard();
 renderSettings();
-// Auto-pull si sync configuré
-if(_getSyncId()&&_getBinId(_getSyncId())){setTimeout(function(){pullFromCloud();},1800);}
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a08f62699b2d7011',t:'MTc4MTAwMDIyNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+
+<script>
+/* Remplace ces valeurs par la configuration de ton projet Firebase (Project settings > Web app). */
+window.PlatinaFirebaseConfig = window.PlatinaFirebaseConfig || {
+  apiKey: "AIzaSyDm4BVS5C9qExbBCtit3phdD4UQvp0mp9A",
+  authDomain: "platina-8f04e.firebaseapp.com",
+  projectId: "platina-8f04e",
+  storageBucket: "platina-8f04e.firebasestorage.app",
+  messagingSenderId: "410565707030",
+  appId: "1:410565707030:web:8aff5ca122cc762cafbc37",
+  measurementId: "G-SLB4VRGF81"
+};
+</script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
+import { getFirestore, doc, onSnapshot, setDoc, getDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+
+let app=null,auth=null,db=null,user=null,unsub=null,lastCloudUpdatedAt=0,saveTimer=null;
+const cfg=window.PlatinaFirebaseConfig||{};
+function configured(){return cfg.apiKey&&cfg.apiKey!=='REMPLACE_MOI'&&cfg.projectId&&cfg.projectId!=='REMPLACE_MOI';}
+function $(id){return document.getElementById(id);}
+function status(txt,cls){if(typeof window.setSyncStatus==='function')window.setSyncStatus(txt,cls);}
+function showAuthForm(show){const f=$('sync-auth-form'),b=$('sync-user-box');if(f)f.style.display=show?'block':'none';if(b)b.style.display=show?'none':'block';}
+function ref(){return user&&db?doc(db,'platinaUsers',user.uid):null;}
+async function pushNow(payload){
+  const r=ref();if(!r)return;
+  const data=payload||(typeof window._cloudPayload==='function'?window._cloudPayload():null);if(!data)return;
+  lastCloudUpdatedAt=data.updatedAt;
+  await setDoc(r,{...data,serverUpdatedAt:serverTimestamp()},{merge:true});
+  localStorage.setItem('platina-sync-ts',Date.now());
+  status('Synchronisé','ok');
+}
+window.__platinaQueueCloudSave=function(payload){if(!ref())return;status('Sauvegarde…','warn');clearTimeout(saveTimer);saveTimer=setTimeout(()=>pushNow(payload).catch(e=>{console.error(e);status('Erreur sync','err');}),650);};
+window.__platinaForceCloudSave=function(payload){pushNow(payload).then(()=>showToast('Sauvegarde cloud envoyée','☁️')).catch(e=>{console.error(e);showToast('Erreur Firebase','⚠️');status('Erreur sync','err');});};
+window.__platinaSignIn=function(){if(!configured()){showToast('Configure Firebase dans le code avant la connexion','⚠️');return;}const email=($('sync-email')||{}).value||'',pass=($('sync-password')||{}).value||'';signInWithEmailAndPassword(auth,email.trim(),pass).catch(e=>showToast(e.message,'⚠️'));};
+window.__platinaSignUp=function(){if(!configured()){showToast('Configure Firebase dans le code avant la création de compte','⚠️');return;}const email=($('sync-email')||{}).value||'',pass=($('sync-password')||{}).value||'';createUserWithEmailAndPassword(auth,email.trim(),pass).catch(e=>showToast(e.message,'⚠️'));};
+window.__platinaSignOut=function(){if(auth)signOut(auth);};
+
+if(!configured()){
+  status('Firebase à configurer','warn');
+}else{
+  try{
+    app=initializeApp(cfg);auth=getAuth(app);db=getFirestore(app);status('Déconnecté','warn');showAuthForm(true);
+    onAuthStateChanged(auth,async function(u){
+      user=u;
+      if(unsub){unsub();unsub=null;}
+      if(!u){showAuthForm(true);status('Déconnecté','warn');return;}
+      showAuthForm(false);const mail=$('sync-user-email');if(mail)mail.textContent=u.email||u.uid;status('Connexion cloud…','warn');
+      const r=ref();const snap=await getDoc(r);
+      if(!snap.exists()||!snap.data().games){await pushNow();}
+      else{const data=snap.data();lastCloudUpdatedAt=data.updatedAt||0;if(typeof window.applyCloudPayload==='function')window.applyCloudPayload(data);status('Synchronisé','ok');}
+      unsub=onSnapshot(r,function(snap){
+        if(!snap.exists())return;const data=snap.data();
+        if(!data||!data.games)return;
+        if(data.updatedAt&&data.updatedAt===lastCloudUpdatedAt)return;
+        lastCloudUpdatedAt=data.updatedAt||0;
+        if(typeof window.applyCloudPayload==='function')window.applyCloudPayload(data);
+        status('Synchronisé','ok');
+      },function(e){console.error(e);status('Erreur sync','err');});
+    });
+  }catch(e){console.error(e);status('Erreur config','err');}
+}
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a08f94efda539d54',t:'MTc4MTAwMjI5Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
