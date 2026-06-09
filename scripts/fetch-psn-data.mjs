@@ -10,7 +10,7 @@ import {
 } from "psn-api";
 
 const NPSSO = cleanNpsso(process.env.NPSSO || "");
-const MAX_GAMES = normalizeMaxGames(process.env.MAX_GAMES || "50");
+const MAX_GAMES = normalizeMaxGames(process.env.MAX_GAMES || "0");
 const OUT_FILE = path.join(process.cwd(), "Platina", "psn-data.json");
 
 const GRADS = [
@@ -31,7 +31,7 @@ function cleanNpsso(value) {
 
 function normalizeMaxGames(value) {
   const n = Number(value);
-  if (!Number.isFinite(n) || n < 0) return 50;
+  if (!Number.isFinite(n) || n < 0) return 0;
   return Math.min(Math.floor(n), 800);
 }
 
