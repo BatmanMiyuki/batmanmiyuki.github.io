@@ -267,6 +267,7 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
 .sync-status.err{border-color:var(--red);color:var(--red);background:var(--red-bg)}
 .sync-auth-form{padding:14px 16px;border-top:1px solid var(--border);}
 .sync-auth-form .field{margin-bottom:10px}.sync-actions{display:flex;gap:10px;flex-wrap:wrap}.sync-actions .btn{flex:1;min-width:135px;padding:11px 14px;font-size:12px}.sync-help{font-size:12px;color:var(--text-dim);font-weight:700;line-height:1.35;margin-top:10px}
+.psn-help-link{color:var(--green);font-weight:900;text-decoration:none}.psn-help-link:hover{text-decoration:underline}.psn-small-note{font-size:11px;color:var(--text-dim);font-weight:700;line-height:1.35;margin-top:8px}.psn-status-line{font-size:12px;font-weight:800;color:var(--text-mid);margin-top:10px;line-height:1.35}.psn-status-line.ok{color:var(--green)}.psn-status-line.err{color:var(--red)}
 /* ── LIGHT THEME ── */
 #root.theme-light{--bg:#f4f4f5;--surface:#ffffff;--surface-2:#f0f0f1;--border:#e4e4e7;--border-mid:#d4d4d8;--text:#09090b;--text-mid:#52525b;--text-dim:#a1a1aa;--green-bg:rgba(28,176,246,0.08);--green-mid:rgba(28,176,246,0.2);--blue-bg:#eff8fe;--gold-bg:#fffbeb;--red-bg:#fef2f2;--bronze-bg:#fdf6f0;--bronze-border:#d4956a;--silver-bg:#f8fafc;--silver-border:#b0b8c8;--gold-bg2:#fffbeb;--gold-border:#d4a800;--plat-bg:#eff8ff;--plat-border:#7dd0f5;--shadow:0 2px 8px rgba(0,0,0,0.06);--shadow-md:0 6px 20px rgba(0,0,0,0.09);}
 #root.theme-light .streak-banner{background:linear-gradient(135deg,#cbeeff,#9adaff);border-color:var(--green-dark);}
@@ -459,6 +460,30 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
                 <button class="btn btn-outline" onclick="platinaForceSyncNow()">Forcer la sauvegarde</button>
                 <button class="btn btn-red" onclick="platinaSignOut()">Déconnexion</button>
               </div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-label">Connexion PlayStation</div>
+          <div class="card" style="padding:0;overflow:hidden">
+            <div class="settings-row">
+              <div style="display:flex;align-items:center;gap:12px;min-width:0;flex:1">
+                <div class="settings-row-icon" style="background:rgba(28,176,246,0.12);font-size:20px;">🎮</div>
+                <div style="min-width:0">
+                  <div style="font-size:15px;font-weight:800;color:var(--text);">PlayStation via GitHub Actions</div>
+                  <div style="font-size:12px;font-weight:600;color:var(--text-mid);margin-top:2px;" id="psn-sub">Importe le dernier fichier PSN généré par GitHub Actions</div>
+                </div>
+              </div>
+              <span id="psn-status" class="sync-status warn">En attente</span>
+            </div>
+            <div class="sync-auth-form">
+              <div class="field"><label>Mode d'import</label><select id="psn-mode"><option value="merge">Fusionner avec mes jeux</option><option value="replacePsn">Remplacer uniquement les jeux PSN déjà importés</option><option value="replaceAll">Remplacer toute ma liste par PSN</option></select></div>
+              <div class="sync-actions">
+                <button class="btn btn-green" onclick="importPsnSnapshot()">Importer la dernière sync PSN</button>
+                <button class="btn btn-outline" onclick="window.open('https://github.com/batmanmiyuki/batmanmiyuki.github.io/actions/workflows/update-psn.yml','_blank')">Ouvrir GitHub Actions</button>
+              </div>
+              <div id="psn-status-line" class="psn-status-line">Lance l'action GitHub “Update PlayStation trophies”, puis reviens ici importer le fichier généré.</div>
+              <div class="psn-small-note">Ton NPSSO reste dans GitHub Secrets. L'app lit seulement <b>psn-data.json</b>, elle ne voit jamais ton token PlayStation.</div>
             </div>
           </div>
         </div>
@@ -974,7 +999,7 @@ function renderDashboard(){
   var totalPts=earned.reduce(function(s,t){return s+TC[t.type].pts;},0);
   var pt=games.filter(function(g){var plat=(g.trophies||[]).find(function(t){return t.type==='platinum';});return plat&&plat.earned;}).length;
   var pct100=games.length?Math.round(completedG.length/games.length*100):0;
-  document.getElementById('dash-streak-title').textContent=pt>0?pt+' jeu'+(pt>1?'x':'')+' platiné'+(pt>1?'s':'')+'  ':'0 jeu platiné';
+  document.getElementById('dash-streak-title').textContent=pt>0?pt+' jeu'+(pt>1?'x':'')+' platiné'+(pt>1?'s':'')+'  💎':'0 jeu platiné';
   document.getElementById('dash-streak-sub').textContent=earned.length+' trophées · '+pct100+'% complétion';
   var tPct=allT.length?Math.round(earned.length/allT.length*100):0;
   var gPct=games.length?Math.round(completedG.length/games.length*100):0;
@@ -1005,7 +1030,7 @@ function renderDashboard(){
 function setGamesFilter(f){gamesFilter=f;['progress','platinum','100'].forEach(function(k){document.getElementById('btn-filter-'+k).classList.remove('actif');});document.getElementById('btn-filter-'+f).classList.add('actif');renderGamesList();}
 function renderGames(){document.getElementById('games-count').textContent=games.length+' jeu'+(games.length!==1?'x':'');setGamesFilter(gamesFilter);}
 function renderGamesList(){var html='';if(!games.length){html='<div class="empty"><div class="empty-icon">🎮</div><div class="empty-title">Aucun jeu ajouté</div><div class="empty-sub">Commencez votre collection !</div></div>';}else{var fg=games.filter(function(g){var cat=catGame(g);if(gamesFilter==='platinum')return cat==='platinum';if(gamesFilter==='100')return cat==='100';return cat==='progress';});var q=document.getElementById('games-search');var search=q?q.value.trim().toLowerCase():'';if(search)fg=fg.filter(function(g){return g.name.toLowerCase().includes(search);});fg.sort(function(a,b){return a.name.localeCompare(b.name);});if(!fg.length){html='<div class="empty"><div class="empty-title">Aucun jeu ici</div><div class="empty-sub">Pas de jeu dans cette catégorie.</div></div>';}else{html=fg.map(renderGameCard).join('');}}document.getElementById('games-list').innerHTML=html;}
-function renderGameCard(g){var s=statAll(g),cat=catGame(g);var barColor=cat==='platinum'?'var(--plat-c)':cat==='100'?'var(--green)':'var(--blue)';var badge=cat==='platinum'?'<span style="background:var(--plat-bg);color:var(--plat-c);border:2px solid var(--plat-border);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;"> Platine</span>':cat==='100'?'<span style="background:var(--green-bg);color:var(--green);border:2px solid var(--green);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;"> 100%</span>':'';return '<div class="game-card" onclick="openDetail(\''+g.id+'\')"><div class="game-cover-placeholder" style="'+getCoverStyle(g)+';">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">':'')+(badge?'<div style="position:absolute;bottom:10px;right:10px;z-index:2;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8));">'+badge+'</div>':'')+'<div style="position:absolute;top:10px;left:10px;z-index:2;">'+platformBadge(g.platform)+'</div><span class="cover-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,3).toUpperCase()+'</span></div><div class="game-card-body"><div class="game-name">'+esc(g.name)+'</div><div class="game-prog-row"><span style="font-size:13px;font-weight:700;color:var(--text-mid)">'+s.earned+' / '+s.total+'</span><span class="game-pct" style="color:'+barColor+';">'+s.pct+'%</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+s.pct+'%;background:'+barColor+';"></div></div></div></div>';}
+function renderGameCard(g){var s=statAll(g),cat=catGame(g);var barColor=cat==='platinum'?'var(--plat-c)':cat==='100'?'var(--green)':'var(--blue)';var badge=cat==='platinum'?'<span style="background:var(--plat-bg);color:var(--plat-c);border:2px solid var(--plat-border);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;">💎 Platine</span>':cat==='100'?'<span style="background:var(--green-bg);color:var(--green);border:2px solid var(--green);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:900;">👑 100%</span>':'';return '<div class="game-card" onclick="openDetail(\''+g.id+'\')"><div class="game-cover-placeholder" style="'+getCoverStyle(g)+';">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">':'')+(badge?'<div style="position:absolute;bottom:10px;right:10px;z-index:2;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8));">'+badge+'</div>':'')+'<div style="position:absolute;top:10px;left:10px;z-index:2;">'+platformBadge(g.platform)+'</div><span class="cover-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,3).toUpperCase()+'</span></div><div class="game-card-body"><div class="game-name">'+esc(g.name)+'</div><div class="game-prog-row"><span style="font-size:13px;font-weight:700;color:var(--text-mid)">'+s.earned+' / '+s.total+'</span><span class="game-pct" style="color:'+barColor+';">'+s.pct+'%</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+s.pct+'%;background:'+barColor+';"></div></div></div></div>';}
 
 /* ══ DETAIL ══ */
 function renderDetail(id){
@@ -1014,7 +1039,7 @@ function renderDetail(id){
   var allByType={bronze:0,silver:0,gold:0,platinum:0},allEarnedByType={bronze:0,silver:0,gold:0,platinum:0};
   [...(g.trophies||[]),...(g.dlcs||[]).flatMap(function(d){return d.trophies||[];})].forEach(function(t){allByType[t.type]++;if(t.earned)allEarnedByType[t.type]++;});
   var barColor=cat==='platinum'?'var(--plat-c)':cat==='100'?'var(--green)':'var(--blue)';
-  var pctLabel=cat==='platinum'?'<span class="badge badge-purple"> PLATINE OBTENU</span>':cat==='100'?'<span class="badge badge-green"> 100% COMPLÉTÉ</span>':'';
+  var pctLabel=cat==='platinum'?'<span class="badge badge-purple">💎 PLATINE OBTENU</span>':cat==='100'?'<span class="badge badge-green">👑 100% COMPLÉTÉ</span>':'';
   var statsGrid=ORDER.map(function(type){return '<div class="stat-mini"><div class="stat-mini-val" style="color:'+TC[type].c+';">'+allEarnedByType[type]+'<span style="font-size:14px;color:var(--text-dim)"> / '+allByType[type]+'</span></div><div class="stat-mini-lbl">'+TC[type].label+'</div></div>';}).join('');
   var filterPills=[['all','Tout'],['earned','✓ Acquis'],['notearned','✗ Verrouillés']].map(function(f){return '<button class="filter-pill'+(detailFilter===f[0]?' active':'')+'" onclick="setDetailFilter(\''+id+'\',\''+f[0]+'\')">'+f[1]+'</button>';}).join('');
   var dlcCount=(g.dlcs||[]).length,dlcBadge=dlcCount?'<span class="badge badge-orange"> '+dlcCount+' DLC'+(dlcCount>1?'S':'')+'</span>':'';
@@ -1055,10 +1080,10 @@ function renderSettings(){
   if(gc)gc.textContent=games.length;if(tc)tc.textContent=allT.length;if(pc)pc.textContent=platCount;if(hc)hc.textContent=count100;
   var platGames=games.filter(function(g){var pt=(g.trophies||[]).find(function(t){return t.type==='platinum';});return pt&&pt.earned;}).sort(function(a,b){var pa=(a.trophies||[]).find(function(t){return t.type==='platinum';});var pb=(b.trophies||[]).find(function(t){return t.type==='platinum';});return((pb&&pb.at)||0)-((pa&&pa.at)||0);}).slice(0,6);
   var platEl=document.getElementById('settings-plat-list');
-  if(platEl){if(!platGames.length){platEl.innerHTML='<div class="hof-empty">Aucun jeu platiné pour l\'instant</div>';}else{platEl.innerHTML='<div class="hof-grid">'+platGames.map(function(g){return '<div class="hof-card" onclick="openDetail(\''+g.id+'\')"><div class="hof-cover" style="'+getCoverStyle(g)+'">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5" onerror="this.remove()">':'')+'<span class="hof-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()+'</span><span class="hof-badge"></span></div><div class="hof-name">'+esc(g.name)+'</div></div>';}).join('')+'</div>';}}
+  if(platEl){if(!platGames.length){platEl.innerHTML='<div class="hof-empty">Aucun jeu platiné pour l\'instant</div>';}else{platEl.innerHTML='<div class="hof-grid">'+platGames.map(function(g){return '<div class="hof-card" onclick="openDetail(\''+g.id+'\')"><div class="hof-cover" style="'+getCoverStyle(g)+'">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5" onerror="this.remove()">':'')+'<span class="hof-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()+'</span><span class="hof-badge">💎</span></div><div class="hof-name">'+esc(g.name)+'</div></div>';}).join('')+'</div>';}}
   var games100=games.filter(function(g){var s=statAll(g);return s.total>0&&s.earned===s.total;}).sort(function(a,b){function lastAt(g){var all=(g.trophies||[]).concat((g.dlcs||[]).flatMap(function(d){return d.trophies||[];}));var e=all.filter(function(t){return t.earned&&t.at;}).map(function(t){return t.at;});return e.length?Math.max.apply(null,e):0;}return lastAt(b)-lastAt(a);}).slice(0,6);
   var el100=document.getElementById('settings-100-list');
-  if(el100){if(!games100.length){el100.innerHTML='<div class="hof-empty">Aucun jeu 100% pour l\'instant</div>';}else{el100.innerHTML='<div class="hof-grid">'+games100.map(function(g){return '<div class="hof-card" onclick="openDetail(\''+g.id+'\')"><div class="hof-cover" style="'+getCoverStyle(g)+'">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5" onerror="this.remove()">':'')+'<span class="hof-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()+'</span><span class="hof-badge"></span></div><div class="hof-name">'+esc(g.name)+'</div></div>';}).join('')+'</div>';}}
+  if(el100){if(!games100.length){el100.innerHTML='<div class="hof-empty">Aucun jeu 100% pour l\'instant</div>';}else{el100.innerHTML='<div class="hof-grid">'+games100.map(function(g){return '<div class="hof-card" onclick="openDetail(\''+g.id+'\')"><div class="hof-cover" style="'+getCoverStyle(g)+'">'+(g.coverUrl?'<img src="'+esc(g.coverUrl)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5" onerror="this.remove()">':'')+'<span class="hof-initials">'+g.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase()+'</span><span class="hof-badge">👑</span></div><div class="hof-name">'+esc(g.name)+'</div></div>';}).join('')+'</div>';}}
 }
 
 /* ══ THEME ══ */
@@ -1126,6 +1151,44 @@ function platinaSignIn(){if(typeof window.__platinaSignIn==='function')window.__
 function platinaSignUp(){if(typeof window.__platinaSignUp==='function')window.__platinaSignUp();else showToast('Firebase non configuré','⚠️');}
 function platinaSignOut(){if(typeof window.__platinaSignOut==='function')window.__platinaSignOut();else showToast('Firebase non chargé','⚠️');}
 function platinaForceSyncNow(){if(typeof window.__platinaForceCloudSave==='function')window.__platinaForceCloudSave(_cloudPayload());else showToast('Firebase non chargé','⚠️');}
+
+function setPsnStatus(txt,cls){
+  var st=document.getElementById('psn-status');if(st){st.textContent=txt;st.className='sync-status '+(cls||'warn');}
+  var sub=document.getElementById('psn-sub');if(sub)sub.textContent=txt;
+  var line=document.getElementById('psn-status-line');if(line){line.textContent=txt;line.className='psn-status-line '+(cls||'');}
+}
+function mergePsnGames(existing, imported, mode){
+  if(mode==='replaceAll')return imported;
+  var base=Array.isArray(existing)?existing.slice():[];
+  if(mode==='replacePsn')base=base.filter(function(g){return g.source!=='psn'&&!g.psnNpCommunicationId&&!String(g.id||'').startsWith('psn_');});
+  var idx={};
+  base.forEach(function(g,i){var k=g.psnNpCommunicationId||(String(g.id||'').startsWith('psn_')?String(g.id).replace(/^psn_/,''):null);if(k)idx[k]=i;});
+  imported.forEach(function(g){var k=g.psnNpCommunicationId||(String(g.id||'').startsWith('psn_')?String(g.id).replace(/^psn_/,''):g.id);if(k&&idx[k]!=null)base[idx[k]]=Object.assign({},base[idx[k]],g);else base.push(g);});
+  return base;
+}
+function importPsnSnapshot(){
+  var modeEl=document.getElementById('psn-mode');var mode=modeEl?modeEl.value:'merge';
+  setPsnStatus('Téléchargement de psn-data.json…','warn');
+  fetch('psn-data.json?ts='+Date.now(),{cache:'no-store'}).then(function(r){
+    if(!r.ok)throw new Error('Fichier psn-data.json introuvable. Lance d’abord GitHub Actions.');
+    return r.json();
+  }).then(function(data){
+    if(!data||!Array.isArray(data.games))throw new Error('psn-data.json invalide.');
+    games=mergePsnGames(games,migrateGames(data.games),mode);
+    saveGames();
+    if(data.wishlist&&Array.isArray(data.wishlist)){wishlist=data.wishlist;saveWish();}
+    renderDashboard();renderSettings();if(currentTab==='games')renderGames();if(currentTab==='detail'&&currentDetailId)renderDetail(currentDetailId);
+    var trophyCount=data.games.reduce(function(sum,g){return sum+(g.trophies||[]).length+(g.dlcs||[]).reduce(function(s,d){return s+(d.trophies||[]).length;},0);},0);
+    var msg='Import PSN OK : '+data.games.length+' jeux · '+trophyCount+' trophées';
+    if(data.generatedAt)msg+=' · '+new Date(data.generatedAt).toLocaleString('fr-FR');
+    setPsnStatus(msg,'ok');showToast(msg,'🎮');
+  }).catch(function(err){
+    var msg=(err&&err.message)?err.message:'Erreur import PSN';
+    setPsnStatus(msg,'err');showToast(msg,'❌');
+  });
+}
+
+
 
 /* ══ INIT ══ */
 loadData();
@@ -1197,5 +1260,5 @@ if(!configured()){
   }catch(e){console.error(e);status('Erreur config','err');}
 }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a08f94efda539d54',t:'MTc4MTAwMjI5Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a092f276c951b5ef',t:'MTc4MTAzNzU4MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
