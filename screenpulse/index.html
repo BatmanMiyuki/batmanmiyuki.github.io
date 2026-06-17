@@ -13,9 +13,9 @@
   <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23080c14'/><circle cx='50' cy='50' r='28' fill='none' stroke='%234d96ff' stroke-width='7'/><circle cx='50' cy='50' r='10' fill='%234d96ff'/></svg>"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.7/babel.min.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     html,body,#root{min-height:100%;background:var(--bg-root,#080c14)}
@@ -2085,11 +2085,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 // Pour une installation PWA complète, héberge le fichier via GitHub Pages / Netlify.
 if ('serviceWorker' in navigator) {
   const SW = `
-const CACHE = 'screenpulse-v32';
+const CACHE = 'screenpulse-v33';
 const ASSETS = [
-  'https://unpkg.com/react@18/umd/react.production.min.js',
-  'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
-  'https://unpkg.com/@babel/standalone/babel.min.js',
+  'https://unpkg.com/react@18.3.1/umd/react.production.min.js',
+  'https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js',
+  'https://unpkg.com/@babel/standalone@7.29.7/babel.min.js',
   'https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap'
 ];
 self.addEventListener('install', e => {
@@ -2214,5 +2214,5 @@ window.addEventListener('appinstalled', () => {
   if (wrap) wrap.innerHTML = '<div style="padding:10px 12px;border-radius:10px;background:rgba(107,203,119,0.1);border:1px solid rgba(107,203,119,0.3);color:#6bcb77;font-size:12px;font-weight:700;text-align:center;">✅ ScreenPulse est installée sur ta tablette !</div>';
 });
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0d183395e3cd12c',t:'MTc4MTY5MzYyOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
