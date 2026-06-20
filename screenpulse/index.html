@@ -478,6 +478,23 @@ function SectionHeader({ icon, title }) {
   );
 }
 
+// ── Storage Stats ─────────────────────────────────────────────────────────────
+function StorageBar({ label, bytes, maxBytes, color }) {
+  const pct = Math.min(100, Math.round(bytes / maxBytes * 100));
+  const kb = Math.round(bytes / 1024);
+  return (
+    <div style={{marginBottom:12}}>
+      <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+        <span style={{fontSize:12,color:'var(--text-muted)'}}>{label}</span>
+        <span style={{fontSize:11,fontFamily:'Space Mono,monospace',color:pct>80?'var(--accent-red)':pct>50?'var(--accent-yellow)':'var(--accent-green)'}}>{kb} ko ({pct}%)</span>
+      </div>
+      <div style={{height:4,background:'var(--border)',borderRadius:3,overflow:'hidden'}}>
+        <div style={{height:'100%',background:color,borderRadius:3,width:`${pct}%`,transition:'width 0.4s'}}/>
+      </div>
+    </div>
+  );
+}
+
 // ── Main App ──────────────────────────────────────────────────────────────────
 function App() {
   const [data,setData]             = useState(()=>load('st_data',{}));
@@ -894,7 +911,7 @@ function App() {
         <nav style={{...S.tabs,overflowX:'auto'}}>
           {['week','stats','apps','images','calc','settings'].map(v=>(
             <button key={v} onClick={()=>setView(v)} style={{...S.tab,...(view===v?S.tabA:{}),flexShrink:0}}>
-              {v==='week'?'Aujourd\'hui':v==='stats'?'Stats':v==='apps'?'Apps':v==='images'?'Images':v==='calc'?'Calcul':'Réglages'}
+              {v==='week'?'Semaine':v==='stats'?'Stats':v==='apps'?'Apps':v==='images'?'Images':v==='calc'?'Calcul':'Réglages'}
             </button>
           ))}
         </nav>
@@ -906,19 +923,19 @@ function App() {
           {/* HERO */}
           <section style={S.hero}>
             <div style={S.page}>
-              <Reveal style={S.eyebrow}>{fmtDate(today())} · Écran</Reveal>
+              <Reveal style={S.eyebrow}>{fmtS(week)} – {fmtS(addD(week,6))} {fmtY(week)} · Écran</Reveal>
               <Reveal delay={80}>
                 <h1 style={S.h1}>
                   <span style={S.h1Thin}>Tu as passé</span><br/>
-                  <span className="mono" style={S.h1Accent}>{fmtH((data[todayKey]||{total:0}).total)}</span><br/>
-                  <span style={S.h1Thin}>sur ton écran.</span>
+                  <span className="mono" style={S.h1Accent}>{fmtH(weekData.reduce((a,d)=>a+d.total,0))}</span><br/>
+                  <span style={S.h1Thin}>cette semaine.</span>
                 </h1>
               </Reveal>
               <Reveal delay={160} style={S.lead}>Pas une alerte. Pas une culpabilisation. Juste la vérité, présentée clairement — pour que tu reprennes le contrôle, en douceur.</Reveal>
               <Reveal delay={240}>
                 <div style={S.heroMeta}>
                   <div style={S.heroM}><span className="mono" style={S.heroMv}>{fmtH(avgW)}</span><span style={S.heroMl}>moyenne/jour</span></div>
-                  <div style={S.heroM}><span className="mono" style={S.heroMv}>{dailyGoal>0?Math.round(((data[todayKey]||{total:0}).total/dailyGoal)*100):0}%</span><span style={S.heroMl}>de ton objectif</span></div>
+                  <div style={S.heroM}><span className="mono" style={S.heroMv}>{dailyGoal>0?Math.round((avgW/dailyGoal)*100):0}%</span><span style={S.heroMl}>de ton objectif</span></div>
                   <div style={S.heroM}><span className="mono" style={S.heroMv}>{daysTracked} j</span><span style={S.heroMl}>de suivi</span></div>
                 </div>
               </Reveal>
@@ -1264,7 +1281,7 @@ function App() {
 
               {stats.sorted.length===0&&(
                 <div style={{textAlign:'center',color:'var(--text-faint)',padding:'80px 20px',fontSize:14,lineHeight:1.8}}>
-                  Aucune donnée pour cette période.<br/>Commence à tracker depuis la vue Aujourd'hui !
+                  Aucune donnée pour cette période.<br/>Commence à tracker depuis la vue Semaine !
                 </div>
               )}
             </div>
@@ -1448,7 +1465,7 @@ function App() {
 
                 <div style={S.hair}/>
                 <div style={{...S.card,marginTop:24,border:'1px solid rgba(48,209,88,0.25)',background:'rgba(48,209,88,0.04)'}}>
-                  <div style={{fontSize:12,color:'var(--accent-green)',textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:700,marginBottom:16}}>📤 Publier dans Aujourd'hui</div>
+                  <div style={{fontSize:12,color:'var(--accent-green)',textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:700,marginBottom:16}}>📤 Publier dans la semaine</div>
                   <div style={{display:'flex',flexDirection:'column',gap:6,marginBottom:18}}>
                     <label style={S.pl}>Jour cible</label>
                     <input type="date" style={{...S.di,width:'100%'}} value={calcDate} onChange={e=>{setCalcDate(e.target.value);setPublishDone(false);}} max={toKey(today())}/>
