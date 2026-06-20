@@ -126,13 +126,7 @@
     @keyframes fadeIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
     @keyframes fadeInUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
     @keyframes cue { 0%,100%{opacity:.3;transform:scaleY(.7)} 50%{opacity:1;transform:scaleY(1)} }
-    .settings-section { animation: fadeIn 0.5s cubic-bezier(.22,1,.36,1) both; }
-    .settings-section:nth-child(2){animation-delay:0.06s}
-    .settings-section:nth-child(3){animation-delay:0.12s}
-    .settings-section:nth-child(4){animation-delay:0.18s}
-    .settings-section:nth-child(5){animation-delay:0.24s}
-    .settings-section:nth-child(6){animation-delay:0.30s}
-    .settings-section:nth-child(7){animation-delay:0.36s}
+    .settings-section { opacity:1; animation: fadeIn 0.5s cubic-bezier(.22,1,.36,1); }
 
     .reveal{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}
     .reveal.in{opacity:1;transform:none}
@@ -261,11 +255,20 @@ function Reveal({ children, style, delay=0, as='div' }) {
   useEffect(()=>{
     const el = ref.current;
     if (!el) return;
+    // Si l'élément est déjà visible au montage, l'afficher immédiatement
+    // (évite tout risque de rester bloqué à opacity:0 si l'observer tarde ou échoue)
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      el.classList.add('in');
+      return;
+    }
     const io = new IntersectionObserver((es)=>{
       es.forEach(e=>{ if(e.isIntersecting){ el.classList.add('in'); io.disconnect(); } });
     },{threshold:0.12});
     io.observe(el);
-    return ()=>io.disconnect();
+    // Filet de sécurité : si jamais l'observer ne se déclenche pas, on force l'affichage
+    const fallback = setTimeout(()=>{ el.classList.add('in'); }, 1500);
+    return ()=>{ io.disconnect(); clearTimeout(fallback); };
   },[]);
   const Tag = as;
   return <Tag ref={ref} className="reveal" style={{transitionDelay:`${delay}ms`,...style}}>{children}</Tag>;
@@ -1113,7 +1116,7 @@ function App() {
               )}
 
               {focusedApp&&appStats&&(
-                <div key={appFadeKey} style={{...S.card,border:'1px solid var(--accent)',background:'rgba(77,150,255,0.04)',animation:'fadeInUp 0.45s cubic-bezier(0.22,1,0.36,1) both'}}>
+                <div key={appFadeKey} style={{...S.card,border:'1px solid var(--accent)',background:'rgba(77,150,255,0.04)',opacity:1,animation:'fadeInUp 0.45s cubic-bezier(0.22,1,0.36,1)'}}>
                   <div style={{display:'flex',alignItems:'center',gap:14,marginBottom:20}}>
                     <div style={{width:48,height:48,borderRadius:14,overflow:'hidden',background:'rgba(77,150,255,0.12)',border:'1px solid var(--accent)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
                       {appImages[focusedApp]
