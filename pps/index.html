@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#d5ac54" />
+  <meta name="description" content="Pagot Piano Studio : piano virtuel installable avec lecteur automatique et bibliothèque locale." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="PPS" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Pagot Piano Studio</title>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       INLINE MANIFEST — no external file needed
+  ═══════════════════════════════════════════════════════════ -->
+  <script id="pwa-bootstrap">
+  (function injectManifestAndSW() {
+
+    /* ── 1. SVG ICON as data URI ─────────────────────────────── */
+    const iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#1a1208"/>
+          <stop offset="100%" stop-color="#2e1f0a"/>
+        </linearGradient>
+        <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f2d27e"/>
+          <stop offset="100%" stop-color="#c8952e"/>
+        </linearGradient>
+      </defs>
+      <rect width="192" height="192" rx="40" fill="url(#bg)"/>
+      <rect x="6" y="6" width="180" height="180" rx="36" fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.7"/>
+      <!-- Piano keys decoration -->
+      <g transform="translate(22, 110)">
+        <rect x="0"  y="0" width="16" height="52" rx="3" fill="#f5ede0"/>
+        <rect x="19" y="0" width="16" height="52" rx="3" fill="#f5ede0"/>
+        <rect x="38" y="0" width="16" height="52" rx="3" fill="#f5ede0"/>
+        <rect x="57" y="0" width="16" height="52" rx="3" fill="#f5ede0"/>
+        <rect x="76" y="0" width="16" height="52" rx="3" fill="#f5ede0"/>
+        <rect x="95" y="0" width="16" height="52" rx="3" fill="#f5ede0"/>
+        <rect x="114" y="0" width="16" height="52" rx="3" fill="#f5ede0"/>
+        <rect x="133" y="0" width="16" height="52" rx="3" fill="#f5ede0"/>
+        <!-- Black keys -->
+        <rect x="12" y="0" width="12" height="34" rx="2" fill="#0d0b09"/>
+        <rect x="31" y="0" width="12" height="34" rx="2" fill="#0d0b09"/>
+        <rect x="69" y="0" width="12" height="34" rx="2" fill="#0d0b09"/>
+        <rect x="88" y="0" width="12" height="34" rx="2" fill="#0d0b09"/>
+        <rect x="107" y="0" width="12" height="34" rx="2" fill="#0d0b09"/>
+        <rect x="126" y="0" width="12" height="34" rx="2" fill="#0d0b09"/>
+      </g>
+      <!-- PPS text -->
+      <text x="96" y="98" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="46" fill="url(#gold)" letter-spacing="-2">PPS</text>
+      <!-- Subtle shine line -->
+      <line x1="30" y1="108" x2="162" y2="108" stroke="url(#gold)" stroke-width="1" opacity="0.4"/>
+    </svg>`;
+
+    const iconDataURI = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(iconSVG)));
+
+    /* ── 2. Inject <link> tags for PWA icons ─────────────────── */
+    const linkIcon = document.createElement('link');
+    linkIcon.rel = 'icon'; linkIcon.href = iconDataURI;
+    document.head.appendChild(linkIcon);
+
+    const linkApple = document.createElement('link');
+    linkApple.rel = 'apple-touch-icon'; linkApple.href = iconDataURI;
+    document.head.appendChild(linkApple);
+
+    /* ── 3. Inline Web App Manifest ──────────────────────────── */
+    const manifest = {
+      name: 'Pagot Piano Studio',
+      short_name: 'PPS',
+      description: 'Piano virtuel 88 touches avec lecteur automatique',
+      start_url: './',
+      display: 'standalone',
+      background_color: '#08080a',
+      theme_color: '#d5ac54',
+      orientation: 'any',
+      icons: [
+        { src: iconDataURI, sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
+        { src: iconDataURI, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+      ]
+    };
+    const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    const linkManifest = document.createElement('link');
+    linkManifest.rel = 'manifest'; linkManifest.href = manifestURL;
+    document.head.appendChild(linkManifest);
+
+    /* ── 4. Inline Service Worker via Blob ───────────────────── */
+    const swCode = `
+const CACHE = 'pps-v1';
+const ASSETS = [self.location.href.replace('/sw-blob', '')];
+
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(ASSETS)).catch(() => {})
+  );
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    )
+  );
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
+  e.respondWith(
+    fetch(e.request).then(r => {
+      const clone = r.clone();
+      caches.open(CACHE).then(c => c.put(e.request, clone));
+      return r;
+    }).catch(() => caches.match(e.request))
+  );
+});
+`;
+    if ('serviceWorker' in navigator) {
+      const swBlob = new Blob([swCode], { type: 'application/javascript' });
+      const swURL = URL.createObjectURL(swBlob);
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register(swURL, { scope: './' }).catch(() => {});
+      });
+    }
+  })();
+  </script>
+
+  <style>
+    /* ═══════════════════════════════════════════════════════
+       TOKENS
+    ═══════════════════════════════════════════════════════ */
+    :root {
+      color-scheme: dark;
+      --bg:           #07070a;
+      --bg-2:         #0e0d12;
+      --panel:        rgba(16,14,20,0.82);
+      --panel-strong: rgba(28,22,18,0.94);
+      --gold:         #d5ac54;
+      --gold-lt:      #f2d27e;
+      --gold-dk:      #7e5820;
+      --cream:        #f6efe1;
+      --muted:        #a09484;
+      --muted-lt:     #c4b8a8;
+      --danger:       #d45151;
+      --success:      #50c878;
+      --ink:          #09090c;
+      --white-key:    #f8f1e2;
+      --black-key:    #060608;
+      --active-w:     #ffe085;
+      --active-b:     #d5ac54;
+      --r:            20px;
+      --r-lg:         28px;
+      --shadow-lg:    0 32px 96px rgba(0,0,0,.65), 0 8px 24px rgba(0,0,0,.4);
+      --shadow-md:    0 12px 40px rgba(0,0,0,.4);
+      --glow-gold:    0 0 24px rgba(213,172,84,.55);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      min-height: 100%;
+      background: var(--bg);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: ui-serif, Georgia, Cambria, serif;
+      color: var(--cream);
+      background:
+        radial-gradient(ellipse 60% 40% at 15% 5%,  rgba(213,172,84,.14) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 35% at 85% 12%, rgba(255,235,190,.07) 0%, transparent 60%),
+        radial-gradient(ellipse 80% 60% at 50% 90%, rgba(30,18,8,.5) 0%, transparent 70%),
+        linear-gradient(160deg, #050507 0%, #0e0c14 45%, #1a1108 100%);
+      overflow-x: hidden;
+    }
+
+    /* Subtle grid texture */
+    body::before {
+      content: "";
+      position: fixed; inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 40%, black 30%, transparent 80%);
+      z-index: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       LAYOUT SHELL
+    ═══════════════════════════════════════════════════════ */
+    .app {
+      position: relative;
+      z-index: 1;
+      width: min(1520px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 max(32px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       HEADER / HERO
+    ═══════════════════════════════════════════════════════ */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--r-lg);
+      border: 1px solid rgba(213,172,84,.3);
+      padding: clamp(20px, 3.5vw, 40px) clamp(24px, 4vw, 48px);
+      background:
+        linear-gradient(115deg, rgba(6,5,8,.96) 0%, rgba(32,22,12,.80) 100%),
+        radial-gradient(ellipse 55% 80% at 78% 40%, rgba(213,172,84,.16), transparent 60%);
+      box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    /* Decorative ring */
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -80px; bottom: -80px;
+      width: 480px; height: 240px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(213,172,84,.18);
+      transform: rotate(-15deg);
+      pointer-events: none;
+    }
+
+    /* ── Brand ── */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* PPS Logo */
+    .logo-wrap {
+      flex-shrink: 0;
+      width: 80px; height: 80px;
+      border-radius: 22px;
+      border: 1px solid rgba(213,172,84,.65);
+      background: linear-gradient(145deg, #0e0c10, #231608);
+      box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,.06), var(--glow-gold);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .logo-wrap svg { width: 68px; height: 68px; }
+
+    .brand-text { display: flex; flex-direction: column; gap: 4px; }
+
+    .eyebrow {
+      color: var(--gold-lt);
+      text-transform: uppercase;
+      letter-spacing: .36em;
+      font: 700 11px/1.2 ui-sans-serif, system-ui, sans-serif;
+    }
+
+    .brand-name {
+      font-size: clamp(1.8rem, 5vw, 4.2rem);
+      line-height: .88;
+      letter-spacing: -.055em;
+      font-weight: 700;
+      text-shadow: 0 6px 28px rgba(0,0,0,.8);
+      color: var(--cream);
+    }
+
+    .brand-name em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--gold-lt), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .brand-sub {
+      font: 500 clamp(.78rem, 1.4vw, .9rem)/1.5 ui-sans-serif, system-ui, sans-serif;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* ── Status pills ── */
+    .status-pills {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border: 1px solid rgba(213,172,84,.22);
+      border-radius: 999px;
+      background: rgba(255,255,255,.045);
+      backdrop-filter: blur(16px);
+      font: 700 11px/1 ui-sans-serif, system-ui, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted-lt);
+    }
+
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 14px rgba(213,172,84,.8);
+      transition: background .3s, box-shadow .3s;
+    }
+    .dot.ok  { background: var(--success); box-shadow: 0 0 14px rgba(80,200,120,.8); }
+    .dot.off { background: var(--danger);  box-shadow: 0 0 14px rgba(212,81,81,.7); }
+
+    .btn-install {
+      appearance: none;
+      border: 0;
+      padding: 10px 20px;
+      border-radius: 999px;
+      cursor: pointer;
+      font: 800 12px/1 ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #120d04;
+      background: linear-gradient(135deg, var(--gold-lt), var(--gold));
+      box-shadow: var(--shadow-md), 0 0 20px rgba(213,172,84,.35);
+      transition: transform .15s, filter .15s;
+    }
+    .btn-install:hover  { transform: translateY(-2px); filter: brightness(1.08); }
+    .btn-install:active { transform: translateY(1px); }
+    [hidden] { display: none !important; }
+
+    /* ═══════════════════════════════════════════════════════
+       STUDIO GRID (3 cards)
+    ═══════════════════════════════════════════════════════ */
+    .studio-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, .75fr) minmax(300px, 1.5fr) minmax(260px, .80fr);
+      gap: 16px;
+    }
+
+    /* ── Card ── */
+    .card {
+      border-radius: var(--r);
+      border: 1px solid rgba(213,172,84,.2);
+      background: linear-gradient(175deg, rgba(24,20,28,.9), rgba(8,7,11,.85));
+      box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,.055);
+      backdrop-filter: blur(20px);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .card-title {
+      font: 600 1rem/1.2 ui-serif, Georgia, serif;
+      color: var(--cream);
+      letter-spacing: -.02em;
+    }
+
+    .card-tag {
+      font: 700 10px/1 ui-sans-serif, system-ui, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .2em;
+      color: var(--gold);
+      padding: 4px 9px;
+      border: 1px solid rgba(213,172,84,.3);
+      border-radius: 999px;
+      background: rgba(213,172,84,.08);
+    }
+
+    /* ── Form controls ── */
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .field label {
+      font: 700 11px/1 ui-sans-serif, system-ui, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--muted);
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select,
+    textarea {
+      font: inherit;
+      width: 100%;
+      color: var(--cream);
+      background: rgba(3,3,5,.75);
+      border: 1px solid rgba(213,172,84,.22);
+      border-radius: 13px;
+      outline: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      transition: border-color .18s, box-shadow .18s, background .18s;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select { min-height: 44px; padding: 0 14px; font-size: .9rem; }
+
+    textarea {
+      min-height: 220px;
+      resize: vertical;
+      padding: 14px 16px;
+      font: 650 15px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: #fae9bc;
+      caret-color: var(--gold-lt);
+      border-radius: 16px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(242,210,126,.8);
+      box-shadow: 0 0 0 3px rgba(213,172,84,.14), inset 0 1px 0 rgba(255,255,255,.06);
+      background: rgba(2,2,3,.88);
+    }
+
+    input::placeholder, textarea::placeholder { color: rgba(160,148,132,.5); }
+
+    /* ── Buttons ── */
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,.1);
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font: 800 12px/1 ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      color: var(--cream);
+      background: rgba(255,255,255,.08);
+      box-shadow: 0 8px 20px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.07);
+      transition: transform .15s, filter .15s, background .15s, border-color .15s;
+    }
+
+    .btn:hover  { transform: translateY(-1px); border-color: rgba(213,172,84,.35); filter: brightness(1.06); }
+    .btn:active { transform: translateY(1px) scale(.99); }
+    .btn.primary  { color: #111; background: linear-gradient(135deg, var(--gold-lt), var(--gold)); border-color: transparent; box-shadow: 0 8px 24px rgba(213,172,84,.3); }
+    .btn.success  { background: linear-gradient(135deg, #68da93, #2e9d5c); border-color: transparent; color: #0a2414; }
+    .btn.danger   { background: linear-gradient(135deg, #e47070, #a12828); border-color: transparent; color: #fff; }
+    .btn.ghost    { background: rgba(255,255,255,.05); }
+    .btn.full     { width: 100%; justify-content: center; }
+    .btn.icon-btn { padding: 0 12px; font-size: 16px; }
+
+    .lib-top { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
+
+    /* ── BPM display ── */
+    .bpm-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .bpm-wrap input { flex: 1; text-align: center; font-size: 1.6rem; font-weight: 800; letter-spacing: -.04em; }
+
+    .bpm-label {
+      font: 700 11px/1 ui-sans-serif, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      color: var(--muted);
+    }
+
+    .transport {
+      display: flex;
+      gap: 8px;
+    }
+
+    .transport .btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       PIANO STAGE
+    ═══════════════════════════════════════════════════════ */
+    .piano-stage {
+      border-radius: var(--r-lg);
+      border: 1px solid rgba(213,172,84,.28);
+      background:
+        linear-gradient(180deg, rgba(20,14,10,.98) 0%, rgba(5,5,7,.99) 100%),
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(213,172,84,.1), transparent 55%);
+      box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,.06);
+      overflow: hidden;
+    }
+
+    /* Fallboard (lid with PAGOT lettering) */
+    .fallboard {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 80px;
+      background: linear-gradient(180deg, #181010 0%, #0b0a0e 90%);
+      border-bottom: 1px solid rgba(213,172,84,.25);
+      overflow: hidden;
+    }
+
+    /* Fallboard wood grain lines */
+    .fallboard::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 18px,
+        rgba(255,255,255,.012) 18px,
+        rgba(255,255,255,.012) 19px
+      );
+    }
+
+    .fallboard-brand {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .fallboard-logo { width: 40px; height: 40px; opacity: .9; }
+
+    .fallboard-name {
+      font-size: clamp(.9rem, 2.8vw, 1.5rem);
+      font-weight: 700;
+      letter-spacing: .55em;
+      text-indent: .55em;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, var(--gold-lt) 0%, var(--gold-dk) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      filter: drop-shadow(0 2px 8px rgba(213,172,84,.35));
+    }
+
+    /* Cheeks (side pieces) */
+    .piano-body {
+      display: flex;
+    }
+    .cheek {
+      width: 18px;
+      flex-shrink: 0;
+      background: linear-gradient(90deg, #1a1008, #0c0908);
+    }
+    .cheek.right { background: linear-gradient(90deg, #0c0908, #1a1008); }
+
+    /* Key scroll area */
+    .keyboard-scroll {
+      flex: 1;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0 0 20px;
+      background: linear-gradient(180deg, #0a0809 0%, #130f0b 100%);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(213,172,84,.4) rgba(255,255,255,.04);
+    }
+    .keyboard-scroll::-webkit-scrollbar { height: 6px; }
+    .keyboard-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,.03); }
+    .keyboard-scroll::-webkit-scrollbar-thumb { background: rgba(213,172,84,.3); border-radius: 3px; }
+
+    /* Keys container */
+    .keyboard {
+      position: relative;
+      display: flex;
+      width: max-content;
+      height: 240px;
+      padding-top: 12px;
+    }
+
+    /* ── White key ── */
+    .key {
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 11px;
+      font: 900 9px/1 ui-sans-serif, system-ui, sans-serif;
+      transition: transform .06s ease, filter .07s ease, background .07s ease, box-shadow .07s ease;
+    }
+
+    .key.white {
+      width: 34px;
+      height: 220px;
+      background: linear-gradient(
+        90deg,
+        #d8d0be 0%,
+        #fff8ea 6%,
+        #f8f1e2 70%,
+        #d8cfbd 100%
+      );
+      border: 1px solid rgba(40,30,18,.32);
+      border-top: 0;
+      border-radius: 0 0 8px 8px;
+      box-shadow:
+        inset 0 -18px 28px rgba(80,56,24,.14),
+        inset 0 1px 0 rgba(255,255,255,.85),
+        0 4px 8px rgba(0,0,0,.35);
+      color: rgba(0,0,0,.4);
+      z-index: 1;
+    }
+
+    .key.black {
+      position: absolute;
+      z-index: 2;
+      width: 22px;
+      height: 140px;
+      background: linear-gradient(
+        180deg,
+        #222 0%,
+        #1a1a1a 30%,
+        #0a0a0a 60%,
+        #050505 100%
+      );
+      border: 1px solid #000;
+      border-radius: 0 0 6px 6px;
+      box-shadow:
+        inset 0 -10px 16px rgba(255,255,255,.045),
+        inset 2px 0 4px rgba(255,255,255,.02),
+        0 10px 18px rgba(0,0,0,.7);
+      color: rgba(255,255,255,.38);
+    }
+
+    /* Active states */
+    .key.active.white {
+      background: linear-gradient(180deg, #fff2cc, #e8b84e 60%, #c89030);
+      color: #2a1800;
+      transform: translateY(5px) scaleY(.985);
+      box-shadow:
+        inset 0 -8px 12px rgba(0,0,0,.1),
+        0 0 28px rgba(213,172,84,.6),
+        0 2px 4px rgba(0,0,0,.2);
+      z-index: 3;
+    }
+
+    .key.active.black {
+      background: linear-gradient(180deg, #4a3010, #d5ac54 80%);
+      color: #180e00;
+      transform: translateY(3px);
+      box-shadow: 0 0 22px rgba(213,172,84,.65);
+      z-index: 4;
+    }
+
+    /* Piano bottom rail */
+    .piano-rail {
+      height: 16px;
+      background: linear-gradient(180deg, #1a1208, #0d0a06);
+      border-top: 1px solid rgba(213,172,84,.15);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════════════ */
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: rgba(160,148,132,.5);
+      font: 500 11.5px/1.4 ui-sans-serif, system-ui, sans-serif;
+    }
+
+    .footer a { color: rgba(213,172,84,.55); text-decoration: none; }
+    .footer a:hover { color: var(--gold); }
+
+    /* ═══════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════ */
+    @media (max-width: 1060px) {
+      .studio-grid {
+        grid-template-columns: 1fr;
+      }
+      .sheet-card { order: -1; }
+    }
+
+    @media (max-width: 640px) {
+      .app { width: calc(100% - 20px); padding-top: 14px; gap: 14px; }
+      .hero { padding: 18px 20px; }
+      .logo-wrap { width: 64px; height: 64px; border-radius: 18px; }
+      .fallboard { height: 64px; }
+      .key.white { width: 30px; height: 200px; }
+      .key.black { width: 19px; height: 124px; }
+      .keyboard { height: 218px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .key, .btn, .btn-install { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<main class="app">
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       HERO HEADER
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <header class="hero" aria-label="Pagot Piano Studio">
+    <div class="brand">
+      <!-- PPS Logo SVG inline -->
+      <div class="logo-wrap" aria-hidden="true">
+        <svg viewBox="0 0 68 68" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo PPS">
+          <defs>
+            <linearGradient id="lbg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#1e1509"/>
+              <stop offset="100%" stop-color="#2d1d0a"/>
+            </linearGradient>
+            <linearGradient id="lgold" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#f5d880"/>
+              <stop offset="100%" stop-color="#b8842a"/>
+            </linearGradient>
+            <linearGradient id="lkeys" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#f0e8d5"/>
+              <stop offset="100%" stop-color="#d8ccb8"/>
+            </linearGradient>
+          </defs>
+          <!-- Background -->
+          <rect width="68" height="68" rx="16" fill="url(#lbg)"/>
+          <!-- Gold border -->
+          <rect x="2" y="2" width="64" height="64" rx="14" fill="none" stroke="url(#lgold)" stroke-width="1.2" opacity=".6"/>
+          <!-- PPS text -->
+          <text x="34" y="30" text-anchor="middle"
+                font-family="Georgia,serif" font-weight="700"
+                font-size="22" fill="url(#lgold)" letter-spacing="-1">PPS</text>
+          <!-- Divider line -->
+          <line x1="10" y1="36" x2="58" y2="36" stroke="url(#lgold)" stroke-width=".8" opacity=".45"/>
+          <!-- Piano keys illustration -->
+          <g transform="translate(8, 40)">
+            <!-- White keys -->
+            <rect x="0"  y="0" width="7" height="22" rx="1.5" fill="url(#lkeys)"/>
+            <rect x="8"  y="0" width="7" height="22" rx="1.5" fill="url(#lkeys)"/>
+            <rect x="16" y="0" width="7" height="22" rx="1.5" fill="url(#lkeys)"/>
+            <rect x="24" y="0" width="7" height="22" rx="1.5" fill="url(#lkeys)"/>
+            <rect x="32" y="0" width="7" height="22" rx="1.5" fill="url(#lkeys)"/>
+            <rect x="40" y="0" width="7" height="22" rx="1.5" fill="url(#lkeys)"/>
+            <rect x="48" y="0" width="7" height="22" rx="1.5" fill="url(#lkeys)"/>
+            <!-- Black keys -->
+            <rect x="5"  y="0" width="5" height="14" rx="1" fill="#0d0b09"/>
+            <rect x="13" y="0" width="5" height="14" rx="1" fill="#0d0b09"/>
+            <rect x="29" y="0" width="5" height="14" rx="1" fill="#0d0b09"/>
+            <rect x="37" y="0" width="5" height="14" rx="1" fill="#0d0b09"/>
+            <rect x="45" y="0" width="5" height="14" rx="1" fill="#0d0b09"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="brand-text">
+        <h1 class="brand-name"><em>Pagot</em> Piano Studio</h1>
+      </div>
+    </div>
+
+    <div class="status-pills">
+      <span class="pill">
+        <span class="dot" id="audio-dot"></span>
+        <span id="loading-status">Touchez une note pour lancer</span>
+      </span>
+      <span class="pill">
+        <span class="dot" id="network-dot"></span>
+        <span id="network-status">Réseau</span>
+      </span>
+      <button class="btn-install" id="btn-install" hidden>⬇ Installer l'app</button>
+    </div>
+  </header>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       STUDIO GRID
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <section class="studio-grid" aria-label="Contrôles du studio">
+
+    <!-- Card 1 : Lecteur -->
+    <article class="card">
+      <div class="card-header">
+        <h2 class="card-title">Lecteur automatique</h2>
+        <span class="card-tag">Tempo</span>
+      </div>
+
+      <div class="field">
+        <label for="bpm">BPM</label>
+        <div class="bpm-wrap">
+          <input type="number" id="bpm" value="200" min="10" max="1000" inputmode="numeric" />
+        </div>
+      </div>
+
+      <div class="transport">
+        <button class="btn success" id="btn-play" aria-label="Lire">▶ Lire</button>
+        <button class="btn ghost"   id="btn-pause" aria-label="Pause">⏸</button>
+        <button class="btn danger"  id="btn-stop"  aria-label="Stop">⏹</button>
+      </div>
+    </article>
+
+    <!-- Card 2 : Partition (centre) -->
+    <article class="card sheet-card">
+      <div class="card-header">
+        <h2 class="card-title">Partition</h2>
+        <span class="card-tag">Autoplayer</span>
+      </div>
+      <textarea id="sheet" spellcheck="false"
+        placeholder="Colle ou écris ta partition ici&#10;"></textarea>
+    </article>
+
+    <!-- Card 3 : Bibliothèque -->
+    <article class="card">
+      <div class="card-header">
+        <h2 class="card-title">Bibliothèque</h2>
+        <span class="card-tag">Local</span>
+      </div>
+
+      <div class="lib-top">
+        <div class="field" style="min-width:0">
+          <label for="song-title">Titre du morceau</label>
+          <input type="text" id="song-title" placeholder="Mon morceau" />
+        </div>
+        <button class="btn primary icon-btn" id="btn-save" aria-label="Sauvegarder" style="align-self:end">💾</button>
+      </div>
+
+      <div class="field">
+        <label for="song-list">Morceaux sauvegardés</label>
+        <select id="song-list">
+          <option value="">— Choisir un morceau —</option>
+        </select>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn ghost" id="btn-load" style="flex:1">📂 Charger</button>
+        <button class="btn danger" id="btn-delete">🗑</button>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       PIANO
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <section class="piano-stage" aria-label="Clavier de piano 88 touches">
+
+    <!-- Fallboard / Lid -->
+    <div class="fallboard">
+      <div class="fallboard-brand">
+        <!-- Mini logo in fallboard -->
+        <svg class="fallboard-logo" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="fg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#f5d880"/>
+              <stop offset="100%" stop-color="#9a6a20"/>
+            </linearGradient>
+          </defs>
+          <rect width="40" height="40" rx="8" fill="rgba(0,0,0,.4)"/>
+          <text x="20" y="16" text-anchor="middle" font-family="Georgia,serif"
+                font-weight="700" font-size="13" fill="url(#fg)" letter-spacing="-0.5">PPS</text>
+          <line x1="6" y1="20" x2="34" y2="20" stroke="url(#fg)" stroke-width=".6" opacity=".5"/>
+          <g transform="translate(5,23)">
+            <rect x="0" y="0" width="4" height="13" rx="1" fill="#e8dcc8"/>
+            <rect x="5" y="0" width="4" height="13" rx="1" fill="#e8dcc8"/>
+            <rect x="10" y="0" width="4" height="13" rx="1" fill="#e8dcc8"/>
+            <rect x="15" y="0" width="4" height="13" rx="1" fill="#e8dcc8"/>
+            <rect x="20" y="0" width="4" height="13" rx="1" fill="#e8dcc8"/>
+            <rect x="25" y="0" width="4" height="13" rx="1" fill="#e8dcc8"/>
+            <rect x="3" y="0" width="3" height="8" rx=".8" fill="#0d0b09"/>
+            <rect x="13" y="0" width="3" height="8" rx=".8" fill="#0d0b09"/>
+            <rect x="18" y="0" width="3" height="8" rx=".8" fill="#0d0b09"/>
+            <rect x="23" y="0" width="3" height="8" rx=".8" fill="#0d0b09"/>
+          </g>
+        </svg>
+        <span class="fallboard-name">Pagot</span>
+      </div>
+    </div>
+
+    <!-- Piano body with cheeks -->
+    <div class="piano-body">
+      <div class="cheek"></div>
+      <div class="keyboard-scroll">
+        <div class="keyboard" id="keyboard" role="group" aria-label="Touches du piano"></div>
+      </div>
+      <div class="cheek right"></div>
+    </div>
+
+    <!-- Bottom rail -->
+    <div class="piano-rail"></div>
+  </section>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       FOOTER
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <footer class="footer">
+    <span>© 2026 <strong style="color:var(--muted-lt)">Pagot Piano Studio</strong> </span>
+  </footer>
+
+</main>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     SCRIPTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<script>
+/* ─── PWA INSTALL PROMPT ─── */
+let deferredInstall = null;
+const btnInstall = document.getElementById('btn-install');
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstall = e;
+  btnInstall.hidden = false;
+});
+
+btnInstall.addEventListener('click', async () => {
+  if (!deferredInstall) return;
+  deferredInstall.prompt();
+  await deferredInstall.userChoice;
+  deferredInstall = null;
+  btnInstall.hidden = true;
+});
+
+window.addEventListener('appinstalled', () => {
+  btnInstall.hidden = true;
+  deferredInstall = null;
+});
+
+/* ─── NETWORK STATUS ─── */
+const networkDot    = document.getElementById('network-dot');
+const networkStatus = document.getElementById('network-status');
+
+function updateNetwork() {
+  const on = navigator.onLine;
+  networkDot.className = `dot ${on ? 'ok' : 'off'}`;
+  networkStatus.textContent = on ? 'En ligne' : 'Hors ligne';
+}
+
+window.addEventListener('online',  updateNetwork);
+window.addEventListener('offline', updateNetwork);
+updateNetwork();
+
+/* ─── AUDIO ENGINE ─── */
+let audioCtx, compressor;
+let hasPreloaded = false;
+const audioBuffers   = {};
+const pendingFetches = {};
+const soundfontBase  = 'https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/acoustic_grand_piano-mp3/';
+const audioDot       = document.getElementById('audio-dot');
+const loadingStatus  = document.getElementById('loading-status');
+
+function setAudioStatus(text, cls = '') {
+  loadingStatus.textContent = text;
+  audioDot.className = `dot ${cls}`;
+}
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx   = new (window.AudioContext || window.webkitAudioContext)();
+    compressor = audioCtx.createDynamicsCompressor();
+    Object.assign(compressor, {
+      threshold: { value: -6 },
+      knee:      { value: 30 },
+      ratio:     { value: 12 },
+      attack:    { value: .003 },
+      release:   { value: .25 }
+    });
+    compressor.threshold.setValueAtTime(-6,  audioCtx.currentTime);
+    compressor.knee.setValueAtTime(30,        audioCtx.currentTime);
+    compressor.ratio.setValueAtTime(12,       audioCtx.currentTime);
+    compressor.attack.setValueAtTime(.003,    audioCtx.currentTime);
+    compressor.release.setValueAtTime(.25,    audioCtx.currentTime);
+    compressor.connect(audioCtx.destination);
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (!hasPreloaded) preloadSounds();
+}
+
+async function fetchNote(name) {
+  if (audioBuffers[name]) return audioBuffers[name];
+  if (pendingFetches[name]) return pendingFetches[name];
+  pendingFetches[name] = (async () => {
+    try {
+      const file = name.replace('#', 'b');
+      const r    = await fetch(`${soundfontBase}${file}.mp3`);
+      if (!r.ok) throw new Error();
+      const buf  = await audioCtx.decodeAudioData(await r.arrayBuffer());
+      audioBuffers[name] = buf;
+      return buf;
+    } catch {
+      return null;
+    } finally {
+      delete pendingFetches[name];
+    }
+  })();
+  return pendingFetches[name];
+}
+
+function preloadSounds() {
+  hasPreloaded = true;
+  setAudioStatus('Chargement sons HD…', '');
+  let done = 0;
+  Promise.all(layoutData.map(async k => {
+    await fetchNote(k.note);
+    done++;
+    if (done % 11 === 0) setAudioStatus(`Sons HD ${done}/88`, '');
+  })).then(() => setAudioStatus('Piano prêt ✓', 'ok'));
+}
+
+function noteToFreq(note) {
+  const flat  = note.match(/^([A-G])b(\d)$/);
+  const sharp = note.match(/^([A-G])(#?)(\d)$/);
+  const semi  = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+  let n, oct, acc = 0;
+  if (flat)  { n = flat[1];  oct = +flat[2];  acc = -1; }
+  else if (sharp) { n = sharp[1]; oct = +sharp[3]; acc = sharp[2] ? 1 : 0; }
+  else return 440;
+  return 440 * Math.pow(2, (12 * (oct + 1) + semi[n] + acc - 69) / 12);
+}
+
+function playSynth(note) {
+  if (!audioCtx) return;
+  const now  = audioCtx.currentTime;
+  const freq  = noteToFreq(note);
+  const gain  = audioCtx.createGain();
+  const o1    = audioCtx.createOscillator();
+  const o2    = audioCtx.createOscillator();
+  o1.type = 'triangle'; o2.type = 'sine';
+  o1.frequency.setValueAtTime(freq,        now);
+  o2.frequency.setValueAtTime(freq * 2.01, now);
+  gain.gain.setValueAtTime(.0001,   now);
+  gain.gain.exponentialRampToValueAtTime(.36, now + .016);
+  gain.gain.exponentialRampToValueAtTime(.015, now + 1.3);
+  [o1, o2].forEach(o => { o.connect(gain); o.start(now); o.stop(now + 1.4); });
+  gain.connect(compressor);
+}
+
+function playRealTone(note) {
+  if (!audioCtx) return;
+  const buf = audioBuffers[note];
+  if (!buf) { playSynth(note); fetchNote(note); return; }
+  const src  = audioCtx.createBufferSource();
+  const gain = audioCtx.createGain();
+  src.buffer = buf;
+  gain.gain.setValueAtTime(3.2, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(.01, audioCtx.currentTime + 3);
+  src.connect(gain); gain.connect(compressor);
+  src.start(0);
+}
+
+/* ─── KEYBOARD LAYOUT (88 keys) ─── */
+const layoutData = [
+  { char: '{',  note: 'A0',  b: false }, { char: '}',  note: 'Bb0', b: true  }, { char: '[',  note: 'B0',  b: false },
+  { char: ']',  note: 'C1',  b: false }, { char: '<',  note: 'Db1', b: true  }, { char: '>',  note: 'D1',  b: false }, { char: ',',  note: 'Eb1', b: true  }, { char: '.',  note: 'E1',  b: false },
+  { char: '?',  note: 'F1',  b: false }, { char: '/',  note: 'Gb1', b: true  }, { char: ';',  note: 'G1',  b: false }, { char: ':',  note: 'Ab1', b: true  }, { char: "'",  note: 'A1',  b: false }, { char: '"',  note: 'Bb1', b: true  }, { char: '\\', note: 'B1',  b: false },
+  { char: '1',  note: 'C2',  b: false }, { char: '!',  note: 'Db2', b: true  }, { char: '2',  note: 'D2',  b: false }, { char: '@',  note: 'Eb2', b: true  }, { char: '3',  note: 'E2',  b: false },
+  { char: '4',  note: 'F2',  b: false }, { char: '$',  note: 'Gb2', b: true  }, { char: '5',  note: 'G2',  b: false }, { char: '%',  note: 'Ab2', b: true  }, { char: '6',  note: 'A2',  b: false }, { char: '^',  note: 'Bb2', b: true  }, { char: '7',  note: 'B2',  b: false },
+  { char: '8',  note: 'C3',  b: false }, { char: '*',  note: 'Db3', b: true  }, { char: '9',  note: 'D3',  b: false }, { char: '(',  note: 'Eb3', b: true  }, { char: '0',  note: 'E3',  b: false },
+  { char: 'q',  note: 'F3',  b: false }, { char: 'Q',  note: 'Gb3', b: true  }, { char: 'w',  note: 'G3',  b: false }, { char: 'W',  note: 'Ab3', b: true  }, { char: 'e',  note: 'A3',  b: false }, { char: 'E',  note: 'Bb3', b: true  }, { char: 'r',  note: 'B3',  b: false },
+  { char: 't',  note: 'C4',  b: false }, { char: 'T',  note: 'Db4', b: true  }, { char: 'y',  note: 'D4',  b: false }, { char: 'Y',  note: 'Eb4', b: true  }, { char: 'u',  note: 'E4',  b: false },
+  { char: 'i',  note: 'F4',  b: false }, { char: 'I',  note: 'Gb4', b: true  }, { char: 'o',  note: 'G4',  b: false }, { char: 'O',  note: 'Ab4', b: true  }, { char: 'p',  note: 'A4',  b: false }, { char: 'P',  note: 'Bb4', b: true  }, { char: 'a',  note: 'B4',  b: false },
+  { char: 's',  note: 'C5',  b: false }, { char: 'S',  note: 'Db5', b: true  }, { char: 'd',  note: 'D5',  b: false }, { char: 'D',  note: 'Eb5', b: true  }, { char: 'f',  note: 'E5',  b: false },
+  { char: 'g',  note: 'F5',  b: false }, { char: 'G',  note: 'Gb5', b: true  }, { char: 'h',  note: 'G5',  b: false }, { char: 'H',  note: 'Ab5', b: true  }, { char: 'j',  note: 'A5',  b: false }, { char: 'J',  note: 'Bb5', b: true  }, { char: 'k',  note: 'B5',  b: false },
+  { char: 'l',  note: 'C6',  b: false }, { char: 'L',  note: 'Db6', b: true  }, { char: 'z',  note: 'D6',  b: false }, { char: 'Z',  note: 'Eb6', b: true  }, { char: 'x',  note: 'E6',  b: false },
+  { char: 'c',  note: 'F6',  b: false }, { char: 'C',  note: 'Gb6', b: true  }, { char: 'v',  note: 'G6',  b: false }, { char: 'V',  note: 'Ab6', b: true  }, { char: 'b',  note: 'A6',  b: false }, { char: 'B',  note: 'Bb6', b: true  }, { char: 'n',  note: 'B6',  b: false },
+  { char: 'm',  note: 'C7',  b: false }, { char: '|',  note: 'Db7', b: true  }, { char: '_',  note: 'D7',  b: false }, { char: '=',  note: 'Eb7', b: true  }, { char: '+',  note: 'E7',  b: false },
+  { char: '~',  note: 'F7',  b: false }, { char: '`',  note: 'Gb7', b: true  }, { char: 'é',  note: 'G7',  b: false }, { char: 'è',  note: 'Ab7', b: true  }, { char: 'ç',  note: 'A7',  b: false }, { char: 'à',  note: 'Bb7', b: true  }, { char: 'ù',  note: 'B7',  b: false },
+  { char: 'µ',  note: 'C8',  b: false }
+];
+
+const keyMap  = {};
+const keyEls  = {};
+const kbd     = document.getElementById('keyboard');
+let   wCount  = 0;
+const mobile  = window.matchMedia('(max-width: 640px)').matches;
+const WW      = mobile ? 30 : 34;
+const BW      = mobile ? 19 : 22;
+
+layoutData.forEach(k => {
+  keyMap[k.char] = k;
+  const el = document.createElement('div');
+  el.className = `key ${k.b ? 'black' : 'white'}`;
+  el.textContent = k.char;
+  el.title = `${k.char} → ${k.note}`;
+  el.setAttribute('role', 'button');
+  el.setAttribute('aria-label', `Note ${k.note}`);
+  if (k.b) el.style.left = `${wCount * WW - BW / 2}px`;
+  else wCount++;
+  el.addEventListener('pointerdown', e => { e.preventDefault(); initAudio(); playKeyUI(k.char); });
+  keyEls[k.char] = el;
+  kbd.appendChild(el);
+});
+
+function playKeyUI(char) {
+  const k = keyMap[char];
+  if (!k) return;
+  playRealTone(k.note);
+  const el = keyEls[char];
+  if (el) {
+    el.classList.add('active');
+    setTimeout(() => el.classList.remove('active'), 140);
+  }
+}
+
+/* Keyboard events */
+window.addEventListener('keydown', e => {
+  const tag = document.activeElement.tagName;
+  if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return;
+  if (e.repeat) return;
+  initAudio();
+  if (keyMap[e.key]) playKeyUI(e.key);
+});
+
+/* ─── LIBRARY ─── */
+function getSongs()  { try { return JSON.parse(localStorage.getItem('pps-songs')) || {}; } catch { return {}; } }
+function saveSongs(s){ localStorage.setItem('pps-songs', JSON.stringify(s)); }
+
+function updateSongList() {
+  const songs  = getSongs();
+  const select = document.getElementById('song-list');
+  select.innerHTML = '<option value="">— Choisir un morceau —</option>';
+  Object.keys(songs).sort((a, b) => a.localeCompare(b)).forEach(t => {
+    const o = document.createElement('option');
+    o.value = t; o.textContent = t;
+    select.appendChild(o);
+  });
+}
+
+document.getElementById('btn-save').addEventListener('click', () => {
+  const title = document.getElementById('song-title').value.trim();
+  const sheet = document.getElementById('sheet').value.trim();
+  if (!title || !sheet) { alert('Il faut un titre et une partition !'); return; }
+  const s = getSongs(); s[title] = sheet; saveSongs(s);
+  updateSongList();
+  document.getElementById('song-list').value = title;
+  alert(`"${title}" sauvegardé dans la bibliothèque Pagot !`);
+});
+
+document.getElementById('btn-load').addEventListener('click', () => {
+  const title = document.getElementById('song-list').value;
+  if (!title) return;
+  document.getElementById('sheet').value      = getSongs()[title];
+  document.getElementById('song-title').value = title;
+});
+
+document.getElementById('btn-delete').addEventListener('click', () => {
+  const title = document.getElementById('song-list').value;
+  if (!title) return;
+  if (!confirm(`Supprimer "${title}" ?`)) return;
+  const s = getSongs(); delete s[title]; saveSongs(s);
+  updateSongList();
+  document.getElementById('sheet').value      = '';
+  document.getElementById('song-title').value = '';
+});
+
+updateSongList();
+
+/* ─── AUTO-PLAYER ─── */
+let isPlaying = false, playTimeout, tokens = [], curIdx = 0;
+const sheetArea = document.getElementById('sheet');
+
+function parseSheet(text) {
+  const out = []; let i = 0;
+  while (i < text.length) {
+    const start = i, c = text[i];
+    if (c === '[') {
+      const chord = []; i++;
+      while (i < text.length && text[i] !== ']') {
+        if (keyMap[text[i]]) chord.push(text[i]);
+        i++;
+      }
+      if (chord.length) out.push({ type: 'chord', notes: chord, start, end: Math.min(i + 1, text.length) });
+    } else if (keyMap[c]) {
+      out.push({ type: 'note', note: c, start, end: i + 1 });
+    } else if (c === '-' || c === ' ' || c === '\n' || c === '\t') {
+      out.push({ type: 'pause', start, end: i + 1 });
+    }
+    i++;
+  }
+  return out;
+}
+
+function playNextToken() {
+  if (!isPlaying || curIdx >= tokens.length) {
+    isPlaying = false; curIdx = 0; return;
+  }
+  const tok = tokens[curIdx];
+  const bpm = parseInt(document.getElementById('bpm').value, 10) || 200;
+  const ms  = Math.max(18, Math.floor(15000 / bpm));
+  sheetArea.focus({ preventScroll: true });
+  sheetArea.setSelectionRange(tok.start, tok.end);
+  if (tok.type === 'note')  playKeyUI(tok.note);
+  if (tok.type === 'chord') tok.notes.forEach(n => playKeyUI(n));
+  curIdx++;
+  playTimeout = setTimeout(playNextToken, ms);
+}
+
+document.getElementById('btn-play').addEventListener('click', () => {
+  initAudio();
+  if (!isPlaying) {
+    tokens = parseSheet(sheetArea.value);
+    if (curIdx >= tokens.length) curIdx = 0;
+    if (!tokens.length) { alert('Ajoute une partition avant de lancer la lecture.'); return; }
+    isPlaying = true; playNextToken();
+  }
+});
+
+document.getElementById('btn-pause').addEventListener('click', () => {
+  isPlaying = false; clearTimeout(playTimeout);
+});
+
+document.getElementById('btn-stop').addEventListener('click', () => {
+  isPlaying = false; clearTimeout(playTimeout); curIdx = 0;
+  sheetArea.setSelectionRange(0, 0); sheetArea.blur();
+});
+</script>
+
+</body>
+</html>
