@@ -369,8 +369,73 @@
       z-index: 4;
     }
 
-    /* Rail inférieur */
-    .piano-rail { height: 14px; background: linear-gradient(180deg, #1a1208, #0d0a06); border-top: 1px solid rgba(213,172,84,.12); }
+    /* Rail inférieur + pédale */
+    .piano-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      height: 54px;
+      background: linear-gradient(180deg, #1a1208, #0d0a06);
+      border-top: 1px solid rgba(213,172,84,.12);
+      padding: 0 20px;
+    }
+
+    /* Bouton pédale forte */
+    #btn-sustain {
+      appearance: none;
+      position: relative;
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 22px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1.5px solid rgba(213,172,84,.35);
+      background: rgba(255,255,255,.06);
+      color: var(--muted-lt);
+      font: 700 12px/1 ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);
+      transition: background .18s, border-color .18s, color .18s, box-shadow .18s, transform .1s;
+      user-select: none;
+    }
+
+    #btn-sustain:hover {
+      border-color: rgba(213,172,84,.6);
+      background: rgba(255,255,255,.1);
+    }
+
+    #btn-sustain:active { transform: translateY(2px); }
+
+    /* État activé */
+    #btn-sustain.on {
+      background: linear-gradient(135deg, rgba(213,172,84,.22), rgba(213,172,84,.08));
+      border-color: var(--gold);
+      color: var(--gold-lt);
+      box-shadow: 0 0 22px rgba(213,172,84,.45), 0 4px 14px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1);
+    }
+
+    /* Icône pédale SVG inline */
+    .pedal-icon { width: 20px; height: 20px; flex-shrink: 0; }
+
+    /* Indicateur lumineux */
+    .pedal-led {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,.15);
+      box-shadow: none;
+      transition: background .18s, box-shadow .18s;
+    }
+    #btn-sustain.on .pedal-led {
+      background: var(--gold-lt);
+      box-shadow: 0 0 10px rgba(242,210,126,.9);
+    }
+
+    .pedal-hint {
+      color: rgba(160,148,132,.38);
+      font: 500 11px/1 ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: .05em;
+    }
 
     /* ═══════════════════════════════════════════════
        FOOTER
@@ -516,7 +581,21 @@
       <div class="cheek right"></div>
     </div>
 
-    <div class="piano-rail"></div>
+    <!-- Pédale forte -->
+    <div class="piano-bottom">
+      <button id="btn-sustain" aria-pressed="false" title="Pédale forte (Espace)">
+        <!-- Icône pédale SVG -->
+        <svg class="pedal-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="2" y="13" width="16" height="5" rx="2.5" fill="currentColor" opacity=".7"/>
+          <rect x="6" y="4" width="3" height="9" rx="1.5" fill="currentColor"/>
+          <rect x="11" y="4" width="3" height="9" rx="1.5" fill="currentColor"/>
+          <rect x="4" y="3" width="12" height="3" rx="1.5" fill="currentColor" opacity=".5"/>
+        </svg>
+        Pédale forte
+        <span class="pedal-led"></span>
+      </button>
+      <span class="pedal-hint">Espace · maintenir pour sustain continu</span>
+    </div>
   </section>
 
   <!-- ── FOOTER ──────────────────────────────────── -->
@@ -575,11 +654,37 @@ window.addEventListener('online',  updateNetwork);
 window.addEventListener('offline', updateNetwork);
 updateNetwork();
 
+/* ── Pédale forte ─────────────────────────────── */
+let sustainOn = false;
+const btnSustain = document.getElementById('btn-sustain');
+
+function setSustain(on) {
+  sustainOn = on;
+  btnSustain.classList.toggle('on', on);
+  btnSustain.setAttribute('aria-pressed', String(on));
+  // Quand on relâche la pédale, on stoppe toutes les notes sustenues
+  if (!on) stopAllSustained();
+}
+
+btnSustain.addEventListener('click', () => setSustain(!sustainOn));
+
+// Espace = toggle pédale (hors champs texte)
+window.addEventListener('keydown', e => {
+  if (e.code === 'Space' && document.activeElement.tagName !== 'TEXTAREA'
+      && document.activeElement.tagName !== 'INPUT') {
+    e.preventDefault();
+    setSustain(!sustainOn);
+  }
+});
+
 /* ── Moteur audio ─────────────────────────────── */
-let audioCtx, compressor;
+let audioCtx, compressor, sustainBus, dryGain, wetGain;
 let hasPreloaded = false;
 const audioBuffers   = {};
 const pendingFetches = {};
+// Notes actuellement "sustenues" : note → { gainNode, sourceNode }
+const sustainedNotes = {};
+
 const soundfontBase  = 'https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/acoustic_grand_piano-mp3/';
 const audioDot       = document.getElementById('audio-dot');
 const loadingStatus  = document.getElementById('loading-status');
@@ -589,19 +694,72 @@ function setAudioStatus(text, cls = '') {
   audioDot.className = `dot ${cls}`;
 }
 
+/* ─ Génère un buffer de reverb synthétique (impulse response courte) ─ */
+function makeReverbBuffer(duration = 2.8, decay = 2.2) {
+  const rate     = audioCtx.sampleRate;
+  const length   = Math.floor(rate * duration);
+  const buf      = audioCtx.createBuffer(2, length, rate);
+  for (let ch = 0; ch < 2; ch++) {
+    const data = buf.getChannelData(ch);
+    for (let i = 0; i < length; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+    }
+  }
+  return buf;
+}
+
 function initAudio() {
   if (!audioCtx) {
     audioCtx   = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Compresseur master
     compressor = audioCtx.createDynamicsCompressor();
-    compressor.threshold.setValueAtTime(-5,   audioCtx.currentTime);
-    compressor.knee.setValueAtTime(30,         audioCtx.currentTime);
-    compressor.ratio.setValueAtTime(12,        audioCtx.currentTime);
-    compressor.attack.setValueAtTime(.003,     audioCtx.currentTime);
-    compressor.release.setValueAtTime(.25,     audioCtx.currentTime);
+    compressor.threshold.setValueAtTime(-5,  audioCtx.currentTime);
+    compressor.knee.setValueAtTime(30,        audioCtx.currentTime);
+    compressor.ratio.setValueAtTime(12,       audioCtx.currentTime);
+    compressor.attack.setValueAtTime(.003,    audioCtx.currentTime);
+    compressor.release.setValueAtTime(.25,    audioCtx.currentTime);
     compressor.connect(audioCtx.destination);
+
+    // Bus reverb (sustain) — convolver avec IR synthétique
+    sustainBus = audioCtx.createConvolver();
+    sustainBus.buffer = makeReverbBuffer();
+
+    // Mix dry/wet pour la reverb de sustain
+    dryGain = audioCtx.createGain(); dryGain.gain.value = 1.0;
+    wetGain = audioCtx.createGain(); wetGain.gain.value = 0.0; // off par défaut
+
+    dryGain.connect(compressor);
+    sustainBus.connect(wetGain);
+    wetGain.connect(compressor);
   }
   if (audioCtx.state === 'suspended') audioCtx.resume();
   if (!hasPreloaded) preloadSounds();
+}
+
+/* Met à jour le mix wet en temps réel selon l'état de la pédale */
+function updateSustainMix() {
+  if (!wetGain) return;
+  const now = audioCtx.currentTime;
+  if (sustainOn) {
+    wetGain.gain.setTargetAtTime(0.45, now, 0.05);
+    dryGain.gain.setTargetAtTime(0.85, now, 0.05);
+  } else {
+    wetGain.gain.setTargetAtTime(0.0,  now, 0.08);
+    dryGain.gain.setTargetAtTime(1.0,  now, 0.08);
+  }
+}
+
+/* Stoppe proprement toutes les notes sustenues */
+function stopAllSustained() {
+  const now = audioCtx ? audioCtx.currentTime : 0;
+  for (const [note, obj] of Object.entries(sustainedNotes)) {
+    try {
+      obj.gainNode.gain.setTargetAtTime(0.0001, now, 0.18);
+      obj.source.stop(now + 0.8);
+    } catch {}
+    delete sustainedNotes[note];
+  }
 }
 
 async function fetchNote(name) {
@@ -645,31 +803,59 @@ function noteToFreq(note) {
 
 function playSynth(note) {
   if (!audioCtx) return;
-  const now = audioCtx.currentTime, freq = noteToFreq(note);
-  const g   = audioCtx.createGain();
-  const o1  = audioCtx.createOscillator();
-  const o2  = audioCtx.createOscillator();
+  const now  = audioCtx.currentTime, freq = noteToFreq(note);
+  const g    = audioCtx.createGain();
+  const o1   = audioCtx.createOscillator();
+  const o2   = audioCtx.createOscillator();
   o1.type = 'triangle'; o2.type = 'sine';
   o1.frequency.setValueAtTime(freq,        now);
   o2.frequency.setValueAtTime(freq * 2.01, now);
+
+  const releaseTime = sustainOn ? 5.0 : 1.3;
+  const stopTime    = sustainOn ? 5.2 : 1.5;
+
   g.gain.setValueAtTime(.0001, now);
-  g.gain.exponentialRampToValueAtTime(.36,  now + .016);
-  g.gain.exponentialRampToValueAtTime(.015, now + 1.3);
-  [o1, o2].forEach(o => { o.connect(g); o.start(now); o.stop(now + 1.4); });
-  g.connect(compressor);
+  g.gain.exponentialRampToValueAtTime(.36,     now + .016);
+  g.gain.exponentialRampToValueAtTime(.015,    now + releaseTime);
+  [o1, o2].forEach(o => { o.connect(g); o.start(now); o.stop(now + stopTime); });
+  g.connect(dryGain);
+  if (sustainOn) g.connect(sustainBus);
 }
 
 function playRealTone(note) {
   if (!audioCtx) return;
+  updateSustainMix();
+
   const buf = audioBuffers[note];
   if (!buf) { playSynth(note); fetchNote(note); return; }
+
+  const now  = audioCtx.currentTime;
   const src  = audioCtx.createBufferSource();
   const gain = audioCtx.createGain();
   src.buffer = buf;
-  gain.gain.setValueAtTime(3.2, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(.01, audioCtx.currentTime + 3);
-  src.connect(gain); gain.connect(compressor);
-  src.start(0);
+
+  if (sustainOn) {
+    // Pédale active : long sustain — le son dure 8s avec queue reverb
+    gain.gain.setValueAtTime(3.2, now);
+    gain.gain.exponentialRampToValueAtTime(.18, now + 4.5);
+    gain.gain.exponentialRampToValueAtTime(.001, now + 8.0);
+    src.connect(gain);
+    gain.connect(dryGain);
+    gain.connect(sustainBus);   // envoie dans la reverb de sustain
+    src.start(0);
+    // Mémorise pour stopper proprement au relâchement de la pédale
+    if (sustainedNotes[note]) {
+      try { sustainedNotes[note].source.stop(now + 0.05); } catch {}
+    }
+    sustainedNotes[note] = { gainNode: gain, source: src };
+  } else {
+    // Pédale inactive : release normal court
+    gain.gain.setValueAtTime(3.2, now);
+    gain.gain.exponentialRampToValueAtTime(.01, now + 3.0);
+    src.connect(gain);
+    gain.connect(dryGain);
+    src.start(0);
+  }
 }
 
 /* ── Clavier 88 touches ───────────────────────── */
