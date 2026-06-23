@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1208"/>
+      <stop offset="100%" stop-color="#2e1f0a"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f5d880"/>
+      <stop offset="100%" stop-color="#b8842a"/>
+    </linearGradient>
+    <linearGradient id="keys" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0e8d5"/>
+      <stop offset="100%" stop-color="#d4c9b0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fond arrondi -->
+  <rect width="192" height="192" rx="42" fill="url(#bg)"/>
+  <!-- Bordure dorée -->
+  <rect x="5" y="5" width="182" height="182" rx="38" fill="none" stroke="url(#gold)" stroke-width="2.5" opacity=".7"/>
+  <!-- Reflet subtil en haut -->
+  <rect x="20" y="8" width="152" height="2" rx="1" fill="white" opacity=".08"/>
+
+  <!-- Texte PPS -->
+  <text x="96" y="90"
+    text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-weight="700"
+    font-size="58"
+    letter-spacing="-2"
+    fill="url(#gold)">PPS</text>
+
+  <!-- Ligne séparatrice -->
+  <line x1="26" y1="100" x2="166" y2="100" stroke="url(#gold)" stroke-width="1.2" opacity=".5"/>
+
+  <!-- Clavier piano décoratif -->
+  <g transform="translate(22, 110)">
+    <!-- Touches blanches -->
+    <rect x="0"   y="0" width="18" height="62" rx="3" fill="url(#keys)"/>
+    <rect x="21"  y="0" width="18" height="62" rx="3" fill="url(#keys)"/>
+    <rect x="42"  y="0" width="18" height="62" rx="3" fill="url(#keys)"/>
+    <rect x="63"  y="0" width="18" height="62" rx="3" fill="url(#keys)"/>
+    <rect x="84"  y="0" width="18" height="62" rx="3" fill="url(#keys)"/>
+    <rect x="105" y="0" width="18" height="62" rx="3" fill="url(#keys)"/>
+    <rect x="126" y="0" width="18" height="62" rx="3" fill="url(#keys)"/>
+    <!-- Touches noires -->
+    <rect x="13"  y="0" width="13" height="40" rx="2" fill="#0d0b09"/>
+    <rect x="34"  y="0" width="13" height="40" rx="2" fill="#0d0b09"/>
+    <rect x="75"  y="0" width="13" height="40" rx="2" fill="#0d0b09"/>
+    <rect x="96"  y="0" width="13" height="40" rx="2" fill="#0d0b09"/>
+    <rect x="117" y="0" width="13" height="40" rx="2" fill="#0d0b09"/>
+    <!-- Reflets touches noires -->
+    <rect x="14"  y="1" width="4" height="8" rx="1" fill="white" opacity=".15"/>
+    <rect x="35"  y="1" width="4" height="8" rx="1" fill="white" opacity=".15"/>
+    <rect x="76"  y="1" width="4" height="8" rx="1" fill="white" opacity=".15"/>
+    <rect x="97"  y="1" width="4" height="8" rx="1" fill="white" opacity=".15"/>
+    <rect x="118" y="1" width="4" height="8" rx="1" fill="white" opacity=".15"/>
+  </g>
+</svg>
