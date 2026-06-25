@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#d5ac54" />
+  <meta name="description" content="Pagot Piano Studio : piano virtuel 88 touches, lecteur automatique, bibliothèque locale." />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="PPS" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Pagot Piano Studio</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon-192.svg" />
+
+  <style>
+    /* ═══════════════════════════════════════════════
+       TOKENS
+    ═══════════════════════════════════════════════ */
+    :root {
+      color-scheme: dark;
+      --bg:        #07070a;
+      --gold:      #d5ac54;
+      --gold-lt:   #f2d27e;
+      --gold-dk:   #7e5820;
+      --cream:     #f6efe1;
+      --muted:     #a09484;
+      --muted-lt:  #c4b8a8;
+      --danger:    #d45151;
+      --success:   #50c878;
+      --r:         20px;
+      --r-lg:      28px;
+      --shadow:    0 28px 80px rgba(0,0,0,.6), 0 8px 20px rgba(0,0,0,.35);
+      --glow:      0 0 28px rgba(213,172,84,.5);
+    }
+
+    /* ═══════════════════════════════════════════════
+       BASE
+    ═══════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { min-height: 100%; background: var(--bg); }
+
+    body {
+      min-height: 100vh;
+      font-family: ui-serif, Georgia, Cambria, serif;
+      color: var(--cream);
+      background:
+        radial-gradient(ellipse 55% 38% at 12% 8%,  rgba(213,172,84,.16), transparent 65%),
+        radial-gradient(ellipse 45% 32% at 88% 14%, rgba(255,235,190,.08), transparent 55%),
+        linear-gradient(150deg, #050508 0%, #0e0c14 50%, #1a1108 100%);
+      overflow-x: hidden;
+    }
+
+    /* Grain texture */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(ellipse 85% 75% at 50% 40%, black 20%, transparent 80%);
+    }
+
+    /* ═══════════════════════════════════════════════
+       LAYOUT
+    ═══════════════════════════════════════════════ */
+    .app {
+      position: relative; z-index: 1;
+      width: min(1500px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 26px 0 max(30px, env(safe-area-inset-bottom));
+      display: flex; flex-direction: column; gap: 18px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════════ */
+    .hero {
+      position: relative; overflow: hidden;
+      border-radius: var(--r-lg);
+      border: 1px solid rgba(213,172,84,.32);
+      padding: clamp(18px, 3.5vw, 38px) clamp(22px, 4vw, 46px);
+      background:
+        linear-gradient(112deg, rgba(6,5,9,.96) 0%, rgba(30,20,12,.8) 100%),
+        radial-gradient(ellipse 52% 75% at 80% 38%, rgba(213,172,84,.17), transparent 58%);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.07);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 20px; flex-wrap: wrap;
+    }
+
+    /* Cercle décoratif */
+    .hero::after {
+      content: ""; position: absolute; right: -100px; bottom: -100px;
+      width: 500px; height: 250px; border-radius: 50%;
+      border: 1.5px solid rgba(213,172,84,.2); transform: rotate(-14deg);
+      pointer-events: none;
+    }
+
+    /* ── Marque ── */
+    .brand { display: flex; align-items: center; gap: 20px; position: relative; z-index: 1; }
+
+    .logo-box {
+      flex-shrink: 0;
+      width: 78px; height: 78px; border-radius: 22px;
+      border: 1px solid rgba(213,172,84,.65);
+      background: linear-gradient(145deg, #0e0c10, #231608);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.06), var(--glow);
+      display: grid; place-items: center; overflow: hidden;
+    }
+
+    .logo-box img, .logo-box svg { width: 66px; height: 66px; }
+
+    .brand-text { display: flex; flex-direction: column; gap: 4px; }
+
+    .eyebrow {
+      color: var(--gold-lt);
+      text-transform: uppercase; letter-spacing: .34em;
+      font: 700 11px/1.2 ui-sans-serif, system-ui, sans-serif;
+    }
+
+    .brand-name {
+      font-size: clamp(1.85rem, 5.5vw, 4.4rem);
+      line-height: .9; letter-spacing: -.055em; font-weight: 700;
+      text-shadow: 0 6px 28px rgba(0,0,0,.8); color: var(--cream);
+    }
+
+    .brand-name em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--gold-lt), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .brand-sub {
+      font: 500 clamp(.78rem, 1.4vw, .88rem)/1.5 ui-sans-serif, system-ui, sans-serif;
+      color: var(--muted); margin-top: 5px;
+    }
+
+    /* ── Status pills ── */
+    .pills { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; position: relative; z-index: 1; }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 999px;
+      border: 1px solid rgba(213,172,84,.22);
+      background: rgba(255,255,255,.045); backdrop-filter: blur(16px);
+      font: 700 11px/1 ui-sans-serif, system-ui, sans-serif;
+      text-transform: uppercase; letter-spacing: .07em; color: var(--muted-lt);
+    }
+
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--gold); box-shadow: 0 0 14px rgba(213,172,84,.8);
+      transition: background .3s, box-shadow .3s;
+    }
+    .dot.ok  { background: var(--success); box-shadow: 0 0 14px rgba(80,200,120,.8); }
+    .dot.off { background: var(--danger);  box-shadow: 0 0 14px rgba(212,81,81,.7); }
+
+    #btn-install {
+      appearance: none; border: 0;
+      padding: 10px 18px; border-radius: 999px; cursor: pointer;
+      font: 800 12px/1 ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: .06em; text-transform: uppercase;
+      color: #120d04;
+      background: linear-gradient(135deg, var(--gold-lt), var(--gold));
+      box-shadow: var(--shadow), 0 0 20px rgba(213,172,84,.3);
+      transition: transform .15s, filter .15s;
+    }
+    #btn-install:hover  { transform: translateY(-2px); filter: brightness(1.08); }
+    #btn-install:active { transform: translateY(1px); }
+    [hidden] { display: none !important; }
+
+    /* ═══════════════════════════════════════════════
+       STUDIO GRID
+    ═══════════════════════════════════════════════ */
+    .studio-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, .78fr) minmax(300px, 1.5fr) minmax(260px, .82fr);
+      gap: 16px;
+    }
+
+    .card {
+      border-radius: var(--r);
+      border: 1px solid rgba(213,172,84,.2);
+      background: linear-gradient(175deg, rgba(24,20,28,.9), rgba(8,7,11,.85));
+      box-shadow: 0 18px 50px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.055);
+      backdrop-filter: blur(20px);
+      padding: 20px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+
+    .card-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+
+    .card-title { font: 600 1rem/1.2 ui-serif, Georgia, serif; color: var(--cream); letter-spacing: -.02em; }
+
+    .tag {
+      font: 700 10px/1 ui-sans-serif, system-ui, sans-serif;
+      text-transform: uppercase; letter-spacing: .2em; color: var(--gold);
+      padding: 4px 9px; border: 1px solid rgba(213,172,84,.3); border-radius: 999px;
+      background: rgba(213,172,84,.08);
+    }
+
+    /* ── Champs ── */
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field label {
+      font: 700 11px/1 ui-sans-serif, system-ui, sans-serif;
+      text-transform: uppercase; letter-spacing: .12em; color: var(--muted);
+    }
+
+    input[type="number"], input[type="text"], select, textarea {
+      font: inherit; width: 100%; color: var(--cream);
+      background: rgba(3,3,5,.75);
+      border: 1px solid rgba(213,172,84,.22); border-radius: 13px;
+      outline: none; box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      transition: border-color .18s, box-shadow .18s, background .18s;
+    }
+
+    input[type="number"], input[type="text"], select { min-height: 46px; padding: 0 14px; font-size: .9rem; }
+
+    textarea {
+      min-height: 232px; resize: vertical; padding: 14px 16px;
+      font: 650 15px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: #fae9bc; caret-color: var(--gold-lt); border-radius: 16px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(242,210,126,.8);
+      box-shadow: 0 0 0 3px rgba(213,172,84,.14), inset 0 1px 0 rgba(255,255,255,.06);
+      background: rgba(2,2,3,.88);
+    }
+
+    input::placeholder, textarea::placeholder { color: rgba(160,148,132,.5); }
+
+    /* ── Boutons ── */
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,.1);
+      min-height: 44px; padding: 0 16px; border-radius: 12px; cursor: pointer;
+      font: 800 12px/1 ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: .03em; text-transform: uppercase;
+      color: var(--cream); background: rgba(255,255,255,.08);
+      box-shadow: 0 8px 20px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.07);
+      transition: transform .15s, filter .15s, background .15s, border-color .15s;
+    }
+    .btn:hover  { transform: translateY(-1px); border-color: rgba(213,172,84,.35); filter: brightness(1.07); }
+    .btn:active { transform: translateY(1px) scale(.99); }
+    .btn.primary { color: #111; background: linear-gradient(135deg, var(--gold-lt), var(--gold)); border-color: transparent; box-shadow: 0 8px 24px rgba(213,172,84,.28); }
+    .btn.success { background: linear-gradient(135deg, #68da93, #2e9d5c); border-color: transparent; color: #0a2414; }
+    .btn.danger  { background: linear-gradient(135deg, #e47070, #a12828); border-color: transparent; color: #fff; }
+    .btn.ghost   { background: rgba(255,255,255,.05); }
+
+    .lib-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
+
+    /* BPM large */
+    .bpm-input { text-align: center; font-size: 1.7rem !important; font-weight: 800; letter-spacing: -.04em; }
+
+    .transport { display: flex; gap: 8px; }
+    .transport .btn { flex: 1; justify-content: center; display: flex; align-items: center; gap: 6px; }
+
+    /* ═══════════════════════════════════════════════
+       PIANO STAGE
+    ═══════════════════════════════════════════════ */
+    .piano-stage {
+      border-radius: var(--r-lg);
+      border: 1px solid rgba(213,172,84,.28);
+      background: linear-gradient(180deg, rgba(18,12,8,.99) 0%, rgba(5,5,7,.99) 100%);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.06);
+      overflow: hidden;
+    }
+
+    /* Fallboard */
+    .fallboard {
+      position: relative; overflow: hidden;
+      height: 76px;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, #180f0b 0%, #080708 88%);
+      border-bottom: 1px solid rgba(213,172,84,.22);
+    }
+
+    /* Grain bois */
+    .fallboard::before {
+      content: ""; position: absolute; inset: 0;
+      background: repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(255,255,255,.012) 20px, rgba(255,255,255,.012) 21px);
+    }
+
+    .fallboard-inner {
+      position: relative; z-index: 1;
+      display: flex; align-items: center; gap: 16px;
+    }
+
+    .fallboard-logo { width: 38px; height: 38px; opacity: .9; }
+
+    .fallboard-name {
+      font-size: clamp(.9rem, 3vw, 1.52rem);
+      font-weight: 700; letter-spacing: .55em; text-indent: .55em;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, var(--gold-lt) 0%, var(--gold-dk) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 2px 8px rgba(213,172,84,.3));
+    }
+
+    /* Corps */
+    .piano-body { display: flex; }
+    .cheek { width: 16px; flex-shrink: 0; background: linear-gradient(90deg, #1a1008, #0c0908); }
+    .cheek.right { background: linear-gradient(90deg, #0c0908, #1a1008); }
+
+    .keyboard-scroll {
+      flex: 1; overflow-x: auto; overflow-y: hidden;
+      padding: 0 0 18px;
+      background: linear-gradient(180deg, #0a0809 0%, #130f0b 100%);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(213,172,84,.4) rgba(255,255,255,.04);
+    }
+    .keyboard-scroll::-webkit-scrollbar { height: 5px; }
+    .keyboard-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,.03); }
+    .keyboard-scroll::-webkit-scrollbar-thumb { background: rgba(213,172,84,.3); border-radius: 3px; }
+
+    .keyboard { position: relative; display: flex; width: max-content; height: 240px; padding-top: 12px; }
+
+    /* Touches blanches */
+    .key {
+      cursor: pointer; user-select: none; touch-action: manipulation;
+      display: flex; align-items: flex-end; justify-content: center;
+      padding-bottom: 11px;
+      font: 900 9px/1 ui-sans-serif, system-ui, sans-serif;
+      transition: transform .06s, background .07s, box-shadow .07s;
+    }
+
+    .key.white {
+      width: 34px; height: 220px;
+      background: linear-gradient(90deg, #d9d1bf, #fff9eb 7%, #f8f1e3 72%, #d9d1bf);
+      border: 1px solid rgba(40,30,18,.34); border-top: 0;
+      border-radius: 0 0 8px 8px;
+      box-shadow: inset 0 -18px 28px rgba(80,56,24,.14), inset 0 1px 0 rgba(255,255,255,.85), 0 4px 8px rgba(0,0,0,.3);
+      color: rgba(0,0,0,.38); z-index: 1;
+    }
+
+    .key.black {
+      position: absolute; z-index: 2;
+      width: 22px; height: 140px;
+      background: linear-gradient(180deg, #222 0%, #1a1a1a 30%, #0a0a0a 62%, #050505 100%);
+      border: 1px solid #000; border-radius: 0 0 6px 6px;
+      box-shadow: inset 0 -10px 16px rgba(255,255,255,.04), inset 2px 0 4px rgba(255,255,255,.02), 0 10px 18px rgba(0,0,0,.7);
+      color: rgba(255,255,255,.35);
+    }
+
+    /* Touche active */
+    .key.active.white {
+      background: linear-gradient(180deg, #fff4d0, #e8b84e 60%, #c89030);
+      color: #2a1800;
+      transform: translateY(5px) scaleY(.986);
+      box-shadow: inset 0 -8px 12px rgba(0,0,0,.1), 0 0 28px rgba(213,172,84,.65), 0 2px 4px rgba(0,0,0,.2);
+      z-index: 3;
+    }
+
+    .key.active.black {
+      background: linear-gradient(180deg, #4a3010, #d5ac54 80%);
+      color: #180e00;
+      transform: translateY(3px);
+      box-shadow: 0 0 22px rgba(213,172,84,.7);
+      z-index: 4;
+    }
+
+    /* Rail inférieur + pédale */
+    .piano-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      height: 54px;
+      background: linear-gradient(180deg, #1a1208, #0d0a06);
+      border-top: 1px solid rgba(213,172,84,.12);
+      padding: 0 20px;
+    }
+
+    /* Bouton pédale forte */
+    #btn-sustain {
+      appearance: none;
+      position: relative;
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 22px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1.5px solid rgba(213,172,84,.35);
+      background: rgba(255,255,255,.06);
+      color: var(--muted-lt);
+      font: 700 12px/1 ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);
+      transition: background .18s, border-color .18s, color .18s, box-shadow .18s, transform .1s;
+      user-select: none;
+    }
+
+    #btn-sustain:hover {
+      border-color: rgba(213,172,84,.6);
+      background: rgba(255,255,255,.1);
+    }
+
+    #btn-sustain:active { transform: translateY(2px); }
+
+    /* État activé */
+    #btn-sustain.on {
+      background: linear-gradient(135deg, rgba(213,172,84,.22), rgba(213,172,84,.08));
+      border-color: var(--gold);
+      color: var(--gold-lt);
+      box-shadow: 0 0 22px rgba(213,172,84,.45), 0 4px 14px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1);
+    }
+
+    /* Icône pédale SVG inline */
+    .pedal-icon { width: 20px; height: 20px; flex-shrink: 0; }
+
+    /* Indicateur lumineux */
+    .pedal-led {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,.15);
+      box-shadow: none;
+      transition: background .18s, box-shadow .18s;
+    }
+    #btn-sustain.on .pedal-led {
+      background: var(--gold-lt);
+      box-shadow: 0 0 10px rgba(242,210,126,.9);
+    }
+
+    .pedal-hint {
+      color: rgba(160,148,132,.38);
+      font: 500 11px/1 ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: .05em;
+    }
+
+    /* ═══════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════ */
+    footer {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap;
+      color: rgba(160,148,132,.48);
+      font: 500 11.5px/1.4 ui-sans-serif, system-ui, sans-serif;
+    }
+
+    footer a { color: rgba(213,172,84,.55); text-decoration: none; }
+    footer a:hover { color: var(--gold); }
+    code { color: var(--gold); background: rgba(213,172,84,.1); padding: 2px 6px; border-radius: 5px; font-size: .88em; }
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════ */
+    @media (max-width: 1060px) {
+      .studio-grid { grid-template-columns: 1fr; }
+      .sheet-card { order: -1; }
+    }
+
+    @media (max-width: 640px) {
+      .app { width: calc(100% - 20px); padding-top: 14px; gap: 14px; }
+      .hero { padding: 18px 20px; }
+      .logo-box { width: 62px; height: 62px; border-radius: 18px; }
+      .key.white { width: 30px; height: 200px; }
+      .key.black { width: 19px; height: 124px; }
+      .keyboard { height: 218px; }
+      .fallboard { height: 60px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .key, .btn, #btn-install { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+<main class="app">
+
+  <!-- ── HEADER ──────────────────────────────────── -->
+  <header class="hero" aria-label="Pagot Piano Studio">
+    <div class="brand">
+      <div class="logo-box" aria-hidden="true">
+        <img src="icon-192.svg" alt="Logo PPS" width="66" height="66" />
+      </div>
+      <div class="brand-text">
+        <p class="eyebrow">Studio de musique</p>
+        <h1 class="brand-name"><em>Pagot</em> Piano Studio</h1>
+        <p class="brand-sub">Piano 88 touches · Lecteur automatique · Bibliothèque locale</p>
+      </div>
+    </div>
+
+    <div class="pills">
+      <span class="pill">
+        <span class="dot" id="audio-dot"></span>
+        <span id="loading-status">Touchez une note pour lancer</span>
+      </span>
+      <span class="pill">
+        <span class="dot" id="network-dot"></span>
+        <span id="network-status">Réseau</span>
+      </span>
+      <button id="btn-install" hidden>⬇ Installer l'app</button>
+    </div>
+  </header>
+
+  <!-- ── STUDIO GRID ─────────────────────────────── -->
+  <section class="studio-grid" aria-label="Contrôles du studio">
+
+    <!-- Lecteur -->
+    <article class="card">
+      <div class="card-head">
+        <h2 class="card-title">Lecteur automatique</h2>
+        <span class="tag">Tempo</span>
+      </div>
+      <div class="field">
+        <label for="bpm">BPM</label>
+        <input type="number" id="bpm" class="bpm-input" value="200" min="10" max="1000" inputmode="numeric" />
+      </div>
+      <div class="transport">
+        <button class="btn success" id="btn-play">▶ Lire</button>
+        <button class="btn ghost"   id="btn-pause">⏸</button>
+        <button class="btn danger"  id="btn-stop">⏹</button>
+      </div>
+      <p style="font:500 12px/1.5 ui-sans-serif,sans-serif;color:var(--muted);margin-top:auto;">
+        Les notes s'allument en temps réel sur le clavier.
+      </p>
+    </article>
+
+    <!-- Partition -->
+    <article class="card sheet-card">
+      <div class="card-head">
+        <h2 class="card-title">Partition</h2>
+        <span class="tag">Autoplayer</span>
+      </div>
+      <textarea id="sheet" spellcheck="false"
+        placeholder="Colle ou écris ta partition ici&#10;Exemple : t y u i o p a s d f&#10;Accords entre crochets : [tyi]"></textarea>
+    </article>
+
+    <!-- Bibliothèque -->
+    <article class="card">
+      <div class="card-head">
+        <h2 class="card-title">Bibliothèque</h2>
+        <span class="tag">Local</span>
+      </div>
+      <div class="lib-row">
+        <div class="field">
+          <label for="song-title">Titre</label>
+          <input type="text" id="song-title" placeholder="Mon morceau" />
+        </div>
+        <button class="btn primary" id="btn-save" aria-label="Sauvegarder" style="align-self:end;padding:0 14px;">💾</button>
+      </div>
+      <div class="field">
+        <label for="song-list">Morceaux sauvegardés</label>
+        <select id="song-list"><option value="">— Choisir un morceau —</option></select>
+      </div>
+      <div class="btn-row">
+        <button class="btn ghost" id="btn-load" style="flex:1">📂 Charger</button>
+        <button class="btn danger" id="btn-delete">🗑</button>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- ── PIANO ───────────────────────────────────── -->
+  <section class="piano-stage" aria-label="Clavier de piano 88 touches">
+
+    <!-- Couvercle -->
+    <div class="fallboard">
+      <div class="fallboard-inner">
+        <img class="fallboard-logo" src="icon-192.svg" alt="" aria-hidden="true" />
+        <span class="fallboard-name">Pagot</span>
+      </div>
+    </div>
+
+    <!-- Clavier -->
+    <div class="piano-body">
+      <div class="cheek"></div>
+      <div class="keyboard-scroll">
+        <div class="keyboard" id="keyboard" role="group" aria-label="Touches du piano"></div>
+      </div>
+      <div class="cheek right"></div>
+    </div>
+
+    <!-- Pédale forte -->
+    <div class="piano-bottom">
+      <button id="btn-sustain" aria-pressed="false" title="Pédale forte (Espace)">
+        <!-- Icône pédale SVG -->
+        <svg class="pedal-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="2" y="13" width="16" height="5" rx="2.5" fill="currentColor" opacity=".7"/>
+          <rect x="6" y="4" width="3" height="9" rx="1.5" fill="currentColor"/>
+          <rect x="11" y="4" width="3" height="9" rx="1.5" fill="currentColor"/>
+          <rect x="4" y="3" width="12" height="3" rx="1.5" fill="currentColor" opacity=".5"/>
+        </svg>
+        Pédale forte
+        <span class="pedal-led"></span>
+      </button>
+      <span class="pedal-hint">Espace · maintenir pour sustain continu</span>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ──────────────────────────────────── -->
+  <footer>
+    <span>© 2025 <strong style="color:var(--muted-lt)">Pagot Piano Studio</strong> — PWA hors-ligne</span>
+    <span>Clic ou clavier pour jouer · Accords : <code>[abc]</code></span>
+  </footer>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════ -->
+<script>
+/* ── PWA : Service Worker ─────────────────────── */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js', { scope: './' })
+      .catch(err => console.warn('[PPS] SW:', err));
+  });
+}
+
+/* ── PWA : Bouton Installer ───────────────────── */
+let deferredInstall = null;
+const btnInstall = document.getElementById('btn-install');
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstall = e;
+  btnInstall.hidden = false;
+});
+
+btnInstall.addEventListener('click', async () => {
+  if (!deferredInstall) return;
+  deferredInstall.prompt();
+  await deferredInstall.userChoice;
+  deferredInstall = null;
+  btnInstall.hidden = true;
+});
+
+window.addEventListener('appinstalled', () => {
+  btnInstall.hidden = true;
+  deferredInstall = null;
+});
+
+/* ── Réseau ───────────────────────────────────── */
+const networkDot    = document.getElementById('network-dot');
+const networkStatus = document.getElementById('network-status');
+
+function updateNetwork() {
+  const on = navigator.onLine;
+  networkDot.className = `dot ${on ? 'ok' : 'off'}`;
+  networkStatus.textContent = on ? 'En ligne' : 'Hors ligne';
+}
+window.addEventListener('online',  updateNetwork);
+window.addEventListener('offline', updateNetwork);
+updateNetwork();
+
+/* ── Pédale forte ─────────────────────────────── */
+let sustainOn = false;
+const btnSustain = document.getElementById('btn-sustain');
+
+function setSustain(on) {
+  sustainOn = on;
+  btnSustain.classList.toggle('on', on);
+  btnSustain.setAttribute('aria-pressed', String(on));
+  // Quand on relâche la pédale, on stoppe toutes les notes sustenues
+  if (!on) stopAllSustained();
+}
+
+btnSustain.addEventListener('click', () => setSustain(!sustainOn));
+
+// Espace = toggle pédale (hors champs texte)
+window.addEventListener('keydown', e => {
+  if (e.code === 'Space' && document.activeElement.tagName !== 'TEXTAREA'
+      && document.activeElement.tagName !== 'INPUT') {
+    e.preventDefault();
+    setSustain(!sustainOn);
+  }
+});
+
+/* ── Moteur audio ─────────────────────────────── */
+let audioCtx, compressor, sustainBus, dryGain, wetGain;
+let hasPreloaded = false;
+const audioBuffers   = {};
+const pendingFetches = {};
+// Notes actuellement "sustenues" : note → { gainNode, sourceNode }
+const sustainedNotes = {};
+
+const soundfontBase  = 'https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/acoustic_grand_piano-mp3/';
+const audioDot       = document.getElementById('audio-dot');
+const loadingStatus  = document.getElementById('loading-status');
+
+function setAudioStatus(text, cls = '') {
+  loadingStatus.textContent = text;
+  audioDot.className = `dot ${cls}`;
+}
+
+/* ─ Génère un buffer de reverb synthétique (impulse response courte) ─ */
+function makeReverbBuffer(duration = 2.8, decay = 2.2) {
+  const rate     = audioCtx.sampleRate;
+  const length   = Math.floor(rate * duration);
+  const buf      = audioCtx.createBuffer(2, length, rate);
+  for (let ch = 0; ch < 2; ch++) {
+    const data = buf.getChannelData(ch);
+    for (let i = 0; i < length; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+    }
+  }
+  return buf;
+}
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx   = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Compresseur master
+    compressor = audioCtx.createDynamicsCompressor();
+    compressor.threshold.setValueAtTime(-5,  audioCtx.currentTime);
+    compressor.knee.setValueAtTime(30,        audioCtx.currentTime);
+    compressor.ratio.setValueAtTime(12,       audioCtx.currentTime);
+    compressor.attack.setValueAtTime(.003,    audioCtx.currentTime);
+    compressor.release.setValueAtTime(.25,    audioCtx.currentTime);
+    compressor.connect(audioCtx.destination);
+
+    // Bus reverb (sustain) — convolver avec IR synthétique
+    sustainBus = audioCtx.createConvolver();
+    sustainBus.buffer = makeReverbBuffer();
+
+    // Mix dry/wet pour la reverb de sustain
+    dryGain = audioCtx.createGain(); dryGain.gain.value = 1.0;
+    wetGain = audioCtx.createGain(); wetGain.gain.value = 0.0; // off par défaut
+
+    dryGain.connect(compressor);
+    sustainBus.connect(wetGain);
+    wetGain.connect(compressor);
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (!hasPreloaded) preloadSounds();
+}
+
+/* Met à jour le mix wet en temps réel selon l'état de la pédale */
+function updateSustainMix() {
+  if (!wetGain) return;
+  const now = audioCtx.currentTime;
+  if (sustainOn) {
+    wetGain.gain.setTargetAtTime(0.45, now, 0.05);
+    dryGain.gain.setTargetAtTime(0.85, now, 0.05);
+  } else {
+    wetGain.gain.setTargetAtTime(0.0,  now, 0.08);
+    dryGain.gain.setTargetAtTime(1.0,  now, 0.08);
+  }
+}
+
+/* Stoppe proprement toutes les notes sustenues */
+function stopAllSustained() {
+  const now = audioCtx ? audioCtx.currentTime : 0;
+  for (const [note, obj] of Object.entries(sustainedNotes)) {
+    try {
+      obj.gainNode.gain.setTargetAtTime(0.0001, now, 0.18);
+      obj.source.stop(now + 0.8);
+    } catch {}
+    delete sustainedNotes[note];
+  }
+}
+
+async function fetchNote(name) {
+  if (audioBuffers[name]) return audioBuffers[name];
+  if (pendingFetches[name]) return pendingFetches[name];
+  pendingFetches[name] = (async () => {
+    try {
+      const file = name.replace('#', 'b');
+      const r    = await fetch(`${soundfontBase}${file}.mp3`);
+      if (!r.ok) throw new Error();
+      const buf  = await audioCtx.decodeAudioData(await r.arrayBuffer());
+      audioBuffers[name] = buf;
+      return buf;
+    } catch { return null; }
+    finally  { delete pendingFetches[name]; }
+  })();
+  return pendingFetches[name];
+}
+
+function preloadSounds() {
+  hasPreloaded = true;
+  setAudioStatus('Chargement sons HD…', '');
+  let done = 0;
+  Promise.all(layoutData.map(async k => {
+    await fetchNote(k.note);
+    done++;
+    if (done % 11 === 0) setAudioStatus(`Sons HD ${done}/88`, '');
+  })).then(() => setAudioStatus('Piano prêt ✓', 'ok'));
+}
+
+function noteToFreq(note) {
+  const flat  = note.match(/^([A-G])b(\d)$/);
+  const sharp = note.match(/^([A-G])(#?)(\d)$/);
+  const semi  = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+  let n, oct, acc = 0;
+  if (flat)       { n = flat[1];  oct = +flat[2];  acc = -1; }
+  else if (sharp) { n = sharp[1]; oct = +sharp[3]; acc = sharp[2] ? 1 : 0; }
+  else return 440;
+  return 440 * Math.pow(2, (12 * (oct + 1) + semi[n] + acc - 69) / 12);
+}
+
+function playSynth(note) {
+  if (!audioCtx) return;
+  const now  = audioCtx.currentTime, freq = noteToFreq(note);
+  const g    = audioCtx.createGain();
+  const o1   = audioCtx.createOscillator();
+  const o2   = audioCtx.createOscillator();
+  o1.type = 'triangle'; o2.type = 'sine';
+  o1.frequency.setValueAtTime(freq,        now);
+  o2.frequency.setValueAtTime(freq * 2.01, now);
+
+  const releaseTime = sustainOn ? 5.0 : 1.3;
+  const stopTime    = sustainOn ? 5.2 : 1.5;
+
+  g.gain.setValueAtTime(.0001, now);
+  g.gain.exponentialRampToValueAtTime(.36,     now + .016);
+  g.gain.exponentialRampToValueAtTime(.015,    now + releaseTime);
+  [o1, o2].forEach(o => { o.connect(g); o.start(now); o.stop(now + stopTime); });
+  g.connect(dryGain);
+  if (sustainOn) g.connect(sustainBus);
+}
+
+function playRealTone(note) {
+  if (!audioCtx) return;
+  updateSustainMix();
+
+  const buf = audioBuffers[note];
+  if (!buf) { playSynth(note); fetchNote(note); return; }
+
+  const now  = audioCtx.currentTime;
+  const src  = audioCtx.createBufferSource();
+  const gain = audioCtx.createGain();
+  src.buffer = buf;
+
+  if (sustainOn) {
+    // Pédale active : long sustain — le son dure 8s avec queue reverb
+    gain.gain.setValueAtTime(3.2, now);
+    gain.gain.exponentialRampToValueAtTime(.18, now + 4.5);
+    gain.gain.exponentialRampToValueAtTime(.001, now + 8.0);
+    src.connect(gain);
+    gain.connect(dryGain);
+    gain.connect(sustainBus);   // envoie dans la reverb de sustain
+    src.start(0);
+    // Mémorise pour stopper proprement au relâchement de la pédale
+    if (sustainedNotes[note]) {
+      try { sustainedNotes[note].source.stop(now + 0.05); } catch {}
+    }
+    sustainedNotes[note] = { gainNode: gain, source: src };
+  } else {
+    // Pédale inactive : release normal court
+    gain.gain.setValueAtTime(3.2, now);
+    gain.gain.exponentialRampToValueAtTime(.01, now + 3.0);
+    src.connect(gain);
+    gain.connect(dryGain);
+    src.start(0);
+  }
+}
+
+/* ── Clavier 88 touches ───────────────────────── */
+const layoutData = [
+  { char: '{',  note: 'A0',  b: false }, { char: '}',  note: 'Bb0', b: true  }, { char: '[',  note: 'B0',  b: false },
+  { char: ']',  note: 'C1',  b: false }, { char: '<',  note: 'Db1', b: true  }, { char: '>',  note: 'D1',  b: false }, { char: ',',  note: 'Eb1', b: true  }, { char: '.',  note: 'E1',  b: false },
+  { char: '?',  note: 'F1',  b: false }, { char: '/',  note: 'Gb1', b: true  }, { char: ';',  note: 'G1',  b: false }, { char: ':',  note: 'Ab1', b: true  }, { char: "'",  note: 'A1',  b: false }, { char: '"',  note: 'Bb1', b: true  }, { char: '\\', note: 'B1',  b: false },
+  { char: '1',  note: 'C2',  b: false }, { char: '!',  note: 'Db2', b: true  }, { char: '2',  note: 'D2',  b: false }, { char: '@',  note: 'Eb2', b: true  }, { char: '3',  note: 'E2',  b: false },
+  { char: '4',  note: 'F2',  b: false }, { char: '$',  note: 'Gb2', b: true  }, { char: '5',  note: 'G2',  b: false }, { char: '%',  note: 'Ab2', b: true  }, { char: '6',  note: 'A2',  b: false }, { char: '^',  note: 'Bb2', b: true  }, { char: '7',  note: 'B2',  b: false },
+  { char: '8',  note: 'C3',  b: false }, { char: '*',  note: 'Db3', b: true  }, { char: '9',  note: 'D3',  b: false }, { char: '(',  note: 'Eb3', b: true  }, { char: '0',  note: 'E3',  b: false },
+  { char: 'q',  note: 'F3',  b: false }, { char: 'Q',  note: 'Gb3', b: true  }, { char: 'w',  note: 'G3',  b: false }, { char: 'W',  note: 'Ab3', b: true  }, { char: 'e',  note: 'A3',  b: false }, { char: 'E',  note: 'Bb3', b: true  }, { char: 'r',  note: 'B3',  b: false },
+  { char: 't',  note: 'C4',  b: false }, { char: 'T',  note: 'Db4', b: true  }, { char: 'y',  note: 'D4',  b: false }, { char: 'Y',  note: 'Eb4', b: true  }, { char: 'u',  note: 'E4',  b: false },
+  { char: 'i',  note: 'F4',  b: false }, { char: 'I',  note: 'Gb4', b: true  }, { char: 'o',  note: 'G4',  b: false }, { char: 'O',  note: 'Ab4', b: true  }, { char: 'p',  note: 'A4',  b: false }, { char: 'P',  note: 'Bb4', b: true  }, { char: 'a',  note: 'B4',  b: false },
+  { char: 's',  note: 'C5',  b: false }, { char: 'S',  note: 'Db5', b: true  }, { char: 'd',  note: 'D5',  b: false }, { char: 'D',  note: 'Eb5', b: true  }, { char: 'f',  note: 'E5',  b: false },
+  { char: 'g',  note: 'F5',  b: false }, { char: 'G',  note: 'Gb5', b: true  }, { char: 'h',  note: 'G5',  b: false }, { char: 'H',  note: 'Ab5', b: true  }, { char: 'j',  note: 'A5',  b: false }, { char: 'J',  note: 'Bb5', b: true  }, { char: 'k',  note: 'B5',  b: false },
+  { char: 'l',  note: 'C6',  b: false }, { char: 'L',  note: 'Db6', b: true  }, { char: 'z',  note: 'D6',  b: false }, { char: 'Z',  note: 'Eb6', b: true  }, { char: 'x',  note: 'E6',  b: false },
+  { char: 'c',  note: 'F6',  b: false }, { char: 'C',  note: 'Gb6', b: true  }, { char: 'v',  note: 'G6',  b: false }, { char: 'V',  note: 'Ab6', b: true  }, { char: 'b',  note: 'A6',  b: false }, { char: 'B',  note: 'Bb6', b: true  }, { char: 'n',  note: 'B6',  b: false },
+  { char: 'm',  note: 'C7',  b: false }, { char: '|',  note: 'Db7', b: true  }, { char: '_',  note: 'D7',  b: false }, { char: '=',  note: 'Eb7', b: true  }, { char: '+',  note: 'E7',  b: false },
+  { char: '~',  note: 'F7',  b: false }, { char: '`',  note: 'Gb7', b: true  }, { char: 'é',  note: 'G7',  b: false }, { char: 'è',  note: 'Ab7', b: true  }, { char: 'ç',  note: 'A7',  b: false }, { char: 'à',  note: 'Bb7', b: true  }, { char: 'ù',  note: 'B7',  b: false },
+  { char: 'µ',  note: 'C8',  b: false }
+];
+
+const keyMap = {}, keyEls = {};
+const kbd    = document.getElementById('keyboard');
+let   wCount = 0;
+const mobile = window.matchMedia('(max-width: 640px)').matches;
+const WW     = mobile ? 30 : 34;
+const BW     = mobile ? 19 : 22;
+
+layoutData.forEach(k => {
+  keyMap[k.char] = k;
+  const el = document.createElement('div');
+  el.className = `key ${k.b ? 'black' : 'white'}`;
+  el.textContent = k.char;
+  el.title = `${k.char} → ${k.note}`;
+  el.setAttribute('role', 'button');
+  el.setAttribute('aria-label', `Note ${k.note}`);
+  if (k.b) el.style.left = `${wCount * WW - BW / 2}px`;
+  else wCount++;
+  el.addEventListener('pointerdown', e => { e.preventDefault(); initAudio(); playKeyUI(k.char); });
+  keyEls[k.char] = el;
+  kbd.appendChild(el);
+});
+
+function playKeyUI(char) {
+  const k = keyMap[char];
+  if (!k) return;
+  playRealTone(k.note);
+  const el = keyEls[char];
+  if (el) { el.classList.add('active'); setTimeout(() => el.classList.remove('active'), 130); }
+}
+
+window.addEventListener('keydown', e => {
+  const tag = document.activeElement.tagName;
+  if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT' || e.repeat) return;
+  initAudio();
+  if (keyMap[e.key]) playKeyUI(e.key);
+});
+
+/* ── Bibliothèque ─────────────────────────────── */
+const LS_KEY = 'pianoSongs';
+
+function getSongs()  { try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch { return {}; } }
+function saveSongs(s){ localStorage.setItem(LS_KEY, JSON.stringify(s)); }
+
+function updateSongList() {
+  const songs  = getSongs();
+  const select = document.getElementById('song-list');
+  select.innerHTML = '<option value="">— Choisir un morceau —</option>';
+  Object.keys(songs).sort((a, b) => a.localeCompare(b)).forEach(t => {
+    const o = document.createElement('option');
+    o.value = t; o.textContent = t;
+    select.appendChild(o);
+  });
+}
+
+document.getElementById('btn-save').addEventListener('click', () => {
+  const title = document.getElementById('song-title').value.trim();
+  const sheet = document.getElementById('sheet').value.trim();
+  if (!title || !sheet) { alert('Il faut un titre et une partition !'); return; }
+  const s = getSongs(); s[title] = sheet; saveSongs(s);
+  updateSongList(); document.getElementById('song-list').value = title;
+  alert(`"${title}" sauvegardé !`);
+});
+
+document.getElementById('btn-load').addEventListener('click', () => {
+  const title = document.getElementById('song-list').value;
+  if (!title) return;
+  document.getElementById('sheet').value      = getSongs()[title];
+  document.getElementById('song-title').value = title;
+});
+
+document.getElementById('btn-delete').addEventListener('click', () => {
+  const title = document.getElementById('song-list').value;
+  if (!title || !confirm(`Supprimer "${title}" ?`)) return;
+  const s = getSongs(); delete s[title]; saveSongs(s);
+  updateSongList();
+  document.getElementById('sheet').value      = '';
+  document.getElementById('song-title').value = '';
+});
+
+updateSongList();
+
+/* ── Lecteur automatique ──────────────────────── */
+let isPlaying = false, playTimeout, tokens = [], curIdx = 0;
+const sheetArea = document.getElementById('sheet');
+
+function parseSheet(text) {
+  const out = []; let i = 0;
+  while (i < text.length) {
+    const start = i, c = text[i];
+    if (c === '[') {
+      const chord = []; i++;
+      while (i < text.length && text[i] !== ']') { if (keyMap[text[i]]) chord.push(text[i]); i++; }
+      if (chord.length) out.push({ type: 'chord', notes: chord, start, end: Math.min(i + 1, text.length) });
+    } else if (keyMap[c]) {
+      out.push({ type: 'note', note: c, start, end: i + 1 });
+    } else if ('-\n\t '.includes(c)) {
+      out.push({ type: 'pause', start, end: i + 1 });
+    }
+    i++;
+  }
+  return out;
+}
+
+function playNextToken() {
+  if (!isPlaying || curIdx >= tokens.length) { isPlaying = false; curIdx = 0; return; }
+  const tok = tokens[curIdx];
+  const ms  = Math.max(18, Math.floor(15000 / (parseInt(document.getElementById('bpm').value, 10) || 200)));
+  sheetArea.focus({ preventScroll: true });
+  sheetArea.setSelectionRange(tok.start, tok.end);
+  if (tok.type === 'note')  playKeyUI(tok.note);
+  if (tok.type === 'chord') tok.notes.forEach(n => playKeyUI(n));
+  curIdx++;
+  playTimeout = setTimeout(playNextToken, ms);
+}
+
+document.getElementById('btn-play').addEventListener('click', () => {
+  initAudio();
+  if (!isPlaying) {
+    tokens = parseSheet(sheetArea.value);
+    if (curIdx >= tokens.length) curIdx = 0;
+    if (!tokens.length) { alert('Ajoute une partition avant de lancer la lecture.'); return; }
+    isPlaying = true; playNextToken();
+  }
+});
+
+document.getElementById('btn-pause').addEventListener('click', () => {
+  isPlaying = false; clearTimeout(playTimeout);
+});
+
+document.getElementById('btn-stop').addEventListener('click', () => {
+  isPlaying = false; clearTimeout(playTimeout); curIdx = 0;
+  sheetArea.setSelectionRange(0, 0); sheetArea.blur();
+});
+</script>
+</body>
+</html>
