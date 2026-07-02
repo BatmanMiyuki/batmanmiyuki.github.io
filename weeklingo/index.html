@@ -57,7 +57,7 @@
 
   /* HERO IMAGE - NO BLOCK */
   .duo-hero-wrap{position:relative;display:inline-block;margin:10px auto 28px}
-  .duo-hero-glow{display:none} /* bloc supprimé */
+  .duo-hero-glow{display:none}
   .duo-hero-img{
     position:relative;z-index:2;
     width:min(520px,88vw);height:auto;display:block;
@@ -112,7 +112,6 @@
   .logo-mark span{width:4px;background:var(--green);border-radius:2px}
   .logo-mark span:nth-child(1){height:40%} .logo-mark span:nth-child(2){height:70%} .logo-mark span:nth-child(3){height:100%}
 
-  /* account switch */
   .account-switch{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .acc-btn{border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--text-dim);padding:8px 15px;font-size:13px;font-weight:600;transition:.15s}
   .acc-btn.active{background:var(--green-dim);border-color:rgba(88,204,2,.38);color:var(--green-light)}
@@ -124,12 +123,8 @@
   .dash-header-right img.mascot-mini{width:42px;height:42px;object-fit:contain;background:none !important;border:none !important;filter: drop-shadow(0 6px 14px rgba(0,0,0,.45)) drop-shadow(0 0 18px rgba(88,204,2,.28))}
   .mascot-ph-mini{width:42px;height:42px;background:transparent !important;border:1px dashed rgba(147,160,172,.35) !important;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-dimmer)}
 
-  /* DUOLINGO LOGO TITLE - dashboard */
   .duo-title-wrap{text-align:center;padding:28px 24px 8px}
-  .duo-title-wrap img{
-    height:62px;max-width:92%;object-fit:contain;
-    filter: drop-shadow(0 8px 22px rgba(0,0,0,.35)) drop-shadow(0 0 26px rgba(88,204,2,.10));
-  }
+  .duo-title-wrap img{height:62px;max-width:92%;object-fit:contain;filter: drop-shadow(0 8px 22px rgba(0,0,0,.35)) drop-shadow(0 0 26px rgba(88,204,2,.10))}
   @media(max-width:600px){ .duo-title-wrap img{height:42px} }
 
   .dash-body{max-width:1120px;margin:0 auto;padding:10px 24px 60px}
@@ -144,7 +139,6 @@
   .stat-card .sub{font-size:11.5px;color:var(--text-dimmer);margin-top:6px}
   .stat-card::after{content:'';position:absolute;right:-10px;bottom:-14px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle, rgba(88,204,2,.07), transparent 70%)}
 
-  /* compare stats */
   .compare-stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
   .compare-stats .stat-card .val{font-size:22px}
 
@@ -173,7 +167,6 @@
   .form-actions{display:flex;gap:10px;margin-top:16px}
   .form-actions .btn{flex:1;justify-content:center}
 
-  /* league no block */
   .league-box{display:flex;align-items:center;gap:18px;padding:16px;border-radius:16px;background:var(--panel-2);border:1px solid var(--border-soft);margin-bottom:18px}
   .league-img-wrap{width:84px;height:84px;border-radius:18px;background:transparent !important;border:none !important;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;overflow:visible}
   .league-img-wrap::before{content:'';position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);width:68px;height:54px;border-radius:50%;background: radial-gradient(ellipse, rgba(255,176,32,.36), rgba(255,176,32,.12) 60%, transparent 72%);filter:blur(18px);z-index:0}
@@ -202,7 +195,6 @@
   .empty-state{padding:28px;text-align:center;color:var(--text-dim);font-size:13px}
   .empty-state small{color:var(--text-dimmer)}
 
-  /* dashboard mascots no block */
   .dash-mascots-free{position:relative;margin-top:22px;min-height:68px}
   .dash-mascot{position:absolute;background:none !important;border:none !important;border-radius:0 !important;padding:0 !important;object-fit:contain;filter: drop-shadow(0 10px 20px rgba(0,0,0,.45))}
   .dm1{left:2px;top:2px;width:54px;height:54px;transform:rotate(-7deg);filter: drop-shadow(0 10px 20px rgba(0,0,0,.45)) drop-shadow(0 0 20px rgba(88,204,2,.28))}
@@ -223,7 +215,6 @@
 </head>
 <body>
 
-<!-- LANDING -->
 <div id="page-landing">
   <div class="landing-grid-bg"></div>
   <div class="landing-glow-1"></div>
@@ -250,7 +241,6 @@
     <p class="landing-sub">Ton rétroviseur Duolingo, semaine par semaine.<br>Tu remplis tes stats toi-même — vendredi → jeudi.</p>
 
     <div class="duo-hero-wrap">
-      <!-- image SANS bloc -->
       <img id="duoHero" class="duo-hero-img" src="duo-landing.png" alt="Duolingo"
            onerror="this.style.display='none';document.getElementById('duoHeroFallback').style.display='flex'">
       <div id="duoHeroFallback" class="duo-hero-fallback" style="display:none">
@@ -266,7 +256,6 @@
   </div>
 </div>
 
-<!-- DASHBOARD -->
 <div id="page-dashboard">
   <header class="dash-header">
     <div class="dash-header-inner">
@@ -289,7 +278,6 @@
     </div>
   </header>
 
-  <!-- DUOLINGO LOGO CENTRÉ EN TITRE -->
   <div class="duo-title-wrap">
     <img src="duolingo-logo.png" alt="Duolingo" onerror="this.style.display='none'">
   </div>
@@ -306,7 +294,6 @@
       </div>
     </div>
 
-    <!-- STATS SINGLE -->
     <div id="statsSingle" class="stats-grid">
       <div class="stat-card card"><div class="lbl">XP total cumulé</div><div class="val mono" id="statXp">0</div><div class="sub" id="statXpSub">0 semaine</div></div>
       <div class="stat-card card"><div class="lbl">Leçons cumulées</div><div class="val mono" id="statLessons">0</div><div class="sub">toutes semaines</div></div>
@@ -314,7 +301,6 @@
       <div class="stat-card card"><div class="lbl">Série actuelle</div><div class="val mono" id="statStreak" style="color:var(--amber)">0 j</div><div class="sub">jours travaillés cumulés</div></div>
     </div>
 
-    <!-- STATS COMPARE -->
     <div id="statsCompare" style="display:none">
       <div class="compare-stats">
         <div class="stat-card card" style="border-color:rgba(88,204,2,.28)">
@@ -331,7 +317,6 @@
     </div>
 
     <div class="dash-grid">
-      <!-- FORM -->
       <div class="panel card">
         <h3>Ajouter / Éditer une semaine</h3>
         <p class="p-sub">Choisis la date, le compte, coche ven→jeu. Stats à 0 par défaut.</p>
@@ -389,11 +374,10 @@
         </div>
 
         <div class="form-actions">
-          <button class="btn btn-primary" onclick="saveWeek()">💾 Enregistrer</button>
+          <button class="btn btn-primary" onclick="saveWeek(event)">💾 Enregistrer</button>
           <button class="btn btn-ghost" onclick="resetForm()" type="button">Effacer</button>
         </div>
 
-        <!-- mascottes dashboard sans bloc + glow -->
         <div class="dash-mascots-free">
           <div class="dash-mascot-glow dmg1"></div>
           <div class="dash-mascot-glow dmg2"></div>
@@ -405,7 +389,6 @@
         </div>
       </div>
 
-      <!-- CHART + LEAGUE -->
       <div class="panel card" style="position:relative;overflow:hidden">
         <img class="chart-mascot" src="mascotte-chart.png" alt="" onerror="this.style.display='none'">
         <h3 id="chartTitle">Progression hebdomadaire</h3>
@@ -429,7 +412,6 @@
       </div>
     </div>
 
-    <!-- HISTORY -->
     <div class="panel card history">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px">
         <h3 style="margin:0">Historique des semaines</h3>
@@ -469,7 +451,6 @@ const defaultData = {
   compte2:{ id:'compte2', name:'Compte 2', color:'#a78bfa', weeks:[], streak:0 }
 };
 
-// migrate old single-account data if present
 let data = JSON.parse(localStorage.getItem('weeklingo_accounts_v3')||'null');
 if(!data){
   const oldWeeks = JSON.parse(localStorage.getItem('weeklingo_weeks_v2')||'[]');
@@ -496,7 +477,7 @@ function enterDashboard(){ document.getElementById('page-landing').classList.add
 function backToLanding(){ document.getElementById('page-dashboard').classList.remove('open'); document.getElementById('page-landing').classList.remove('hidden'); }
 
 function switchAccount(acc){
-  if(state.compare) return; // in compare mode keep both
+  if(state.compare) return;
   state.account = acc;
   document.querySelectorAll('.acc-btn[data-acc]').forEach(b=>{
     b.classList.toggle('active', b.dataset.acc===acc);
@@ -510,13 +491,12 @@ function toggleCompare(){
   renderAll();
 }
 
-/* date helpers */
 function toISO(d){ return d.toISOString().slice(0,10); }
 function addDays(iso, n){ const d=new Date(iso+'T12:00:00'); d.setDate(d.getDate()+n); return toISO(d); }
 function lastFriday(){
   const t = new Date();
-  const day = t.getDay(); // 0 sun ... 5 fri
-  const diff = (day >=5) ? day-5 : day+2; // days since friday
+  const day = t.getDay();
+  const diff = (day >=5) ? day-5 : day+2;
   t.setDate(t.getDate() - diff);
   return toISO(t);
 }
@@ -541,11 +521,11 @@ function updateLeaguePreview(key){
   img.src=LEAGUE_IMGS[key]||LEAGUE_IMGS.or; img.style.display='block'; ph.style.display='none';
   img.onerror=()=>{img.style.display='none'; ph.style.display='block'};
   document.getElementById('leagueName').textContent='Ligue '+(LEAGUE_LABELS[key]||key);
-  document.getElementById('leagueSub').textContent='Aperçu sélection';
+  document.getElementById('leagueSub').textContent = 'Aperçu sélection';
 }
 
-/* save */
-function saveWeek(){
+function saveWeek(evt){
+  if(evt) evt.preventDefault();
   const accId = document.getElementById('fAccount').value;
   const acc = data[accId];
   const dateStart = document.getElementById('fDateStart').value;
@@ -561,7 +541,6 @@ function saveWeek(){
     if(!confirm('Tout est à 0, enregistrer quand même ?')) return;
   }
 
-  // if week with same date exists -> update
   const existingIdx = acc.weeks.findIndex(w=>w.dateStart===dateStart);
   const streakGain = days.length;
   const entry = {
@@ -570,19 +549,19 @@ function saveWeek(){
     updatedAt: new Date().toISOString()
   };
   if(existingIdx>=0){
-    // adjust streak: remove old gain, add new
     acc.streak = acc.streak - (acc.weeks[existingIdx].streakGain||0) + streakGain;
     acc.weeks[existingIdx] = entry;
   } else {
     acc.weeks.push(entry);
     acc.streak += streakGain;
   }
-  // sort by date
   acc.weeks.sort((a,b)=>a.dateStart.localeCompare(b.dateStart));
   saveAll();
   renderAll();
-  // feedback
-  const btn = event.target; const t=btn.textContent; btn.textContent='✅ Enregistré !'; setTimeout(()=>btn.textContent=t,1200);
+
+  if(evt && evt.target){
+    const btn = evt.target; const t=btn.textContent; btn.textContent='✅ Enregistré !'; setTimeout(()=>btn.textContent=t,1200);
+  }
 }
 
 function resetForm(){
@@ -602,18 +581,15 @@ function resetAll(){
   saveAll(); renderAll();
 }
 
-/* RENDER */
 let chartInst=null;
 function getAcc(aid){ return data[aid]; }
 
 function renderAll(){
-  // header account buttons
   document.querySelectorAll('.acc-btn[data-acc]').forEach(b=>{
     b.classList.toggle('active', b.dataset.acc===state.account && !state.compare);
   });
   document.getElementById('fAccount').value = state.account;
 
-  // stats
   const a1 = getAcc('compte1'), a2 = getAcc('compte2');
   const sum = acc => ({
     xp: acc.weeks.reduce((s,w)=>s+w.xp,0),
@@ -657,7 +633,6 @@ function renderAll(){
   }
   document.getElementById('weekCountPill').textContent = (s1.count+s2.count)+' sem. total';
 
-  // league preview = last week of active account
   const activeAcc = getAcc(state.account);
   if(activeAcc.weeks.length){
     const last = activeAcc.weeks[activeAcc.weeks.length-1];
@@ -680,7 +655,6 @@ function renderChart(){
 
   let labels, datasets;
   if(state.compare){
-    // union of dates
     const allDates = Array.from(new Set([...a1.weeks.map(w=>w.dateStart), ...a2.weeks.map(w=>w.dateStart)])).sort();
     labels = allDates.map(d => { const [y,m,da]=d.split('-'); return da+'/'+m; });
     const map1 = Object.fromEntries(a1.weeks.map(w=>[w.dateStart,w.xp]));
@@ -726,7 +700,6 @@ function renderHistory(){
   if(!rows.length){ wrap.innerHTML=`<div class="empty-state">Aucune semaine encore.<br><small>Choisis une date puis Enregistrer.</small></div>`; return; }
   let html=`<table class="history-table"><thead><tr><th>Compte</th><th>Date ven→jeu</th><th>Jours</th><th>XP</th><th>Leçons</th><th>Min</th><th>Ligue</th><th>+Stk</th><th></th></tr></thead><tbody>`;
   rows.forEach(w=>{
-    const acc = data[w._acc];
     const dayBadges = DAY_ORDER.map(d=>`<span class="badge-day ${w.days?.includes(d)?'on':''}">${DAY_SHORT[d]}</span>`).join('');
     const accPill = w._acc==='compte1' ? '<span class="acc-pill c1">C1</span>' : '<span class="acc-pill c2">C2</span>';
     const dateLabel = w.dateStart ? `${w.dateStart} → ${w.dateEnd||addDays(w.dateStart,6)}` : '—';
@@ -787,7 +760,6 @@ function exportCSV(){
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='weeklingo_export.csv'; a.click();
 }
 
-/* init */
 updateDayPreview(); updateLeaguePreview('or'); initDates();
 
 if ('serviceWorker' in navigator) {
