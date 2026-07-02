@@ -274,7 +274,7 @@
 
       <div class="dash-header-right">
         <span class="pill mono" id="weekCountPill">0 semaine</span>
-        <img class="mascot-mini" src="mascotte-header.png" alt="" onerror="this.outerHTML='<div class=mascot-ph-mini>duo</div>'">
+        <img class="mascot-mini" src="mascotte1.png" alt="" onerror="this.outerHTML='<div class=mascot-ph-mini>duo</div>'">
         <button class="btn btn-ghost btn-sm" onclick="backToLanding()">Accueil</button>
       </div>
     </div>
@@ -291,7 +291,7 @@
         <p id="welcomeSub">Semaine Duolingo : <b>vendredi → jeudi</b>. Choisis la date, remplis tes chiffres.</p>
       </div>
       <div style="display:flex;gap:12px;align-items:center">
-        <img class="welcome-mascot" src="mascotte-dash-top.png" alt="" onerror="this.style.display='none'">
+        <img class="welcome-mascot" src="mascotte2.png" alt="" onerror="this.style.display='none'">
         <span class="pill">🔥 Série: <b class="mono" id="streakTop" style="margin-left:6px;color:var(--amber)">0</b></span>
       </div>
     </div>
@@ -319,7 +319,8 @@
     </div>
 
     <div class="dash-grid">
-      <div class="panel card">
+      <div class="panel card" style="position:relative;overflow:hidden">
+        <img src="mascotte8.png" alt="" style="position:absolute;right:16px;top:12px;width:44px;height:44px;object-fit:contain;z-index:3;transform:rotate(-6deg);filter:drop-shadow(0 8px 16px rgba(0,0,0,.4)) drop-shadow(0 0 16px rgba(167,139,250,.28))" onerror="this.style.display='none'">
         <h3>Ajouter / Éditer une semaine</h3>
         <p class="p-sub">Choisis la date, le compte, coche ven→jeu. Stats à 0 par défaut.</p>
 
@@ -384,15 +385,14 @@
           <div class="dash-mascot-glow dmg1"></div>
           <div class="dash-mascot-glow dmg2"></div>
           <div class="dash-mascot-glow dmg3"></div>
-          <img class="dash-mascot dm1" src="mascotte-dash1.png" alt="" onerror="this.style.display='none'">
-          <img class="dash-mascot dm2" src="mascotte-dash2.png" alt="" onerror="this.style.display='none'">
-          <img class="dash-mascot dm3" src="mascotte-dash3.png" alt="" onerror="this.style.display='none'">
-          <span style="position:absolute;left:214px;top:20px;font-size:11px;color:var(--text-dimmer)">PNG libres • glow</span>
+          <img class="dash-mascot dm1" src="mascotte4.png" alt="" onerror="this.style.display='none'">
+          <img class="dash-mascot dm2" src="mascotte5.png" alt="" onerror="this.style.display='none'">
+          <img class="dash-mascot dm3" src="mascotte6.png" alt="" onerror="this.style.display='none'">
         </div>
       </div>
 
       <div class="panel card" style="position:relative;overflow:hidden">
-        <img class="chart-mascot" src="mascotte-chart.png" alt="" onerror="this.style.display='none'">
+        <img class="chart-mascot" src="mascotte3.png" alt="" onerror="this.style.display='none'">
         <h3 id="chartTitle">Progression hebdomadaire</h3>
         <p class="p-sub" id="chartSub">XP – points reliés, par semaine datée</p>
 
@@ -416,7 +416,7 @@
 
     <div class="panel card history">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px">
-        <h3 style="margin:0">Historique des semaines</h3>
+        <h3 style="margin:0;display:flex;align-items:center;gap:10px"><img src="mascotte7.png" alt="" style="width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 6px 12px rgba(0,0,0,.4)) drop-shadow(0 0 14px rgba(88,204,2,.25))" onerror="this.style.display='none'">Historique des semaines</h3>
         <div style="display:flex;gap:8px;align-items:center">
           <select id="historyFilter" onchange="renderHistory()" style="background:var(--panel-2);border:1px solid var(--border);color:var(--text-dim);border-radius:999px;padding:6px 12px;font-size:12px">
             <option value="all">Tous les comptes</option>
@@ -814,12 +814,15 @@ updateDayPreview(); updateLeaguePreview('or'); initDates();
 // ── PWA : Service Worker ──────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
   const SW = `
-const CACHE = 'weeklingo-v1';
+const CACHE = 'weeklingo-v3';
 const ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js',
   'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap',
   'bronze.png','argent.png','or.png','saphir.png','rubis.png',
-  'emeraude.png','amethyste.png','perle.png','obsidienne.png','diamant.png'
+  'emeraude.png','amethyste.png','perle.png','obsidienne.png','diamant.png',
+  'mascotte1.png','mascotte2.png','mascotte3.png','mascotte4.png',
+  'mascotte5.png','mascotte6.png','mascotte7.png','mascotte8.png',
+  'duo-landing.png','duolingo-logo.png'
 ];
 self.addEventListener('install', e => {
   e.waitUntil(
@@ -910,5 +913,5 @@ window.addEventListener('appinstalled', () => {
   if (wrap) wrap.innerHTML = '<div style="padding:11px 14px;border-radius:12px;background:rgba(88,204,2,0.08);border:1px solid rgba(88,204,2,0.3);color:#58cc02;font-size:12px;font-weight:700;text-align:center;">✅ Weeklingo est installée sur ton appareil !</div>';
 });
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a14e8ad2ff6d720a',t:'MTc4MzAwNDY1OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
