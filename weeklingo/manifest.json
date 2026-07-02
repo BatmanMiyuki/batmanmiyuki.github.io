@@ -1,71 +1,57 @@
 {
   "name": "Weeklingo",
   "short_name": "Weeklingo",
-  "description": "Ton rétroviseur Duolingo — stats hebdo, 2 comptes, saisie manuelle ven→jeu",
-  "start_url": "./index.html?utm_source=pwa",
+  "description": "Ton rétroviseur Duolingo – stats hebdo, 2 comptes, saisie manuelle, offline.",
+  "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "background_color": "#0a0d13",
-  "theme_color": "#58cc02",
+  "theme_color": "#0a0d13",
   "orientation": "portrait-primary",
-  "scope": "./",
+  "categories": ["education", "productivity"],
   "lang": "fr",
   "dir": "ltr",
-  "categories": ["education", "productivity", "utilities"],
-  "id": "weeklingo.app",
-  "launch_handler": { "client_mode": "auto" },
-  "edge_side_panel": { "preferred_width": 420 },
   "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "icons/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
-    }
+    { "src": "icon-72.png", "sizes": "72x72", "type": "image/png", "purpose": "any" },
+    { "src": "icon-96.png", "sizes": "96x96", "type": "image/png", "purpose": "any" },
+    { "src": "icon-144.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
   ],
   "screenshots": [
     {
-      "src": "icons/icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Dashboard Weeklingo"
+      "form_factor": "wide",
+      "label": "Weeklingo Dashboard"
     }
   ],
   "shortcuts": [
     {
       "name": "Ajouter une semaine",
       "short_name": "Ajouter",
-      "description": "Saisir tes stats de la semaine",
-      "url": "./index.html#add?utm_source=pwa_shortcut",
-      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+      "description": "Saisir mes stats Duolingo",
+      "url": "/index.html#add",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Comparer les comptes",
+      "name": "Comparer comptes",
       "short_name": "Comparer",
-      "url": "./index.html#compare?utm_source=pwa_shortcut",
-      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+      "description": "Comparer Compte 1 vs Compte 2",
+      "url": "/index.html#compare",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
   ],
-  "related_applications": [],
-  "prefer_related_applications": false,
-  "handle_links": "preferred"
+  "edge_side_panel": { "preferred_width": 400 },
+  "launch_handler": { "client_mode": "focus-existing" },
+  "handle_links": "preferred",
+  "file_handlers": [
+    {
+      "action": "/index.html",
+      "accept": { "text/csv": [".csv"] }
+    }
+  ]
 }
