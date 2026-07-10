@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Quoridor Solver IA forte</title>
+<style>
+  :root{--bg:#0b1020;--panel:#121a31;--ink:#f2f6ff;--muted:#9aa8c7;--a:#51d88a;--b:#ff647c;--wall:#ffd166;--grid:#33415f;}
+  *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at top,#1c2b55,#0b1020 55%);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;}
+  main{max-width:1150px;margin:auto;padding:24px;display:grid;grid-template-columns:1fr 360px;gap:22px} @media(max-width:850px){main{grid-template-columns:1fr}}
+  .card{background:rgba(18,26,49,.92);border:1px solid #253452;border-radius:18px;box-shadow:0 20px 60px #0008;padding:18px}.title{display:flex;align-items:center;gap:12px;margin-bottom:14px}.badge{background:#26365f;color:#cfe0ff;border:1px solid #41578b;padding:5px 9px;border-radius:999px;font-size:12px}.muted{color:var(--muted)}
+  #boardWrap{display:flex;justify-content:center;overflow:auto;padding:6px}.board{display:grid;grid-template-columns:repeat(17,32px);grid-template-rows:repeat(17,32px);gap:0;user-select:none}.cell{width:32px;height:32px;border-radius:8px;background:#e9eefb;color:#13203a;display:flex;align-items:center;justify-content:center;font-weight:800;cursor:pointer;border:1px solid #b5c2df}.cell:hover{outline:3px solid #7aa2ff}.gap{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#5e6d8e}.vgap,.hgap,.cross{background:#17223d}.wallH{background:var(--wall)!important;border-radius:8px}.wallV{background:var(--wall)!important;border-radius:8px}.pawnA{background:var(--a);box-shadow:0 0 0 4px #51d88a55 inset}.pawnB{background:var(--b);box-shadow:0 0 0 4px #ff647c55 inset}.hint{outline:3px solid #61dafb}.best{outline:4px solid #ffd166!important}
+  input,select,button{width:100%;border-radius:12px;border:1px solid #33466e;background:#0e162b;color:var(--ink);padding:11px 12px;font:inherit}button{cursor:pointer;font-weight:700;background:linear-gradient(180deg,#3265ff,#2447b9);border:none}button.secondary{background:#22314f}button.danger{background:#743143}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stack{display:flex;flex-direction:column;gap:10px}.log{height:210px;overflow:auto;background:#090e1d;border:1px solid #243250;border-radius:12px;padding:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;white-space:pre-wrap}.score{font-size:15px;line-height:1.45}.big{font-size:22px;font-weight:900}.pill{display:inline-flex;gap:6px;align-items:center;background:#0d1528;border:1px solid #2b3b60;border-radius:999px;padding:7px 10px;margin:3px 4px 3px 0}.dot{width:10px;height:10px;border-radius:50%;display:inline-block}.a{background:var(--a)}.b{background:var(--b)}
+</style>
+</head>
+<body>
+<main>
+<section class="card">
+  <div class="title"><div class="big">Quoridor Solver</div><span class="badge">IA forte alpha-beta</span><span class="badge">10 murs chacun</span></div>
+  <div id="boardWrap"><div id="board" class="board"></div></div>
+  <p class="muted">Clique sur une case pour déplacer le pion du joueur au tour. Pour poser un mur, utilise la notation à droite : <b>h e4</b> ou <b>v d6</b>. Coordonnées : a1 en bas à gauche, i9 en haut à droite.</p>
+</section>
+<aside class="card stack">
+  <div class="score" id="status"></div>
+  <div class="row"><button id="bestBtn">Meilleur coup IA</button><button class="secondary" id="playBestBtn">Jouer meilleur</button></div>
+  <div class="row"><input id="seconds" type="number" min="1" max="20" step="1" value="4" title="secondes"/><select id="depth"><option value="3">Profondeur 3</option><option value="4" selected>Profondeur 4</option><option value="5">Profondeur 5</option><option value="6">Profondeur 6</option></select></div>
+  <div class="row"><input id="moveText" placeholder="ex: e2, h e4, v d6"/><button class="secondary" id="playBtn">Jouer</button></div>
+  <div class="row"><button class="secondary" id="undoBtn">Undo</button><button class="danger" id="resetBtn">Reset</button></div>
+  <div class="score" id="analysis"></div>
+  <div class="log" id="log"></div>
+</aside>
+</main>
+<script>
+const N=9, INF=1e9; let state, hist=[], lastBest=null;
+function init(){state={p0:[8,4],p1:[0,4],h:new Set(),v:new Set(),w0:10,w1:10,turn:0};hist=[];lastBest=null;log('Nouvelle partie. A/P1 commence en e1 et va vers e9.');draw();}
+const key=(r,c)=>r+','+c; const has=(set,r,c)=>set.has(key(r,c));
+function clone(s){return {p0:[...s.p0],p1:[...s.p1],h:new Set(s.h),v:new Set(s.v),w0:s.w0,w1:s.w1,turn:s.turn}}
+function rcToCell(r,c){return String.fromCharCode(97+c)+(9-r)}
+function cellToRc(x){x=x.trim().toLowerCase(); const c=x.charCodeAt(0)-97, rank=parseInt(x.slice(1),10); if(c<0||c>8||rank<1||rank>9)throw Error('cellule invalide'); return [9-rank,c]}
+function wallToRc(x){x=x.trim().toLowerCase(); const c=x.charCodeAt(0)-97, rank=parseInt(x.slice(1),10), r=8-rank; if(c<0||c>7||r<0||r>7)throw Error('mur hors plateau a1..h8'); return [r,c]}
+function rcToWall(r,c){return String.fromCharCode(97+c)+(8-r)}
+function moveStr(m){return m.k==='P'?rcToCell(m.r,m.c):(m.k.toLowerCase()+' '+rcToWall(m.r,m.c))}
+function pawn(s,p){return p===0?s.p0:s.p1} function walls(s,p){return p===0?s.w0:s.w1} function winner(s){if(s.p0[0]===0)return 0;if(s.p1[0]===8)return 1;return null}
+function blocked(s,a,b){const [r1,c1]=a,[r2,c2]=b;if(Math.abs(r1-r2)+Math.abs(c1-c2)!==1)return true;if(r2===r1-1){let wr=r2,wc=c1<8?c1:c1-1;return has(s.h,wr,wc)||has(s.h,wr,wc-1)}if(r2===r1+1){let wr=r1,wc=c1<8?c1:c1-1;return has(s.h,wr,wc)||has(s.h,wr,wc-1)}if(c2===c1-1){let wc=c2,wr=r1<8?r1:r1-1;return has(s.v,wr,wc)||has(s.v,wr-1,wc)}if(c2===c1+1){let wc=c1,wr=r1<8?r1:r1-1;return has(s.v,wr,wc)||has(s.v,wr-1,wc)}return false}
+function neigh(s,cell){const [r,c]=cell,out=[]; for(const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]){let nr=r+dr,nc=c+dc;if(nr>=0&&nr<9&&nc>=0&&nc<9&&!blocked(s,cell,[nr,nc]))out.push([nr,nc])} return out}
+function shortestPath(s,p){const start=pawn(s,p), goal=p===0?0:8, q=[start], prev=new Map([[key(...start),null]]);let qi=0,end=null;while(qi<q.length){const x=q[qi++];if(x[0]===goal){end=x;break}for(const nb of neigh(s,x)){const k=key(...nb);if(!prev.has(k)){prev.set(k,x);q.push(nb)}}}if(!end)return [INF,[]];const path=[];let cur=end;while(cur){path.push(cur);cur=prev.get(key(...cur))}path.reverse();return [path.length-1,path]}
+function legalPawn(s,p=s.turn){const me=pawn(s,p),opp=pawn(s,1-p),moves=new Map();for(const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]){const adj=[me[0]+dr,me[1]+dc];if(adj[0]<0||adj[0]>8||adj[1]<0||adj[1]>8||blocked(s,me,adj))continue;if(adj[0]!==opp[0]||adj[1]!==opp[1])moves.set(key(...adj),{k:'P',r:adj[0],c:adj[1]});else{const bh=[opp[0]+dr,opp[1]+dc];if(bh[0]>=0&&bh[0]<9&&bh[1]>=0&&bh[1]<9&&!blocked(s,opp,bh))moves.set(key(...bh),{k:'P',r:bh[0],c:bh[1]});else for(const [tdr,tdc] of [[-dc,dr],[dc,-dr]]){const dg=[opp[0]+tdr,opp[1]+tdc];if(dg[0]>=0&&dg[0]<9&&dg[1]>=0&&dg[1]<9&&!blocked(s,opp,dg))moves.set(key(...dg),{k:'P',r:dg[0],c:dg[1]})}}}return [...moves.values()]}
+function wallFits(s,k,r,c){if(r<0||r>7||c<0||c>7)return false;if(k==='H'){if(has(s.h,r,c)||has(s.v,r,c)||has(s.h,r,c-1)||has(s.h,r,c+1))return false}else{if(has(s.v,r,c)||has(s.h,r,c)||has(s.v,r-1,c)||has(s.v,r+1,c))return false}return true}
+function makeMove(s,m){let ns=clone(s);if(m.k==='P'){if(s.turn===0)ns.p0=[m.r,m.c];else ns.p1=[m.r,m.c];ns.turn=1-s.turn;return ns} if(m.k==='H')ns.h.add(key(m.r,m.c)); else ns.v.add(key(m.r,m.c)); if(s.turn===0)ns.w0--;else ns.w1--; ns.turn=1-s.turn;return ns}
+function wallLegal(s,k,r,c){if(walls(s,s.turn)<=0||!wallFits(s,k,r,c))return false;const ns=makeMove(s,{k,r,c});return shortestPath(ns,0)[0]<INF&&shortestPath(ns,1)[0]<INF}
+function evaluate(s){const w=winner(s);if(w!==null)return w===s.turn?1000000:-1000000;const me=s.turn,op=1-me;const dm=shortestPath(s,me)[0],doo=shortestPath(s,op)[0];const mob=legalPawn(s,me).length-legalPawn(s,op).length;return Math.round((doo-dm)*120+(walls(s,me)-walls(s,op))*7+mob*4)}
+function candidateWalls(s,limit=26){if(walls(s,s.turn)<=0)return[];const p0=shortestPath(s,0)[1],p1=shortestPath(s,1)[1],cells=[...p0,...p1,s.p0,s.p1],seen=new Set(),arr=[];for(const [r,c] of cells){for(let rr=Math.max(0,r-2);rr<=Math.min(7,r+1);rr++)for(let cc=Math.max(0,c-2);cc<=Math.min(7,c+1);cc++)for(const k of ['H','V']){const id=k+rr+','+cc;if(!seen.has(id)){seen.add(id);if(wallLegal(s,k,rr,cc)){const ns=makeMove(s,{k,r:rr,c:cc});arr.push([-evaluate(ns),{k,r:rr,c:cc}])}}}}arr.sort((a,b)=>b[0]-a[0]);return arr.slice(0,limit).map(x=>x[1])}
+function orderMoves(s,moves){return moves.map(m=>[-evaluate(makeMove(s,m))+(m.k==='P'?20:0),m]).sort((a,b)=>b[0]-a[0]).map(x=>x[1])}
+function legalMoves(s){return orderMoves(s,[...legalPawn(s),...candidateWalls(s)])}
+let deadline=0,nodes=0;
+function negamax(s,d,a,b){if(Date.now()>deadline)throw Error('timeout');nodes++;if(winner(s)!==null||d===0)return [evaluate(s),null];let best=null,bestv=-INF;const moves=legalMoves(s);for(const m of moves){const [v0]=negamax(makeMove(s,m),d-1,-b,-a);const v=-v0;if(v>bestv){bestv=v;best=m}a=Math.max(a,v);if(a>=b)break}return [bestv,best]}
+function bestMove(seconds=4,maxDepth=4){deadline=Date.now()+seconds*1000;nodes=0;let moves=legalMoves(state);if(!moves.length)throw Error('aucun coup légal');let best=moves[0],score=-INF,reached=0;try{for(let d=1;d<=maxDepth;d++){let [sc,mv]=negamax(state,d,-INF,INF);if(mv){best=mv;score=sc;reached=d}}}catch(e){}return {best,score,reached,nodes}}
+function parseMove(t){const p=t.trim().toLowerCase().split(/\s+/); if(!p[0])throw Error('coup vide'); if(p[0]==='h'||p[0]==='v'){const [r,c]=wallToRc(p[1]);return {k:p[0].toUpperCase(),r,c}} const cell=p[0]==='p'?p[1]:p[0]; const [r,c]=cellToRc(cell); return {k:'P',r,c}}
+function sameMove(a,b){return a&&b&&a.k===b.k&&a.r===b.r&&a.c===b.c}
+function isLegal(s,m){if(m.k==='P')return legalPawn(s).some(x=>sameMove(x,m));return wallLegal(s,m.k,m.r,m.c)}
+function play(m){if(!isLegal(state,m)){log('Coup illégal: '+moveStr(m));return false}hist.push(clone(state));state=makeMove(state,m);lastBest=null;log((state.turn?'A/P1':'B/P2')+' a joué '+moveStr(m));draw();return true}
+function draw(){const b=document.getElementById('board');b.innerHTML='';for(let gr=0;gr<17;gr++)for(let gc=0;gc<17;gc++){const el=document.createElement('div'); if(gr%2===0&&gc%2===0){const r=gr/2,c=gc/2;el.className='cell';el.textContent='';if(state.p0[0]===r&&state.p0[1]===c){el.textContent='A';el.classList.add('pawnA')}if(state.p1[0]===r&&state.p1[1]===c){el.textContent='B';el.classList.add('pawnB')}if(lastBest&&lastBest.k==='P'&&lastBest.r===r&&lastBest.c===c)el.classList.add('best');el.title=rcToCell(r,c);el.onclick=()=>play({k:'P',r,c});}
+ else {el.className=(gr%2?'hgap':'vgap')+' gap'; if(gr%2===1&&gc%2===0){const r=(gr-1)/2,c=gc/2;if((c<8&&has(state.h,r,c))||has(state.h,r,c-1))el.classList.add('wallH')} if(gr%2===0&&gc%2===1){const r=gr/2,c=(gc-1)/2;if((r<8&&has(state.v,r,c))||has(state.v,r-1,c))el.classList.add('wallV')} if(gr%2===1&&gc%2===1)el.className='cross gap'} b.appendChild(el)}
+ const d0=shortestPath(state,0)[0],d1=shortestPath(state,1)[0],w=winner(state);document.getElementById('status').innerHTML=`<span class="pill"><span class="dot a"></span>A/P1 murs ${state.w0}, distance ${d0}</span><span class="pill"><span class="dot b"></span>B/P2 murs ${state.w1}, distance ${d1}</span><br><b>${w===null?'Tour: '+(state.turn===0?'A/P1':'B/P2'):(w===0?'A/P1 gagne':'B/P2 gagne')}</b>`;}
+function log(x){const l=document.getElementById('log');l.textContent+=x+'\n';l.scrollTop=l.scrollHeight}
+document.getElementById('bestBtn').onclick=()=>{document.getElementById('analysis').textContent='Calcul...';setTimeout(()=>{const r=bestMove(+seconds.value,+depth.value);lastBest=r.best;document.getElementById('analysis').innerHTML=`Meilleur coup: <b>${moveStr(r.best)}</b><br>Score ${r.score} | profondeur ${r.reached} | nœuds ${r.nodes}`;log('IA conseille: '+moveStr(r.best));draw();},30)};
+document.getElementById('playBestBtn').onclick=()=>{const r=bestMove(+seconds.value,+depth.value);play(r.best);document.getElementById('analysis').innerHTML=`Joué: <b>${moveStr(r.best)}</b> | score ${r.score}`};
+document.getElementById('playBtn').onclick=()=>{try{play(parseMove(moveText.value));moveText.value=''}catch(e){log('Erreur: '+e.message)}};
+document.getElementById('undoBtn').onclick=()=>{if(hist.length){state=hist.pop();lastBest=null;draw();log('Undo')}};
+document.getElementById('resetBtn').onclick=init;
+init();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a18ffdd0bc3102d3',t:'MTc4MzY5MDk0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
