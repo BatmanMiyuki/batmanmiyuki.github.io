@@ -421,6 +421,40 @@
         }
         .stats-edit summary::-webkit-details-marker { display: none; }
 
+        /* ═══ Historique des leçons (modal Stats) ═══ */
+        .lessons-hist-count {
+            display: inline-block; margin-left: 6px;
+            background: var(--duo-blue); color: #fff;
+            font-size: .78em; font-weight: 900;
+            padding: 2px 9px; border-radius: 999px;
+        }
+        .lessons-hist { margin-top: 10px; }
+        .lessons-hist-scroll {
+            max-height: 220px; overflow-y: auto;
+            border: 2px solid var(--border-color); border-radius: 12px;
+        }
+        .lessons-hist-table { width: 100%; border-collapse: collapse; font-size: .88em; }
+        .lessons-hist-table th {
+            font-size: .78em; text-transform: uppercase; letter-spacing: .05em;
+            color: #999; font-weight: 800; padding: 8px 12px; text-align: left;
+            background: var(--bg-color); position: sticky; top: 0;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .lessons-hist-table td { padding: 8px 12px; border-bottom: 1px solid var(--border-color); font-weight: 600; }
+        .lessons-hist-table tr:last-child td { border-bottom: none; }
+        .lessons-hist-table .lh-val { color: var(--duo-blue); font-weight: 800; text-align: right; }
+        .lessons-hist-empty { padding: 14px; text-align: center; color: #999; font-size: .85em; font-weight: 600; }
+
+        /* ═══ Export / Import (modal Stats) ═══ */
+        .data-tools {
+            margin-top: 4px; padding: 14px;
+            border: 2px dashed var(--border-color); border-radius: 16px;
+            background: var(--bg-color);
+        }
+        .data-tools-title { font-weight: 900; margin-bottom: 10px; }
+        .data-tools-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .data-tools-hint { font-size: .75em; color: #999; font-weight: 600; margin-top: 10px; line-height: 1.5; }
+
         /* ═══ Édition de session ═══ */
         .row-actions { white-space: nowrap; }
         .row-edit { cursor: pointer; margin-right: 8px; opacity: .75; transition: .12s; }
@@ -461,6 +495,54 @@
         .my-league-lbl { font-size: .68em; font-weight: 800; letter-spacing: .12em; color: #999; }
         .my-league-name { font-size: 1.4em; font-weight: 900; color: var(--duo-blue); line-height: 1.2; }
         .my-league-streak { font-size: .85em; font-weight: 700; color: #777; margin-top: 2px; }
+
+        /* ═══ Photo de la semaine (bouton vertical + modal) ═══ */
+        .week-card { position: relative; padding-right: 46px !important; }
+        .photo-side-btn {
+            position: absolute; top: 0; right: 0; bottom: 0;
+            width: 38px; border: none; cursor: pointer;
+            border-radius: 0 16px 16px 0;
+            background: linear-gradient(180deg, #e8f7dc, #d8f0c5);
+            border-left: 2px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            transition: .15s; padding: 0;
+        }
+        .photo-side-btn span {
+            writing-mode: vertical-rl; transform: rotate(180deg);
+            font-weight: 800; font-size: .78em; letter-spacing: .08em;
+            color: var(--duo-green-dark); white-space: nowrap;
+            font-family: inherit;
+        }
+        .photo-side-btn:hover { filter: brightness(1.04); width: 42px; }
+        .photo-side-btn:active { filter: brightness(.96); }
+        .photo-side-btn.has-photo {
+            background: linear-gradient(180deg, #d9f0ff, #c2e6fc);
+        }
+        .photo-side-btn.has-photo span { color: #1795cc; }
+        .photo-side-btn.no-photo {
+            background: linear-gradient(180deg, #efefef, #e2e2e2);
+        }
+        .photo-side-btn.no-photo span { color: #999; }
+
+        .photo-view {
+            width: 100%; border-radius: 12px;
+            border: 2px solid var(--border-color);
+            display: block;
+        }
+        .photo-empty {
+            padding: 22px; text-align: center; color: #999;
+            font-weight: 600; font-size: .9em;
+            border: 2px dashed var(--border-color); border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        .photo-none-check {
+            display: flex; align-items: center; gap: 10px;
+            margin-top: 14px; padding: 12px;
+            border: 2px solid var(--border-color); border-radius: 12px;
+            cursor: pointer; font-weight: 700; font-size: .9em; color: #777;
+            background: var(--bg-color);
+        }
+        .photo-none-check input { width: 20px; height: 20px; accent-color: var(--duo-green); cursor: pointer; }
 
         /* ═══ Semaine inactive : bannière diagonale ═══ */
         .inactive-banner {
@@ -576,6 +658,19 @@
         </div>
     </div>
 
+    <!-- MODAL PHOTO SEMAINE -->
+    <div class="stats-overlay" id="photoOverlay" onclick="if(event.target===this)closePhotoModal()">
+        <div class="stats-modal">
+            <div class="stats-modal-head">
+                <h2 style="margin:0;">📷 Photo de la semaine</h2>
+                <button class="stats-close" onclick="closePhotoModal()">✕</button>
+            </div>
+            <p style="margin:0 0 12px; font-size:.85em; color:#777; font-weight:600;" id="photoModalSub"></p>
+            <div id="photoModalContent"></div>
+            <input type="file" id="photoFile" accept="image/*" style="display:none;" onchange="handlePhotoFile(event)">
+        </div>
+    </div>
+
     <!-- MODAL STATS GLOBAL -->
     <div class="stats-overlay" id="statsOverlay" onclick="if(event.target===this)closeStats()">
         <div class="stats-modal">
@@ -596,7 +691,8 @@
         </div>
 
         <div id="page-suivi" class="page active">
-            <div class="card">
+            <div class="card week-card">
+                <button class="photo-side-btn" id="photoBtn" onclick="openPhotoModal()"><span id="photoBtnTxt">📷 Insérer une photo</span></button>
                 <div class="week-nav">
                     <button onclick="changeWeek(-1)">◀</button>
                     <span id="weekLabel">Du ... au ...</span>
@@ -858,6 +954,7 @@
             const inBtn = document.getElementById('inactiveBtn');
             inBtn.classList.toggle('on', isInactive);
             inBtn.innerText = isInactive ? '💤 Semaine inactive ✓ (annuler)' : '💤 Marquer la semaine inactive';
+            updatePhotoBtn();
 
             const dataAcc1 = getChartDataForAccount(1, datesDb);
             const dataAcc2 = getChartDataForAccount(2, datesDb);
@@ -1057,6 +1154,20 @@
             return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         }
 
+        function renderLessonsHistory(acc) {
+            if (db[acc].length === 0) {
+                return '<div class="lessons-hist-empty">Aucune session enregistrée.</div>';
+            }
+            let rows = '';
+            db[acc].forEach(e => {
+                rows += `<tr><td>${formatDateFr(e.date)}</td><td class="lh-val">${e.lessons} leçon${e.lessons > 1 ? 's' : ''}</td></tr>`;
+            });
+            return `<div class="lessons-hist-scroll"><table class="lessons-hist-table">
+                <thead><tr><th>Date</th><th>Leçons</th></tr></thead>
+                <tbody>${rows}</tbody>
+            </table></div>`;
+        }
+
         function renderStats() {
             const monthSince = isoDaysAgo(30);
             const yearSince = isoDaysAgo(365);
@@ -1096,10 +1207,101 @@
                         </div>
                         <button class="btn-main" style="margin-top:10px;" onclick="saveRecords(${acc})">Enregistrer</button>
                     </details>
+                    <details class="stats-edit">
+                        <summary>📚 Historique des leçons <span class="lessons-hist-count">${db[acc].length}</span></summary>
+                        <div class="lessons-hist">${renderLessonsHistory(acc)}</div>
+                    </details>
                 </div>`;
             });
 
+            // Boutons Export / Import tout en bas
+            out += `
+            <div class="data-tools">
+                <div class="data-tools-title">💾 Mes données</div>
+                <div class="data-tools-row">
+                    <button class="btn-main" onclick="exportData()">⬇️ Exporter</button>
+                    <button class="btn-main btn-compare" style="margin-top:0;" onclick="document.getElementById('importFile').click()">⬆️ Importer</button>
+                </div>
+                <input type="file" id="importFile" accept=".json,application/json" style="display:none;" onchange="importData(event)">
+                <div class="data-tools-hint">Exporte une sauvegarde de toutes tes données (sessions, records, ligues, semaines inactives) dans un fichier. Importe-la sur un autre appareil pour tout retrouver.</div>
+            </div>`;
+
             document.getElementById('statsContent').innerHTML = out;
+        }
+
+        // --- EXPORT / IMPORT DES DONNÉES ---
+        function exportData() {
+            const payload = {
+                app: 'weeklingo',
+                version: 1,
+                exportedAt: new Date().toISOString(),
+                db: db,
+                records: recordsDb,
+                league: leagueDb,
+                leagueLastWeek: localStorage.getItem('weeklingo_league_lastweek') || '',
+                inactiveWeeks: inactiveWeeks,
+                photos: photosDb
+            };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            const d = new Date();
+            const stamp = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            a.href = URL.createObjectURL(blob);
+            a.download = `weeklingo_sauvegarde_${stamp}.json`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const payload = JSON.parse(e.target.result);
+                    if (!payload || payload.app !== 'weeklingo' || !payload.db) {
+                        alert("Ce fichier n'est pas une sauvegarde Weeklingo valide.");
+                        return;
+                    }
+                    if (!confirm('⚠️ Importer cette sauvegarde va REMPLACER toutes les données actuelles (les 3 comptes). Continuer ?')) return;
+
+                    db = payload.db;
+                    [1,2,3].forEach(a => { if (!db[a]) db[a] = []; });
+                    localStorage.setItem('weeklingo_db', JSON.stringify(db));
+
+                    if (payload.records) {
+                        recordsDb = payload.records;
+                        [1,2,3].forEach(a => { if (!recordsDb[a]) recordsDb[a] = { xp:{val:0,date:''}, lessons:{val:0,date:''} }; });
+                        localStorage.setItem('weeklingo_records', JSON.stringify(recordsDb));
+                    }
+                    if (payload.league) {
+                        leagueDb = payload.league;
+                        [1,2,3].forEach(a => { if (!leagueDb[a]) leagueDb[a] = { league: 'bronze', streak: 1 }; });
+                        localStorage.setItem('weeklingo_league', JSON.stringify(leagueDb));
+                    }
+                    if (payload.leagueLastWeek) {
+                        localStorage.setItem('weeklingo_league_lastweek', payload.leagueLastWeek);
+                    }
+                    if (payload.inactiveWeeks) {
+                        inactiveWeeks = payload.inactiveWeeks;
+                        [1,2,3].forEach(a => { if (!inactiveWeeks[a]) inactiveWeeks[a] = []; });
+                        localStorage.setItem('weeklingo_inactive', JSON.stringify(inactiveWeeks));
+                    }
+                    if (payload.photos) {
+                        photosDb = payload.photos;
+                        [1,2,3].forEach(a => { if (!photosDb[a]) photosDb[a] = {}; });
+                        savePhotosDb();
+                    }
+
+                    updateView();
+                    renderStats();
+                    alert('✅ Sauvegarde importée avec succès !');
+                } catch (err) {
+                    alert("Erreur : impossible de lire ce fichier.");
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
         }
 
         function saveRecords(acc) {
@@ -1115,6 +1317,112 @@
             };
             localStorage.setItem('weeklingo_records', JSON.stringify(recordsDb));
             renderStats();
+        }
+
+        // --- PHOTOS DE SEMAINE (stats envoyées par Duolingo) ---
+        // Structure : { compte: { cléSemaine: dataURL | 'none' } }
+        let photosDb = JSON.parse(localStorage.getItem('weeklingo_photos')) || { 1: {}, 2: {}, 3: {} };
+        [1,2,3].forEach(a => { if (!photosDb[a]) photosDb[a] = {}; });
+
+        function savePhotosDb() {
+            try {
+                localStorage.setItem('weeklingo_photos', JSON.stringify(photosDb));
+            } catch (e) {
+                alert("⚠️ Stockage plein ! Supprime d'anciennes photos pour libérer de la place.");
+            }
+        }
+
+        function getPhotoState() {
+            const v = photosDb[currentAccount][currentWeekKey];
+            if (v === 'none') return 'none';
+            if (v) return 'photo';
+            return 'empty';
+        }
+
+        function updatePhotoBtn() {
+            const btn = document.getElementById('photoBtn');
+            const txt = document.getElementById('photoBtnTxt');
+            const state = getPhotoState();
+            btn.classList.remove('has-photo', 'no-photo');
+            if (state === 'photo') { txt.innerText = '🖼️ Voir la photo'; btn.classList.add('has-photo'); }
+            else if (state === 'none') { txt.innerText = '🚫 Pas de photo'; btn.classList.add('no-photo'); }
+            else { txt.innerText = '📷 Insérer une photo'; }
+        }
+
+        function openPhotoModal() {
+            renderPhotoModal();
+            document.getElementById('photoOverlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePhotoModal() {
+            document.getElementById('photoOverlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function renderPhotoModal() {
+            const state = getPhotoState();
+            const sub = document.getElementById('photoModalSub');
+            const content = document.getElementById('photoModalContent');
+            sub.innerText = ACCOUNT_EMOJIS[currentAccount] + ' ' + ACCOUNT_NAMES[currentAccount] + ' — semaine du ' + formatDateFr(currentWeekKey);
+
+            if (state === 'photo') {
+                content.innerHTML = `
+                    <img src="${photosDb[currentAccount][currentWeekKey]}" class="photo-view" alt="Stats Duolingo">
+                    <div class="data-tools-row" style="margin-top:12px;">
+                        <button class="btn-main btn-compare" style="margin-top:0;" onclick="document.getElementById('photoFile').click()">🔄 Remplacer</button>
+                        <button class="btn-main btn-compare" style="margin-top:0; color:var(--duo-red); border-color:rgba(255,75,75,.4);" onclick="deletePhoto()">🗑️ Supprimer</button>
+                    </div>`;
+            } else {
+                content.innerHTML = `
+                    <div class="photo-empty">Aucune photo pour cette semaine.</div>
+                    <button class="btn-main" onclick="document.getElementById('photoFile').click()">📷 Importer une photo</button>
+                    <label class="photo-none-check">
+                        <input type="checkbox" id="noPhotoCheck" ${state === 'none' ? 'checked' : ''} onchange="toggleNoPhoto(this.checked)">
+                        <span>Pas de photo reçue cette semaine</span>
+                    </label>`;
+            }
+        }
+
+        function handlePhotoFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                // Compression : max 900px de large, JPEG qualité 0.82 (localStorage limité)
+                const img = new Image();
+                img.onload = () => {
+                    const maxW = 900;
+                    const scale = Math.min(1, maxW / img.width);
+                    const c = document.createElement('canvas');
+                    c.width = Math.round(img.width * scale);
+                    c.height = Math.round(img.height * scale);
+                    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+                    photosDb[currentAccount][currentWeekKey] = c.toDataURL('image/jpeg', 0.82);
+                    savePhotosDb();
+                    updatePhotoBtn();
+                    renderPhotoModal();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        function toggleNoPhoto(checked) {
+            if (checked) photosDb[currentAccount][currentWeekKey] = 'none';
+            else delete photosDb[currentAccount][currentWeekKey];
+            savePhotosDb();
+            updatePhotoBtn();
+            renderPhotoModal();
+        }
+
+        function deletePhoto() {
+            if (!confirm('Supprimer cette photo ?')) return;
+            delete photosDb[currentAccount][currentWeekKey];
+            savePhotosDb();
+            updatePhotoBtn();
+            renderPhotoModal();
         }
 
         // --- LIGUE (lundi -> dimanche 22h) ---
@@ -1278,7 +1586,7 @@
         }
 
         // Fermer les modals avec Échap
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeStats(); closeLeague(); } });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeStats(); closeLeague(); closePhotoModal(); } });
 
         // Lancement initial
         updateView();
@@ -1387,5 +1695,5 @@ self.addEventListener('fetch', e => {
             if (wrap) wrap.innerHTML = '<div style="padding:12px;border-radius:12px;background:rgba(88,204,2,0.1);border:2px solid rgba(88,204,2,0.35);color:#58a700;font-weight:800;text-align:center;">✅ Weeklingo est installée sur ton appareil !</div>';
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1566d43c84f1310',t:'MTc4MzA4NzMzNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a15ee7275dc41cf8',t:'MTc4MzE3NjIxMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1566d43c84f1310',t:'MTc4MzA4NzMzNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
