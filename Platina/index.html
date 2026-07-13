@@ -338,6 +338,21 @@
 
 @media(max-width:1050px){#app-launcher .launcher-choices{grid-template-columns:1fr;min-height:0}#app-launcher .launcher-choice{min-height:720px}#app-launcher .launcher-choice:first-child{border-bottom:2px solid #262626}.hub-preview-content{grid-template-columns:minmax(0,1fr) 210px}.hub-trophy-strip{min-width:210px}.hub-stat-preview{min-width:210px}}
 @media(max-width:620px){#app-launcher .launcher-shell{padding:14px 13px 20px;gap:16px}.hub-global-header{padding:0 4px;min-height:64px}.hub-global-logo{width:46px;height:46px}.hub-global-brand strong{font-size:19px}.hub-global-brand small{font-size:9px}.hub-global-question{display:none}#app-launcher .launcher-choice{padding:22px 18px;min-height:760px;border-radius:22px}.hub-app-title{font-size:52px}.hub-app-desc{font-size:14px}.hub-preview-box{padding:14px;margin-top:24px}.hub-preview-head small{font-size:8px}.hub-preview-content{grid-template-columns:1fr;gap:14px}.hub-covers{gap:7px}.hub-game-card small{font-size:8px}.hub-trophy-strip{min-width:0;grid-template-columns:repeat(4,1fr)}.hub-trophy-strip>span{height:45px;justify-content:center}.hub-trophy-strip small{display:none}.hub-stat-preview{min-width:0;grid-template-columns:1fr 1fr}.hub-stat-preview>span+span{border-top:0;border-left:2px solid #262626}.hub-card-footer{grid-template-columns:1fr;gap:13px}.hub-card-footer .hub-open-btn{min-height:52px}.hub-card-footer strong{white-space:normal}.hub-card-footer small{font-size:8px}}
+
+/* PLAY HUB V4 — jaquettes superposées en éventail */
+#app-launcher .hub-covers{display:flex;align-items:center;justify-content:center;gap:0;padding:18px 20px 24px;min-width:275px;overflow:visible}
+#app-launcher .hub-game-card{position:relative;display:block;flex:0 0 clamp(88px,7.3vw,108px);width:clamp(88px,7.3vw,108px);margin-left:-23px;transition:transform .22s ease,filter .22s ease;filter:drop-shadow(0 12px 12px rgba(0,0,0,.4))}
+#app-launcher .hub-game-card:first-child{margin-left:0;z-index:1;transform:translateY(8px) rotate(-7deg)}
+#app-launcher .hub-game-card:nth-child(2){z-index:3;transform:translateY(-9px) rotate(0)}
+#app-launcher .hub-game-card:nth-child(3){z-index:2;transform:translateY(8px) rotate(7deg)}
+#app-launcher .hub-game-card .hub-cover{width:100%;height:auto;aspect-ratio:.76;margin:0;border:3px solid #262626;border-radius:14px;box-shadow:0 12px 24px rgba(0,0,0,.5);transform:none!important}
+#app-launcher .hub-game-card small{position:absolute;z-index:5;left:7px;right:7px;bottom:7px;margin:0;padding:5px 6px;border-radius:7px;background:rgba(0,0,0,.8);color:#fff;font-size:7px;font-weight:900;line-height:1.1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;backdrop-filter:blur(5px)}
+#app-launcher .hub-game-card i{z-index:6;top:6px;left:6px}
+#app-launcher .launcher-choice:hover .hub-game-card:first-child{transform:translateY(2px) rotate(-9deg)}
+#app-launcher .launcher-choice:hover .hub-game-card:nth-child(2){transform:translateY(-17px) scale(1.04)}
+#app-launcher .launcher-choice:hover .hub-game-card:nth-child(3){transform:translateY(2px) rotate(9deg)}
+#app-launcher .launcher-choice:hover .hub-game-card .hub-cover{transform:none!important;border-color:#1cb0f6}
+@media(max-width:620px){#app-launcher .hub-covers{min-width:0;padding:18px 10px 25px}#app-launcher .hub-game-card{flex-basis:100px;width:100px;margin-left:-22px}}
 </style>
 <script id="pstat-inline-script">
 
@@ -2519,5 +2534,5 @@ if(!configured()){
   }catch(e){console.error(e);status('Erreur config','err');}
 }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1a83997ed1bbb69',t:'MTc4Mzk0NTA1MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1a85a27bcc3f4f5',t:'MTc4Mzk0NjM4NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
