@@ -11,6 +11,824 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&family=Orbitron:wght@700;900&display=swap" rel="stylesheet"/>
+<style id="pstat-inline-styles">
+/* ═══════════════════════════════════════════════════════════════
+   PStat + sélecteur d'applications — extension de Platina
+   Les styles sont volontairement isolés sous #pstat-root / #app-launcher.
+   ═══════════════════════════════════════════════════════════════ */
+
+#root.app-hidden{display:none!important}
+
+/* ── Bouton de retour au sélecteur dans Platina ── */
+.mode-return-btn{
+  position:fixed;top:max(12px,env(safe-area-inset-top,0px));right:14px;z-index:88;
+  min-height:40px;padding:8px 13px;border:1.5px solid rgba(255,255,255,.14);
+  border-radius:999px;background:rgba(12,12,16,.82);backdrop-filter:blur(16px);
+  color:#fff;font:900 11px/1 'Nunito',sans-serif;letter-spacing:.45px;cursor:pointer;
+  display:flex;align-items:center;gap:7px;box-shadow:0 8px 24px rgba(0,0,0,.28);
+}
+.mode-return-btn:hover{border-color:#1cb0f6;color:#7eeeff;transform:translateY(-1px)}
+.mode-return-mark{width:21px;height:21px;border-radius:7px;background:linear-gradient(145deg,#1cb0f6,#075dff);display:grid;place-items:center;font-size:10px;color:#fff}
+@media(max-width:520px){.mode-return-btn{padding:8px 10px}.mode-return-label{display:none}}
+
+/* ── Sélecteur initial ── */
+#app-launcher{
+  --hub-bg:#05050a;--hub-card:#101018;--hub-line:rgba(255,255,255,.1);
+  position:fixed;inset:0;z-index:1000;overflow:auto;
+  color:#fff;background:
+    radial-gradient(circle at 12% 12%,rgba(28,176,246,.17),transparent 34%),
+    radial-gradient(circle at 86% 82%,rgba(139,92,246,.2),transparent 38%),
+    var(--hub-bg);
+  transition:opacity .28s ease,visibility .28s ease;
+}
+#app-launcher.launcher-hidden{opacity:0;visibility:hidden;pointer-events:none}
+.launcher-grid-bg{position:fixed;inset:0;pointer-events:none;opacity:.22;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,#000,transparent 90%)}
+.launcher-shell{position:relative;width:min(1060px,100%);min-height:100%;margin:auto;padding:max(34px,env(safe-area-inset-top,0px)) 24px max(32px,env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;justify-content:center}
+.launcher-top{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:34px}
+.launcher-brand{display:flex;align-items:center;gap:13px}
+.launcher-brand-mark{width:44px;height:44px;border-radius:15px;background:#fff;color:#07070d;display:grid;place-items:center;font:900 20px/1 'Orbitron',sans-serif;box-shadow:0 0 0 6px rgba(255,255,255,.055)}
+.launcher-brand-copy strong{display:block;font:900 15px/1.1 'Orbitron',sans-serif;letter-spacing:1.6px}
+.launcher-brand-copy span{display:block;color:#8d8d9a;font-size:11px;font-weight:800;margin-top:4px;letter-spacing:.7px;text-transform:uppercase}
+.launcher-status{display:flex;align-items:center;gap:8px;color:#9b9baa;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.launcher-status i{width:7px;height:7px;border-radius:50%;background:#30dca3;box-shadow:0 0 12px #30dca3}
+.launcher-intro{max-width:720px;margin-bottom:28px}
+.launcher-kicker{font-size:11px;font-weight:1000;letter-spacing:1.8px;color:#7eeeff;text-transform:uppercase;margin-bottom:10px}
+.launcher-title{font:900 clamp(34px,7vw,68px)/.98 'Orbitron',sans-serif;letter-spacing:-2.5px;margin:0}
+.launcher-title span{color:#77778a}
+.launcher-subtitle{font-size:15px;font-weight:700;line-height:1.55;color:#a4a4b2;margin-top:18px;max-width:580px}
+.launcher-choices{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.launcher-choice{
+  position:relative;text-align:left;min-height:290px;padding:25px;border:1.5px solid var(--hub-line);
+  border-radius:28px;background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));
+  color:#fff;overflow:hidden;cursor:pointer;font-family:'Nunito',sans-serif;
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+}
+.launcher-choice:hover,.launcher-choice:focus-visible{transform:translateY(-5px);outline:none}
+.launcher-choice.platina-choice:hover,.launcher-choice.platina-choice:focus-visible{border-color:#1cb0f6;box-shadow:0 24px 70px rgba(28,176,246,.16)}
+.launcher-choice.pstat-choice:hover,.launcher-choice.pstat-choice:focus-visible{border-color:#9b7cff;box-shadow:0 24px 70px rgba(139,92,246,.18)}
+.launcher-choice-glow{position:absolute;width:250px;height:250px;right:-95px;top:-100px;border-radius:50%;filter:blur(12px);opacity:.24;transition:opacity .2s,transform .3s}
+.platina-choice .launcher-choice-glow{background:#1cb0f6}.pstat-choice .launcher-choice-glow{background:#8b5cf6}
+.launcher-choice:hover .launcher-choice-glow{opacity:.38;transform:scale(1.12)}
+.launcher-choice-head{position:relative;display:flex;align-items:center;justify-content:space-between}
+.launcher-app-icon{width:54px;height:54px;border-radius:18px;display:grid;place-items:center}
+.launcher-app-icon svg{width:27px;height:27px}
+.platina-choice .launcher-app-icon{background:rgba(28,176,246,.15);color:#5fd5ff;border:1px solid rgba(28,176,246,.28)}
+.pstat-choice .launcher-app-icon{background:rgba(139,92,246,.16);color:#b8a5ff;border:1px solid rgba(139,92,246,.3)}
+.launcher-arrow{width:40px;height:40px;border:1px solid rgba(255,255,255,.14);border-radius:50%;display:grid;place-items:center;font-size:19px;transition:transform .2s,background .2s}
+.launcher-choice:hover .launcher-arrow{transform:translateX(3px);background:#fff;color:#09090f}
+.launcher-app-tag{position:relative;display:block;margin-top:28px;color:#777786;font-size:10px;font-weight:1000;text-transform:uppercase;letter-spacing:1.2px}
+.launcher-app-name{position:relative;display:block;font:900 29px/1 'Orbitron',sans-serif;margin-top:7px}
+.platina-choice .launcher-app-name{color:#5fd5ff}.pstat-choice .launcher-app-name{color:#b8a5ff}
+.launcher-app-desc{position:relative;display:block;color:#a6a6b4;font-size:13px;font-weight:700;line-height:1.48;margin-top:13px;max-width:360px}
+.launcher-app-features{position:absolute;left:25px;right:25px;bottom:22px;display:flex;gap:7px;flex-wrap:wrap}
+.launcher-app-features span{border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.2);padding:6px 9px;border-radius:999px;font-size:9px;font-weight:900;color:#bcbcc7;text-transform:uppercase;letter-spacing:.35px}
+.launcher-foot{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-top:20px;color:#6f6f7d;font-size:10px;font-weight:800}
+.launcher-foot strong{color:#aaaab6}
+@media(max-width:720px){
+  .launcher-shell{justify-content:flex-start;padding-left:16px;padding-right:16px}
+  .launcher-top{margin-top:4px;margin-bottom:38px}.launcher-status{display:none}
+  .launcher-title{letter-spacing:-1.5px}.launcher-subtitle{font-size:14px}
+  .launcher-choices{grid-template-columns:1fr}.launcher-choice{min-height:274px}
+  .launcher-foot{align-items:flex-start;flex-direction:column}
+}
+
+/* ── Application PStat ── */
+#pstat-root{
+  --ps-bg:#07070c;--ps-surface:#111118;--ps-surface-2:#181821;--ps-line:#282833;
+  --ps-text:#f8f8fb;--ps-mid:#aaaab8;--ps-dim:#6e6e7c;--ps-accent:#9b7cff;
+  --ps-accent-2:#6751e8;--ps-cyan:#65dcff;--ps-green:#35d39d;--ps-orange:#ffb45d;
+  position:fixed;inset:0;z-index:120;background:var(--ps-bg);color:var(--ps-text);
+  display:flex;flex-direction:column;font-family:'Nunito',sans-serif;overflow:hidden;
+}
+#pstat-root.pstat-hidden{display:none}
+#pstat-root *{box-sizing:border-box}
+.pstat-topbar{height:72px;min-height:72px;padding:max(10px,env(safe-area-inset-top,0px)) 20px 9px;display:flex;align-items:center;justify-content:space-between;gap:14px;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(7,7,12,.82);backdrop-filter:blur(18px);z-index:20}
+.pstat-brand{display:flex;align-items:center;gap:11px;min-width:0}
+.pstat-brand-mark{width:38px;height:38px;border-radius:13px;background:linear-gradient(145deg,#ad94ff,#6248e8);display:grid;place-items:center;color:#fff;font:900 15px/1 'Orbitron',sans-serif;box-shadow:0 9px 24px rgba(103,81,232,.32)}
+.pstat-brand-name{font:900 17px/1 'Orbitron',sans-serif;letter-spacing:.5px}
+.pstat-brand-sub{font-size:9px;color:var(--ps-dim);font-weight:900;text-transform:uppercase;letter-spacing:.8px;margin-top:4px}
+.pstat-top-actions{display:flex;gap:8px;align-items:center}
+.pstat-icon-btn{height:38px;min-width:38px;padding:0 11px;border:1px solid var(--ps-line);border-radius:12px;background:var(--ps-surface);color:var(--ps-mid);font:900 10px/1 'Nunito',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}
+.pstat-icon-btn:hover{border-color:var(--ps-accent);color:#fff}
+.pstat-icon-btn svg{width:16px;height:16px}
+.pstat-main{position:relative;flex:1;overflow:hidden}
+.pstat-screen{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;padding:24px max(18px,calc((100vw - 1040px)/2)) calc(88px + env(safe-area-inset-bottom,0px));opacity:0;pointer-events:none;transform:translateY(9px);transition:opacity .18s,transform .18s}
+.pstat-screen.pstat-active{opacity:1;pointer-events:auto;transform:none}
+.pstat-screen::-webkit-scrollbar{width:0}
+.pstat-page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:20px}
+.pstat-eyebrow{font-size:10px;font-weight:1000;color:var(--ps-accent);text-transform:uppercase;letter-spacing:1.3px;margin-bottom:7px}
+.pstat-page-title{font:900 clamp(25px,5vw,36px)/1.05 'Orbitron',sans-serif;letter-spacing:-1px}
+.pstat-page-sub{font-size:12px;color:var(--ps-dim);font-weight:700;margin-top:8px}
+.pstat-card{background:linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.026));border:1px solid rgba(255,255,255,.09);border-radius:22px}
+
+/* Dashboard */
+.pstat-profile-hero{position:relative;min-height:178px;padding:24px;overflow:hidden;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:14px;background:linear-gradient(120deg,#171226,#11111a 54%,#0c1720)}
+.pstat-profile-hero:before{content:"";position:absolute;width:320px;height:320px;border-radius:50%;right:-100px;top:-210px;background:radial-gradient(circle,rgba(155,124,255,.6),rgba(155,124,255,0) 68%)}
+.pstat-profile-copy{position:relative;z-index:1;min-width:0}
+.pstat-live-chip{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:999px;background:rgba(53,211,157,.09);border:1px solid rgba(53,211,157,.2);color:#65e8bb;font-size:9px;font-weight:1000;letter-spacing:.7px;text-transform:uppercase}
+.pstat-live-chip i{width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 9px currentColor}
+.pstat-profile-hello{font-size:13px;color:var(--ps-mid);font-weight:800;margin-top:20px}
+.pstat-profile-name{font:900 clamp(24px,5vw,39px)/1 'Orbitron',sans-serif;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pstat-profile-sync{font-size:10px;font-weight:800;color:var(--ps-dim);margin-top:10px}
+.pstat-avatar{position:relative;z-index:1;width:88px;height:88px;border-radius:26px;object-fit:cover;border:2px solid rgba(255,255,255,.22);background:linear-gradient(145deg,#28283a,#15151f);box-shadow:0 15px 35px rgba(0,0,0,.35);flex-shrink:0}
+.pstat-avatar-fallback{display:grid;place-items:center;font:900 28px/1 'Orbitron',sans-serif;color:#bcaeff}
+.pstat-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.pstat-metric{padding:17px;min-width:0}
+.pstat-metric-icon{width:31px;height:31px;border-radius:10px;display:grid;place-items:center;margin-bottom:18px}
+.pstat-metric-icon svg{width:16px;height:16px}
+.pstat-metric:nth-child(1) .pstat-metric-icon{background:rgba(101,220,255,.11);color:var(--ps-cyan)}
+.pstat-metric:nth-child(2) .pstat-metric-icon{background:rgba(155,124,255,.12);color:#b6a5ff}
+.pstat-metric:nth-child(3) .pstat-metric-icon{background:rgba(53,211,157,.11);color:var(--ps-green)}
+.pstat-metric:nth-child(4) .pstat-metric-icon{background:rgba(255,180,93,.11);color:var(--ps-orange)}
+.pstat-metric-value{font:900 clamp(20px,4vw,29px)/1 'Orbitron',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pstat-metric-label{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--ps-dim);font-weight:1000;margin-top:8px}
+.pstat-dashboard-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(260px,.75fr);gap:14px}
+.pstat-section-card{padding:20px;min-width:0}
+.pstat-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.pstat-section-title{font-size:14px;font-weight:1000;color:#f5f5f8}
+.pstat-section-note{font-size:9px;color:var(--ps-dim);font-weight:900;text-transform:uppercase;letter-spacing:.55px}
+.pstat-ranking{display:flex;flex-direction:column;gap:13px}
+.pstat-rank-row{display:grid;grid-template-columns:26px 43px minmax(0,1fr) auto;align-items:center;gap:10px}
+.pstat-rank-num{font:900 11px/1 'Orbitron',sans-serif;color:var(--ps-dim);text-align:center}
+.pstat-game-thumb{width:43px;height:43px;border-radius:12px;object-fit:cover;background:#242431;border:1px solid rgba(255,255,255,.1)}
+.pstat-game-fallback{display:grid;place-items:center;font-size:10px;font-weight:1000;color:#d9d2ff;background:linear-gradient(145deg,#3b315c,#161623)}
+.pstat-rank-main{min-width:0}
+.pstat-rank-line{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pstat-rank-name{font-size:12px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pstat-rank-meta{font-size:9px;color:var(--ps-dim);font-weight:800;margin-top:3px}
+.pstat-rank-bar{height:4px;border-radius:999px;background:#252530;margin-top:7px;overflow:hidden}
+.pstat-rank-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#7559ed,#b59fff);min-width:3px}
+.pstat-rank-hours{font:900 11px/1 'Orbitron',sans-serif;color:#c8bcff;white-space:nowrap}
+.pstat-platforms{display:flex;flex-direction:column;gap:11px}
+.pstat-platform-row{display:grid;grid-template-columns:43px 1fr auto;gap:9px;align-items:center;padding:10px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055)}
+.pstat-platform-code{height:29px;border-radius:9px;background:#22222d;display:grid;place-items:center;font-size:9px;font-weight:1000;color:#fff}
+.pstat-platform-name{font-size:11px;font-weight:900}.pstat-platform-meta{font-size:9px;color:var(--ps-dim);font-weight:800;margin-top:2px}
+.pstat-platform-pct{font:900 10px/1 'Orbitron',sans-serif;color:var(--ps-cyan)}
+.pstat-recent-card{grid-column:1/-1}
+.pstat-recent-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+.pstat-recent-game{min-width:0;padding:9px;border-radius:15px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+.pstat-recent-cover{width:100%;aspect-ratio:1.6;border-radius:10px;object-fit:cover;background:#22222c;margin-bottom:9px}
+.pstat-recent-name{font-size:10px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pstat-recent-date{font-size:8px;color:var(--ps-dim);font-weight:800;margin-top:3px}
+
+/* Liste jeux */
+.pstat-controls{display:grid;grid-template-columns:minmax(180px,1fr) 190px;gap:10px;margin-bottom:14px}
+.pstat-search-wrap{height:46px;border:1px solid var(--ps-line);border-radius:14px;background:var(--ps-surface);display:flex;align-items:center;gap:10px;padding:0 14px}
+.pstat-search-wrap svg{width:17px;color:var(--ps-dim)}
+.pstat-search-wrap input,.pstat-select{width:100%;border:none;outline:none;background:transparent;color:var(--ps-text);font:800 12px/1 'Nunito',sans-serif}
+.pstat-select{height:46px;border:1px solid var(--ps-line);border-radius:14px;background:var(--ps-surface);padding:0 13px;color-scheme:dark}
+.pstat-games-summary{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px;color:var(--ps-dim);font-size:10px;font-weight:900}
+.pstat-games-list{display:flex;flex-direction:column;gap:8px}
+.pstat-game-row{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:13px;align-items:center;padding:10px 14px 10px 10px;border:1px solid rgba(255,255,255,.075);border-radius:17px;background:rgba(255,255,255,.036)}
+.pstat-game-row-cover{width:56px;height:56px;border-radius:13px;object-fit:cover;background:#20202a}
+.pstat-game-row-name{font-size:13px;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pstat-game-row-meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:6px;color:var(--ps-dim);font-size:9px;font-weight:800}
+.pstat-platform-pill,.pstat-service-pill{padding:4px 7px;border-radius:999px;background:#24242f;color:#c4c4ce;font-size:8px;font-weight:1000;text-transform:uppercase;letter-spacing:.3px}
+.pstat-service-pill{background:rgba(155,124,255,.1);color:#bbaeff}
+.pstat-game-time{text-align:right}.pstat-game-hours{font:900 14px/1 'Orbitron',sans-serif;color:#c5b8ff}.pstat-game-count{font-size:8px;color:var(--ps-dim);font-weight:900;margin-top:6px;text-transform:uppercase}
+
+/* Transactions */
+.pstat-privacy-banner{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;margin-bottom:14px;border:1px solid rgba(53,211,157,.2);background:rgba(53,211,157,.055);border-radius:16px}
+.pstat-privacy-banner svg{width:18px;color:var(--ps-green);flex-shrink:0;margin-top:1px}.pstat-privacy-title{font-size:11px;font-weight:1000;color:#7be6c0}.pstat-privacy-text{font-size:9px;color:#86a99d;font-weight:700;line-height:1.4;margin-top:3px}
+.pstat-transaction-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.pstat-transaction-metric{padding:16px}.pstat-transaction-metric strong{display:block;font:900 20px/1 'Orbitron',sans-serif}.pstat-transaction-metric span{display:block;color:var(--ps-dim);font-size:9px;font-weight:1000;text-transform:uppercase;letter-spacing:.5px;margin-top:8px}
+.pstat-import-panel{padding:18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.pstat-import-copy{min-width:0}.pstat-import-title{font-size:13px;font-weight:1000}.pstat-import-desc{font-size:10px;color:var(--ps-dim);font-weight:700;line-height:1.45;margin-top:5px;max-width:520px}
+.pstat-import-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.pstat-btn{min-height:39px;padding:9px 13px;border-radius:12px;border:1px solid var(--ps-line);background:var(--ps-surface-2);color:var(--ps-text);font:900 10px/1 'Nunito',sans-serif;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;text-decoration:none}
+.pstat-btn:hover{border-color:var(--ps-accent)}.pstat-btn-primary{background:linear-gradient(145deg,#9b7cff,#634be3);border-color:transparent;box-shadow:0 8px 20px rgba(103,81,232,.25)}.pstat-btn-danger{color:#ff858f;border-color:rgba(255,93,106,.24);background:rgba(255,93,106,.06)}
+.pstat-btn svg{width:14px;height:14px}
+.pstat-transaction-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.pstat-transaction-toolbar .pstat-search-wrap{flex:1;max-width:430px}
+.pstat-transaction-list{display:flex;flex-direction:column;gap:7px}
+.pstat-transaction-row{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;border:1px solid rgba(255,255,255,.07);border-radius:16px;background:rgba(255,255,255,.032)}
+.pstat-transaction-icon{width:42px;height:42px;border-radius:12px;background:rgba(155,124,255,.1);color:#baaaff;display:grid;place-items:center;font-size:16px}
+.pstat-transaction-name{font-size:12px;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pstat-transaction-meta{font-size:9px;color:var(--ps-dim);font-weight:800;margin-top:4px}.pstat-transaction-amount{font:900 12px/1 'Orbitron',sans-serif;white-space:nowrap}.pstat-transaction-amount.refund{color:var(--ps-green)}
+
+/* Réglages PStat */
+.pstat-settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pstat-setting-card{padding:19px}.pstat-setting-icon{width:36px;height:36px;border-radius:12px;background:rgba(155,124,255,.11);color:#bbaeff;display:grid;place-items:center;margin-bottom:15px}.pstat-setting-title{font-size:13px;font-weight:1000}.pstat-setting-text{font-size:10px;color:var(--ps-dim);font-weight:700;line-height:1.45;margin:6px 0 15px}.pstat-setting-line{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid rgba(255,255,255,.06);font-size:10px}.pstat-setting-line span{color:var(--ps-dim);font-weight:800}.pstat-setting-line strong{font-weight:1000;text-align:right}
+
+/* États vides / chargement */
+.pstat-empty{padding:36px 18px;text-align:center;border:1px dashed rgba(255,255,255,.12);border-radius:18px;color:var(--ps-dim)}
+.pstat-empty-icon{font-size:27px;margin-bottom:10px}.pstat-empty strong{display:block;font-size:12px;color:var(--ps-mid)}.pstat-empty span{display:block;font-size:9px;font-weight:700;line-height:1.45;margin:6px auto 0;max-width:390px}
+.pstat-skeleton{height:55px;border-radius:14px;background:linear-gradient(90deg,#17171f,#23232e,#17171f);background-size:200% 100%;animation:pstatShimmer 1.25s linear infinite}
+@keyframes pstatShimmer{to{background-position:-200% 0}}
+
+/* Navigation PStat */
+.pstat-nav{height:64px;min-height:64px;padding:0 8px env(safe-area-inset-bottom,0px);border-top:1px solid rgba(255,255,255,.08);background:rgba(12,12,17,.92);backdrop-filter:blur(18px);display:flex;z-index:22}
+.pstat-nav-btn{position:relative;flex:1;border:none;background:none;color:#6d6d7c;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.pstat-nav-btn svg{width:19px;height:19px}.pstat-nav-btn span{font-size:8px;font-weight:1000;text-transform:uppercase;letter-spacing:.45px}.pstat-nav-btn:before{content:"";position:absolute;top:0;width:31px;height:3px;border-radius:0 0 4px 4px;background:var(--ps-accent);opacity:0;transform:scaleX(.3);transition:.18s}.pstat-nav-btn.pstat-nav-active{color:#b9aaff}.pstat-nav-btn.pstat-nav-active:before{opacity:1;transform:scaleX(1)}
+
+@media(max-width:760px){
+  .pstat-topbar{height:64px;min-height:64px;padding-left:14px;padding-right:12px}.pstat-brand-sub{display:none}.pstat-back-label{display:none}
+  .pstat-screen{padding-top:18px;padding-left:13px;padding-right:13px}
+  .pstat-profile-hero{padding:18px;min-height:160px}.pstat-avatar{width:68px;height:68px;border-radius:21px}.pstat-profile-name{font-size:25px}
+  .pstat-metrics{grid-template-columns:1fr 1fr}.pstat-metric{padding:15px}.pstat-metric-icon{margin-bottom:13px}
+  .pstat-dashboard-grid{grid-template-columns:1fr}.pstat-recent-card{grid-column:auto}.pstat-recent-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.pstat-recent-game:nth-child(n+5){display:none}
+  .pstat-controls{grid-template-columns:1fr}.pstat-game-row{grid-template-columns:50px minmax(0,1fr) auto}.pstat-game-row-cover{width:50px;height:50px}
+  .pstat-transaction-metrics{grid-template-columns:1fr 1fr}.pstat-transaction-metric:last-child{grid-column:1/-1}.pstat-import-panel{align-items:flex-start;flex-direction:column}.pstat-import-actions{justify-content:flex-start}
+  .pstat-settings-grid{grid-template-columns:1fr}
+}
+@media(max-width:420px){
+  .pstat-page-head{align-items:flex-start;flex-direction:column}.pstat-page-title{font-size:27px}
+  .pstat-metric-value{font-size:20px}.pstat-metric-label{font-size:8px}
+  .pstat-rank-row{grid-template-columns:22px 39px minmax(0,1fr) auto}.pstat-game-thumb{width:39px;height:39px}.pstat-rank-hours{font-size:9px}
+  .pstat-game-row{padding-right:10px;gap:10px}.pstat-game-hours{font-size:11px}.pstat-game-count{display:none}
+  .pstat-transaction-row{grid-template-columns:36px minmax(0,1fr) auto;padding:10px}.pstat-transaction-icon{width:36px;height:36px}.pstat-transaction-amount{font-size:10px}
+}
+
+</style>
+<script id="pstat-inline-script">
+/* PStat — statistiques PlayStation + transactions locales
+   Aucune donnée financière n'est envoyée vers psn-data.json ou Firebase. */
+(function () {
+  'use strict';
+
+  var DATA_URL = 'psn-data.json';
+  var TRANSACTION_KEY = 'pstat-transactions-v1';
+  var pstatData = null;
+  var playedGames = [];
+  var transactions = [];
+  var currentPstatTab = 'overview';
+  var dataLoading = false;
+
+  function byId(id) { return document.getElementById(id); }
+  function text(id, value) { var el = byId(id); if (el) el.textContent = value; }
+  function html(id, value) { var el = byId(id); if (el) el.innerHTML = value; }
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (char) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char];
+    });
+  }
+  function stripAccents(value) {
+    return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  }
+  function notify(message, icon) {
+    if (typeof window.showToast === 'function') window.showToast(message, icon || '●');
+    else console.info(message);
+  }
+
+  /* ── Sélecteur d'applications ── */
+  function closeTransientUi() {
+    document.querySelectorAll('.modal-overlay.open,.date-modal-overlay.open,.trophy-detail-overlay.open,.lightbox-overlay.open').forEach(function (el) {
+      el.classList.remove('open');
+    });
+    var install = byId('tt-install-banner');
+    if (install) install.classList.remove('show');
+  }
+
+  window.openAppHub = function () {
+    closeTransientUi();
+    var launcher = byId('app-launcher');
+    var root = byId('root');
+    var pstat = byId('pstat-root');
+    if (root) { root.classList.remove('app-hidden'); root.setAttribute('aria-hidden', 'true'); }
+    if (pstat) { pstat.classList.add('pstat-hidden'); pstat.setAttribute('aria-hidden', 'true'); }
+    if (launcher) { launcher.classList.remove('launcher-hidden'); launcher.setAttribute('aria-hidden', 'false'); }
+    document.title = 'Platina + PStat';
+  };
+
+  window.choosePlayStationApp = function (mode) {
+    var launcher = byId('app-launcher');
+    var root = byId('root');
+    var pstat = byId('pstat-root');
+    if (launcher) { launcher.classList.add('launcher-hidden'); launcher.setAttribute('aria-hidden', 'true'); }
+
+    if (mode === 'pstat') {
+      if (root) { root.classList.add('app-hidden'); root.setAttribute('aria-hidden', 'true'); }
+      if (pstat) { pstat.classList.remove('pstat-hidden'); pstat.setAttribute('aria-hidden', 'false'); }
+      document.title = 'PStat — Mon compte PlayStation';
+      loadPstatData(false);
+      renderTransactions();
+    } else {
+      if (pstat) { pstat.classList.add('pstat-hidden'); pstat.setAttribute('aria-hidden', 'true'); }
+      if (root) { root.classList.remove('app-hidden'); root.setAttribute('aria-hidden', 'false'); }
+      document.title = 'Platina';
+      requestAnimationFrame(function () {
+        window.dispatchEvent(new Event('resize'));
+        if (typeof window.renderDashboard === 'function') window.renderDashboard();
+      });
+    }
+  };
+
+  /* ── Navigation PStat ── */
+  window.switchPstatTab = function (tab) {
+    currentPstatTab = tab;
+    document.querySelectorAll('.pstat-screen').forEach(function (screen) {
+      screen.classList.toggle('pstat-active', screen.getAttribute('data-pstat-screen') === tab);
+    });
+    document.querySelectorAll('.pstat-nav-btn').forEach(function (button) {
+      button.classList.toggle('pstat-nav-active', button.getAttribute('data-pstat-tab') === tab);
+    });
+    var screen = document.querySelector('.pstat-screen[data-pstat-screen="' + tab + '"]');
+    if (screen) screen.scrollTop = 0;
+    if (tab === 'games') renderPlayedGames();
+    if (tab === 'transactions') renderTransactions();
+  };
+
+  /* ── Données PSN ── */
+  function parseISODuration(value) {
+    if (typeof value === 'number' && isFinite(value)) return Math.max(0, value);
+    var match = String(value || '').match(/^P(?:(\d+(?:\.\d+)?)D)?(?:T(?:(\d+(?:\.\d+)?)H)?(?:(\d+(?:\.\d+)?)M)?(?:(\d+(?:\.\d+)?)S)?)?$/i);
+    if (!match) return 0;
+    return Math.round((Number(match[1] || 0) * 86400) + (Number(match[2] || 0) * 3600) + (Number(match[3] || 0) * 60) + Number(match[4] || 0));
+  }
+
+  function normalizePlatform(game) {
+    var raw = stripAccents(game.platform || game.category || game.platformRaw || '');
+    if (raw.indexOf('ps5') >= 0) return 'PS5';
+    if (raw.indexOf('ps4') >= 0) return 'PS4';
+    if (raw.indexOf('ps3') >= 0) return 'PS3';
+    if (raw.indexOf('vita') >= 0) return 'PS Vita';
+    if (raw.indexOf('pc') >= 0) return 'PC';
+    return 'Autre';
+  }
+
+  function initials(name) {
+    return String(name || 'PS').split(/\s+/).filter(Boolean).slice(0, 2).map(function (part) { return part.charAt(0).toUpperCase(); }).join('') || 'PS';
+  }
+
+  function coverMarkup(game, className) {
+    var cover = game.coverUrl || game.imageUrl || game.localizedImageUrl || '';
+    if (cover) return '<img class="' + className + '" src="' + escapeHtml(cover) + '" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;' + className + ' pstat-game-fallback&quot;>' + escapeHtml(initials(game.name)) + '</div>\'">';
+    return '<div class="' + className + ' pstat-game-fallback">' + escapeHtml(initials(game.name)) + '</div>';
+  }
+
+  function fallbackGamesFromTrophies(data) {
+    return (data.games || []).map(function (game) {
+      return {
+        titleId: game.psnNpCommunicationId || game.id,
+        name: game.name,
+        coverUrl: game.coverUrl || '',
+        platform: game.platform || game.platformRaw || '',
+        category: game.platform || '',
+        service: 'unknown',
+        playCount: 0,
+        durationSeconds: 0,
+        playDuration: 'PT0S',
+        firstPlayedDateTime: null,
+        lastPlayedDateTime: game.psnLastUpdatedDateTime || (game.addedAt ? new Date(game.addedAt).toISOString() : null),
+        statsUnavailable: true
+      };
+    });
+  }
+
+  function normalizePlayedGames(data) {
+    var source = data.playStats && Array.isArray(data.playStats.games) ? data.playStats.games : fallbackGamesFromTrophies(data);
+    return source.map(function (game) {
+      var normalized = Object.assign({}, game);
+      normalized.name = game.localizedName || game.name || 'Jeu sans nom';
+      normalized.coverUrl = game.coverUrl || game.localizedImageUrl || game.imageUrl || '';
+      normalized.durationSeconds = Number.isFinite(Number(game.durationSeconds)) ? Number(game.durationSeconds) : parseISODuration(game.playDuration);
+      normalized.playCount = Number(game.playCount || 0);
+      normalized.platform = normalizePlatform(game);
+      return normalized;
+    });
+  }
+
+  function setLoadingUi() {
+    html('pstat-top-games', '<div class="pstat-skeleton"></div><div class="pstat-skeleton"></div><div class="pstat-skeleton"></div>');
+    html('pstat-platforms', '<div class="pstat-skeleton"></div><div class="pstat-skeleton"></div>');
+    text('pstat-sync-label', 'Synchronisation des données…');
+  }
+
+  window.reloadPstatData = function () { loadPstatData(true); };
+
+  function loadPstatData(force) {
+    if (dataLoading || (pstatData && !force)) return;
+    dataLoading = true;
+    setLoadingUi();
+    fetch(DATA_URL + '?ts=' + Date.now(), { cache: 'no-store' })
+      .then(function (response) {
+        if (!response.ok) throw new Error('psn-data.json est introuvable.');
+        return response.json();
+      })
+      .then(function (data) {
+        if (!data || !Array.isArray(data.games)) throw new Error('Le fichier de données PSN est invalide.');
+        pstatData = data;
+        playedGames = normalizePlayedGames(data);
+        renderPstatDashboard();
+        renderPlayedGames();
+        renderPstatSettings();
+        var hasPlayStats = Boolean(data.playStats && Array.isArray(data.playStats.games));
+        notify(hasPlayStats ? 'Statistiques PStat actualisées' : 'Relance GitHub Actions pour importer le temps de jeu', hasPlayStats ? '✓' : '↻');
+      })
+      .catch(function (error) {
+        renderPstatError(error && error.message ? error.message : 'Impossible de charger les données PSN.');
+      })
+      .finally(function () { dataLoading = false; });
+  }
+
+  function renderPstatError(message) {
+    var empty = '<div class="pstat-empty"><div class="pstat-empty-icon">⚠</div><strong>Données indisponibles</strong><span>' + escapeHtml(message) + '</span></div>';
+    html('pstat-top-games', empty);
+    html('pstat-platforms', empty);
+    html('pstat-recent-games', empty);
+    text('pstat-sync-label', message);
+  }
+
+  function formatInteger(value) { return Math.round(Number(value || 0)).toLocaleString('fr-FR'); }
+  function formatHours(seconds, short) {
+    seconds = Math.max(0, Number(seconds || 0));
+    var hours = Math.floor(seconds / 3600);
+    var minutes = Math.floor((seconds % 3600) / 60);
+    if (hours <= 0) return minutes > 0 ? minutes + ' min' : '0 h';
+    if (short || hours >= 100) return formatInteger(hours) + ' h';
+    return hours + ' h ' + String(minutes).padStart(2, '0');
+  }
+  function formatDate(value, relative) {
+    if (!value) return 'Date inconnue';
+    var date = new Date(value);
+    if (isNaN(date.getTime())) return 'Date inconnue';
+    if (relative) {
+      var days = Math.floor((Date.now() - date.getTime()) / 86400000);
+      if (days <= 0) return "Aujourd'hui";
+      if (days === 1) return 'Hier';
+      if (days < 30) return 'Il y a ' + days + ' j';
+    }
+    return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+  function serviceLabel(value) {
+    var raw = stripAccents(value);
+    if (raw.indexOf('plus') >= 0) return 'PS Plus';
+    if (raw.indexOf('purchased') >= 0 || raw === 'none') return 'Acheté';
+    return '';
+  }
+
+  function totalPlaySeconds() {
+    if (pstatData && pstatData.playStats && Number.isFinite(Number(pstatData.playStats.totalDurationSeconds))) return Number(pstatData.playStats.totalDurationSeconds);
+    return playedGames.reduce(function (sum, game) { return sum + Number(game.durationSeconds || 0); }, 0);
+  }
+
+  function libraryTotal() {
+    if (pstatData && pstatData.library && Number.isFinite(Number(pstatData.library.total))) return Number(pstatData.library.total);
+    if (pstatData && pstatData.playStats && Number.isFinite(Number(pstatData.playStats.totalTitles))) return Number(pstatData.playStats.totalTitles);
+    return playedGames.length;
+  }
+
+  function transactionCurrencies() {
+    var sums = {};
+    transactions.forEach(function (item) {
+      var currency = String(item.currency || 'EUR').toUpperCase();
+      sums[currency] = (sums[currency] || 0) + Number(item.amount || 0);
+    });
+    return sums;
+  }
+  function currencySymbol(code) {
+    return { EUR: '€', USD: '$', GBP: '£', CAD: '$CA', CHF: 'CHF', JPY: '¥' }[String(code || '').toUpperCase()] || String(code || '');
+  }
+  function formatMoney(value, currency) {
+    try { return Number(value || 0).toLocaleString('fr-FR', { style: 'currency', currency: currency || 'EUR' }); }
+    catch (e) { return Number(value || 0).toFixed(2) + ' ' + currencySymbol(currency); }
+  }
+  function transactionTotalLabel() {
+    var sums = transactionCurrencies();
+    var codes = Object.keys(sums);
+    if (!codes.length) return '0,00 €';
+    if (codes.length === 1) return formatMoney(sums[codes[0]], codes[0]);
+    return codes.length + ' devises';
+  }
+
+  function renderPstatDashboard() {
+    if (!pstatData) return;
+    var profile = pstatData.profile || {};
+    var userName = profile.onlineId || 'Joueur PlayStation';
+    text('pstat-user-name', userName);
+    text('pstat-header-profile', userName);
+    text('pstat-sync-label', pstatData.generatedAt ? 'Mis à jour le ' + new Date(pstatData.generatedAt).toLocaleString('fr-FR') : 'Date de synchronisation inconnue');
+
+    var avatar = byId('pstat-avatar');
+    var avatarFallback = byId('pstat-avatar-fallback');
+    if (avatar && profile.avatarUrl) {
+      avatar.src = profile.avatarUrl;
+      avatar.style.display = 'block';
+      if (avatarFallback) avatarFallback.style.display = 'none';
+    } else {
+      if (avatar) avatar.style.display = 'none';
+      if (avatarFallback) { avatarFallback.style.display = 'grid'; avatarFallback.textContent = initials(userName); }
+    }
+
+    text('pstat-metric-library', formatInteger(libraryTotal()));
+    text('pstat-metric-hours', formatHours(totalPlaySeconds(), true));
+    text('pstat-metric-sessions', formatInteger(playedGames.reduce(function (sum, game) { return sum + Number(game.playCount || 0); }, 0)));
+    text('pstat-metric-spend', transactionTotalLabel());
+
+    renderTopGames();
+    renderPlatforms();
+    renderRecentGames();
+  }
+
+  function renderTopGames() {
+    var ranked = playedGames.slice().sort(function (a, b) { return b.durationSeconds - a.durationSeconds || b.playCount - a.playCount; }).slice(0, 8);
+    if (!ranked.length) {
+      html('pstat-top-games', '<div class="pstat-empty"><div class="pstat-empty-icon">◫</div><strong>Aucun jeu trouvé</strong><span>Lance la synchronisation PSN depuis les réglages de Platina.</span></div>');
+      return;
+    }
+    var max = Math.max(1, ranked[0].durationSeconds);
+    var noDurations = ranked.every(function (game) { return !game.durationSeconds; });
+    html('pstat-ranking-note', noDurations ? 'Action PSN à relancer' : 'Temps de jeu total');
+    html('pstat-top-games', ranked.map(function (game, index) {
+      var width = noDurations ? Math.max(12, 100 - index * 9) : Math.max(3, Math.round(game.durationSeconds / max * 100));
+      return '<div class="pstat-rank-row">' +
+        '<div class="pstat-rank-num">' + String(index + 1).padStart(2, '0') + '</div>' +
+        coverMarkup(game, 'pstat-game-thumb') +
+        '<div class="pstat-rank-main"><div class="pstat-rank-name">' + escapeHtml(game.name) + '</div>' +
+        '<div class="pstat-rank-meta">' + escapeHtml(game.platform) + (game.playCount ? ' · ' + formatInteger(game.playCount) + ' lancements' : '') + '</div>' +
+        '<div class="pstat-rank-bar"><div class="pstat-rank-fill" style="width:' + width + '%"></div></div></div>' +
+        '<div class="pstat-rank-hours">' + (noDurations ? '—' : formatHours(game.durationSeconds, true)) + '</div></div>';
+    }).join(''));
+  }
+
+  function renderPlatforms() {
+    var groups = {};
+    playedGames.forEach(function (game) {
+      var platform = game.platform || 'Autre';
+      if (!groups[platform]) groups[platform] = { games: 0, seconds: 0 };
+      groups[platform].games += 1;
+      groups[platform].seconds += Number(game.durationSeconds || 0);
+    });
+    var totalSeconds = Math.max(1, totalPlaySeconds());
+    var rows = Object.keys(groups).map(function (platform) { return { platform: platform, games: groups[platform].games, seconds: groups[platform].seconds }; })
+      .sort(function (a, b) { return b.seconds - a.seconds || b.games - a.games; });
+    if (!rows.length) {
+      html('pstat-platforms', '<div class="pstat-empty"><strong>Aucune plateforme</strong></div>');
+      return;
+    }
+    html('pstat-platforms', rows.map(function (row) {
+      var pct = totalPlaySeconds() ? Math.round(row.seconds / totalSeconds * 100) : Math.round(row.games / playedGames.length * 100);
+      return '<div class="pstat-platform-row"><div class="pstat-platform-code">' + escapeHtml(row.platform.replace('PlayStation ', 'PS')) + '</div>' +
+        '<div><div class="pstat-platform-name">' + escapeHtml(row.platform) + '</div><div class="pstat-platform-meta">' + row.games + ' jeu' + (row.games > 1 ? 'x' : '') + (row.seconds ? ' · ' + formatHours(row.seconds, true) : '') + '</div></div>' +
+        '<div class="pstat-platform-pct">' + pct + '%</div></div>';
+    }).join(''));
+  }
+
+  function renderRecentGames() {
+    var recent = playedGames.slice().sort(function (a, b) { return new Date(b.lastPlayedDateTime || 0) - new Date(a.lastPlayedDateTime || 0); }).slice(0, 5);
+    if (!recent.length) {
+      html('pstat-recent-games', '<div class="pstat-empty"><strong>Aucune activité récente</strong></div>');
+      return;
+    }
+    html('pstat-recent-games', recent.map(function (game) {
+      return '<div class="pstat-recent-game">' + coverMarkup(game, 'pstat-recent-cover') + '<div class="pstat-recent-name">' + escapeHtml(game.name) + '</div><div class="pstat-recent-date">' + formatDate(game.lastPlayedDateTime, true) + '</div></div>';
+    }).join(''));
+  }
+
+  /* ── Écran de classement des jeux ── */
+  window.filterPstatGames = renderPlayedGames;
+  function renderPlayedGames() {
+    var list = byId('pstat-games-list');
+    if (!list) return;
+    var query = stripAccents((byId('pstat-games-search') || {}).value || '');
+    var sort = ((byId('pstat-games-sort') || {}).value || 'duration');
+    var filtered = playedGames.filter(function (game) {
+      return !query || stripAccents(game.name + ' ' + game.platform + ' ' + serviceLabel(game.service)).indexOf(query) >= 0;
+    });
+    filtered.sort(function (a, b) {
+      if (sort === 'recent') return new Date(b.lastPlayedDateTime || 0) - new Date(a.lastPlayedDateTime || 0);
+      if (sort === 'name') return a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' });
+      if (sort === 'sessions') return b.playCount - a.playCount;
+      return b.durationSeconds - a.durationSeconds || b.playCount - a.playCount;
+    });
+    text('pstat-games-count', filtered.length + ' jeu' + (filtered.length > 1 ? 'x' : ''));
+    text('pstat-games-total-hours', formatHours(filtered.reduce(function (sum, game) { return sum + game.durationSeconds; }, 0), true));
+    if (!filtered.length) {
+      list.innerHTML = '<div class="pstat-empty"><div class="pstat-empty-icon">⌕</div><strong>Aucun résultat</strong><span>Essaie un autre nom de jeu ou une autre plateforme.</span></div>';
+      return;
+    }
+    list.innerHTML = filtered.map(function (game) {
+      var service = serviceLabel(game.service);
+      return '<div class="pstat-game-row">' + coverMarkup(game, 'pstat-game-row-cover') +
+        '<div style="min-width:0"><div class="pstat-game-row-name">' + escapeHtml(game.name) + '</div><div class="pstat-game-row-meta"><span class="pstat-platform-pill">' + escapeHtml(game.platform) + '</span>' +
+        (service ? '<span class="pstat-service-pill">' + escapeHtml(service) + '</span>' : '') +
+        '<span>Dernière partie : ' + escapeHtml(formatDate(game.lastPlayedDateTime, true)) + '</span></div></div>' +
+        '<div class="pstat-game-time"><div class="pstat-game-hours">' + (game.statsUnavailable ? '—' : formatHours(game.durationSeconds, true)) + '</div><div class="pstat-game-count">' + (game.playCount ? formatInteger(game.playCount) + ' lancements' : 'temps indisponible') + '</div></div></div>';
+    }).join('');
+  }
+
+  /* ── Transactions locales ── */
+  function loadTransactions() {
+    try {
+      var parsed = JSON.parse(localStorage.getItem(TRANSACTION_KEY) || '[]');
+      transactions = Array.isArray(parsed) ? parsed.filter(function (item) { return item && item.name; }) : [];
+    } catch (e) { transactions = []; }
+  }
+  function saveTransactions() {
+    localStorage.setItem(TRANSACTION_KEY, JSON.stringify(transactions));
+  }
+
+  function detectDelimiter(line) {
+    var candidates = [';', '\t', ','];
+    var best = ';', count = -1;
+    candidates.forEach(function (delimiter) {
+      var hits = 0, quoted = false;
+      for (var i = 0; i < line.length; i++) {
+        if (line[i] === '"') quoted = !quoted;
+        else if (!quoted && line[i] === delimiter) hits++;
+      }
+      if (hits > count) { count = hits; best = delimiter; }
+    });
+    return best;
+  }
+
+  function parseDelimited(content) {
+    content = String(content || '').replace(/^\uFEFF/, '');
+    var delimiter = detectDelimiter(content.split(/\r?\n/)[0] || '');
+    var rows = [], row = [], field = '', quoted = false;
+    for (var i = 0; i < content.length; i++) {
+      var char = content[i];
+      if (char === '"') {
+        if (quoted && content[i + 1] === '"') { field += '"'; i++; }
+        else quoted = !quoted;
+      } else if (char === delimiter && !quoted) {
+        row.push(field); field = '';
+      } else if ((char === '\n' || char === '\r') && !quoted) {
+        if (char === '\r' && content[i + 1] === '\n') i++;
+        row.push(field); field = '';
+        if (row.some(function (cell) { return String(cell).trim(); })) rows.push(row);
+        row = [];
+      } else field += char;
+    }
+    row.push(field);
+    if (row.some(function (cell) { return String(cell).trim(); })) rows.push(row);
+    return rows;
+  }
+
+  function headerIndex(headers, choices) {
+    var normalized = headers.map(stripAccents);
+    for (var i = 0; i < choices.length; i++) {
+      var wanted = stripAccents(choices[i]);
+      var exact = normalized.indexOf(wanted);
+      if (exact >= 0) return exact;
+    }
+    for (var j = 0; j < choices.length; j++) {
+      var partial = stripAccents(choices[j]);
+      var found = normalized.findIndex(function (header) { return header.indexOf(partial) >= 0; });
+      if (found >= 0) return found;
+    }
+    return -1;
+  }
+
+  function parseAmount(value) {
+    var raw = String(value == null ? '' : value).trim().replace(/\s/g, '').replace(/[€$£¥]/g, '');
+    if (!raw) return 0;
+    if (raw.indexOf(',') >= 0 && raw.indexOf('.') >= 0) {
+      if (raw.lastIndexOf(',') > raw.lastIndexOf('.')) raw = raw.replace(/\./g, '').replace(',', '.');
+      else raw = raw.replace(/,/g, '');
+    } else if (raw.indexOf(',') >= 0) raw = raw.replace(',', '.');
+    raw = raw.replace(/[^0-9+\-.]/g, '');
+    var amount = Number(raw);
+    return Number.isFinite(amount) ? amount : 0;
+  }
+
+  function normalizeDate(value) {
+    var raw = String(value || '').trim();
+    var french = raw.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})(?:\s+.*)?$/);
+    if (french) {
+      var year = Number(french[3]); if (year < 100) year += 2000;
+      var date = new Date(year, Number(french[2]) - 1, Number(french[1]));
+      if (!isNaN(date.getTime())) return date.toISOString();
+    }
+    var parsed = new Date(raw);
+    return isNaN(parsed.getTime()) ? null : parsed.toISOString();
+  }
+
+  function guessCurrency(value, rowCurrency) {
+    var raw = String(value || '');
+    var explicit = String(rowCurrency || '').trim().toUpperCase();
+    if (explicit) return explicit;
+    if (raw.indexOf('€') >= 0) return 'EUR';
+    if (raw.indexOf('£') >= 0) return 'GBP';
+    if (raw.indexOf('¥') >= 0) return 'JPY';
+    if (raw.indexOf('$') >= 0) return 'USD';
+    return 'EUR';
+  }
+
+  function transactionsFromCsv(content) {
+    var rows = parseDelimited(content);
+    if (rows.length < 2) throw new Error('Le CSV ne contient aucune transaction.');
+    var headers = rows[0];
+    var indexes = {
+      date: headerIndex(headers, ['date', 'transaction date', 'date de transaction', 'order date', 'date de commande']),
+      name: headerIndex(headers, ['description', 'name', 'nom', 'product', 'produit', 'details', 'item', 'article']),
+      amount: headerIndex(headers, ['amount', 'montant', 'price', 'prix', 'total', 'transaction amount']),
+      currency: headerIndex(headers, ['currency', 'devise']),
+      type: headerIndex(headers, ['type', 'transaction type', 'type de transaction', 'status', 'statut']),
+      id: headerIndex(headers, ['transaction id', 'id transaction', 'order number', 'numero de commande', 'id', 'reference'])
+    };
+    if (indexes.name < 0 || indexes.amount < 0) throw new Error('Colonnes introuvables. Le CSV doit contenir au moins Description et Montant.');
+    return rows.slice(1).map(function (row, rowIndex) {
+      var name = String(row[indexes.name] || '').trim();
+      var amountRaw = row[indexes.amount] || '';
+      var type = indexes.type >= 0 ? String(row[indexes.type] || '').trim() : 'Achat';
+      var amount = parseAmount(amountRaw);
+      if (/refund|rembours/i.test(type) && amount > 0) amount *= -1;
+      var date = indexes.date >= 0 ? normalizeDate(row[indexes.date]) : null;
+      var id = indexes.id >= 0 ? String(row[indexes.id] || '').trim() : '';
+      var currency = guessCurrency(amountRaw, indexes.currency >= 0 ? row[indexes.currency] : '');
+      var key = id || [date || '', name, amount, currency, rowIndex].join('|');
+      return { id: key, date: date, name: name, amount: amount, currency: currency, type: type || 'Achat' };
+    }).filter(function (item) { return item.name; });
+  }
+
+  window.importPstatTransactions = function (input) {
+    var file = input && input.files ? input.files[0] : null;
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (event) {
+      try {
+        var imported = transactionsFromCsv(event.target.result);
+        var known = new Set(transactions.map(function (item) { return item.id; }));
+        var added = 0;
+        imported.forEach(function (item) { if (!known.has(item.id)) { transactions.push(item); known.add(item.id); added++; } });
+        saveTransactions();
+        renderTransactions();
+        notify(added + ' transaction' + (added > 1 ? 's importées' : ' importée'), '↓');
+      } catch (error) { notify(error.message || 'Import CSV impossible', '⚠'); }
+      input.value = '';
+    };
+    reader.readAsText(file, 'UTF-8');
+  };
+
+  function csvCell(value) { return '"' + String(value == null ? '' : value).replace(/"/g, '""') + '"'; }
+  function downloadText(filename, content, type) {
+    var blob = new Blob(['\uFEFF' + content], { type: type || 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob), link = document.createElement('a');
+    link.href = url; link.download = filename; document.body.appendChild(link); link.click(); link.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+  window.downloadPstatCsvTemplate = function () {
+    downloadText('modele-transactions-pstat.csv', 'Date;Description;Montant;Devise;Type;ID\n01/01/2026;Exemple de jeu;19,99;EUR;Achat;EXEMPLE-001\n');
+  };
+  window.exportPstatTransactions = function () {
+    if (!transactions.length) { notify('Aucune transaction à exporter', '↥'); return; }
+    var rows = ['Date;Description;Montant;Devise;Type;ID'];
+    transactions.forEach(function (item) {
+      rows.push([item.date ? new Date(item.date).toLocaleDateString('fr-FR') : '', item.name, Number(item.amount || 0).toFixed(2).replace('.', ','), item.currency, item.type, item.id].map(csvCell).join(';'));
+    });
+    downloadText('transactions-pstat.csv', rows.join('\n'));
+  };
+  window.clearPstatTransactions = function () {
+    if (!transactions.length) return;
+    if (!window.confirm('Supprimer toutes les transactions stockées sur cet appareil ?')) return;
+    transactions = []; saveTransactions(); renderTransactions(); notify('Transactions locales supprimées', '⌫');
+  };
+  window.filterPstatTransactions = renderTransactions;
+
+  function renderTransactions() {
+    text('pstat-trans-count', formatInteger(transactions.length));
+    text('pstat-trans-total', transactionTotalLabel());
+    var dated = transactions.filter(function (item) { return item.date; }).sort(function (a, b) { return new Date(a.date) - new Date(b.date); });
+    text('pstat-trans-since', dated.length ? formatDate(dated[0].date, false) : '—');
+    text('pstat-metric-spend', transactionTotalLabel());
+
+    var list = byId('pstat-transaction-list');
+    if (!list) return;
+    var query = stripAccents((byId('pstat-transaction-search') || {}).value || '');
+    var filtered = transactions.filter(function (item) { return !query || stripAccents(item.name + ' ' + item.type + ' ' + item.id).indexOf(query) >= 0; })
+      .sort(function (a, b) { return new Date(b.date || 0) - new Date(a.date || 0); });
+    text('pstat-transaction-results', filtered.length + ' résultat' + (filtered.length > 1 ? 's' : ''));
+    if (!filtered.length) {
+      list.innerHTML = '<div class="pstat-empty"><div class="pstat-empty-icon">↓</div><strong>' + (transactions.length ? 'Aucun résultat' : 'Aucune transaction importée') + '</strong><span>' + (transactions.length ? 'Modifie ta recherche.' : 'Exporte ton historique PlayStation au format CSV, puis importe le fichier ici. Les données resteront sur cet appareil.') + '</span></div>';
+      return;
+    }
+    list.innerHTML = filtered.map(function (item) {
+      var refund = Number(item.amount) < 0 || /refund|rembours/i.test(item.type || '');
+      return '<div class="pstat-transaction-row"><div class="pstat-transaction-icon">' + (refund ? '↩' : '▣') + '</div>' +
+        '<div style="min-width:0"><div class="pstat-transaction-name">' + escapeHtml(item.name) + '</div><div class="pstat-transaction-meta">' + escapeHtml(formatDate(item.date, false)) + ' · ' + escapeHtml(item.type || 'Transaction') + (item.id ? ' · ' + escapeHtml(item.id) : '') + '</div></div>' +
+        '<div class="pstat-transaction-amount' + (refund ? ' refund' : '') + '">' + escapeHtml(formatMoney(item.amount, item.currency)) + '</div></div>';
+    }).join('');
+  }
+
+  /* ── Réglages et informations ── */
+  window.openPsnGithubAction = function () {
+    window.open('https://github.com/batmanmiyuki/batmanmiyuki.github.io/actions/workflows/update-psn.yml', '_blank', 'noopener');
+  };
+
+  function renderPstatSettings() {
+    if (!pstatData) return;
+    text('pstat-settings-generated', pstatData.generatedAt ? new Date(pstatData.generatedAt).toLocaleString('fr-FR') : '—');
+    text('pstat-settings-played', formatInteger(playedGames.length));
+    text('pstat-settings-library', formatInteger(libraryTotal()));
+    text('pstat-settings-errors', formatInteger((pstatData.errors || []).length));
+    text('pstat-settings-locale', pstatData.locale || 'fr-FR');
+    text('pstat-settings-version', String(pstatData.version || '—'));
+    text('pstat-data-mode', pstatData.playStats ? 'Temps de jeu disponible' : 'Synchronisation à relancer');
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    loadTransactions();
+    var root = byId('root');
+    var launcher = byId('app-launcher');
+    var pstat = byId('pstat-root');
+    if (root) root.setAttribute('aria-hidden', 'true');
+    if (launcher) launcher.setAttribute('aria-hidden', 'false');
+    if (pstat) pstat.setAttribute('aria-hidden', 'true');
+    renderTransactions();
+  });
+})();
+
+</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='34' fill='%23000820'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='30%25' y1='15%25' x2='70%25' y2='85%25'%3E%3Cstop offset='0%25' stop-color='%237eeeff'/%3E%3Cstop offset='45%25' stop-color='%231cb0f6'/%3E%3Cstop offset='100%25' stop-color='%230a80b5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M63 33h66L119 100H73Z' fill='url(%23g)'/%3E%3Cpath d='M63 43Q26 44 26 72Q26 96 63 94' stroke='url(%23g)' stroke-width='11' fill='none' stroke-linecap='round'/%3E%3Cpath d='M129 43Q166 44 166 72Q166 96 129 94' stroke='url(%23g)' stroke-width='11' fill='none' stroke-linecap='round'/%3E%3Crect x='87' y='100' width='18' height='22' fill='url(%23g)'/%3E%3Crect x='61' y='122' width='70' height='18' rx='9' fill='url(%23g)'/%3E%3Cellipse cx='80' cy='58' rx='7' ry='16' fill='rgba(255,255,255,0.25)' transform='rotate(-12,80,58)'/%3E%3C/svg%3E">
 <style>
 :root {
@@ -278,6 +1096,7 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
 </head>
 <body>
 <div id="root">
+  <button class="mode-return-btn" type="button" onclick="openAppHub()" title="Changer d’application"><span class="mode-return-mark">P/</span><span class="mode-return-label">CHANGER D’APP</span></button>
   <div id="screens">
 
     <!-- DASHBOARD -->
@@ -482,7 +1301,7 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
                 <button class="btn btn-green" onclick="importPsnSnapshot()">Importer la dernière sync PSN</button>
                 <button class="btn btn-outline" onclick="window.open('https://github.com/batmanmiyuki/batmanmiyuki.github.io/actions/workflows/update-psn.yml','_blank')">Ouvrir GitHub Actions</button>
               </div>
-              <div id="psn-status-line" class="psn-status-line">Lance l'action GitHub “Update PlayStation trophies”, puis reviens ici importer le fichier généré.</div>
+              <div id="psn-status-line" class="psn-status-line">Lance l’action GitHub « Update PlayStation data », puis reviens ici importer le fichier généré.</div>
               <div class="psn-small-note">Ton NPSSO reste dans GitHub Secrets. L'app lit seulement <b>psn-data.json</b>, elle ne voit jamais ton token PlayStation.</div>
             </div>
           </div>
@@ -499,7 +1318,7 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
           <div class="settings-section-label">À propos</div>
           <div class="card" style="padding:0;overflow:hidden">
             <div class="info-row"><span class="info-label">Application</span><span class="info-val">Platina</span></div>
-            <div class="info-row"><span class="info-label">Version</span><span class="info-val" style="color:var(--green)">43</span></div>
+            <div class="info-row"><span class="info-label">Version</span><span class="info-val" style="color:var(--green)">44 · PStat</span></div>
             <div class="info-row"><span class="info-label">Créé le</span><span class="info-val">14 avril 2026</span></div>
             <div class="info-row"><span class="info-label">Jeux trackés</span><span class="info-val" id="settings-game-count" style="color:var(--blue)">—</span></div>
             <div class="info-row"><span class="info-label">Trophées trackés</span><span class="info-val" id="settings-trophy-count" style="color:var(--gold)">—</span></div>
@@ -522,6 +1341,177 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
     <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')"><div class="nav-indicator"></div><div class="nav-icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><span class="label">Système</span></button>
   </nav>
 </div>
+
+<!-- ══════════════ SÉLECTEUR PLATINA / PSTAT ══════════════ -->
+<div id="app-launcher" aria-label="Choisir une application">
+  <div class="launcher-grid-bg"></div>
+  <main class="launcher-shell">
+    <div class="launcher-top">
+      <div class="launcher-brand">
+        <div class="launcher-brand-mark">P/</div>
+        <div class="launcher-brand-copy"><strong>PLAY HUB</strong><span>par PAGOT Enzo</span></div>
+      </div>
+      <div class="launcher-status"><i></i> Deux expériences · un seul espace</div>
+    </div>
+    <div class="launcher-intro">
+      <div class="launcher-kicker">Votre univers PlayStation</div>
+      <h1 class="launcher-title">Quelle est votre<br><span>mission ?</span></h1>
+      <p class="launcher-subtitle">Chassez les trophées avec Platina ou explorez l’ensemble de votre activité PlayStation avec PStat.</p>
+    </div>
+    <div class="launcher-choices">
+      <button class="launcher-choice platina-choice" type="button" onclick="choosePlayStationApp('platina')">
+        <span class="launcher-choice-glow"></span>
+        <span class="launcher-choice-head">
+          <span class="launcher-app-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 4h8l-1 8H9L8 4Z"/><path d="M8 6H5a3 3 0 0 0 3 4m8-4h3a3 3 0 0 1-3 4M12 12v4m-4 3h8m-9 0h10"/></svg>
+          </span>
+          <span class="launcher-arrow">→</span>
+        </span>
+        <span class="launcher-app-tag">Trophy tracker</span>
+        <span class="launcher-app-name">PLATINA</span>
+        <span class="launcher-app-desc">Suivez vos trophées, vos platines, vos objectifs et votre progression jeu par jeu.</span>
+        <span class="launcher-app-features"><span>Trophées</span><span>Platines</span><span>Wishlist</span></span>
+      </button>
+      <button class="launcher-choice pstat-choice" type="button" onclick="choosePlayStationApp('pstat')">
+        <span class="launcher-choice-glow"></span>
+        <span class="launcher-choice-head">
+          <span class="launcher-app-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19V9m5 10V5m5 14v-7m5 7V3"/><path d="M2 19h20"/></svg>
+          </span>
+          <span class="launcher-arrow">→</span>
+        </span>
+        <span class="launcher-app-tag">Account intelligence</span>
+        <span class="launcher-app-name">PSTAT</span>
+        <span class="launcher-app-desc">Mesurez votre temps de jeu, retrouvez vos jeux les plus joués et centralisez vos transactions.</span>
+        <span class="launcher-app-features"><span>Temps de jeu</span><span>Classements</span><span>Transactions</span></span>
+      </button>
+    </div>
+    <div class="launcher-foot"><span><strong>Platina + PStat</strong> · Données PlayStation synchronisées par GitHub Actions</span><span>Les transactions restent privées sur cet appareil.</span></div>
+  </main>
+</div>
+
+<!-- ═════════════════════ APPLICATION PSTAT ═════════════════════ -->
+<div id="pstat-root" class="pstat-hidden" aria-hidden="true">
+  <header class="pstat-topbar">
+    <div class="pstat-brand">
+      <div class="pstat-brand-mark">PS</div>
+      <div><div class="pstat-brand-name">PSTAT</div><div class="pstat-brand-sub" id="pstat-header-profile">Compte PlayStation</div></div>
+    </div>
+    <div class="pstat-top-actions">
+      <button class="pstat-icon-btn" type="button" onclick="reloadPstatData()" title="Actualiser les données">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0 1 5M20 4v7h-7"/></svg><span class="pstat-back-label">Actualiser</span>
+      </button>
+      <button class="pstat-icon-btn" type="button" onclick="openAppHub()" title="Changer d’application">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg><span class="pstat-back-label">Changer d’app</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="pstat-main">
+    <!-- Vue d'ensemble -->
+    <section class="pstat-screen pstat-active" data-pstat-screen="overview">
+      <div class="pstat-profile-hero pstat-card">
+        <div class="pstat-profile-copy">
+          <div class="pstat-live-chip"><i></i> Compte synchronisé</div>
+          <div class="pstat-profile-hello">Bon retour,</div>
+          <div class="pstat-profile-name" id="pstat-user-name">Joueur PlayStation</div>
+          <div class="pstat-profile-sync" id="pstat-sync-label">Chargement des données…</div>
+        </div>
+        <img id="pstat-avatar" class="pstat-avatar" alt="Avatar PlayStation" style="display:none">
+        <div id="pstat-avatar-fallback" class="pstat-avatar pstat-avatar-fallback">PS</div>
+      </div>
+
+      <div class="pstat-metrics">
+        <div class="pstat-metric pstat-card"><div class="pstat-metric-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M8 4v16m4-11h5m-5 4h5"/></svg></div><div class="pstat-metric-value" id="pstat-metric-library">—</div><div class="pstat-metric-label">Jeux en bibliothèque</div></div>
+        <div class="pstat-metric pstat-card"><div class="pstat-metric-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="pstat-metric-value" id="pstat-metric-hours">—</div><div class="pstat-metric-label">Temps de jeu total</div></div>
+        <div class="pstat-metric pstat-card"><div class="pstat-metric-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 17V9m5 8V5m5 12v-6m5 6V3"/></svg></div><div class="pstat-metric-value" id="pstat-metric-sessions">—</div><div class="pstat-metric-label">Lancements de jeux</div></div>
+        <div class="pstat-metric pstat-card"><div class="pstat-metric-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18m-14 5h3"/></svg></div><div class="pstat-metric-value" id="pstat-metric-spend">0,00 €</div><div class="pstat-metric-label">Montant net importé</div></div>
+      </div>
+
+      <div class="pstat-dashboard-grid">
+        <div class="pstat-section-card pstat-card">
+          <div class="pstat-section-head"><div class="pstat-section-title">Jeux les plus joués</div><div class="pstat-section-note" id="pstat-ranking-note">Temps de jeu total</div></div>
+          <div id="pstat-top-games" class="pstat-ranking"><div class="pstat-skeleton"></div><div class="pstat-skeleton"></div></div>
+        </div>
+        <div class="pstat-section-card pstat-card">
+          <div class="pstat-section-head"><div class="pstat-section-title">Plateformes</div><div class="pstat-section-note">Répartition</div></div>
+          <div id="pstat-platforms" class="pstat-platforms"><div class="pstat-skeleton"></div></div>
+        </div>
+        <div class="pstat-section-card pstat-card pstat-recent-card">
+          <div class="pstat-section-head"><div class="pstat-section-title">Activité récente</div><div class="pstat-section-note">Derniers jeux lancés</div></div>
+          <div id="pstat-recent-games" class="pstat-recent-strip"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Jeux -->
+    <section class="pstat-screen" data-pstat-screen="games">
+      <div class="pstat-page-head"><div><div class="pstat-eyebrow">Bibliothèque personnelle</div><div class="pstat-page-title">Mes jeux</div><div class="pstat-page-sub">Classement complet par temps de jeu, activité ou nombre de lancements.</div></div></div>
+      <div class="pstat-controls">
+        <label class="pstat-search-wrap" aria-label="Rechercher un jeu"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="pstat-games-search" type="search" placeholder="Rechercher un jeu…" oninput="filterPstatGames()"></label>
+        <select id="pstat-games-sort" class="pstat-select" onchange="filterPstatGames()"><option value="duration">Plus joués</option><option value="recent">Plus récents</option><option value="sessions">Plus lancés</option><option value="name">Ordre alphabétique</option></select>
+      </div>
+      <div class="pstat-games-summary"><span id="pstat-games-count">0 jeu</span><span><strong id="pstat-games-total-hours">0 h</strong> dans cette sélection</span></div>
+      <div id="pstat-games-list" class="pstat-games-list"><div class="pstat-skeleton"></div></div>
+    </section>
+
+    <!-- Transactions -->
+    <section class="pstat-screen" data-pstat-screen="transactions">
+      <div class="pstat-page-head"><div><div class="pstat-eyebrow">Historique privé</div><div class="pstat-page-title">Transactions</div><div class="pstat-page-sub">Importez, recherchez et analysez vos achats PlayStation.</div></div></div>
+      <div class="pstat-privacy-banner"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><div><div class="pstat-privacy-title">Stockage local et privé</div><div class="pstat-privacy-text">Les montants importés restent dans ce navigateur. Ils ne sont jamais ajoutés au dépôt GitHub public ni au fichier PSN.</div></div></div>
+      <div class="pstat-transaction-metrics">
+        <div class="pstat-transaction-metric pstat-card"><strong id="pstat-trans-count">0</strong><span>Transactions</span></div>
+        <div class="pstat-transaction-metric pstat-card"><strong id="pstat-trans-total">0,00 €</strong><span>Montant net importé</span></div>
+        <div class="pstat-transaction-metric pstat-card"><strong id="pstat-trans-since">—</strong><span>Depuis</span></div>
+      </div>
+      <div class="pstat-import-panel pstat-card">
+        <div class="pstat-import-copy"><div class="pstat-import-title">Importer un historique CSV</div><div class="pstat-import-desc">Colonnes reconnues automatiquement : Date, Description/Produit, Montant, Devise, Type et ID. Les lignes déjà importées sont ignorées.</div></div>
+        <div class="pstat-import-actions">
+          <button class="pstat-btn" type="button" onclick="downloadPstatCsvTemplate()">Télécharger le modèle</button>
+          <label class="pstat-btn pstat-btn-primary" for="pstat-csv-file">Importer un CSV</label>
+          <input id="pstat-csv-file" type="file" accept=".csv,text/csv" hidden onchange="importPstatTransactions(this)">
+        </div>
+      </div>
+      <div class="pstat-transaction-toolbar">
+        <label class="pstat-search-wrap" aria-label="Rechercher une transaction"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="pstat-transaction-search" type="search" placeholder="Jeu, type ou identifiant…" oninput="filterPstatTransactions()"></label>
+        <span class="pstat-section-note" id="pstat-transaction-results">0 résultat</span>
+      </div>
+      <div id="pstat-transaction-list" class="pstat-transaction-list"></div>
+    </section>
+
+    <!-- Réglages -->
+    <section class="pstat-screen" data-pstat-screen="settings">
+      <div class="pstat-page-head"><div><div class="pstat-eyebrow">Configuration</div><div class="pstat-page-title">Réglages</div><div class="pstat-page-sub">Synchronisation PSN, confidentialité et gestion des données.</div></div></div>
+      <div class="pstat-settings-grid">
+        <div class="pstat-setting-card pstat-card">
+          <div class="pstat-setting-icon">↻</div><div class="pstat-setting-title">Synchronisation PlayStation</div><div class="pstat-setting-text">GitHub Actions récupère les trophées en français quand PlayStation fournit une version française, ainsi que les jeux et le temps de jeu.</div>
+          <div class="pstat-setting-line"><span>Dernière génération</span><strong id="pstat-settings-generated">—</strong></div><div class="pstat-setting-line"><span>Jeux joués</span><strong id="pstat-settings-played">—</strong></div><div class="pstat-setting-line"><span>Jeux en bibliothèque</span><strong id="pstat-settings-library">—</strong></div><div class="pstat-setting-line"><span>État</span><strong id="pstat-data-mode">—</strong></div>
+          <button class="pstat-btn pstat-btn-primary" type="button" style="width:100%;margin-top:14px" onclick="openPsnGithubAction()">Ouvrir GitHub Actions</button>
+        </div>
+        <div class="pstat-setting-card pstat-card">
+          <div class="pstat-setting-icon">FR</div><div class="pstat-setting-title">Langue des trophées</div><div class="pstat-setting-text">Aucune traduction automatique n’est inventée. PStat demande directement la localisation française à PlayStation ; si elle n’existe pas, le texte original reste affiché.</div>
+          <div class="pstat-setting-line"><span>Langue demandée</span><strong id="pstat-settings-locale">fr-FR</strong></div><div class="pstat-setting-line"><span>Source</span><strong>PlayStation Network</strong></div><div class="pstat-setting-line"><span>Erreurs d’import</span><strong id="pstat-settings-errors">—</strong></div><div class="pstat-setting-line"><span>Version des données</span><strong id="pstat-settings-version">—</strong></div>
+        </div>
+        <div class="pstat-setting-card pstat-card">
+          <div class="pstat-setting-icon">▣</div><div class="pstat-setting-title">Transactions locales</div><div class="pstat-setting-text">Exportez une copie de vos transactions ou effacez-les de cet appareil. Cette action ne modifie pas votre compte PlayStation.</div>
+          <div class="pstat-import-actions" style="justify-content:flex-start"><button class="pstat-btn" type="button" onclick="exportPstatTransactions()">Exporter le CSV</button><button class="pstat-btn pstat-btn-danger" type="button" onclick="clearPstatTransactions()">Tout effacer</button></div>
+        </div>
+        <div class="pstat-setting-card pstat-card">
+          <div class="pstat-setting-icon">P/</div><div class="pstat-setting-title">Changer d’application</div><div class="pstat-setting-text">Revenez au Play Hub pour passer de PStat à Platina sans recharger la page et sans perdre votre navigation.</div>
+          <button class="pstat-btn" type="button" style="width:100%" onclick="openAppHub()">Retourner au Play Hub</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="pstat-nav" aria-label="Navigation PStat">
+    <button class="pstat-nav-btn pstat-nav-active" type="button" data-pstat-tab="overview" onclick="switchPstatTab('overview')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg><span>Vue d’ensemble</span></button>
+    <button class="pstat-nav-btn" type="button" data-pstat-tab="games" onclick="switchPstatTab('games')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4m-2-2v4m7-2h.01m3-2h.01"/></svg><span>Jeux</span></button>
+    <button class="pstat-nav-btn" type="button" data-pstat-tab="transactions" onclick="switchPstatTab('transactions')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18m-14 5h3"/></svg><span>Transactions</span></button>
+    <button class="pstat-nav-btn" type="button" data-pstat-tab="settings" onclick="switchPstatTab('settings')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.4 1A7 7 0 0 0 15 6l-.3-2.6h-4L10.4 6A7 7 0 0 0 8.8 7L6.4 6 4.5 9.5 6.6 11a7 7 0 0 0 0 2l-2.1 1.5 2 3.4 2.3-1A7 7 0 0 0 10.4 18l.3 2.6h4L15 18a7 7 0 0 0 1.5-1l2.4 1 2-3.4-2-1.5c.1-.4.1-.7.1-1.1Z"/></svg><span>Réglages</span></button>
+  </nav>
+</div>
+
 
 <!-- ADD GAME -->
 <div class="modal-overlay" id="modal-add-game" onclick="closeModal('add-game')">
@@ -1297,5 +2287,5 @@ if(!configured()){
   }catch(e){console.error(e);status('Erreur config','err');}
 }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a093638e3dce046d',t:'MTc4MTA0MjIxNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
