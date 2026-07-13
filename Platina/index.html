@@ -238,8 +238,110 @@
   .pstat-transaction-row{grid-template-columns:36px minmax(0,1fr) auto;padding:10px}.pstat-transaction-icon{width:36px;height:36px}.pstat-transaction-amount{font-size:10px}
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   V2 — identité visuelle unifiée avec Platina
+   ═══════════════════════════════════════════════════════════════ */
+
+/* PLAY HUB : véritable écran partagé */
+#app-launcher{background:#000;overflow:hidden;font-family:'Nunito',sans-serif}
+#app-launcher .launcher-grid-bg,#app-launcher .launcher-top,#app-launcher .launcher-intro,#app-launcher .launcher-foot{display:none}
+#app-launcher .launcher-shell{width:100%;height:100%;min-height:100%;padding:0;display:block;max-width:none}
+#app-launcher .launcher-choices{width:100%;height:100dvh;display:grid;grid-template-columns:1fr 1fr;gap:0}
+#app-launcher .launcher-choice{min-width:0;min-height:100%;border:0;border-radius:0;padding:clamp(30px,5vw,72px);display:flex;align-items:stretch;background:#090909;box-shadow:none;isolation:isolate}
+#app-launcher .launcher-choice:first-child{border-right:2px solid #262626;background:radial-gradient(circle at 78% 28%,rgba(28,176,246,.17),transparent 32%),#080b0e}
+#app-launcher .launcher-choice:last-child{background:radial-gradient(circle at 78% 28%,rgba(28,176,246,.12),transparent 34%),#0a0a0a}
+#app-launcher .launcher-choice:after{content:"";position:absolute;inset:14px;border:2px solid transparent;border-radius:24px;pointer-events:none;transition:.2s}
+#app-launcher .launcher-choice:hover,#app-launcher .launcher-choice:focus-visible{transform:none;background-color:#101010}
+#app-launcher .launcher-choice:hover:after,#app-launcher .launcher-choice:focus-visible:after{border-color:#1cb0f6;box-shadow:inset 0 0 30px rgba(28,176,246,.08),0 0 30px rgba(28,176,246,.08)}
+#app-launcher .launcher-choice-glow{width:360px;height:360px;background:#1cb0f6;opacity:.08;right:-160px;top:-140px}
+#app-launcher .pstat-choice:hover,#app-launcher .pstat-choice:focus-visible{border-color:#1cb0f6;box-shadow:none}
+.hub-half-inner{position:relative;z-index:2;width:min(560px,100%);height:100%;margin:auto;display:flex;flex-direction:column;text-align:left;color:#fff}
+.hub-half-head{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.hub-shared-logo{width:64px;height:64px;border-radius:18px;background:linear-gradient(145deg,#7eeeff,#1cb0f6 52%,#0a80b5);color:#fff;display:grid;place-items:center;border:2px solid rgba(126,238,255,.5);box-shadow:0 7px 0 #086892,0 12px 26px rgba(28,176,246,.25)}
+.hub-shared-logo svg{width:40px;height:40px;fill:currentColor;overflow:visible;filter:drop-shadow(0 2px 2px rgba(0,0,0,.18))}
+.hub-app-chip{padding:8px 12px;border:2px solid #262626;border-radius:999px;background:#121212;color:#a1a1aa;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.6px}
+.hub-copy{display:block;margin-top:clamp(32px,6vh,64px)}
+.hub-kicker{display:block;color:#1cb0f6;font-size:12px;font-weight:1000;text-transform:uppercase;letter-spacing:1.4px;margin-bottom:9px}
+.hub-app-title{display:block;font:1000 clamp(48px,6vw,82px)/.9 'Nunito',sans-serif;letter-spacing:-3px;color:#1cb0f6}
+.hub-app-title span{color:#fff}
+.hub-app-desc{display:block;max-width:500px;margin-top:18px;color:#a1a1aa;font-size:clamp(15px,1.35vw,19px);font-weight:700;line-height:1.48}
+.hub-visual{display:flex;align-items:center;justify-content:space-between;gap:22px;margin-top:clamp(28px,5vh,52px);min-height:170px}
+.hub-covers{display:flex;align-items:center;padding-left:15px;min-width:0}
+.hub-cover{width:clamp(84px,8vw,122px);aspect-ratio:.78;object-fit:cover;border-radius:16px;border:3px solid #262626;background:#1e1e1e;box-shadow:0 16px 26px rgba(0,0,0,.45);margin-left:-15px;display:grid;place-items:center;color:#71717a;font-size:16px;font-weight:1000;overflow:hidden;transition:.2s}
+.hub-cover:nth-child(2){transform:translateY(-10px);z-index:2}.hub-cover:nth-child(3){transform:translateY(5px);z-index:3}
+.launcher-choice:hover .hub-cover{border-color:#1cb0f6}.launcher-choice:hover .hub-cover:nth-child(2){transform:translateY(-17px)}
+.hub-trophy-strip{display:flex;align-items:center;gap:8px;padding:10px 12px;border:2px solid #262626;border-radius:18px;background:#121212}
+.hub-trophy-strip>span{width:39px;height:39px;display:grid;place-items:center}.hub-trophy-strip img{width:38px;height:38px;object-fit:contain}.hub-trophy-strip .hub-plat img{width:48px;height:48px;filter:drop-shadow(0 0 9px rgba(28,176,246,.55))}
+.hub-stat-preview{display:grid;grid-template-columns:1fr 1fr;border:2px solid #262626;border-radius:18px;background:#121212;overflow:hidden;min-width:210px}
+.hub-stat-preview>span{padding:15px;text-align:center}.hub-stat-preview>span+span{border-left:2px solid #262626}.hub-stat-preview b{display:block;color:#1cb0f6;font-size:25px;font-weight:1000;line-height:1}.hub-stat-preview small{display:block;color:#71717a;font-size:9px;font-weight:900;text-transform:uppercase;margin-top:7px}
+.hub-live-line{display:flex;justify-content:space-between;gap:15px;align-items:center;border-top:2px solid #262626;margin-top:auto;padding-top:19px}.hub-live-line strong{font-size:13px;font-weight:900;color:#fff}.hub-live-line small{font-size:10px;font-weight:800;color:#71717a;text-align:right}
+.hub-open-btn{margin-top:18px;width:100%;min-height:54px;border-radius:12px;background:#1cb0f6;border-bottom:5px solid #128ec7;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-size:15px;font-weight:1000;text-transform:uppercase;letter-spacing:.5px;box-shadow:0 5px 16px rgba(28,176,246,.25)}
+.hub-open-btn b{font-size:22px}.launcher-choice:active .hub-open-btn{transform:translateY(3px);border-bottom-width:2px}
+
+/* PStat reprend exactement la palette, les cartes et les dimensions de Platina */
+#pstat-root{--ps-bg:#000;--ps-surface:#121212;--ps-surface-2:#1e1e1e;--ps-line:#262626;--ps-text:#fff;--ps-mid:#a1a1aa;--ps-dim:#71717a;--ps-accent:#1cb0f6;--ps-accent-2:#128ec7;--ps-cyan:#7eeeff;--ps-green:#1cb0f6;--ps-orange:#ffc800;background:#000}
+.pstat-topbar{height:78px;min-height:78px;padding:12px 24px;border-bottom:2px solid #262626;background:#121212;backdrop-filter:none}
+.pstat-brand{gap:13px}.pstat-brand-mark{width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,#7eeeff,#1cb0f6 52%,#0a80b5);border:2px solid rgba(126,238,255,.45);box-shadow:0 5px 0 #086892,0 8px 20px rgba(28,176,246,.22);color:#fff}
+.pstat-brand-mark svg{width:31px;height:31px;fill:currentColor;overflow:visible}.pstat-brand-name{font:1000 25px/1 'Nunito',sans-serif;letter-spacing:-.8px}.pstat-brand-name span{color:#1cb0f6}.pstat-brand-sub{font-size:10px;color:#71717a}
+.pstat-icon-btn{height:44px;min-width:44px;padding:0 14px;border:2px solid #3f3f46;border-bottom-width:4px;border-radius:10px;background:#1e1e1e;color:#a1a1aa;font-size:12px}.pstat-icon-btn:hover{border-color:#1cb0f6;color:#1cb0f6}.pstat-icon-btn:active{transform:translateY(2px);border-bottom-width:2px}.pstat-icon-btn svg{width:18px;height:18px}
+.pstat-screen{padding:30px max(22px,calc((100vw - 1240px)/2)) calc(104px + env(safe-area-inset-bottom,0px))}
+.pstat-eyebrow{font-size:12px;color:#1cb0f6;letter-spacing:1px}.pstat-page-title{font:1000 clamp(32px,4vw,44px)/1.05 'Nunito',sans-serif;letter-spacing:-1.5px}.pstat-page-sub{font-size:15px;color:#a1a1aa;margin-top:8px}
+.pstat-card{background:#121212;border:2px solid #262626;border-radius:20px;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.pstat-profile-hero{min-height:205px;padding:28px;border-color:rgba(28,176,246,.28);background:linear-gradient(135deg,#081a2e,#040f1a);box-shadow:0 4px 20px rgba(28,176,246,.15)}
+.pstat-profile-hero:before{background:radial-gradient(circle,rgba(28,176,246,.42),rgba(28,176,246,0) 68%)}
+.pstat-live-chip{padding:7px 11px;border:2px solid rgba(28,176,246,.28);background:rgba(28,176,246,.1);color:#7eeeff;font-size:10px}.pstat-profile-hello{font-size:16px}.pstat-profile-name{font:1000 clamp(31px,4vw,47px)/1 'Nunito',sans-serif;letter-spacing:-1.4px}.pstat-profile-sync{font-size:12px}.pstat-avatar{width:100px;height:100px;border-radius:24px;border:3px solid rgba(126,238,255,.35)}.pstat-avatar-fallback{font:1000 32px/1 'Nunito',sans-serif;color:#7eeeff}
+.pstat-metrics{gap:12px;margin-bottom:16px}.pstat-metric{padding:20px}.pstat-metric-icon{width:40px;height:40px;border-radius:12px;margin-bottom:18px}.pstat-metric-icon svg{width:20px;height:20px}.pstat-metric:nth-child(n) .pstat-metric-icon{background:rgba(28,176,246,.1);color:#1cb0f6}.pstat-metric-value{font:1000 clamp(26px,3vw,36px)/1 'Nunito',sans-serif;letter-spacing:-1px}.pstat-metric-label{font-size:11px;color:#a1a1aa;margin-top:9px}
+.pstat-dashboard-grid{grid-template-columns:minmax(0,1.5fr) minmax(310px,.75fr);gap:16px}.pstat-section-card{padding:23px}.pstat-section-title{font-size:18px}.pstat-section-note{font-size:10px}
+.pstat-ranking{gap:15px}.pstat-rank-row{grid-template-columns:31px 54px minmax(0,1fr) auto;gap:13px}.pstat-rank-num{font:1000 12px/1 'Nunito',sans-serif;color:#71717a}.pstat-game-thumb{width:54px;height:54px;border-radius:13px;border:2px solid #262626}.pstat-rank-name{font-size:15px}.pstat-rank-meta{font-size:11px;margin-top:4px}.pstat-rank-bar{height:6px;background:#262626;margin-top:8px}.pstat-rank-fill{background:#1cb0f6;box-shadow:0 0 8px rgba(28,176,246,.35)}.pstat-rank-hours{font:1000 14px/1 'Nunito',sans-serif;color:#7eeeff}
+.pstat-platforms{gap:12px}.pstat-platform-row{grid-template-columns:54px 1fr auto;padding:13px;border:2px solid #262626;border-radius:14px;background:#1e1e1e}.pstat-platform-code{height:35px;background:#121212;font-size:10px}.pstat-platform-name{font-size:14px}.pstat-platform-meta{font-size:11px}.pstat-platform-pct{font:1000 14px/1 'Nunito',sans-serif;color:#1cb0f6}
+.pstat-recent-strip{gap:12px}.pstat-recent-game{padding:11px;border:2px solid #262626;background:#1e1e1e}.pstat-recent-cover{border:1px solid #3f3f46}.pstat-recent-name{font-size:13px}.pstat-recent-date{font-size:10px;margin-top:5px}
+.pstat-controls{grid-template-columns:minmax(220px,1fr) 230px;gap:12px}.pstat-search-wrap,.pstat-select{height:52px;border:2px solid #3f3f46;border-radius:10px;background:#1e1e1e}.pstat-search-wrap input,.pstat-select{font-size:14px}.pstat-search-wrap:focus-within,.pstat-select:focus{border-color:#1cb0f6}.pstat-games-summary{font-size:12px;margin:15px 2px}.pstat-games-list{gap:10px}.pstat-game-row{grid-template-columns:68px minmax(0,1fr) auto;gap:16px;padding:12px 17px 12px 12px;border:2px solid #262626;border-radius:16px;background:#121212}.pstat-game-row-cover{width:68px;height:68px;border-radius:13px}.pstat-game-row-name{font-size:16px}.pstat-game-row-meta{font-size:11px;gap:8px}.pstat-platform-pill,.pstat-service-pill{font-size:9px;padding:5px 8px}.pstat-service-pill{background:rgba(28,176,246,.1);color:#7eeeff}.pstat-game-hours{font:1000 17px/1 'Nunito',sans-serif;color:#7eeeff}.pstat-game-count{font-size:9px}
+.pstat-privacy-banner{padding:17px 19px;border:2px solid rgba(28,176,246,.28);background:rgba(28,176,246,.07);border-radius:14px}.pstat-privacy-banner svg{width:22px;color:#1cb0f6}.pstat-privacy-title{font-size:14px;color:#7eeeff}.pstat-privacy-text{font-size:11px;color:#a1a1aa}.pstat-transaction-metrics{gap:12px}.pstat-transaction-metric{padding:20px}.pstat-transaction-metric strong{font:1000 27px/1 'Nunito',sans-serif}.pstat-transaction-metric span{font-size:10px}.pstat-import-panel{padding:22px;border-radius:20px}.pstat-import-title{font-size:16px}.pstat-import-desc{font-size:12px}.pstat-btn{min-height:45px;padding:11px 16px;border:2px solid #3f3f46;border-bottom-width:4px;border-radius:10px;background:#1e1e1e;font-size:12px;text-transform:uppercase;letter-spacing:.35px}.pstat-btn:active{transform:translateY(2px);border-bottom-width:2px}.pstat-btn-primary{background:#1cb0f6;border-color:#1cb0f6;border-bottom-color:#128ec7;color:#fff;box-shadow:0 4px 12px rgba(28,176,246,.3)}.pstat-btn-primary:hover{background:#3bc2f8}.pstat-btn-danger{color:#ff4b4b;border-color:rgba(255,75,75,.42);background:#1a0505}.pstat-transaction-toolbar .pstat-search-wrap{max-width:520px}.pstat-transaction-list{gap:9px}.pstat-transaction-row{grid-template-columns:48px minmax(0,1fr) auto;gap:14px;padding:14px 16px;border:2px solid #262626;border-radius:15px;background:#121212}.pstat-transaction-icon{width:48px;height:48px;border-radius:12px;background:rgba(28,176,246,.1);color:#1cb0f6}.pstat-transaction-name{font-size:15px}.pstat-transaction-meta{font-size:11px}.pstat-transaction-amount{font:1000 15px/1 'Nunito',sans-serif}.pstat-transaction-amount.refund{color:#1cb0f6}.pstat-transaction-delete{width:32px;height:32px;margin-left:10px;border:2px solid rgba(255,75,75,.32);border-radius:50%;background:#1a0505;color:#ff4b4b;font-weight:900;cursor:pointer}.pstat-transaction-delete:hover{border-color:#ff4b4b}
+.pstat-setting-card{padding:22px}.pstat-setting-icon{width:43px;height:43px;background:rgba(28,176,246,.1);color:#1cb0f6}.pstat-setting-title{font-size:16px}.pstat-setting-text{font-size:12px}.pstat-setting-line{font-size:12px;padding:11px 0}
+.pstat-empty strong{font-size:15px}.pstat-empty span{font-size:11px}.pstat-skeleton{height:66px;background:linear-gradient(90deg,#121212,#1e1e1e,#121212);background-size:200% 100%}
+.pstat-nav{height:72px;min-height:72px;border-top:2px solid #262626;background:#121212;backdrop-filter:none}.pstat-nav-btn{color:#71717a}.pstat-nav-btn svg{width:23px;height:23px}.pstat-nav-btn span{font-size:10px}.pstat-nav-btn:before{background:#1cb0f6}.pstat-nav-btn.pstat-nav-active{color:#1cb0f6}
+
+/* Modale de saisie manuelle */
+.pstat-manual-modal{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;pointer-events:none;transition:.2s;backdrop-filter:blur(8px)}.pstat-manual-modal.open{opacity:1;pointer-events:auto}.pstat-manual-sheet{width:min(560px,100%);max-height:92dvh;overflow:auto;background:#121212;border:2px solid #3f3f46;border-radius:20px;box-shadow:0 0 50px rgba(28,176,246,.18);transform:translateY(20px) scale(.97);transition:.22s}.pstat-manual-modal.open .pstat-manual-sheet{transform:none}.pstat-manual-header{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:20px 22px;border-bottom:2px solid #262626}.pstat-manual-title{font-size:23px;font-weight:1000}.pstat-manual-close{width:38px;height:38px;border-radius:50%;border:2px solid #3f3f46;background:#1e1e1e;color:#a1a1aa;font-size:15px;font-weight:900;cursor:pointer}.pstat-manual-close:hover{color:#ff4b4b;border-color:#ff4b4b}.pstat-manual-body{padding:22px}.pstat-manual-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pstat-manual-field{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}.pstat-manual-field>span{font-size:11px;font-weight:900;text-transform:uppercase;color:#a1a1aa;letter-spacing:.45px}.pstat-manual-field input,.pstat-manual-field select{width:100%;height:49px;padding:0 13px;border:2px solid #3f3f46;border-radius:10px;background:#1e1e1e;color:#fff;font:800 14px 'Nunito',sans-serif;outline:none;color-scheme:dark}.pstat-manual-field input:focus,.pstat-manual-field select:focus{border-color:#1cb0f6}.pstat-manual-submit{width:100%;margin-top:5px}
+
+@media(max-width:900px){#app-launcher{overflow:auto}#app-launcher .launcher-choices{height:auto;min-height:100dvh;grid-template-columns:1fr}#app-launcher .launcher-choice{min-height:100dvh;padding:32px 22px}#app-launcher .launcher-choice:first-child{border-right:0;border-bottom:2px solid #262626}.hub-half-inner{width:min(620px,100%)}.hub-app-title{font-size:60px}.hub-visual{margin-top:30px}.pstat-dashboard-grid{grid-template-columns:1fr}.pstat-recent-card{grid-column:auto}}
+@media(max-width:760px){.pstat-topbar{height:70px;min-height:70px;padding:10px 13px}.pstat-brand-mark{width:43px;height:43px}.pstat-brand-name{font-size:23px}.pstat-screen{padding:20px 13px calc(92px + env(safe-area-inset-bottom,0px))}.pstat-page-title{font-size:34px}.pstat-page-sub{font-size:13px}.pstat-profile-hero{min-height:177px;padding:20px}.pstat-profile-name{font-size:31px}.pstat-avatar{width:74px;height:74px}.pstat-metrics{grid-template-columns:1fr 1fr}.pstat-metric{padding:17px}.pstat-metric-value{font-size:27px}.pstat-metric-label{font-size:9px}.pstat-section-card{padding:18px}.pstat-rank-row{grid-template-columns:24px 48px minmax(0,1fr) auto;gap:9px}.pstat-game-thumb{width:48px;height:48px}.pstat-rank-name{font-size:13px}.pstat-rank-meta{font-size:9px}.pstat-rank-hours{font-size:12px}.pstat-recent-strip{grid-template-columns:1fr 1fr}.pstat-controls{grid-template-columns:1fr}.pstat-game-row{grid-template-columns:56px minmax(0,1fr) auto;gap:10px}.pstat-game-row-cover{width:56px;height:56px}.pstat-game-row-name{font-size:14px}.pstat-transaction-metrics{grid-template-columns:1fr 1fr}.pstat-transaction-metric:last-child{grid-column:1/-1}.pstat-import-panel{align-items:flex-start;flex-direction:column}.pstat-import-actions{justify-content:flex-start}.pstat-settings-grid{grid-template-columns:1fr}.pstat-nav{height:66px;min-height:66px}.pstat-nav-btn span{font-size:8px}}
+@media(max-width:520px){.hub-half-head{align-items:flex-start}.hub-shared-logo{width:56px;height:56px}.hub-app-chip{font-size:9px}.hub-copy{margin-top:35px}.hub-app-title{font-size:52px}.hub-app-desc{font-size:15px}.hub-visual{align-items:flex-end;gap:10px}.hub-cover{width:76px}.hub-trophy-strip{display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:7px}.hub-trophy-strip>span{width:32px;height:32px}.hub-trophy-strip img{width:31px;height:31px}.hub-stat-preview{min-width:135px;grid-template-columns:1fr}.hub-stat-preview>span{padding:10px}.hub-stat-preview>span+span{border-left:0;border-top:2px solid #262626}.hub-live-line{align-items:flex-start;flex-direction:column}.hub-live-line small{text-align:left}.pstat-manual-grid{grid-template-columns:1fr}.pstat-manual-sheet{border-radius:20px 20px 0 0;max-height:94dvh}.pstat-manual-modal{align-items:flex-end;padding:0}.pstat-transaction-row{grid-template-columns:42px minmax(0,1fr) auto;padding:12px}.pstat-transaction-icon{width:42px;height:42px}.pstat-transaction-name{font-size:13px}.pstat-transaction-meta{font-size:9px}}
+
+.platina-header-logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#7eeeff,#1cb0f6 52%,#0a80b5);border:2px solid rgba(126,238,255,.45);box-shadow:0 5px 0 #086892,0 8px 18px rgba(28,176,246,.22);color:#fff;display:grid;place-items:center;flex-shrink:0}.platina-header-logo svg{width:28px;height:28px;fill:currentColor;overflow:visible}
+
+/* ═══════════════════════════════════════════════════════════════
+   PLAY HUB V3 — deux espaces aérés et aperçus explicitement nommés
+   ═══════════════════════════════════════════════════════════════ */
+#app-launcher{overflow:auto;background:radial-gradient(circle at 50% -15%,rgba(28,176,246,.11),transparent 34%),#000}
+#app-launcher .launcher-shell{width:100%;min-height:100dvh;height:auto;padding:22px clamp(20px,3vw,46px) 28px;display:flex;flex-direction:column;gap:22px}
+.hub-global-header{width:100%;min-height:70px;padding:0 4px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-shrink:0}
+.hub-global-brand{display:flex;align-items:center;gap:14px;text-align:left}.hub-global-logo{width:52px;height:52px;border-radius:15px;background:linear-gradient(145deg,#7eeeff,#1cb0f6 52%,#0a80b5);color:#fff;display:grid;place-items:center;border:2px solid rgba(126,238,255,.48);box-shadow:0 5px 0 #086892}.hub-global-logo svg{width:32px;height:32px;fill:currentColor;overflow:visible}.hub-global-brand>span:last-child{display:block}.hub-global-brand strong{display:block;color:#fff;font-size:22px;font-weight:1000;line-height:1}.hub-global-brand small{display:block;color:#71717a;font-size:11px;font-weight:800;margin-top:5px}
+.hub-global-question{text-align:right}.hub-global-question strong{display:block;color:#fff;font-size:14px;font-weight:900}.hub-global-question span{display:block;color:#71717a;font-size:10px;font-weight:800;margin-top:4px}
+#app-launcher .launcher-choices{width:100%;height:auto;min-height:760px;flex:1;display:grid;grid-template-columns:1fr 1fr;gap:clamp(18px,2.2vw,34px)}
+#app-launcher .launcher-choice{min-height:760px;padding:clamp(26px,3vw,42px);border:2px solid #262626!important;border-radius:26px;background:linear-gradient(145deg,#121212,#090909);box-shadow:0 12px 36px rgba(0,0,0,.4);overflow:hidden}
+#app-launcher .launcher-choice:first-child{border-right:2px solid #262626!important;background:radial-gradient(circle at 82% 18%,rgba(28,176,246,.12),transparent 30%),linear-gradient(145deg,#121212,#080a0c)}
+#app-launcher .launcher-choice:last-child{background:radial-gradient(circle at 82% 18%,rgba(28,176,246,.09),transparent 32%),linear-gradient(145deg,#121212,#090909)}
+#app-launcher .launcher-choice:after{inset:8px;border-radius:20px}
+.hub-half-inner{width:100%;max-width:none;margin:0;height:100%;display:flex;flex-direction:column}
+.hub-half-head{min-height:36px}.hub-app-number{width:36px;height:36px;border:2px solid rgba(28,176,246,.35);border-radius:10px;background:rgba(28,176,246,.09);color:#1cb0f6;display:grid;place-items:center;font-size:12px;font-weight:1000}.hub-app-chip{font-size:10px;padding:7px 11px}
+.hub-copy{margin-top:22px}.hub-kicker{display:none}.hub-app-title{font-size:clamp(47px,5vw,68px);line-height:.93;letter-spacing:-2.5px}.hub-app-desc{max-width:520px;margin-top:13px;font-size:clamp(14px,1.2vw,17px);line-height:1.45}
+.hub-preview-box{display:block;margin-top:27px;padding:18px;border:2px solid #262626;border-radius:18px;background:#0c0c0c;text-align:left;box-shadow:inset 0 1px rgba(255,255,255,.025)}
+.hub-preview-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:2px solid #1e1e1e}.hub-preview-head>span{display:block;min-width:0}.hub-preview-head strong{display:block;color:#fff;font-size:13px;font-weight:1000}.hub-preview-head small{display:block;color:#71717a;font-size:9px;font-weight:800;margin-top:4px;white-space:normal}.hub-preview-head>b{padding:5px 8px;border-radius:7px;background:rgba(28,176,246,.1);color:#1cb0f6;font-size:8px;letter-spacing:.7px;flex-shrink:0}
+.hub-preview-content{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;padding-top:16px;min-height:155px}
+.hub-covers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;padding:0;min-width:0;align-items:start}
+.hub-game-card{position:relative;display:block;min-width:0;text-align:left}.hub-game-card .hub-cover{width:100%;height:auto;aspect-ratio:.78;margin:0;transform:none!important;border:2px solid #262626;border-radius:11px;box-shadow:0 8px 16px rgba(0,0,0,.4)}.launcher-choice:hover .hub-game-card .hub-cover{border-color:#1cb0f6;transform:translateY(-3px)!important}.hub-game-card small{display:block;color:#a1a1aa;font-size:8px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:7px}.hub-game-card i{position:absolute;top:5px;left:5px;width:19px;height:19px;border-radius:6px;background:rgba(0,0,0,.78);border:1px solid rgba(255,255,255,.18);color:#fff;display:grid;place-items:center;font-style:normal;font-size:8px;font-weight:1000}
+.hub-trophy-strip{min-width:188px;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:9px;border:2px solid #262626;border-radius:14px;background:#121212}.hub-trophy-strip>span{width:auto;height:54px;display:flex;align-items:center;gap:4px;padding:4px;border-radius:8px;background:#0d0d0d}.hub-trophy-strip img,.hub-trophy-strip .hub-plat img{width:31px;height:31px;object-fit:contain;filter:none}.hub-trophy-strip .hub-plat img{filter:drop-shadow(0 0 7px rgba(28,176,246,.45))}.hub-trophy-strip small{display:block;color:#a1a1aa;font-size:7px;font-weight:900}
+.hub-stat-preview{min-width:174px;grid-template-columns:1fr;border-radius:14px}.hub-stat-preview>span{padding:12px 14px}.hub-stat-preview>span+span{border-left:0;border-top:2px solid #262626}.hub-stat-preview b{font-size:23px}.hub-stat-preview small{font-size:8px}
+.hub-card-footer{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,220px);align-items:center;gap:18px;margin-top:auto;padding-top:22px}.hub-card-footer>span:first-child{display:block;text-align:left;min-width:0}.hub-card-footer strong{display:block;color:#fff;font-size:12px;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hub-card-footer small{display:block;color:#71717a;font-size:9px;font-weight:800;margin-top:4px}.hub-card-footer .hub-open-btn{width:100%;min-height:50px;margin:0;padding:0 16px;font-size:12px;border-radius:10px}
+
+@media(max-width:1050px){#app-launcher .launcher-choices{grid-template-columns:1fr;min-height:0}#app-launcher .launcher-choice{min-height:720px}#app-launcher .launcher-choice:first-child{border-bottom:2px solid #262626}.hub-preview-content{grid-template-columns:minmax(0,1fr) 210px}.hub-trophy-strip{min-width:210px}.hub-stat-preview{min-width:210px}}
+@media(max-width:620px){#app-launcher .launcher-shell{padding:14px 13px 20px;gap:16px}.hub-global-header{padding:0 4px;min-height:64px}.hub-global-logo{width:46px;height:46px}.hub-global-brand strong{font-size:19px}.hub-global-brand small{font-size:9px}.hub-global-question{display:none}#app-launcher .launcher-choice{padding:22px 18px;min-height:760px;border-radius:22px}.hub-app-title{font-size:52px}.hub-app-desc{font-size:14px}.hub-preview-box{padding:14px;margin-top:24px}.hub-preview-head small{font-size:8px}.hub-preview-content{grid-template-columns:1fr;gap:14px}.hub-covers{gap:7px}.hub-game-card small{font-size:8px}.hub-trophy-strip{min-width:0;grid-template-columns:repeat(4,1fr)}.hub-trophy-strip>span{height:45px;justify-content:center}.hub-trophy-strip small{display:none}.hub-stat-preview{min-width:0;grid-template-columns:1fr 1fr}.hub-stat-preview>span+span{border-top:0;border-left:2px solid #262626}.hub-card-footer{grid-template-columns:1fr;gap:13px}.hub-card-footer .hub-open-btn{min-height:52px}.hub-card-footer strong{white-space:normal}.hub-card-footer small{font-size:8px}}
 </style>
 <script id="pstat-inline-script">
+
+
 /* PStat — statistiques PlayStation + transactions locales
    Aucune donnée financière n'est envoyée vers psn-data.json ou Firebase. */
 (function () {
@@ -353,6 +455,45 @@
     var cover = game.coverUrl || game.imageUrl || game.localizedImageUrl || '';
     if (cover) return '<img class="' + className + '" src="' + escapeHtml(cover) + '" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;' + className + ' pstat-game-fallback&quot;>' + escapeHtml(initials(game.name)) + '</div>\'">';
     return '<div class="' + className + ' pstat-game-fallback">' + escapeHtml(initials(game.name)) + '</div>';
+  }
+
+  function hubCoverMarkup(game, index) {
+    var cover = game.coverUrl || game.imageUrl || game.localizedImageUrl || '';
+    var name = game.localizedName || game.name || 'Jeu PlayStation';
+    var label = escapeHtml(initials(name));
+    var picture = cover
+      ? '<img class="hub-cover" src="' + escapeHtml(cover) + '" alt="' + escapeHtml(name) + '" loading="lazy" onerror="this.outerHTML=\'<span class=&quot;hub-cover hub-cover-fallback&quot;>' + label + '</span>\'">'
+      : '<span class="hub-cover hub-cover-fallback">' + label + '</span>';
+    return '<span class="hub-game-card" title="' + escapeHtml(name) + '">' + picture + '<small>' + escapeHtml(name) + '</small><i>' + (index + 1) + '</i></span>';
+  }
+
+  function renderLauncherPreview(data) {
+    if (!data) return;
+    var allGames = Array.isArray(data.games) ? data.games.filter(function (game) { return game && game.coverUrl; }) : [];
+    var trophyGames = allGames.slice(0, 3);
+    var hasPlayStats = Boolean(data.playStats && Array.isArray(data.playStats.games) && data.playStats.games.some(function (game) { return Number(game.durationSeconds || 0) > 0; }));
+    var statsGames = hasPlayStats
+      ? data.playStats.games.slice().sort(function (a, b) { return Number(b.durationSeconds || 0) - Number(a.durationSeconds || 0); }).filter(function (game) { return game.coverUrl || game.imageUrl; }).slice(0, 3)
+      : allGames.slice(3, 6);
+    if (!statsGames.length) statsGames = trophyGames;
+    if (trophyGames.length) html('launcher-platina-covers', trophyGames.map(hubCoverMarkup).join(''));
+    if (statsGames.length) html('launcher-pstat-covers', statsGames.map(hubCoverMarkup).join(''));
+    text('launcher-pstat-preview-title', hasPlayStats ? 'Jeux les plus joués' : 'Aperçu de la bibliothèque');
+    text('launcher-pstat-preview-sub', hasPlayStats ? 'Les 3 couvertures représentent votre classement personnel' : 'Trois autres jeux provenant de votre compte PlayStation');
+    text('launcher-pstat-preview-badge', hasPlayStats ? 'TOP 3' : 'JEUX');
+    var trophyCount = Number(data.trophiesImported || 0);
+    var gameCount = data.library && Number.isFinite(Number(data.library.total)) ? Number(data.library.total) : Number(data.gamesImported || trophyGames.length || 0);
+    var seconds = data.playStats ? Number(data.playStats.totalDurationSeconds || 0) : 0;
+    text('launcher-platina-stat', trophyCount ? formatInteger(trophyCount) + ' trophées synchronisés' : 'Vos trophées vous attendent');
+    text('launcher-games-stat', gameCount ? formatInteger(gameCount) : '—');
+    text('launcher-hours-stat', seconds ? formatHours(seconds, true) : '—');
+  }
+
+  function loadLauncherPreview() {
+    fetch(DATA_URL + '?hub=' + Date.now(), { cache: 'no-store' })
+      .then(function (response) { if (!response.ok) throw new Error('Données indisponibles'); return response.json(); })
+      .then(renderLauncherPreview)
+      .catch(function () { /* Les aperçus de secours restent visibles. */ });
   }
 
   function fallbackGamesFromTrophies(data) {
@@ -773,6 +914,55 @@
     if (!window.confirm('Supprimer toutes les transactions stockées sur cet appareil ?')) return;
     transactions = []; saveTransactions(); renderTransactions(); notify('Transactions locales supprimées', '⌫');
   };
+
+  window.openPstatTransactionModal = function () {
+    var modal = byId('pstat-transaction-modal');
+    if (!modal) return;
+    var today = new Date();
+    var localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    var dateInput = byId('pstat-manual-date');
+    if (dateInput) dateInput.value = localDate;
+    ['pstat-manual-name', 'pstat-manual-amount', 'pstat-manual-id'].forEach(function (id) { var field = byId(id); if (field) field.value = ''; });
+    var currency = byId('pstat-manual-currency'); if (currency) currency.value = 'EUR';
+    var type = byId('pstat-manual-type'); if (type) type.value = 'Achat';
+    modal.classList.add('open');
+    setTimeout(function () { var name = byId('pstat-manual-name'); if (name) name.focus(); }, 80);
+  };
+
+  window.closePstatTransactionModal = function () {
+    var modal = byId('pstat-transaction-modal');
+    if (modal) modal.classList.remove('open');
+  };
+
+  window.saveManualPstatTransaction = function () {
+    var name = String((byId('pstat-manual-name') || {}).value || '').trim();
+    var amount = Number((byId('pstat-manual-amount') || {}).value || 0);
+    var currency = String((byId('pstat-manual-currency') || {}).value || 'EUR');
+    var type = String((byId('pstat-manual-type') || {}).value || 'Achat');
+    var idInput = String((byId('pstat-manual-id') || {}).value || '').trim();
+    var rawDate = String((byId('pstat-manual-date') || {}).value || '');
+    if (!name) { notify('Indique le nom du jeu ou de la transaction', '⚠'); return; }
+    if (!Number.isFinite(amount) || amount === 0) { notify('Indique un montant valide', '⚠'); return; }
+    if (/rembours/i.test(type) && amount > 0) amount *= -1;
+    var id = idInput || 'manuel_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+    if (transactions.some(function (item) { return item.id === id; })) { notify('Cet identifiant existe déjà', '⚠'); return; }
+    var date = rawDate ? new Date(rawDate + 'T12:00:00').toISOString() : new Date().toISOString();
+    transactions.push({ id: id, date: date, name: name, amount: amount, currency: currency, type: type });
+    saveTransactions();
+    renderTransactions();
+    closePstatTransactionModal();
+    notify('Transaction ajoutée à PStat', '✓');
+  };
+
+  window.deletePstatTransaction = function (encodedId) {
+    var id = decodeURIComponent(String(encodedId || ''));
+    var item = transactions.find(function (transaction) { return transaction.id === id; });
+    if (!item) return;
+    if (!window.confirm('Supprimer « ' + item.name + ' » de PStat ?')) return;
+    transactions = transactions.filter(function (transaction) { return transaction.id !== id; });
+    saveTransactions(); renderTransactions(); notify('Transaction supprimée', '⌫');
+  };
+
   window.filterPstatTransactions = renderTransactions;
 
   function renderTransactions() {
@@ -789,14 +979,15 @@
       .sort(function (a, b) { return new Date(b.date || 0) - new Date(a.date || 0); });
     text('pstat-transaction-results', filtered.length + ' résultat' + (filtered.length > 1 ? 's' : ''));
     if (!filtered.length) {
-      list.innerHTML = '<div class="pstat-empty"><div class="pstat-empty-icon">↓</div><strong>' + (transactions.length ? 'Aucun résultat' : 'Aucune transaction importée') + '</strong><span>' + (transactions.length ? 'Modifie ta recherche.' : 'Exporte ton historique PlayStation au format CSV, puis importe le fichier ici. Les données resteront sur cet appareil.') + '</span></div>';
+      list.innerHTML = '<div class="pstat-empty"><div class="pstat-empty-icon">＋</div><strong>' + (transactions.length ? 'Aucun résultat' : 'Aucune transaction enregistrée') + '</strong><span>' + (transactions.length ? 'Modifie ta recherche.' : 'Ajoute un achat manuellement avec le bouton ci-dessus, ou importe un fichier CSV. Les données resteront sur cet appareil.') + '</span></div>';
       return;
     }
     list.innerHTML = filtered.map(function (item) {
       var refund = Number(item.amount) < 0 || /refund|rembours/i.test(item.type || '');
+      var safeId = encodeURIComponent(String(item.id || '')).replace(/'/g, '%27');
       return '<div class="pstat-transaction-row"><div class="pstat-transaction-icon">' + (refund ? '↩' : '▣') + '</div>' +
         '<div style="min-width:0"><div class="pstat-transaction-name">' + escapeHtml(item.name) + '</div><div class="pstat-transaction-meta">' + escapeHtml(formatDate(item.date, false)) + ' · ' + escapeHtml(item.type || 'Transaction') + (item.id ? ' · ' + escapeHtml(item.id) : '') + '</div></div>' +
-        '<div class="pstat-transaction-amount' + (refund ? ' refund' : '') + '">' + escapeHtml(formatMoney(item.amount, item.currency)) + '</div></div>';
+        '<div class="pstat-transaction-amount' + (refund ? ' refund' : '') + '">' + escapeHtml(formatMoney(item.amount, item.currency)) + '<button class="pstat-transaction-delete" type="button" title="Supprimer" onclick="deletePstatTransaction(\'' + safeId + '\')">✕</button></div></div>';
     }).join('');
   }
 
@@ -825,8 +1016,11 @@
     if (launcher) launcher.setAttribute('aria-hidden', 'false');
     if (pstat) pstat.setAttribute('aria-hidden', 'true');
     renderTransactions();
+    loadLauncherPreview();
   });
 })();
+
+
 
 </script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='34' fill='%23000820'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='30%25' y1='15%25' x2='70%25' y2='85%25'%3E%3Cstop offset='0%25' stop-color='%237eeeff'/%3E%3Cstop offset='45%25' stop-color='%231cb0f6'/%3E%3Cstop offset='100%25' stop-color='%230a80b5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M63 33h66L119 100H73Z' fill='url(%23g)'/%3E%3Cpath d='M63 43Q26 44 26 72Q26 96 63 94' stroke='url(%23g)' stroke-width='11' fill='none' stroke-linecap='round'/%3E%3Cpath d='M129 43Q166 44 166 72Q166 96 129 94' stroke='url(%23g)' stroke-width='11' fill='none' stroke-linecap='round'/%3E%3Crect x='87' y='100' width='18' height='22' fill='url(%23g)'/%3E%3Crect x='61' y='122' width='70' height='18' rx='9' fill='url(%23g)'/%3E%3Cellipse cx='80' cy='58' rx='7' ry='16' fill='rgba(255,255,255,0.25)' transform='rotate(-12,80,58)'/%3E%3C/svg%3E">
@@ -1102,7 +1296,8 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
     <!-- DASHBOARD -->
     <div class="screen active" id="screen-dashboard">
       <div class="page-header" style="padding-bottom:0">
-        <div class="page-title" style="display:flex;align-items:center;gap:10px;">
+        <div class="page-title" style="display:flex;align-items:center;gap:12px;">
+          <span class="platina-header-logo" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M21 11h22l-4 23H25L21 11Z"/><path d="M22 16h-6c-5 0-8 4-8 9s4 9 12 9M42 16h6c5 0 8 4 8 9s-4 9-12 9" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="M29 34h6v9h-6zM21 43h22v7H21z"/><path d="M18 50h28v5H18z"/></svg></span>
           <span style="color:var(--blue)">Plat<span style="color:white">ina</span></span>
         </div>
       </div>
@@ -1344,49 +1539,67 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
 
 <!-- ══════════════ SÉLECTEUR PLATINA / PSTAT ══════════════ -->
 <div id="app-launcher" aria-label="Choisir une application">
-  <div class="launcher-grid-bg"></div>
   <main class="launcher-shell">
-    <div class="launcher-top">
-      <div class="launcher-brand">
-        <div class="launcher-brand-mark">P/</div>
-        <div class="launcher-brand-copy"><strong>PLAY HUB</strong><span>par PAGOT Enzo</span></div>
+    <header class="hub-global-header">
+      <div class="hub-global-brand">
+        <span class="hub-global-logo" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M21 11h22l-4 23H25L21 11Z"/><path d="M22 16h-6c-5 0-8 4-8 9s4 9 12 9M42 16h6c5 0 8 4 8 9s-4 9-12 9" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="M29 34h6v9h-6zM21 43h22v7H21z"/><path d="M18 50h28v5H18z"/></svg></span>
+        <span><strong>Play Hub</strong><small>Deux espaces, un seul compte PlayStation</small></span>
       </div>
-      <div class="launcher-status"><i></i> Deux expériences · un seul espace</div>
-    </div>
-    <div class="launcher-intro">
-      <div class="launcher-kicker">Votre univers PlayStation</div>
-      <h1 class="launcher-title">Quelle est votre<br><span>mission ?</span></h1>
-      <p class="launcher-subtitle">Chassez les trophées avec Platina ou explorez l’ensemble de votre activité PlayStation avec PStat.</p>
-    </div>
+      <div class="hub-global-question"><strong>Choisissez votre espace</strong><span>Vous pourrez changer à tout moment</span></div>
+    </header>
+
     <div class="launcher-choices">
       <button class="launcher-choice platina-choice" type="button" onclick="choosePlayStationApp('platina')">
         <span class="launcher-choice-glow"></span>
-        <span class="launcher-choice-head">
-          <span class="launcher-app-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 4h8l-1 8H9L8 4Z"/><path d="M8 6H5a3 3 0 0 0 3 4m8-4h3a3 3 0 0 1-3 4M12 12v4m-4 3h8m-9 0h10"/></svg>
+        <span class="hub-half-inner">
+          <span class="hub-half-head"><span class="hub-app-number">01</span><span class="hub-app-chip">Trophées & progression</span></span>
+          <span class="hub-copy">
+            <span class="hub-app-title">Plat<span>ina</span></span>
+            <span class="hub-app-desc">Suivez vos listes de trophées, vos jeux terminés et vos prochains objectifs.</span>
           </span>
-          <span class="launcher-arrow">→</span>
+          <span class="hub-preview-box">
+            <span class="hub-preview-head"><span><strong>Derniers jeux à trophées</strong><small>Les 3 couvertures viennent de votre synchronisation PSN</small></span><b>RÉCENTS</b></span>
+            <span class="hub-preview-content">
+              <span class="hub-covers" id="launcher-platina-covers">
+                <span class="hub-game-card"><span class="hub-cover hub-cover-fallback">GOW</span><small>Jeu récent</small></span>
+                <span class="hub-game-card"><span class="hub-cover hub-cover-fallback">SM2</span><small>Jeu récent</small></span>
+                <span class="hub-game-card"><span class="hub-cover hub-cover-fallback">ER</span><small>Jeu récent</small></span>
+              </span>
+              <span class="hub-trophy-strip" aria-label="Trophées Bronze, Argent, Or et Platine">
+                <span><img src="bronze.png" alt="Bronze"><small>Bronze</small></span><span><img src="argent.png" alt="Argent"><small>Argent</small></span><span><img src="or.png" alt="Or"><small>Or</small></span><span class="hub-plat"><img src="platine.png" alt="Platine"><small>Platine</small></span>
+              </span>
+            </span>
+          </span>
+          <span class="hub-card-footer"><span><strong id="launcher-platina-stat">Vos trophées vous attendent</strong><small>Dashboard · Jeux · Wishlist</small></span><span class="hub-open-btn">Ouvrir Platina <b>→</b></span></span>
         </span>
-        <span class="launcher-app-tag">Trophy tracker</span>
-        <span class="launcher-app-name">PLATINA</span>
-        <span class="launcher-app-desc">Suivez vos trophées, vos platines, vos objectifs et votre progression jeu par jeu.</span>
-        <span class="launcher-app-features"><span>Trophées</span><span>Platines</span><span>Wishlist</span></span>
       </button>
+
       <button class="launcher-choice pstat-choice" type="button" onclick="choosePlayStationApp('pstat')">
         <span class="launcher-choice-glow"></span>
-        <span class="launcher-choice-head">
-          <span class="launcher-app-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19V9m5 10V5m5 14v-7m5 7V3"/><path d="M2 19h20"/></svg>
+        <span class="hub-half-inner">
+          <span class="hub-half-head"><span class="hub-app-number">02</span><span class="hub-app-chip">Activité PlayStation</span></span>
+          <span class="hub-copy">
+            <span class="hub-app-title">P<span>Stat</span></span>
+            <span class="hub-app-desc">Découvrez votre bibliothèque, votre temps de jeu et vos classements personnels.</span>
           </span>
-          <span class="launcher-arrow">→</span>
+          <span class="hub-preview-box">
+            <span class="hub-preview-head"><span><strong id="launcher-pstat-preview-title">Jeux les plus joués</strong><small id="launcher-pstat-preview-sub">Les 3 couvertures représentent votre classement personnel</small></span><b id="launcher-pstat-preview-badge">TOP 3</b></span>
+            <span class="hub-preview-content">
+              <span class="hub-covers" id="launcher-pstat-covers">
+                <span class="hub-game-card"><span class="hub-cover hub-cover-fallback">#1</span><small>Top 1</small></span>
+                <span class="hub-game-card"><span class="hub-cover hub-cover-fallback">#2</span><small>Top 2</small></span>
+                <span class="hub-game-card"><span class="hub-cover hub-cover-fallback">#3</span><small>Top 3</small></span>
+              </span>
+              <span class="hub-stat-preview">
+                <span><b id="launcher-hours-stat">—</b><small>heures jouées</small></span>
+                <span><b id="launcher-games-stat">—</b><small>jeux</small></span>
+              </span>
+            </span>
+          </span>
+          <span class="hub-card-footer"><span><strong>Votre histoire PlayStation</strong><small>Statistiques · Classements · Transactions</small></span><span class="hub-open-btn">Ouvrir PStat <b>→</b></span></span>
         </span>
-        <span class="launcher-app-tag">Account intelligence</span>
-        <span class="launcher-app-name">PSTAT</span>
-        <span class="launcher-app-desc">Mesurez votre temps de jeu, retrouvez vos jeux les plus joués et centralisez vos transactions.</span>
-        <span class="launcher-app-features"><span>Temps de jeu</span><span>Classements</span><span>Transactions</span></span>
       </button>
     </div>
-    <div class="launcher-foot"><span><strong>Platina + PStat</strong> · Données PlayStation synchronisées par GitHub Actions</span><span>Les transactions restent privées sur cet appareil.</span></div>
   </main>
 </div>
 
@@ -1394,8 +1607,8 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
 <div id="pstat-root" class="pstat-hidden" aria-hidden="true">
   <header class="pstat-topbar">
     <div class="pstat-brand">
-      <div class="pstat-brand-mark">PS</div>
-      <div><div class="pstat-brand-name">PSTAT</div><div class="pstat-brand-sub" id="pstat-header-profile">Compte PlayStation</div></div>
+      <div class="pstat-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M21 11h22l-4 23H25L21 11Z"/><path d="M22 16h-6c-5 0-8 4-8 9s4 9 12 9M42 16h6c5 0 8 4 8 9s-4 9-12 9" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="M29 34h6v9h-6zM21 43h22v7H21z"/><path d="M18 50h28v5H18z"/></svg></div>
+      <div><div class="pstat-brand-name"><span>P</span>Stat</div><div class="pstat-brand-sub" id="pstat-header-profile">Compte PlayStation</div></div>
     </div>
     <div class="pstat-top-actions">
       <button class="pstat-icon-btn" type="button" onclick="reloadPstatData()" title="Actualiser les données">
@@ -1458,17 +1671,18 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
     <!-- Transactions -->
     <section class="pstat-screen" data-pstat-screen="transactions">
       <div class="pstat-page-head"><div><div class="pstat-eyebrow">Historique privé</div><div class="pstat-page-title">Transactions</div><div class="pstat-page-sub">Importez, recherchez et analysez vos achats PlayStation.</div></div></div>
-      <div class="pstat-privacy-banner"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><div><div class="pstat-privacy-title">Stockage local et privé</div><div class="pstat-privacy-text">Les montants importés restent dans ce navigateur. Ils ne sont jamais ajoutés au dépôt GitHub public ni au fichier PSN.</div></div></div>
+      <div class="pstat-privacy-banner"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><div><div class="pstat-privacy-title">Transactions privées</div><div class="pstat-privacy-text">Sony ne fournit pas l’historique financier dans l’API des trophées et des heures. Ajoutez vos achats manuellement ou importez un CSV : les montants restent uniquement dans ce navigateur.</div></div></div>
       <div class="pstat-transaction-metrics">
         <div class="pstat-transaction-metric pstat-card"><strong id="pstat-trans-count">0</strong><span>Transactions</span></div>
         <div class="pstat-transaction-metric pstat-card"><strong id="pstat-trans-total">0,00 €</strong><span>Montant net importé</span></div>
         <div class="pstat-transaction-metric pstat-card"><strong id="pstat-trans-since">—</strong><span>Depuis</span></div>
       </div>
       <div class="pstat-import-panel pstat-card">
-        <div class="pstat-import-copy"><div class="pstat-import-title">Importer un historique CSV</div><div class="pstat-import-desc">Colonnes reconnues automatiquement : Date, Description/Produit, Montant, Devise, Type et ID. Les lignes déjà importées sont ignorées.</div></div>
+        <div class="pstat-import-copy"><div class="pstat-import-title">Ajouter vos transactions</div><div class="pstat-import-desc">Saisie rapide directement dans PStat, ou import d’un historique CSV. Les doublons possédant le même identifiant sont ignorés.</div></div>
         <div class="pstat-import-actions">
-          <button class="pstat-btn" type="button" onclick="downloadPstatCsvTemplate()">Télécharger le modèle</button>
-          <label class="pstat-btn pstat-btn-primary" for="pstat-csv-file">Importer un CSV</label>
+          <button class="pstat-btn pstat-btn-primary" type="button" onclick="openPstatTransactionModal()">+ Ajouter manuellement</button>
+          <button class="pstat-btn" type="button" onclick="downloadPstatCsvTemplate()">Modèle CSV</button>
+          <label class="pstat-btn" for="pstat-csv-file">Importer un CSV</label>
           <input id="pstat-csv-file" type="file" accept=".csv,text/csv" hidden onchange="importPstatTransactions(this)">
         </div>
       </div>
@@ -1503,6 +1717,24 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
       </div>
     </section>
   </main>
+
+
+  <div class="pstat-manual-modal" id="pstat-transaction-modal" onclick="closePstatTransactionModal(event)">
+    <div class="pstat-manual-sheet" role="dialog" aria-modal="true" aria-labelledby="pstat-manual-title" onclick="event.stopPropagation()">
+      <div class="pstat-manual-header"><div><div class="pstat-eyebrow">Transaction privée</div><div class="pstat-manual-title" id="pstat-manual-title">Ajouter un achat</div></div><button class="pstat-manual-close" type="button" onclick="closePstatTransactionModal()">✕</button></div>
+      <div class="pstat-manual-body">
+        <label class="pstat-manual-field"><span>Description / jeu *</span><input id="pstat-manual-name" placeholder="Ex : Marvel’s Spider-Man 2"></label>
+        <div class="pstat-manual-grid">
+          <label class="pstat-manual-field"><span>Date</span><input id="pstat-manual-date" type="date"></label>
+          <label class="pstat-manual-field"><span>Montant *</span><input id="pstat-manual-amount" type="number" inputmode="decimal" step="0.01" placeholder="69,99"></label>
+          <label class="pstat-manual-field"><span>Devise</span><select id="pstat-manual-currency"><option value="EUR">EUR — €</option><option value="USD">USD — $</option><option value="GBP">GBP — £</option><option value="CHF">CHF</option><option value="CAD">CAD</option><option value="JPY">JPY — ¥</option></select></label>
+          <label class="pstat-manual-field"><span>Type</span><select id="pstat-manual-type"><option value="Achat">Achat</option><option value="Abonnement">Abonnement</option><option value="DLC">DLC</option><option value="Monnaie virtuelle">Monnaie virtuelle</option><option value="Remboursement">Remboursement</option><option value="Autre">Autre</option></select></label>
+        </div>
+        <label class="pstat-manual-field"><span>Identifiant (optionnel)</span><input id="pstat-manual-id" placeholder="Numéro de commande PlayStation"></label>
+        <button class="pstat-btn pstat-btn-primary pstat-manual-submit" type="button" onclick="saveManualPstatTransaction()">Enregistrer la transaction</button>
+      </div>
+    </div>
+  </div>
 
   <nav class="pstat-nav" aria-label="Navigation PStat">
     <button class="pstat-nav-btn pstat-nav-active" type="button" data-pstat-tab="overview" onclick="switchPstatTab('overview')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg><span>Vue d’ensemble</span></button>
@@ -2287,5 +2519,5 @@ if(!configured()){
   }catch(e){console.error(e);status('Erreur config','err');}
 }
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1a83997ed1bbb69',t:'MTc4Mzk0NTA1MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
