@@ -1,0 +1,66 @@
+name: Update PStat accounts
+
+on:
+  workflow_dispatch:
+    inputs:
+      account:
+        description: "Compte(s) PStat à synchroniser"
+        required: true
+        default: "both"
+        type: choice
+        options:
+          - both
+          - batman
+          - frere
+  schedule:
+    - cron: "15 5 * * 0"
+
+permissions:
+  contents: write
+
+jobs:
+  update-pstat-accounts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install psn-api
+        run: npm install psn-api@^2.18.0
+
+      - name: Sync BATMAN_Miyukii
+        if: github.event_name == 'schedule' || github.event.inputs.account == 'both' || github.event.inputs.account == 'batman'
+        env:
+          NPSSO: ${{ secrets.PSN_NPSSO }}
+          PSTAT_ACCOUNT_KEY: batman
+          PSTAT_FALLBACK_ONLINE_ID: BATMAN_Miyukii
+        run: |
+          if [ -z "$NPSSO" ]; then
+            echo "::warning::Secret PSN_NPSSO absent : compte BATMAN ignoré."
+            exit 0
+          fi
+          node scripts/fetch-pstat-account.mjs
+
+      - name: Sync compte du frère
+        if: github.event_name == 'schedule' || github.event.inputs.account == 'both' || github.event.inputs.account == 'frere'
+        env:
+          NPSSO: ${{ secrets.PSN_NPSSO_FRERE }}
+          PSTAT_ACCOUNT_KEY: frere
+          PSTAT_FALLBACK_ONLINE_ID: Compte du frère
+        run: |
+          if [ -z "$NPSSO" ]; then
+            echo "::warning::Secret PSN_NPSSO_FRERE absent : compte du frère ignoré."
+            exit 0
+          fi
+          node scripts/fetch-pstat-account.mjs
+
+      - name: Commit PStat account data
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update PStat account statistics"
+          file_pattern: "Platina/pstat-accounts.json"
