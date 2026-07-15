@@ -353,8 +353,15 @@
 #app-launcher .launcher-choice:hover .hub-game-card:nth-child(3){transform:translateY(2px) rotate(9deg)}
 #app-launcher .launcher-choice:hover .hub-game-card .hub-cover{transform:none!important;border-color:#1cb0f6}
 @media(max-width:620px){#app-launcher .hub-covers{min-width:0;padding:18px 10px 25px}#app-launcher .hub-game-card{flex-basis:100px;width:100px;margin-left:-22px}}
+
+/* PStat multi-compte */
+.pstat-account-picker{min-width:270px;max-width:390px;display:flex;align-items:center;gap:12px;padding:8px 10px 8px 13px;border:2px solid #262626;border-radius:12px;background:#1e1e1e}.pstat-account-picker>div{display:block;min-width:95px}.pstat-account-picker span{display:block;color:#a1a1aa;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.45px}.pstat-account-picker small{display:block;color:#71717a;font-size:8px;font-weight:800;margin-top:3px}.pstat-account-picker select{flex:1;min-width:125px;height:36px;padding:0 30px 0 10px;border:2px solid #3f3f46;border-radius:9px;background:#121212;color:#fff;font:900 12px 'Nunito',sans-serif;outline:none;color-scheme:dark}.pstat-account-picker select:focus{border-color:#1cb0f6}
+.pstat-account-help-card{grid-column:1/-1}.pstat-token-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.pstat-token-steps>div{display:flex;align-items:flex-start;gap:9px;padding:12px;border:2px solid #262626;border-radius:12px;background:#1e1e1e}.pstat-token-steps b{width:25px;height:25px;border-radius:8px;background:rgba(28,176,246,.12);color:#1cb0f6;display:grid;place-items:center;flex-shrink:0}.pstat-token-steps span{color:#a1a1aa;font-size:10px;font-weight:700;line-height:1.4}.pstat-token-steps code{color:#7eeeff;font-weight:900}.pstat-account-links{display:flex;gap:9px;flex-wrap:wrap}.pstat-token-warning{margin-top:12px;padding:10px 12px;border:2px solid rgba(255,200,0,.22);border-radius:10px;background:rgba(255,200,0,.05);color:#d6b95b;font-size:10px;font-weight:800}
+@media(max-width:850px){.pstat-account-picker{min-width:0;max-width:none;margin-left:auto}.pstat-account-picker>div{display:none}.pstat-account-picker select{min-width:150px}.pstat-token-steps{grid-template-columns:1fr}}
+@media(max-width:580px){.pstat-topbar{gap:7px}.pstat-brand-sub{display:none}.pstat-account-picker{padding:5px;flex:1}.pstat-account-picker select{width:100%;min-width:0;height:38px;font-size:10px}.pstat-top-actions{gap:5px}.pstat-icon-btn{padding:0 10px}.pstat-account-links{display:grid;grid-template-columns:1fr}.pstat-account-links .pstat-btn{width:100%}}
 </style>
 <script id="pstat-inline-script">
+
 
 
 /* PStat — statistiques PlayStation + transactions locales
@@ -363,12 +370,17 @@
   'use strict';
 
   var DATA_URL = 'psn-data.json';
+  var ACCOUNTS_URL = 'pstat-accounts.json';
   var TRANSACTION_KEY = 'pstat-transactions-v1';
   var pstatData = null;
+  var pstatAccounts = [];
+  var currentPstatAccountKey = 'batman';
   var playedGames = [];
   var transactions = [];
   var currentPstatTab = 'overview';
   var dataLoading = false;
+  var accountsLoading = false;
+  try { currentPstatAccountKey = localStorage.getItem('pstat-selected-account') || 'batman'; } catch (e) {}
 
   function byId(id) { return document.getElementById(id); }
   function text(id, value) { var el = byId(id); if (el) el.textContent = value; }
@@ -416,7 +428,7 @@
       if (root) { root.classList.add('app-hidden'); root.setAttribute('aria-hidden', 'true'); }
       if (pstat) { pstat.classList.remove('pstat-hidden'); pstat.setAttribute('aria-hidden', 'false'); }
       document.title = 'PStat — Mon compte PlayStation';
-      loadPstatData(false);
+      loadPstatAccounts(false);
       renderTransactions();
     } else {
       if (pstat) { pstat.classList.add('pstat-hidden'); pstat.setAttribute('aria-hidden', 'true'); }
@@ -549,7 +561,84 @@
     text('pstat-sync-label', 'Synchronisation des données…');
   }
 
-  window.reloadPstatData = function () { loadPstatData(true); };
+  function accountLabel(account) {
+    return account && account.profile && account.profile.onlineId
+      ? account.profile.onlineId
+      : (account && account.label ? account.label : 'Compte PlayStation');
+  }
+
+  function populatePstatAccountSelector() {
+    var select = byId('pstat-account-select');
+    if (!select || !pstatAccounts.length) return;
+    select.innerHTML = pstatAccounts.map(function (account) {
+      return '<option value="' + escapeHtml(account.key) + '">' + escapeHtml(accountLabel(account)) + '</option>';
+    }).join('');
+    var exists = pstatAccounts.some(function (account) { return account.key === currentPstatAccountKey; });
+    if (!exists) currentPstatAccountKey = pstatAccounts[0].key;
+    select.value = currentPstatAccountKey;
+    text('pstat-account-count', pstatAccounts.length + ' compte' + (pstatAccounts.length > 1 ? 's' : ''));
+  }
+
+  function applyPstatAccount(accountKey, silent) {
+    var account = pstatAccounts.find(function (item) { return item.key === accountKey; });
+    if (!account) return false;
+    currentPstatAccountKey = account.key;
+    try { localStorage.setItem('pstat-selected-account', currentPstatAccountKey); } catch (e) {}
+    pstatData = {
+      version: account.version || 1,
+      source: 'pstat-multi-account',
+      locale: account.locale || 'fr-FR',
+      generatedAt: account.generatedAt || null,
+      profile: account.profile || { onlineId: account.label || account.key },
+      playStats: account.playStats || null,
+      library: account.library || null,
+      errors: account.errors || [],
+      games: []
+    };
+    playedGames = normalizePlayedGames(pstatData);
+    loadTransactions();
+    renderPstatDashboard();
+    renderPlayedGames();
+    renderTransactions();
+    renderPstatSettings();
+    populatePstatAccountSelector();
+    document.title = 'PStat — ' + accountLabel(account);
+    if (!silent) notify('Compte PStat : ' + accountLabel(account), '✓');
+    return true;
+  }
+
+  window.switchPstatAccount = function (accountKey) {
+    applyPstatAccount(accountKey, false);
+  };
+
+  function loadPstatAccounts(force) {
+    if (accountsLoading) return;
+    if (pstatAccounts.length && !force) {
+      applyPstatAccount(currentPstatAccountKey, true);
+      return;
+    }
+    accountsLoading = true;
+    fetch(ACCOUNTS_URL + '?ts=' + Date.now(), { cache: 'no-store' })
+      .then(function (response) {
+        if (!response.ok) throw new Error('Aucun fichier multi-compte');
+        return response.json();
+      })
+      .then(function (manifest) {
+        var accounts = Array.isArray(manifest && manifest.accounts) ? manifest.accounts : [];
+        if (!accounts.length) throw new Error('Aucun compte PStat synchronisé');
+        pstatAccounts = accounts.filter(function (account) { return account && account.key && account.playStats; });
+        if (!pstatAccounts.length) throw new Error('Comptes PStat invalides');
+        populatePstatAccountSelector();
+        applyPstatAccount(currentPstatAccountKey, true);
+      })
+      .catch(function () {
+        pstatAccounts = [];
+        loadPstatData(force);
+      })
+      .finally(function () { accountsLoading = false; });
+  }
+
+  window.reloadPstatData = function () { loadPstatAccounts(true); };
 
   function loadPstatData(force) {
     if (dataLoading || (pstatData && !force)) return;
@@ -562,10 +651,21 @@
       })
       .then(function (data) {
         if (!data || !Array.isArray(data.games)) throw new Error('Le fichier de données PSN est invalide.');
+        if (!data.profile) data.profile = { onlineId: 'BATMAN_Miyukii', avatarUrl: '', isPlus: false };
         pstatData = data;
         playedGames = normalizePlayedGames(data);
+        pstatAccounts = [{
+          key: 'batman', label: 'BATMAN_Miyukii', version: data.version,
+          locale: data.locale || 'fr-FR', generatedAt: data.generatedAt,
+          profile: data.profile, playStats: data.playStats,
+          library: data.library, errors: data.errors || []
+        }];
+        currentPstatAccountKey = 'batman';
+        populatePstatAccountSelector();
+        loadTransactions();
         renderPstatDashboard();
         renderPlayedGames();
+        renderTransactions();
         renderPstatSettings();
         var hasPlayStats = Boolean(data.playStats && Array.isArray(data.playStats.games));
         notify(hasPlayStats ? 'Statistiques PStat actualisées' : 'Relance GitHub Actions pour importer le temps de jeu', hasPlayStats ? '✓' : '↻');
@@ -762,15 +862,19 @@
     }).join('');
   }
 
-  /* ── Transactions locales ── */
+  /* ── Transactions locales, séparées par compte PStat ── */
+  function transactionStorageKey() { return TRANSACTION_KEY + '-' + String(currentPstatAccountKey || 'batman'); }
   function loadTransactions() {
     try {
-      var parsed = JSON.parse(localStorage.getItem(TRANSACTION_KEY) || '[]');
+      var raw = localStorage.getItem(transactionStorageKey());
+      // Migration de l'ancien stockage vers le compte principal uniquement.
+      if (raw === null && currentPstatAccountKey === 'batman') raw = localStorage.getItem(TRANSACTION_KEY);
+      var parsed = JSON.parse(raw || '[]');
       transactions = Array.isArray(parsed) ? parsed.filter(function (item) { return item && item.name; }) : [];
     } catch (e) { transactions = []; }
   }
   function saveTransactions() {
-    localStorage.setItem(TRANSACTION_KEY, JSON.stringify(transactions));
+    localStorage.setItem(transactionStorageKey(), JSON.stringify(transactions));
   }
 
   function detectDelimiter(line) {
@@ -1010,6 +1114,9 @@
   window.openPsnGithubAction = function () {
     window.open('https://github.com/batmanmiyuki/batmanmiyuki.github.io/actions/workflows/update-psn.yml', '_blank', 'noopener');
   };
+  window.openPstatAccountsAction = function () {
+    window.open('https://github.com/batmanmiyuki/batmanmiyuki.github.io/actions/workflows/update-pstat-accounts.yml', '_blank', 'noopener');
+  };
 
   function renderPstatSettings() {
     if (!pstatData) return;
@@ -1032,8 +1139,10 @@
     if (pstat) pstat.setAttribute('aria-hidden', 'true');
     renderTransactions();
     loadLauncherPreview();
+    loadPstatAccounts(false);
   });
 })();
+
 
 
 
@@ -1625,6 +1734,10 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
       <div class="pstat-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M21 11h22l-4 23H25L21 11Z"/><path d="M22 16h-6c-5 0-8 4-8 9s4 9 12 9M42 16h6c5 0 8 4 8 9s-4 9-12 9" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="M29 34h6v9h-6zM21 43h22v7H21z"/><path d="M18 50h28v5H18z"/></svg></div>
       <div><div class="pstat-brand-name"><span>P</span>Stat</div><div class="pstat-brand-sub" id="pstat-header-profile">Compte PlayStation</div></div>
     </div>
+    <div class="pstat-account-picker">
+      <div><span>Compte suivi dans PStat</span><small id="pstat-account-count">1 compte</small></div>
+      <select id="pstat-account-select" onchange="switchPstatAccount(this.value)" aria-label="Choisir le compte PlayStation suivi"><option value="batman">BATMAN_Miyukii</option></select>
+    </div>
     <div class="pstat-top-actions">
       <button class="pstat-icon-btn" type="button" onclick="reloadPstatData()" title="Actualiser les données">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0 1 5M20 4v7h-7"/></svg><span class="pstat-back-label">Actualiser</span>
@@ -1712,6 +1825,21 @@ nav{height:calc(var(--nav-h) + var(--safe-b));min-height:calc(var(--nav-h) + var
     <section class="pstat-screen" data-pstat-screen="settings">
       <div class="pstat-page-head"><div><div class="pstat-eyebrow">Configuration</div><div class="pstat-page-title">Réglages</div><div class="pstat-page-sub">Synchronisation PSN, confidentialité et gestion des données.</div></div></div>
       <div class="pstat-settings-grid">
+        <div class="pstat-setting-card pstat-card pstat-account-help-card">
+          <div class="pstat-setting-icon">＋</div><div class="pstat-setting-title">Ajouter un compte PStat</div>
+          <div class="pstat-setting-text">Chaque compte garde son propre NPSSO dans GitHub Secrets. Le token n’est jamais saisi ni enregistré dans cette application publique.</div>
+          <div class="pstat-token-steps">
+            <div><b>1</b><span>Connectez-vous sur PlayStation.com avec le compte concerné, puis ouvrez le lien NPSSO.</span></div>
+            <div><b>2</b><span>Dans GitHub Secrets, gardez <code>PSN_NPSSO</code> pour BATMAN_Miyukii et créez <code>PSN_NPSSO_FRERE</code>.</span></div>
+            <div><b>3</b><span>Lancez l’action « Update PStat accounts » sur « Les deux comptes ».</span></div>
+          </div>
+          <div class="pstat-account-links">
+            <a class="pstat-btn pstat-btn-primary" href="https://ca.account.sony.com/api/v1/ssocookie" target="_blank" rel="noopener noreferrer">Obtenir le NPSSO</a>
+            <a class="pstat-btn" href="https://github.com/batmanmiyuki/batmanmiyuki.github.io/settings/secrets/actions" target="_blank" rel="noopener noreferrer">Secrets GitHub</a>
+            <button class="pstat-btn" type="button" onclick="openPstatAccountsAction()">Synchroniser les comptes</button>
+          </div>
+          <div class="pstat-token-warning">⚠ Ne partagez jamais un NPSSO par message et ne le mettez jamais directement dans le fichier HTML.</div>
+        </div>
         <div class="pstat-setting-card pstat-card">
           <div class="pstat-setting-icon">↻</div><div class="pstat-setting-title">Synchronisation PlayStation</div><div class="pstat-setting-text">GitHub Actions récupère les trophées en français quand PlayStation fournit une version française, ainsi que les jeux et le temps de jeu.</div>
           <div class="pstat-setting-line"><span>Dernière génération</span><strong id="pstat-settings-generated">—</strong></div><div class="pstat-setting-line"><span>Jeux joués</span><strong id="pstat-settings-played">—</strong></div><div class="pstat-setting-line"><span>Jeux en bibliothèque</span><strong id="pstat-settings-library">—</strong></div><div class="pstat-setting-line"><span>État</span><strong id="pstat-data-mode">—</strong></div>
@@ -2534,5 +2662,5 @@ if(!configured()){
   }catch(e){console.error(e);status('Erreur config','err');}
 }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1a85a27bcc3f4f5',t:'MTc4Mzk0NjM4NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
