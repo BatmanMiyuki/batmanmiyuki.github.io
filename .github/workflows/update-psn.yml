@@ -1,4 +1,4 @@
-name: Update PlayStation trophies
+name: Update PlayStation data
 
 on:
   workflow_dispatch:
@@ -32,7 +32,7 @@ jobs:
       - name: Install psn-api
         run: npm install psn-api@^2.18.0
 
-      - name: Fetch PlayStation trophies
+      - name: Fetch PlayStation trophies and account stats
         env:
           NPSSO: ${{ secrets.PSN_NPSSO }}
           MAX_GAMES: ${{ github.event.inputs.maxGames || '0' }}
@@ -41,5 +41,5 @@ jobs:
       - name: Commit psn-data.json
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Update PlayStation trophy data"
+          commit_message: "Update PlayStation trophies and PStat data"
           file_pattern: "Platina/psn-data.json"
