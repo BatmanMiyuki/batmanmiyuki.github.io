@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anime Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="logo" onclick="navigate('home')">
+        <span>🎬</span> AnimeTracker
+      </a>
+      <div class="nav-links">
+        <a href="#" onclick="navigate('home')">🏠 Accueil</a>
+        <a href="#" onclick="navigate('add')">➕ Ajouter</a>
+        <a href="#" onclick="navigate('profile')">👤 Profil</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- HOME -->
+    <section id="page-home" class="page active">
+      <h1>Ma Collection</h1>
+      <div id="home-empty" class="empty-state hidden">
+        <p style="font-size: 1.125rem; margin-bottom: 1rem;">Aucun anime pour le moment</p>
+        <button class="btn btn-primary" onclick="navigate('add')">Ajouter mon premier anime</button>
+      </div>
+      <div id="anime-grid" class="card-grid"></div>
+    </section>
+
+    <!-- ADD -->
+    <section id="page-add" class="page">
+      <h1>Ajouter un anime</h1>
+      <div class="form-card">
+        <div class="steps">
+          <div class="step active" id="step1-label">1. Anime</div>
+          <div class="step" id="step2-label">2. Saison</div>
+          <div class="step" id="step3-label">3. Épisodes</div>
+        </div>
+
+        <!-- Step 1: Anime -->
+        <div id="step1">
+          <div class="form-group">
+            <label>Titre</label>
+            <input type="text" id="add-title" placeholder="Titre de l'anime">
+          </div>
+          <div class="form-group">
+            <label>Synopsis</label>
+            <textarea id="add-synopsis" placeholder="Synopsis..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Image de couverture (URL)</label>
+            <input type="text" id="add-cover" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="add-status">
+              <option value="planned">À voir</option>
+              <option value="watching">En cours</option>
+              <option value="completed">Terminé</option>
+              <option value="dropped">Abandonné</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="createAnime()">Créer l'anime</button>
+        </div>
+
+        <!-- Step 2: Season -->
+        <div id="step2" class="hidden">
+          <div class="form-group">
+            <label>Saisons créées</label>
+            <div id="seasons-list" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;"></div>
+          </div>
+          <div style="display:flex;gap:1rem;">
+            <div class="form-group" style="width:80px;">
+              <label>Numéro</label>
+              <input type="number" id="add-season-num" value="1" min="1">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label>Titre (optionnel)</label>
+              <input type="text" id="add-season-title" placeholder="ex: Arc Namek">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="createSeason()">Ajouter la saison</button>
+          <p style="margin-top:1rem;color:var(--text-muted);font-size:0.875rem;">Clique sur une saison ci-dessus pour y ajouter des épisodes.</p>
+        </div>
+
+        <!-- Step 3: Episodes -->
+        <div id="step3" class="hidden">
+          <p style="margin-bottom:1rem;color:var(--text-muted);">Saison <span id="ep-season-num"></span></p>
+          <div class="form-group">
+            <label>Épisodes ajoutés</label>
+            <div id="episodes-list" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;"></div>
+          </div>
+          <div style="display:flex;gap:1rem;">
+            <div class="form-group" style="width:80px;">
+              <label>Numéro</label>
+              <input type="number" id="add-ep-num" value="1" min="1">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label>Titre (optionnel)</label>
+              <input type="text" id="add-ep-title" placeholder="Titre de l'épisode">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Source vidéo</label>
+            <div class="source-toggle">
+              <button class="btn btn-sm btn-outline active" id="btn-url" onclick="setVideoSource('url')">🔗 URL</button>
+              <button class="btn btn-sm btn-outline" id="btn-file" onclick="setVideoSource('file')">📁 Fichier local</button>
+            </div>
+          </div>
+          <div class="form-group" id="input-url-group">
+            <label>URL de la vidéo</label>
+            <input type="text" id="add-ep-url" placeholder="https://...">
+          </div>
+          <div class="form-group hidden" id="input-file-group">
+            <label>Fichier vidéo</label>
+            <input type="file" id="add-ep-file" accept="video/*">
+          </div>
+          <div class="form-group">
+            <label>Durée (secondes, optionnel)</label>
+            <input type="number" id="add-ep-duration" placeholder="1420">
+          </div>
+          <button class="btn btn-primary" onclick="createEpisode()">Ajouter l'épisode</button>
+          <button class="btn btn-outline" style="margin-top:0.75rem;width:100%;" onclick="finishAdd()">Terminer et retourner à l'accueil</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ANIME DETAIL -->
+    <section id="page-anime" class="page">
+      <a href="#" class="back-link" onclick="navigate('home')">← Retour</a>
+      <div id="anime-detail-content"></div>
+    </section>
+
+    <!-- WATCH -->
+    <section id="page-watch" class="page">
+      <div id="watch-content"></div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="page-profile" class="page">
+      <div id="profile-content"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1bfc32f6e11cea9',t:'MTc4NDE5MTg1OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
