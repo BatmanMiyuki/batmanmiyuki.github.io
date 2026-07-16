@@ -3,16 +3,61 @@
   "source": "psn-github-actions",
   "locale": "fr-FR",
   "localizationPolicy": "official-playstation-or-original",
-  "generatedAt": "2026-07-16T08:03:53.169Z",
+  "generatedAt": "2026-07-16T22:02:05.288Z",
   "maxGames": 0,
-  "gamesImported": 162,
-  "trophiesImported": 6674,
+  "gamesImported": 159,
+  "trophiesImported": 6564,
   "profile": null,
   "playStats": {
-    "totalTitles": 190,
-    "totalDurationSeconds": 19853309,
-    "totalPlayCount": 4865,
+    "totalTitles": 213,
+    "totalDurationSeconds": 21214853,
+    "totalPlayCount": 5132,
     "games": [
+      {
+        "titleId": "CUSA07027_00",
+        "conceptId": 228418,
+        "name": "Cars 3 : Course vers la victoire",
+        "originalName": "Cars 3 : Course vers la victoire",
+        "coverUrl": "https://image.api.playstation.com/cdn/UP1018/CUSA07044_00/wDcjj1RHZ2sBkkgLGUANyNUSnClZdmcHrH3gBUmH3c1foLoFtQQgo5LDEbu9Jif4.png",
+        "platform": "PS4",
+        "category": "ps4_game",
+        "service": "none(purchased)",
+        "playCount": 33,
+        "playDuration": "PT22H22M2S",
+        "durationSeconds": 80522,
+        "firstPlayedDateTime": "2025-01-25T13:29:26.430000Z",
+        "lastPlayedDateTime": "2026-07-16T21:34:30.970000Z"
+      },
+      {
+        "titleId": "CUSA02979_00",
+        "conceptId": 202508,
+        "name": "LEGO® Worlds",
+        "originalName": "LEGO® Worlds",
+        "coverUrl": "https://image.api.playstation.com/gs2-sec/appkgo/prod/CUSA02979_00/3/i_d38f9cbc8fec7c7a46f5905841846f01a194778f5d550a6e6b2a88a3e37adc50/i/icon0.png",
+        "platform": "PS4",
+        "category": "ps4_game",
+        "service": "none(purchased)",
+        "playCount": 37,
+        "playDuration": "PT28H5M38S",
+        "durationSeconds": 101138,
+        "firstPlayedDateTime": "2024-08-24T08:43:04.210000Z",
+        "lastPlayedDateTime": "2026-07-16T20:15:47.160000Z"
+      },
+      {
+        "titleId": "CUSA48152_00",
+        "conceptId": 10010622,
+        "name": "Fantasy Beauties",
+        "originalName": "Fantasy Beauties",
+        "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202403/0414/394bf38782f1506165aa18f4de0cf0a87df57a0642d93d6c.png",
+        "platform": "PS4",
+        "category": "ps4_game",
+        "service": "none(purchased)",
+        "playCount": 4,
+        "playDuration": "PT1H18M38S",
+        "durationSeconds": 4718,
+        "firstPlayedDateTime": "2025-03-16T00:19:26.260000Z",
+        "lastPlayedDateTime": "2026-07-16T13:29:10.090000Z"
+      },
       {
         "titleId": "PPSA10990_00",
         "conceptId": 223118,
@@ -23,10 +68,10 @@
         "category": "ps5_native_game",
         "service": "none(purchased)",
         "playCount": 205,
-        "playDuration": "PT501H42M52S",
-        "durationSeconds": 1806172,
+        "playDuration": "PT503H8M27S",
+        "durationSeconds": 1811307,
         "firstPlayedDateTime": "2026-04-17T11:18:57.630000Z",
-        "lastPlayedDateTime": "2026-07-16T05:47:32.980000Z"
+        "lastPlayedDateTime": "2026-07-16T08:08:09.450000Z"
       },
       {
         "titleId": "CUSA15138_00",
@@ -102,21 +147,6 @@
         "durationSeconds": 33246,
         "firstPlayedDateTime": "2026-07-11T19:56:31.340000Z",
         "lastPlayedDateTime": "2026-07-14T17:03:11.290000Z"
-      },
-      {
-        "titleId": "CUSA02979_00",
-        "conceptId": 202508,
-        "name": "LEGO® Worlds",
-        "originalName": "LEGO® Worlds",
-        "coverUrl": "https://image.api.playstation.com/gs2-sec/appkgo/prod/CUSA02979_00/3/i_d38f9cbc8fec7c7a46f5905841846f01a194778f5d550a6e6b2a88a3e37adc50/i/icon0.png",
-        "platform": "PS4",
-        "category": "ps4_game",
-        "service": "none(purchased)",
-        "playCount": 35,
-        "playDuration": "PT26H2M",
-        "durationSeconds": 93720,
-        "firstPlayedDateTime": "2024-08-24T08:43:04.210000Z",
-        "lastPlayedDateTime": "2026-07-13T23:12:10.460000Z"
       },
       {
         "titleId": "PPSA26339_00",
@@ -406,8 +436,8 @@
       {
         "titleId": "PPSA02199_00",
         "conceptId": 232345,
-        "name": "ЗВЁЗДНЫЕ ВОЙНЫ Джедаи: Павший Орден™",
-        "originalName": "ЗВЁЗДНЫЕ ВОЙНЫ Джедаи: Павший Орден™",
+        "name": "STAR WARS Jedi: Fallen Order™",
+        "originalName": "STAR WARS Jedi: Fallen Order™",
         "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202012/1013/DKYIpVhskEQ4jbzr1PVxsO0Z.png",
         "platform": "PS5",
         "category": "ps5_native_game",
@@ -719,21 +749,6 @@
         "lastPlayedDateTime": "2025-10-25T12:32:26.120000Z"
       },
       {
-        "titleId": "CUSA07027_00",
-        "conceptId": 228418,
-        "name": "Cars 3 : Course vers la victoire",
-        "originalName": "Cars 3 : Course vers la victoire",
-        "coverUrl": "https://image.api.playstation.com/cdn/UP1018/CUSA07044_00/wDcjj1RHZ2sBkkgLGUANyNUSnClZdmcHrH3gBUmH3c1foLoFtQQgo5LDEbu9Jif4.png",
-        "platform": "PS4",
-        "category": "ps4_game",
-        "service": "none(purchased)",
-        "playCount": 30,
-        "playDuration": "PT17H36M34S",
-        "durationSeconds": 63394,
-        "firstPlayedDateTime": "2025-01-25T13:29:26.430000Z",
-        "lastPlayedDateTime": "2025-10-25T12:26:50.230000Z"
-      },
-      {
         "titleId": "PPSA01615_00",
         "conceptId": 203054,
         "name": "Netflix",
@@ -811,9 +826,9 @@
       {
         "titleId": "PPSA05031_00",
         "conceptId": 235227,
-        "name": "Призрак Цусимы",
-        "originalName": "Призрак Цусимы",
-        "coverUrl": "https://image.api.playstation.com/vulcan/img/rnd/202011/1023/r10cUBOmBkGLc98Vr1jUXxBd.png",
+        "name": "Ghost of Tsushima",
+        "originalName": "Ghost of Tsushima",
+        "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202010/0222/niMUubpU9y1PxNvYmDfb8QFD.png",
         "platform": "PS5",
         "category": "ps5_native_game",
         "service": "ps_plus",
@@ -1004,21 +1019,6 @@
         "lastPlayedDateTime": "2025-03-19T14:36:27.140000Z"
       },
       {
-        "titleId": "CUSA48152_00",
-        "conceptId": 10010622,
-        "name": "Fantasy Beauties",
-        "originalName": "Fantasy Beauties",
-        "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202403/0414/394bf38782f1506165aa18f4de0cf0a87df57a0642d93d6c.png",
-        "platform": "PS4",
-        "category": "ps4_game",
-        "service": "none(purchased)",
-        "playCount": 2,
-        "playDuration": "PT31M14S",
-        "durationSeconds": 1874,
-        "firstPlayedDateTime": "2025-03-16T00:19:26.260000Z",
-        "lastPlayedDateTime": "2025-03-16T11:14:48.910000Z"
-      },
-      {
         "titleId": "CUSA02041_00",
         "conceptId": 202753,
         "name": "MotoGP™15",
@@ -1051,8 +1051,8 @@
       {
         "titleId": "CUSA01519_00",
         "conceptId": 202450,
-        "name": "LEGO® Мир юрского периода™",
-        "originalName": "LEGO® Мир юрского периода™",
+        "name": "LEGO® Jurassic World™",
+        "originalName": "LEGO® Jurassic World™",
         "coverUrl": "https://image.api.playstation.com/gs2-sec/appkgo/prod/CUSA01519_00/2/i_ea3e909586597ea1251820b35d0306cfdff8673462298620d69b92489861d830/i/icon0.png",
         "platform": "PS4",
         "category": "ps4_game",
@@ -1246,8 +1246,8 @@
       {
         "titleId": "CUSA04893_00",
         "conceptId": 225519,
-        "name": "Assassin’s Creed®: Эцио Аудиторе. Коллекция",
-        "originalName": "Assassin’s Creed®: Эцио Аудиторе. Коллекция",
+        "name": "Assassin's Creed The Ezio Collection",
+        "originalName": "Assassin's Creed The Ezio Collection",
         "coverUrl": "https://image.api.playstation.com/gs2-sec/appkgo/prod/CUSA04893_00/3/i_1cb18fb68f50580587f2834a2288a99023af359c3dda3b79d96726611c162828/i/icon0.png",
         "platform": "PS4",
         "category": "ps4_game",
@@ -1306,8 +1306,8 @@
       {
         "titleId": "PPSA01325_00",
         "conceptId": 10000229,
-        "name": "ASTRO's PLAYROOM",
-        "originalName": "ASTRO's PLAYROOM",
+        "name": "ASTRO'S PLAYROOM",
+        "originalName": "ASTRO'S PLAYROOM",
         "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202502/1908/3d17c33239dab88c7e2f24af50140b3f6fa555e6030d5704.png",
         "platform": "PS5",
         "category": "ps5_native_game",
@@ -1636,8 +1636,8 @@
       {
         "titleId": "PPSA13466_00",
         "conceptId": 10005318,
-        "name": "The First Descendant",
-        "originalName": "The First Descendant",
+        "name": "THE FIRST DESCENDANT",
+        "originalName": "THE FIRST DESCENDANT",
         "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202605/2105/69fdf186ff908e7c630e12dfd4a805be6a566f81803e40ca.png",
         "platform": "PS5",
         "category": "ps5_native_game",
@@ -1801,8 +1801,8 @@
       {
         "titleId": "CUSA09216_00",
         "conceptId": 228857,
-        "name": "The Sims™ 4",
-        "originalName": "The Sims™ 4",
+        "name": "Les Sims™ 4",
+        "originalName": "Les Sims™ 4",
         "coverUrl": "https://image.api.playstation.com/vulcan/img/rnd/202111/3019/oXPtJkwSeNlYon2MqTX9K4sQ.png",
         "platform": "PS4",
         "category": "ps4_game",
@@ -2174,6 +2174,21 @@
         "lastPlayedDateTime": "2023-09-01T15:38:15.540000Z"
       },
       {
+        "titleId": "CUSA00411_00",
+        "conceptId": 201930,
+        "name": "Grand Theft Auto V (PlayStation®5)",
+        "originalName": "Grand Theft Auto V (PlayStation®5)",
+        "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202202/2816/K6mmm89oNII1iI1aqaClO0wh.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 144,
+        "playDuration": "PT292H25M58S",
+        "durationSeconds": 1052758,
+        "firstPlayedDateTime": "2022-08-21T15:53:17.450000Z",
+        "lastPlayedDateTime": "2023-09-01T12:56:42.510000Z"
+      },
+      {
         "titleId": "CUSA27965_00",
         "conceptId": 10002581,
         "name": "Mon Amie Peppa Pig: Édition complète",
@@ -2202,6 +2217,36 @@
         "durationSeconds": 932,
         "firstPlayedDateTime": "2023-09-01T08:23:42.700000Z",
         "lastPlayedDateTime": "2023-09-01T08:23:42.700000Z"
+      },
+      {
+        "titleId": "CUSA06210_00",
+        "conceptId": 212870,
+        "name": "NARUTO SHIPPUDEN: Ultimate Ninja STORM 4",
+        "originalName": "NARUTO SHIPPUDEN: Ultimate Ninja STORM 4",
+        "coverUrl": "https://image.api.playstation.com/gs2-sec/appkgo/prod/CUSA02854_00/2/i_312b49d77c370ee1797be4ee74d814909845f4d5c88fe18a6dc79f9c1982bfb4/i/icon0.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 1,
+        "playDuration": "PT3M53S",
+        "durationSeconds": 233,
+        "firstPlayedDateTime": "2023-08-30T20:00:29.530000Z",
+        "lastPlayedDateTime": "2023-08-30T20:00:29.530000Z"
+      },
+      {
+        "titleId": "CUSA12552_00",
+        "conceptId": 232352,
+        "name": "Apex Legends™",
+        "originalName": "Apex Legends™",
+        "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202604/2919/7760e5a519da26b29eb0df8a75835d6c52d6d1044ba99347.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 1,
+        "playDuration": "PT0S",
+        "durationSeconds": 0,
+        "firstPlayedDateTime": "2023-08-30T19:57:53.210000Z",
+        "lastPlayedDateTime": "2023-08-30T19:57:53.210000Z"
       },
       {
         "titleId": "CUSA01780_00",
@@ -2564,6 +2609,51 @@
         "lastPlayedDateTime": "2023-08-21T18:47:57.030000Z"
       },
       {
+        "titleId": "CUSA27106_00",
+        "conceptId": 10002538,
+        "name": "FIFA 22",
+        "originalName": "FIFA 22",
+        "coverUrl": "https://image.api.playstation.com/vulcan/img/rnd/202109/2115/5jeuJiXUpb1bZc0Lp1U8N5Ka.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 28,
+        "playDuration": "PT23H45M34S",
+        "durationSeconds": 85534,
+        "firstPlayedDateTime": "2022-10-29T16:12:29.930000Z",
+        "lastPlayedDateTime": "2023-08-15T08:04:01.990000Z"
+      },
+      {
+        "titleId": "CUSA18987_00",
+        "conceptId": 10000278,
+        "name": "FIFA 21",
+        "originalName": "FIFA 21",
+        "coverUrl": "https://image.api.playstation.com/vulcan/img/rnd/202101/1315/1zfTY2JW41HdDTGJC00Go4nk.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 29,
+        "playDuration": "PT19H28M19S",
+        "durationSeconds": 70099,
+        "firstPlayedDateTime": "2023-08-01T21:31:43.450000Z",
+        "lastPlayedDateTime": "2023-08-15T08:00:18.380000Z"
+      },
+      {
+        "titleId": "CUSA02343_00",
+        "conceptId": 205353,
+        "name": "Uncharted™: The Nathan Drake Collection",
+        "originalName": "Uncharted™: The Nathan Drake Collection",
+        "coverUrl": "https://image.api.playstation.com/vulcan/img/rnd/202011/1101/zC3kulm2Ho3ZE38ZUYHW7WMK.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 5,
+        "playDuration": "PT3H1S",
+        "durationSeconds": 10801,
+        "firstPlayedDateTime": "2023-07-21T09:44:22.310000Z",
+        "lastPlayedDateTime": "2023-08-12T16:27:24.180000Z"
+      },
+      {
         "titleId": "CUSA00126_00",
         "conceptId": 200242,
         "name": "Prime Video",
@@ -2669,6 +2759,36 @@
         "lastPlayedDateTime": "2023-07-22T08:45:55.010000Z"
       },
       {
+        "titleId": "CUSA18008_00",
+        "conceptId": 235235,
+        "name": "Resident Evil Village",
+        "originalName": "Resident Evil Village",
+        "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202101/0812/FkzwjnJknkrFlozkTdeQBMub.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 3,
+        "playDuration": "PT4H21M51S",
+        "durationSeconds": 15711,
+        "firstPlayedDateTime": "2023-07-18T16:03:22.150000Z",
+        "lastPlayedDateTime": "2023-07-21T18:24:36.450000Z"
+      },
+      {
+        "titleId": "CUSA23755_00",
+        "conceptId": 10001110,
+        "name": "Astérix & Obélix Baffez-les tous !",
+        "originalName": "Astérix & Obélix Baffez-les tous !",
+        "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202110/1809/7P7g91JmHjLFYnK3SxENtBUy.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 3,
+        "playDuration": "PT3H14M16S",
+        "durationSeconds": 11656,
+        "firstPlayedDateTime": "2023-07-18T13:33:09.850000Z",
+        "lastPlayedDateTime": "2023-07-20T16:54:27.130000Z"
+      },
+      {
         "titleId": "CUSA34115_00",
         "conceptId": 10005251,
         "name": "Cuties Hacked: Oh no someone stole my photos!",
@@ -2682,6 +2802,51 @@
         "durationSeconds": 8515,
         "firstPlayedDateTime": "2023-07-18T19:14:25.300000Z",
         "lastPlayedDateTime": "2023-07-20T14:23:56.330000Z"
+      },
+      {
+        "titleId": "CUSA00001_00",
+        "conceptId": 10000974,
+        "name": "THE PLAYROOM",
+        "originalName": "THE PLAYROOM",
+        "coverUrl": "https://image.api.playstation.com/gs2-sec/appkgo/prod/CUSA00001_00/1/i_f10c33e5f30e3b3900a201af324a2a0e3912e843c1090d66e13f378151c1afa1/i/icon0.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 1,
+        "playDuration": "PT5M55S",
+        "durationSeconds": 355,
+        "firstPlayedDateTime": "2023-07-20T09:34:48.020000Z",
+        "lastPlayedDateTime": "2023-07-20T09:34:48.020000Z"
+      },
+      {
+        "titleId": "CUSA14876_00",
+        "conceptId": 233410,
+        "name": "Crash™ Team Racing Nitro-Fueled",
+        "originalName": "Crash™ Team Racing Nitro-Fueled",
+        "coverUrl": "https://image.api.playstation.com/gs2-sec/appkgo/prod/CUSA14876_00/1/i_21c09f7ae962c3ca3bb8d4e985d65caab4a0e8f1c818d9e91c54d09c759e21df/i/icon0.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 1,
+        "playDuration": "PT2H7M46S",
+        "durationSeconds": 7666,
+        "firstPlayedDateTime": "2023-07-18T07:59:39.900000Z",
+        "lastPlayedDateTime": "2023-07-18T07:59:39.900000Z"
+      },
+      {
+        "titleId": "CUSA05526_00",
+        "conceptId": 221765,
+        "name": "STEEP",
+        "originalName": "STEEP",
+        "coverUrl": "https://image.api.playstation.com/gs2-sec/appkgo/prod/CUSA05526_00/2/i_c8094d5d5778a7deb586d35a39a606beec8e8faf120802182960a69a51fcd45a/i/icon0.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 1,
+        "playDuration": "PT27M14S",
+        "durationSeconds": 1634,
+        "firstPlayedDateTime": "2023-07-06T15:35:23.540000Z",
+        "lastPlayedDateTime": "2023-07-06T15:35:23.540000Z"
       },
       {
         "titleId": "CUSA02644_00",
@@ -2729,6 +2894,51 @@
         "lastPlayedDateTime": "2023-05-05T19:40:15.380000Z"
       },
       {
+        "titleId": "CUSA37077_00",
+        "conceptId": 10006236,
+        "name": "Quiz Thiz USA: Bronze Edition",
+        "originalName": "Quiz Thiz USA: Bronze Edition",
+        "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202211/0619/pF8gndhOwOdUf9RmHKRL3mpi.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 6,
+        "playDuration": "PT13M34S",
+        "durationSeconds": 814,
+        "firstPlayedDateTime": "2023-03-06T20:16:59.320000Z",
+        "lastPlayedDateTime": "2023-03-26T18:57:42.750000Z"
+      },
+      {
+        "titleId": "CUSA04695_00",
+        "conceptId": 204162,
+        "name": "South Park™: Le Bâton de la Vérité™",
+        "originalName": "South Park™: Le Bâton de la Vérité™",
+        "coverUrl": "https://image.api.playstation.com/gs2-sec/appkgo/prod/CUSA04695_00/2/i_a4d6404cdf79e181f650f4a1f331b298e4cf3c06288d0dfd84d72fa34aed3108/i/icon0.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 1,
+        "playDuration": "PT17M14S",
+        "durationSeconds": 1034,
+        "firstPlayedDateTime": "2023-03-26T16:32:25.790000Z",
+        "lastPlayedDateTime": "2023-03-26T16:32:25.790000Z"
+      },
+      {
+        "titleId": "CUSA06782_00",
+        "conceptId": 224802,
+        "name": "ARK: Survival Evolved",
+        "originalName": "ARK: Survival Evolved",
+        "coverUrl": "https://image.api.playstation.com/vulcan/img/rnd/202010/0818/HVUPJTyjOslwxbwCC8edPC45.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 19,
+        "playDuration": "PT10H25M48S",
+        "durationSeconds": 37548,
+        "firstPlayedDateTime": "2023-02-23T10:27:34.110000Z",
+        "lastPlayedDateTime": "2023-03-12T12:57:54.780000Z"
+      },
+      {
         "titleId": "CUSA03309_00",
         "conceptId": 201634,
         "name": "Far Cry® Primal",
@@ -2774,6 +2984,21 @@
         "lastPlayedDateTime": "2023-03-06T19:55:56.400000Z"
       },
       {
+        "titleId": "CUSA05170_00",
+        "conceptId": 207049,
+        "name": "DRAGON QUEST BUILDERS",
+        "originalName": "DRAGON QUEST BUILDERS",
+        "coverUrl": "https://image.api.playstation.com/gs2-sec/appkgo/prod/CUSA05170_00/3/i_b1185a8c3f0ffc6a97fe4070b68ec72d1c99036d615d01d5c042004b279795a6/i/icon0.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 1,
+        "playDuration": "PT1H17M13S",
+        "durationSeconds": 4633,
+        "firstPlayedDateTime": "2023-03-05T17:38:10.230000Z",
+        "lastPlayedDateTime": "2023-03-05T17:38:10.230000Z"
+      },
+      {
         "titleId": "CUSA20108_00",
         "conceptId": 10000714,
         "name": "SUPER ANIMAL ROYALE",
@@ -2787,6 +3012,66 @@
         "durationSeconds": 721,
         "firstPlayedDateTime": "2023-03-03T20:38:30.650000Z",
         "lastPlayedDateTime": "2023-03-03T20:38:30.650000Z"
+      },
+      {
+        "titleId": "CUSA06244_00",
+        "conceptId": 222885,
+        "name": "The Escapists 2",
+        "originalName": "The Escapists 2",
+        "coverUrl": "https://image.api.playstation.com/gs2-sec/appkgo/prod/CUSA06244_00/3/i_3a4aa3da2b2c4165ee16399affacf6117c817d9fd2f116fd998447d91a2efd76/i/icon0.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 2,
+        "playDuration": "PT38M47S",
+        "durationSeconds": 2327,
+        "firstPlayedDateTime": "2023-03-01T18:20:32.580000Z",
+        "lastPlayedDateTime": "2023-03-01T21:49:48.040000Z"
+      },
+      {
+        "titleId": "CUSA33344_00",
+        "conceptId": 10004937,
+        "name": "Disney•Pixar Toy Story 3",
+        "originalName": "Disney•Pixar Toy Story 3",
+        "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202205/0322/kmpzvkulop0RWjOf5yHyG8yd.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 1,
+        "playDuration": "PT12M45S",
+        "durationSeconds": 765,
+        "firstPlayedDateTime": "2023-03-01T16:11:18.200000Z",
+        "lastPlayedDateTime": "2023-03-01T16:11:18.200000Z"
+      },
+      {
+        "titleId": "CUSA05935_00",
+        "conceptId": 223683,
+        "name": "LEGO®  Harry Potter™ Collection",
+        "originalName": "LEGO®  Harry Potter™ Collection",
+        "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202408/2817/3ed20bb3b43ca71d45872ed6a5c2c3ca52ff9123814cafd1.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 1,
+        "playDuration": "PT1H2M32S",
+        "durationSeconds": 3752,
+        "firstPlayedDateTime": "2023-03-01T14:31:46.190000Z",
+        "lastPlayedDateTime": "2023-03-01T14:31:46.190000Z"
+      },
+      {
+        "titleId": "CUSA05198_00",
+        "conceptId": 221793,
+        "name": "Tricky Towers",
+        "originalName": "Tricky Towers",
+        "coverUrl": "https://image.api.playstation.com/gs2-sec/appkgo/prod/CUSA05198_00/5/i_583367fc5cb6db0cc61cabbb4a2b0ff9109088fa9936ce2c5652e52090b3a794/i/icon0.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 6,
+        "playDuration": "PT1H58M31S",
+        "durationSeconds": 7111,
+        "firstPlayedDateTime": "2023-02-25T15:17:23.930000Z",
+        "lastPlayedDateTime": "2023-02-28T15:11:06.290000Z"
       },
       {
         "titleId": "CUSA06172_00",
@@ -2804,6 +3089,36 @@
         "lastPlayedDateTime": "2023-02-28T15:04:11.230000Z"
       },
       {
+        "titleId": "CUSA26951_00",
+        "conceptId": 10002468,
+        "name": "Chicory: A Colorful Tale",
+        "originalName": "Chicory: A Colorful Tale",
+        "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202105/0720/ZGr1VaG5J22qhZIKhfY0wmdb.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 1,
+        "playDuration": "PT1H3M1S",
+        "durationSeconds": 3781,
+        "firstPlayedDateTime": "2023-02-27T21:40:27.070000Z",
+        "lastPlayedDateTime": "2023-02-27T21:40:27.070000Z"
+      },
+      {
+        "titleId": "CUSA26330_00",
+        "conceptId": 10002216,
+        "name": "MONOPOLY® Madness",
+        "originalName": "MONOPOLY® Madness",
+        "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202110/2907/33W7jKlA3MtWC8fNMDQKsa6K.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 2,
+        "playDuration": "PT1H14M12S",
+        "durationSeconds": 4452,
+        "firstPlayedDateTime": "2023-02-27T15:52:40.940000Z",
+        "lastPlayedDateTime": "2023-02-27T20:14:17.630000Z"
+      },
+      {
         "titleId": "CUSA35284_00",
         "conceptId": 10005666,
         "name": "Welcome to Pammy's Story in the World of Project: Summer Ice (Visual Novel)",
@@ -2819,6 +3134,21 @@
         "lastPlayedDateTime": "2023-02-24T18:41:10.410000Z"
       },
       {
+        "titleId": "CUSA04040_00",
+        "conceptId": 217373,
+        "name": "UNO®",
+        "originalName": "UNO®",
+        "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202310/3015/4bef785af8b464395fc2d7791a101217a4640eaa79e6994d.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 1,
+        "playDuration": "PT1H26M10S",
+        "durationSeconds": 5170,
+        "firstPlayedDateTime": "2023-02-23T11:11:11.310000Z",
+        "lastPlayedDateTime": "2023-02-23T11:11:11.310000Z"
+      },
+      {
         "titleId": "CUSA00572_00",
         "conceptId": 233754,
         "name": "SHAREfactory™",
@@ -2832,6 +3162,21 @@
         "durationSeconds": 329,
         "firstPlayedDateTime": "2022-09-24T21:55:36.180000Z",
         "lastPlayedDateTime": "2023-02-21T19:27:05.540000Z"
+      },
+      {
+        "titleId": "CUSA26616_00",
+        "conceptId": 10003551,
+        "name": "Grand Theft Auto: Vice City – The Definitive Edition",
+        "originalName": "Grand Theft Auto: Vice City – The Definitive Edition",
+        "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202110/2814/rJUoz79dvG3GCWSe9pFewZtz.png",
+        "platform": "Autre",
+        "category": "unknown",
+        "service": "none_purchased",
+        "playCount": 2,
+        "playDuration": "PT19M45S",
+        "durationSeconds": 1185,
+        "firstPlayedDateTime": "2023-02-21T11:08:10.600000Z",
+        "lastPlayedDateTime": "2023-02-21T11:33:55.030000Z"
       },
       {
         "titleId": "CUSA01483_00",
@@ -4671,7 +5016,7 @@
           "earned": false,
           "at": null,
           "rarity": 0,
-          "earnedRate": 0.7,
+          "earnedRate": 0.8,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR59122_00/84065762-e729-4e76-8c96-25fadcc5ca8b.png"
         },
         {
@@ -4983,7 +5328,7 @@
           "earned": true,
           "at": 1781898671000,
           "rarity": 2,
-          "earnedRate": 40.2,
+          "earnedRate": 40.3,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR59122_00/3689f1c1-4833-409d-8a04-ca14f99a3d0b.png"
         },
         {
@@ -5165,7 +5510,7 @@
           "earned": true,
           "at": 1781894647000,
           "rarity": 3,
-          "earnedRate": 54.7,
+          "earnedRate": 54.8,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR59122_00/3689f1c1-4833-409d-8a04-ca14f99a3d0b.png"
         },
         {
@@ -5178,7 +5523,7 @@
           "earned": true,
           "at": 1781893377000,
           "rarity": 3,
-          "earnedRate": 59.7,
+          "earnedRate": 59.6,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR59122_00/7b0ffd87-5f93-46d1-8eed-fb331eb93c09.png"
         },
         {
@@ -5457,7 +5802,7 @@
           "earned": false,
           "at": null,
           "rarity": 2,
-          "earnedRate": 28.7,
+          "earnedRate": 28.8,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR24913_00/49fb0066-2726-4160-ac57-7751b048875b.png"
         },
         {
@@ -6757,7 +7102,7 @@
           "earned": true,
           "at": 1779881466000,
           "rarity": 3,
-          "earnedRate": 53.4,
+          "earnedRate": 53.5,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR41008_00/3ad3509c-fea1-4e05-b67b-b25198857146.PNG"
         },
         {
@@ -9449,7 +9794,7 @@
           "earned": true,
           "at": 1776431270000,
           "rarity": 3,
-          "earnedRate": 55.3,
+          "earnedRate": 55.4,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR39814_00/9320bfd8-4f19-41e7-bc74-a70b3abc4f89.png"
         },
         {
@@ -9462,7 +9807,7 @@
           "earned": true,
           "at": 1776424847000,
           "rarity": 2,
-          "earnedRate": 38.1,
+          "earnedRate": 38.2,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR39814_00/60946e15-595c-4ad0-9106-37159e6df7bd.png"
         },
         {
@@ -9741,7 +10086,7 @@
           "earned": true,
           "at": 1721252058000,
           "rarity": 2,
-          "earnedRate": 49.7,
+          "earnedRate": 49.6,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR23097_00/b3663a84-2514-4b89-b630-0a5ff2f96c24.png"
         },
         {
@@ -12221,7 +12566,7 @@
           "earned": true,
           "at": 1772746747000,
           "rarity": 2,
-          "earnedRate": 29.1,
+          "earnedRate": 29,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR50009_00/e6e1ae30-536b-44e7-acb0-70792b8fb4e9.png"
         },
         {
@@ -12788,7 +13133,7 @@
               "earned": false,
               "at": null,
               "rarity": 0,
-              "earnedRate": 1.9,
+              "earnedRate": 1.8,
               "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR50009_00/fd5687b9-7f05-4663-9616-89a68eab80b8.png"
             },
             {
@@ -13112,1493 +13457,6 @@
       "psnLastUpdatedDateTime": "2026-03-11T17:39:31Z"
     },
     {
-      "id": "psn_NPWR40882_00",
-      "source": "psn",
-      "psnNpCommunicationId": "NPWR40882_00",
-      "name": "Cookie Clicker",
-      "platform": "PS4",
-      "platformRaw": "PS4",
-      "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/8D9A4B57EB97B48431A328BAA2C13DB2B9EA5AC3.PNG",
-      "grad": [
-        "#0a2a3a",
-        "#041018"
-      ],
-      "trophies": [
-        {
-          "id": "psn_NPWR40882_00_0",
-          "psnTrophyId": 0,
-          "psnGroupId": "default",
-          "name": "Platinum Cookie",
-          "desc": "Do Not Eat.",
-          "type": "platinum",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 9.9,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/0F748824656B19283C5576B1D4CE798919F1DB81.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_1",
-          "psnTrophyId": 1,
-          "psnGroupId": "default",
-          "name": "Self-improvement",
-          "desc": "Reach level 10 You.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 18,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/C0F76FFEFC077CAE61AE1228A5AAF836700C6BE9.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_2",
-          "psnTrophyId": 2,
-          "psnGroupId": "default",
-          "name": "Motormouth",
-          "desc": "Reach level 10 wizard towers.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 25.6,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/99850D5DA6D4248F26615B5D31ADCDD837F0C3A4.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_3",
-          "psnTrophyId": 3,
-          "psnGroupId": "default",
-          "name": "Lovely cookies",
-          "desc": "Unlock every Valentine-themed cookie.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 18,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/8EC42D328FC27D84C59CBB26F5CC31491CAD4008.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_4",
-          "psnTrophyId": 4,
-          "psnGroupId": "default",
-          "name": "Oft we mar what's well",
-          "desc": "Purchase 700 upgrades. But don't let that stop you!",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 11.4,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/570C108BAAA4991CA2F015033DF1EE837FE003AF.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_5",
-          "psnTrophyId": 5,
-          "psnGroupId": "default",
-          "name": "The long now",
-          "desc": "Reach level 10 time machines.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 19.6,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/27AEC3155D41906C734CE0E751DA2BE10DA1DAF5.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_6",
-          "psnTrophyId": 6,
-          "psnGroupId": "default",
-          "name": "It belongs in a bakery",
-          "desc": "Reach level 10 temples.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 24.4,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/8E20AC5C361D098452BDB093D5BCCBAE7E3BE39C.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_7",
-          "psnTrophyId": 7,
-          "psnGroupId": "default",
-          "name": "Full warehouses",
-          "desc": "Own at least 1000 of a stock market good.",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 14.9,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/B5801C13554D4B420D21C0BA85568C93CDEE910F.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_8",
-          "psnTrophyId": 8,
-          "psnGroupId": "default",
-          "name": "No nobility in poverty",
-          "desc": "Own at least 500 of every stock market good.",
-          "type": "silver",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 13.8,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/91FF4E3D65BB5548F9EC9476CE35ADDAE53150C8.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_9",
-          "psnTrophyId": 9,
-          "psnGroupId": "default",
-          "name": "Initial public offering",
-          "desc": "Make your first stock market profit.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 20.9,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/6F21A671A1EFEC8708BA7ECAE09D36CFB40C4913.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_10",
-          "psnTrophyId": 10,
-          "psnGroupId": "default",
-          "name": "Rookie numbers",
-          "desc": "Own at least 100 of every stock market good. Gotta pump those numbers up!",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 14,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/45F211424DFB6B9D3FCB71AACCA51C667ED01E89.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_11",
-          "psnTrophyId": 11,
-          "psnGroupId": "default",
-          "name": "Been there done that",
-          "desc": "Reach level 10 shipments.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 23.2,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/CFE81F95C2351C277ED7785AB869BAB2148F21BA.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_12",
-          "psnTrophyId": 12,
-          "psnGroupId": "default",
-          "name": "Palettable",
-          "desc": "Reach level 10 prisms.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 18.7,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/AE9C43F739538F8F7FE352E14B469207562B443E.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_13",
-          "psnTrophyId": 13,
-          "psnGroupId": "default",
-          "name": "Bizarro world",
-          "desc": "Reach level 10 portals.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 20.5,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/AA6E6CAF4EB3B81856C34096D1202168E3BB0CBF.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_14",
-          "psnTrophyId": 14,
-          "psnGroupId": "default",
-          "name": "Debt evasion",
-          "desc": "Take out a loan and ascend before incurring the CpS penalty. Really got 'em buttered!",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 14.8,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/DE139CF74DC34FD5FD8B2E723F7F9E433C12C912.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_15",
-          "psnTrophyId": 15,
-          "psnGroupId": "default",
-          "name": "Mathematician",
-          "desc": "Have at least 1 of the most expensive building, 2 of the second-most, 4 of the next and so on.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 20,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/62403F36E6B8D6B56F967536B87BD52D778A81B4.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_16",
-          "psnTrophyId": 16,
-          "psnGroupId": "default",
-          "name": "Base 10",
-          "desc": "Have at least 10 of the most expensive building, 20 of the second-most, 30 of the next and so on.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 19.9,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/56F5FEF78D2C4D819C71553F3E04F4CCC6566327.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_17",
-          "psnTrophyId": 17,
-          "psnGroupId": "default",
-          "name": "A wizard is you",
-          "desc": "Cast 999 spells.  I'm a what?",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 11.5,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/CF6B7DF06231F44DD327859211CE95032B47AD72.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_18",
-          "psnTrophyId": 18,
-          "psnGroupId": "default",
-          "name": "D-d-d-d-deeper",
-          "desc": "Reach level 10 mines.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 24.5,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/625793BF6D7B96E8CDBBC520BFBA9968B8F9A4EF.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_19",
-          "psnTrophyId": 19,
-          "psnGroupId": "default",
-          "name": "Sugar sugar",
-          "desc": "Harvest a bifurcated sugar lump.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 33,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/2A480F3D2CE799338BFDC8B1CECE83658F1D0531.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_20",
-          "psnTrophyId": 20,
-          "psnGroupId": "default",
-          "name": "All-natural cane sugar",
-          "desc": "Harvest a golden sugar lump.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 12.4,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/09E44776F4C7612E53EBC449E1D202D89B931501.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_21",
-          "psnTrophyId": 21,
-          "psnGroupId": "default",
-          "name": "Sweetmeats",
-          "desc": "Harvest a meaty sugar lump.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 16.6,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/18FFC0D47C1B73C0BB2D0290890393ACA5F46BB6.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_22",
-          "psnTrophyId": 22,
-          "psnGroupId": "default",
-          "name": "Alexandria",
-          "desc": "Reach level 10 javascript consoles.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 18.1,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/5F9893F19F846D553D1B361CE84120FA022008DD.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_23",
-          "psnTrophyId": 23,
-          "psnGroupId": "default",
-          "name": "Strange topologies",
-          "desc": "Reach level 10 idleverses.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 18,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/6DEB5B2C67E4A9109FBA2803F17C8CC1C110368F.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_24",
-          "psnTrophyId": 24,
-          "psnGroupId": "default",
-          "name": "Spooky cookies",
-          "desc": "Unlock every Halloween-themed cookie.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 14.6,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/B166178228BB6902EDF4A013B3C29477254244DC.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_25",
-          "psnTrophyId": 25,
-          "psnGroupId": "default",
-          "name": "Methuselah",
-          "desc": "Reach level 10 grandmas.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 26.7,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/288523EFE0C847986C2293D0135C1DF0D11E8F68.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_26",
-          "psnTrophyId": 26,
-          "psnGroupId": "default",
-          "name": "Leprechaun",
-          "desc": "Click 777 golden cookies.",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 16.4,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/0CC2C20749DF5439D40DD61D3CA8FA18D7EAF5DA.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_27",
-          "psnTrophyId": 27,
-          "psnGroupId": "default",
-          "name": "Fortune",
-          "desc": "Click 77 golden cookies. You should really go to bed.",
-          "type": "silver",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 32,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/2B778F6277DDE5925D8AF354503B5978FEA2CD3F.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_28",
-          "psnTrophyId": 28,
-          "psnGroupId": "default",
-          "name": "Golden cookie",
-          "desc": "Click a golden cookie.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 3,
-          "earnedRate": 79.7,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/0B6158E31B41720063F11C76A0622D29E0934B3D.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_29",
-          "psnTrophyId": 29,
-          "psnGroupId": "default",
-          "name": "In the garden of Eden (baby)",
-          "desc": "Fill every tile of the biggest garden plot with plants.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 14.7,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/48EB3EC976EDB75670C479FA07BDCE9CFFFE418F.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_30",
-          "psnTrophyId": 30,
-          "psnGroupId": "default",
-          "name": "Keeper of the conservatory",
-          "desc": "Unlock every garden seed.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 11.3,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/684C003E2132F82731FAE3A9088DF5D2EA74A787.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_31",
-          "psnTrophyId": 31,
-          "psnGroupId": "default",
-          "name": "Seedless to nay",
-          "desc": "Convert a complete seed log into sugar lumps by sacrificing your garden to the sugar hornets.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 11.3,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/4607CB8D5D35474E679F22714A904A3A05731B0E.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_32",
-          "psnTrophyId": 32,
-          "psnGroupId": "default",
-          "name": "Sierpinski rhomboids",
-          "desc": "Reach level 10 fractal engines.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 18.4,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/3207F1625DA11E3D8280A9A55A80C67D41FC958A.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_33",
-          "psnTrophyId": 33,
-          "psnGroupId": "default",
-          "name": "Huge tracts of land",
-          "desc": "Reach level 10 farms.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 26.3,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/E0AA6BE027FAFD44761A7346500CBFF77BFF6C93.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_34",
-          "psnTrophyId": 34,
-          "psnGroupId": "default",
-          "name": "Patently genius",
-          "desc": "Reach level 10 factories.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 24.1,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/BF424C984A14B99E76E86E2F1C5D90780028B587.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_35",
-          "psnTrophyId": 35,
-          "psnGroupId": "default",
-          "name": "Hide & seek champion",
-          "desc": "Unlock all the eggs.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 13.9,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/213C159C113AAA52BE60A68CBACDF80854160AA3.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_36",
-          "psnTrophyId": 36,
-          "psnGroupId": "default",
-          "name": "A round of applause",
-          "desc": "Have 1,000 cursors. Boy, are my arms tired!",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 13.6,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/D050B48F71749AAFE39F80FD98449A71F4322F85.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_37",
-          "psnTrophyId": 37,
-          "psnGroupId": "default",
-          "name": "Freaky jazz hands",
-          "desc": "Reach level 10 cursors.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 28.3,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/D3C7913C02B1F4E006C89EA32D9F415ABB0AEDBC.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_38",
-          "psnTrophyId": 38,
-          "psnGroupId": "default",
-          "name": "Gifted",
-          "desc": "Reach level 10 cortex bakers.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 17.8,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/2D6A6D8E09BCDA01673B9DDE677BDEF9445B8C80.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_39",
-          "psnTrophyId": 39,
-          "psnGroupId": "default",
-          "name": "Neverclick",
-          "desc": "Make 1 million cookies by only having clicked 15 times.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 13.9,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/72FDF946DCC7E762A5059D910CA953FBD6A50263.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_40",
-          "psnTrophyId": 40,
-          "psnGroupId": "default",
-          "name": "Nihilism",
-          "desc": "Ascend with 1 quadrillion cookies baked.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 22.9,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/2E107B8D097C7F9532AE94C62C131AF83440158D.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_41",
-          "psnTrophyId": 41,
-          "psnGroupId": "default",
-          "name": "Let it snow",
-          "desc": "Unlock every Christmas-themed cookie.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 16.4,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/9D1C3B62E13D3A54F930EBDD00706F3DCAE042A0.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_42",
-          "psnTrophyId": 42,
-          "psnGroupId": "default",
-          "name": "All hail Santa",
-          "desc": "Reach Santa's final form.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 20.5,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/85BD0BAF2533B22564AE87B49D683F80C808DF85.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_43",
-          "psnTrophyId": 43,
-          "psnGroupId": "default",
-          "name": "Let's leaf it at that",
-          "desc": "Reach level 10 chancemakers.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 18.5,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/DD030115DC5FDFD0257E78A0EC8529A3885FD0AD.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_44",
-          "psnTrophyId": 44,
-          "psnGroupId": "default",
-          "name": "A capital idea",
-          "desc": "Reach level 10 banks.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 24.6,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/B343DE3D362FF343E1E2F41B2E02700029B59B93.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_45",
-          "psnTrophyId": 45,
-          "psnGroupId": "default",
-          "name": "And a little extra",
-          "desc": "Bake 10^72 cookies in one ascension.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 11.9,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/141EF67AA5E097518A87C9E6A8169598DB5AC95A.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_46",
-          "psnTrophyId": 46,
-          "psnGroupId": "default",
-          "name": "Rebirth",
-          "desc": "Ascend at least once.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 30.3,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/B6FE92C7392D377BCE7AA57C77A3F8E38E7FAFDD.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_47",
-          "psnTrophyId": 47,
-          "psnGroupId": "default",
-          "name": "Chubby hadrons",
-          "desc": "Reach level 10 antimatter condensers.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 19,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/74DB193E64277A6B2DD6EE79BF99E5937095B3CA.PNG"
-        },
-        {
-          "id": "psn_NPWR40882_00_48",
-          "psnTrophyId": 48,
-          "psnGroupId": "default",
-          "name": "Phlogisticated substances",
-          "desc": "Reach level 10 alchemy labs.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 21.7,
-          "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40882_00_00D9494011BB7C85A750AC2063E7DE1DE9C0ABEE23/0AA4125FF96ECE1852AE7B9FCB23D95F465C4003.PNG"
-        }
-      ],
-      "dlcs": [],
-      "addedAt": 1772805672000,
-      "psnProgress": 0,
-      "psnLastUpdatedDateTime": "2026-03-06T14:01:12Z"
-    },
-    {
-      "id": "psn_NPWR40883_00",
-      "source": "psn",
-      "psnNpCommunicationId": "NPWR40883_00",
-      "name": "Cookie Clicker",
-      "platform": "PS5",
-      "platformRaw": "PS5",
-      "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/f4523e59-2948-403a-b258-2dd7430552be.png",
-      "grad": [
-        "#1a3a5c",
-        "#0a1e30"
-      ],
-      "trophies": [
-        {
-          "id": "psn_NPWR40883_00_0",
-          "psnTrophyId": 0,
-          "psnGroupId": "default",
-          "name": "Platinum Cookie",
-          "desc": "Do Not Eat.",
-          "type": "platinum",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 3.1,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/992596ec-af62-4796-8a3e-61ec128870f8.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_1",
-          "psnTrophyId": 1,
-          "psnGroupId": "default",
-          "name": "Self-improvement",
-          "desc": "Reach level 10 You.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 9.7,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/6c7c8890-f37a-4b4b-a502-babbf7e2b197.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_2",
-          "psnTrophyId": 2,
-          "psnGroupId": "default",
-          "name": "Motormouth",
-          "desc": "Reach level 10 wizard towers.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 18.4,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/5aae735d-55e3-485e-879e-e409eda6914d.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_3",
-          "psnTrophyId": 3,
-          "psnGroupId": "default",
-          "name": "Lovely cookies",
-          "desc": "Unlock every Valentine-themed cookie.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 10,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/8e47f5cd-9a77-4ee9-8606-6421526bd3ca.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_4",
-          "psnTrophyId": 4,
-          "psnGroupId": "default",
-          "name": "Oft we mar what's well",
-          "desc": "Purchase 700 upgrades. But don't let that stop you!",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 3.8,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/7e0fd1ac-0ec5-4e5d-934b-d82b81c56e03.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_5",
-          "psnTrophyId": 5,
-          "psnGroupId": "default",
-          "name": "The long now",
-          "desc": "Reach level 10 time machines.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 11.2,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/4fe1933c-501a-4eb6-8c79-e17a43a64418.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_6",
-          "psnTrophyId": 6,
-          "psnGroupId": "default",
-          "name": "It belongs in a bakery",
-          "desc": "Reach level 10 temples.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 17,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/2e4f27f2-7df6-4ae9-bef1-c30fa46a5469.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_7",
-          "psnTrophyId": 7,
-          "psnGroupId": "default",
-          "name": "Full warehouses",
-          "desc": "Own at least 1000 of a stock market good.",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 6.8,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/86381333-be01-494e-8ad1-23c138e12ed3.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_8",
-          "psnTrophyId": 8,
-          "psnGroupId": "default",
-          "name": "No nobility in poverty",
-          "desc": "Own at least 500 of every stock market good.",
-          "type": "silver",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 5.7,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/dbc948a3-41e6-4611-aedd-8de8d0ae02d6.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_9",
-          "psnTrophyId": 9,
-          "psnGroupId": "default",
-          "name": "Initial public offering",
-          "desc": "Make your first stock market profit.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 14.9,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/9abbb0e4-ce5b-4b32-8042-99ad2d5e89e1.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_10",
-          "psnTrophyId": 10,
-          "psnGroupId": "default",
-          "name": "Rookie numbers",
-          "desc": "Own at least 100 of every stock market good. Gotta pump those numbers up!",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 6.1,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/1a1490ed-5559-4b23-92e9-a33bd734d952.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_11",
-          "psnTrophyId": 11,
-          "psnGroupId": "default",
-          "name": "Been there done that",
-          "desc": "Reach level 10 shipments.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 15.6,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/fd7afcae-49c1-4cd8-a059-3d88de6dac32.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_12",
-          "psnTrophyId": 12,
-          "psnGroupId": "default",
-          "name": "Palettable",
-          "desc": "Reach level 10 prisms.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 10.2,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/3fa52d17-5a66-41fb-8348-9f56e06d5544.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_13",
-          "psnTrophyId": 13,
-          "psnGroupId": "default",
-          "name": "Bizarro world",
-          "desc": "Reach level 10 portals.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 12.2,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/a330f157-b712-4e29-ab72-bfc8b732e89c.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_14",
-          "psnTrophyId": 14,
-          "psnGroupId": "default",
-          "name": "Debt evasion",
-          "desc": "Take out a loan and ascend before incurring the CpS penalty. Really got 'em buttered!",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 6.8,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/afa43a3b-d04e-4936-a624-a2e30e053c42.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_15",
-          "psnTrophyId": 15,
-          "psnGroupId": "default",
-          "name": "Mathematician",
-          "desc": "Have at least 1 of the most expensive building, 2 of the second-most, 4 of the next and so on.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 12.1,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/e2ace424-b301-4567-89d9-ad32292915e6.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_16",
-          "psnTrophyId": 16,
-          "psnGroupId": "default",
-          "name": "Base 10",
-          "desc": "Have at least 10 of the most expensive building, 20 of the second-most, 30 of the next and so on.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 12.1,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/a47de9bd-cecb-473e-8616-660929651641.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_17",
-          "psnTrophyId": 17,
-          "psnGroupId": "default",
-          "name": "A wizard is you",
-          "desc": "Cast 999 spells.  I'm a what?",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 3.8,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/9040a6aa-7da9-4d83-85fe-3a5abfd65f36.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_18",
-          "psnTrophyId": 18,
-          "psnGroupId": "default",
-          "name": "D-d-d-d-deeper",
-          "desc": "Reach level 10 mines.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 16.7,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/abc9d965-dbec-4de8-a099-b7219a05acb1.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_19",
-          "psnTrophyId": 19,
-          "psnGroupId": "default",
-          "name": "Sugar sugar",
-          "desc": "Harvest a bifurcated sugar lump.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 27.4,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/0aea0f18-f4a8-4bc0-ae76-87ef72cddcae.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_20",
-          "psnTrophyId": 20,
-          "psnGroupId": "default",
-          "name": "All-natural cane sugar",
-          "desc": "Harvest a golden sugar lump.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 5.3,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/265c51e6-676a-4b45-96f4-bbe9f69ad465.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_21",
-          "psnTrophyId": 21,
-          "psnGroupId": "default",
-          "name": "Sweetmeats",
-          "desc": "Harvest a meaty sugar lump.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 8.8,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/f75006ad-e792-4fcc-8a23-5fbf8bf75485.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_22",
-          "psnTrophyId": 22,
-          "psnGroupId": "default",
-          "name": "Alexandria",
-          "desc": "Reach level 10 javascript consoles.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 9.6,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/dbeb2945-d9b0-4ceb-afb5-0b346235490c.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_23",
-          "psnTrophyId": 23,
-          "psnGroupId": "default",
-          "name": "Strange topologies",
-          "desc": "Reach level 10 idleverses.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 9.5,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/09f9891f-5dc6-4f6f-8863-efcf5e46a198.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_24",
-          "psnTrophyId": 24,
-          "psnGroupId": "default",
-          "name": "Spooky cookies",
-          "desc": "Unlock every Halloween-themed cookie.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 6.7,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/e446a4b1-22dd-4ce9-8ac0-094082d69195.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_25",
-          "psnTrophyId": 25,
-          "psnGroupId": "default",
-          "name": "Methuselah",
-          "desc": "Reach level 10 grandmas.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 19.2,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/7d33aa9a-bbfc-44ee-9f57-8d2d347160d7.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_26",
-          "psnTrophyId": 26,
-          "psnGroupId": "default",
-          "name": "Leprechaun",
-          "desc": "Click 777 golden cookies.",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 8.9,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/b34602cb-fe59-44d9-966b-a92ba6dce52c.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_27",
-          "psnTrophyId": 27,
-          "psnGroupId": "default",
-          "name": "Fortune",
-          "desc": "Click 77 golden cookies. You should really go to bed.",
-          "type": "silver",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 25.9,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/6416cfab-679e-43d9-ac93-e23fef2643ab.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_28",
-          "psnTrophyId": 28,
-          "psnGroupId": "default",
-          "name": "Golden cookie",
-          "desc": "Click a golden cookie.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 3,
-          "earnedRate": 82.4,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/a4746b84-3593-4fe0-8737-c584ea5582df.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_29",
-          "psnTrophyId": 29,
-          "psnGroupId": "default",
-          "name": "In the garden of Eden (baby)",
-          "desc": "Fill every tile of the biggest garden plot with plants.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 6.5,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/7d299de8-9050-4748-96d3-35d6ba3554e0.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_30",
-          "psnTrophyId": 30,
-          "psnGroupId": "default",
-          "name": "Keeper of the conservatory",
-          "desc": "Unlock every garden seed.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 3.7,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/e5b628b9-b2a2-4ff3-b14e-17222c06986a.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_31",
-          "psnTrophyId": 31,
-          "psnGroupId": "default",
-          "name": "Seedless to nay",
-          "desc": "Convert a complete seed log into sugar lumps by sacrificing your garden to the sugar hornets.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 3.7,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/cdc65133-2d71-4fc7-9b37-69c5c762df43.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_32",
-          "psnTrophyId": 32,
-          "psnGroupId": "default",
-          "name": "Sierpinski rhomboids",
-          "desc": "Reach level 10 fractal engines.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 9.9,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/19b74abe-7601-4568-9515-f59ad0a89491.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_33",
-          "psnTrophyId": 33,
-          "psnGroupId": "default",
-          "name": "Huge tracts of land",
-          "desc": "Reach level 10 farms.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 18.9,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/700f16d9-3f84-4e84-9161-2963ad8ea12c.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_34",
-          "psnTrophyId": 34,
-          "psnGroupId": "default",
-          "name": "Patently genius",
-          "desc": "Reach level 10 factories.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 16.4,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/02e8e1a6-bba1-4bee-8b6b-61f385d53176.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_35",
-          "psnTrophyId": 35,
-          "psnGroupId": "default",
-          "name": "Hide & seek champion",
-          "desc": "Unlock all the eggs.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 6,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/9794f6b8-81ca-4fbe-bc7e-3f3c05314396.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_36",
-          "psnTrophyId": 36,
-          "psnGroupId": "default",
-          "name": "A round of applause",
-          "desc": "Have 1,000 cursors. Boy, are my arms tired!",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 5.3,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/f5352e52-346c-42a8-b2b7-312405c9fd64.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_37",
-          "psnTrophyId": 37,
-          "psnGroupId": "default",
-          "name": "Freaky jazz hands",
-          "desc": "Reach level 10 cursors.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 21.7,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/51e2b639-e26e-413f-bca5-6e7af55da4f6.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_38",
-          "psnTrophyId": 38,
-          "psnGroupId": "default",
-          "name": "Gifted",
-          "desc": "Reach level 10 cortex bakers.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 9.4,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/4eaa8a88-20ea-4987-a53a-15d79541abc7.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_39",
-          "psnTrophyId": 39,
-          "psnGroupId": "default",
-          "name": "Neverclick",
-          "desc": "Make 1 million cookies by only having clicked 15 times.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 5.3,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/ab25df4f-ef1c-4f46-b38f-77fd3c298774.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_40",
-          "psnTrophyId": 40,
-          "psnGroupId": "default",
-          "name": "Nihilism",
-          "desc": "Ascend with 1 quadrillion cookies baked.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 15,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/2b653d8f-cf18-469c-9371-59630af15ce9.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_41",
-          "psnTrophyId": 41,
-          "psnGroupId": "default",
-          "name": "Let it snow",
-          "desc": "Unlock every Christmas-themed cookie.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 8.5,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/01c793b1-6c80-436a-a968-20ce9758137d.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_42",
-          "psnTrophyId": 42,
-          "psnGroupId": "default",
-          "name": "All hail Santa",
-          "desc": "Reach Santa's final form.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 12.4,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/1d68c268-fda5-42df-9ac6-23b3140730b2.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_43",
-          "psnTrophyId": 43,
-          "psnGroupId": "default",
-          "name": "Let's leaf it at that",
-          "desc": "Reach level 10 chancemakers.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 10,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/e0641c0a-3453-4f9a-ad73-69d8ab2f4f09.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_44",
-          "psnTrophyId": 44,
-          "psnGroupId": "default",
-          "name": "A capital idea",
-          "desc": "Reach level 10 banks.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 16.9,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/c92a483c-c729-4b43-ba9b-33c0404aa7ac.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_45",
-          "psnTrophyId": 45,
-          "psnGroupId": "default",
-          "name": "And a little extra",
-          "desc": "Bake 10^72 cookies in one ascension.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 4,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/6329100d-3817-408d-8ac9-d8463bacbe2d.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_46",
-          "psnTrophyId": 46,
-          "psnGroupId": "default",
-          "name": "Rebirth",
-          "desc": "Ascend at least once.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 2,
-          "earnedRate": 23.1,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/7c890b15-35d3-4020-a574-a1db2042f68c.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_47",
-          "psnTrophyId": 47,
-          "psnGroupId": "default",
-          "name": "Chubby hadrons",
-          "desc": "Reach level 10 antimatter condensers.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 10.5,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/90240ce8-4094-473a-8dec-d3e7c7c9be48.png"
-        },
-        {
-          "id": "psn_NPWR40883_00_48",
-          "psnTrophyId": 48,
-          "psnGroupId": "default",
-          "name": "Phlogisticated substances",
-          "desc": "Reach level 10 alchemy labs.",
-          "type": "bronze",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 13.6,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR40883_00/f01fadf9-4e2b-4240-b210-32c29ec9c924.png"
-        }
-      ],
-      "dlcs": [],
-      "addedAt": 1772802012000,
-      "psnProgress": 0,
-      "psnLastUpdatedDateTime": "2026-03-06T13:00:12Z"
-    },
-    {
-      "id": "psn_NPWR22975_00",
-      "source": "psn",
-      "psnNpCommunicationId": "NPWR22975_00",
-      "name": "Plague Hunters",
-      "platform": "PS5",
-      "platformRaw": "PS5",
-      "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22975_00/25acb83a-6db2-434b-b416-edf40255a459.png",
-      "grad": [
-        "#3a0a0a",
-        "#220404"
-      ],
-      "trophies": [
-        {
-          "id": "psn_NPWR22975_00_0",
-          "psnTrophyId": 0,
-          "psnGroupId": "default",
-          "name": "Surgeon",
-          "desc": "The Core Trophies of Plague Hunters",
-          "type": "platinum",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 1.2,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22975_00/25acb83a-6db2-434b-b416-edf40255a459.png"
-        },
-        {
-          "id": "psn_NPWR22975_00_1",
-          "psnTrophyId": 1,
-          "psnGroupId": "default",
-          "name": "Builder",
-          "desc": "Unlock all farm buildings.",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 5.5,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22975_00/3401fc57-41bd-46d1-926f-f8da63290377.png"
-        },
-        {
-          "id": "psn_NPWR22975_00_2",
-          "psnTrophyId": 2,
-          "psnGroupId": "default",
-          "name": "Savior",
-          "desc": "Rescue 50 Survivors.",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 5,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22975_00/512a8d7e-98d9-4440-8eef-4925ba7065bc.png"
-        },
-        {
-          "id": "psn_NPWR22975_00_3",
-          "psnTrophyId": 3,
-          "psnGroupId": "default",
-          "name": "Magical Doctor",
-          "desc": "Heal 20 times using the Nurse.",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 4.1,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22975_00/617c88e8-e2ca-4a0f-8964-a8f3038ad8c9.png"
-        },
-        {
-          "id": "psn_NPWR22975_00_4",
-          "psnTrophyId": 4,
-          "psnGroupId": "default",
-          "name": "Hot Under the Collar",
-          "desc": "Kill 10 enemies using the Soldier's Flame Thrower.",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 1,
-          "earnedRate": 8.9,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22975_00/8aa1c969-09a0-4430-968a-fe2e3015c189.png"
-        },
-        {
-          "id": "psn_NPWR22975_00_5",
-          "psnTrophyId": 5,
-          "psnGroupId": "default",
-          "name": "Poisonous",
-          "desc": "Poison enemies 10 times.",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 3,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22975_00/2202aa41-36f4-48e4-a4f3-499597e46fcd.png"
-        },
-        {
-          "id": "psn_NPWR22975_00_6",
-          "psnTrophyId": 6,
-          "psnGroupId": "default",
-          "name": "Traveler",
-          "desc": "Reach the City.",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 3.7,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22975_00/4f89b496-5793-442f-9bf6-f521cc82a9fb.png"
-        },
-        {
-          "id": "psn_NPWR22975_00_7",
-          "psnTrophyId": 7,
-          "psnGroupId": "default",
-          "name": "Adventurer",
-          "desc": "Discover the Catacombs.",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 2,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22975_00/d951a19b-1bf0-4822-a33b-da84d25dd204.png"
-        },
-        {
-          "id": "psn_NPWR22975_00_8",
-          "psnTrophyId": 8,
-          "psnGroupId": "default",
-          "name": "All the Way",
-          "desc": "Finish an Expedition.",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 1.3,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22975_00/7e6a1415-d69a-4dbe-9403-16ff9594a020.png"
-        },
-        {
-          "id": "psn_NPWR22975_00_9",
-          "psnTrophyId": 9,
-          "psnGroupId": "default",
-          "name": "Rejuvenated",
-          "desc": "Perform the Angelic Protection skill.",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 2.7,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22975_00/94b645b9-5e3e-43d4-9f72-310f6a28dfeb.png"
-        },
-        {
-          "id": "psn_NPWR22975_00_10",
-          "psnTrophyId": 10,
-          "psnGroupId": "default",
-          "name": "Rocket Man",
-          "desc": "Perform the Wrath of Tin skill.",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 2.6,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22975_00/f11a3fd8-acb9-42dc-bec2-4d84ebcf2073.png"
-        },
-        {
-          "id": "psn_NPWR22975_00_11",
-          "psnTrophyId": 11,
-          "psnGroupId": "default",
-          "name": "Remedy",
-          "desc": "Cure an afflicted ally.",
-          "type": "gold",
-          "earned": false,
-          "at": null,
-          "rarity": 0,
-          "earnedRate": 2.2,
-          "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22975_00/3afd5847-8a74-4b28-9695-f4bbd2a03d00.png"
-        }
-      ],
-      "dlcs": [],
-      "addedAt": 1772744267000,
-      "psnProgress": 0,
-      "psnLastUpdatedDateTime": "2026-03-05T20:57:47Z"
-    },
-    {
       "id": "psn_NPWR56511_00",
       "source": "psn",
       "psnNpCommunicationId": "NPWR56511_00",
@@ -14607,8 +13465,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR56511_00/af0e9dc9-765d-4e11-91e0-df3ba2871955.png",
       "grad": [
-        "#0a3a10",
-        "#041506"
+        "#0a2a3a",
+        "#041018"
       ],
       "trophies": [
         {
@@ -14782,8 +13640,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR58325_00/d133c461-0975-408d-9c0b-a50a89e67285.png",
       "grad": [
-        "#2d0a3a",
-        "#130418"
+        "#1a3a5c",
+        "#0a1e30"
       ],
       "trophies": [
         {
@@ -14957,8 +13815,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR48326_00/32dce2a4-3a7e-4566-9090-2b108e8f65a6.PNG",
       "grad": [
-        "#3a200a",
-        "#160b04"
+        "#3a0a0a",
+        "#220404"
       ],
       "trophies": [
         {
@@ -15275,8 +14133,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR41319_00/7270b75f-f28d-424e-96d1-ae88a5405438.PNG",
       "grad": [
-        "#0a1e3a",
-        "#040b18"
+        "#0a3a10",
+        "#041506"
       ],
       "trophies": [
         {
@@ -15458,7 +14316,7 @@
           "earned": true,
           "at": 1730222569000,
           "rarity": 3,
-          "earnedRate": 57.6,
+          "earnedRate": 57.7,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR41319_00/8c2faf4b-0eb5-4dee-ac42-04b188eccc03.PNG"
         },
         {
@@ -15471,7 +14329,7 @@
           "earned": true,
           "at": 1730223388000,
           "rarity": 3,
-          "earnedRate": 58.8,
+          "earnedRate": 58.9,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR41319_00/c3304f23-a22a-4a62-9138-90e172289912.PNG"
         },
         {
@@ -15653,7 +14511,7 @@
           "earned": true,
           "at": 1730229940000,
           "rarity": 1,
-          "earnedRate": 10.6,
+          "earnedRate": 10.7,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR41319_00/e1c36db5-09e1-4910-a1d5-b2405a5cb1ca.PNG"
         },
         {
@@ -15835,7 +14693,7 @@
           "earned": true,
           "at": 1730235489000,
           "rarity": 0,
-          "earnedRate": 2.2,
+          "earnedRate": 2.3,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR41319_00/b5bbfd68-6248-458d-92b5-d6174203645b.PNG"
         },
         {
@@ -15913,7 +14771,7 @@
           "earned": true,
           "at": 1730234769000,
           "rarity": 2,
-          "earnedRate": 27.6,
+          "earnedRate": 27.7,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR41319_00/e3fdba75-8df3-4af7-97d2-88e6593275b1.PNG"
         },
         {
@@ -16639,7 +15497,7 @@
               "earned": true,
               "at": 1730545086000,
               "rarity": 0,
-              "earnedRate": 2.8,
+              "earnedRate": 2.9,
               "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR41319_00/8568de88-4fde-442a-8b19-63c9177c6321.PNG"
             },
             {
@@ -17091,7 +15949,7 @@
               "earned": true,
               "at": 1730643581000,
               "rarity": 0,
-              "earnedRate": 2.1,
+              "earnedRate": 2.2,
               "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR41319_00/0d1af6ce-b852-4475-9962-8c020951ba4e.PNG"
             },
             {
@@ -17203,8 +16061,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR43471_00/80a5135e-7ed3-4828-8c94-1029e2cc4b04.png",
       "grad": [
-        "#2a0a20",
-        "#10040c"
+        "#2d0a3a",
+        "#130418"
       ],
       "trophies": [
         {
@@ -17295,7 +16153,7 @@
           "earned": true,
           "at": 1765104818000,
           "rarity": 2,
-          "earnedRate": 21.9,
+          "earnedRate": 22,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR43471_00/77060901-44e7-41dd-b584-201ae4f32e22.png"
         },
         {
@@ -17399,7 +16257,7 @@
           "earned": false,
           "at": null,
           "rarity": 2,
-          "earnedRate": 23.6,
+          "earnedRate": 23.7,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR43471_00/93d32cb7-e4e7-4eb4-968b-2455a64ec98a.png"
         },
         {
@@ -17451,7 +16309,7 @@
           "earned": false,
           "at": null,
           "rarity": 2,
-          "earnedRate": 17.1,
+          "earnedRate": 17.2,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR43471_00/36fb96e3-605c-49b4-b455-17b2d80d06bd.png"
         },
         {
@@ -17490,7 +16348,7 @@
           "earned": true,
           "at": 1765104380000,
           "rarity": 2,
-          "earnedRate": 19.8,
+          "earnedRate": 19.9,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR43471_00/b28e34e0-47d7-46d2-9907-5190f2ce2f6f.png"
         },
         {
@@ -17620,7 +16478,7 @@
           "earned": true,
           "at": 1751386452000,
           "rarity": 2,
-          "earnedRate": 36.9,
+          "earnedRate": 37,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR43471_00/b996fe07-b31a-42be-9040-1e2b5009161f.png"
         },
         {
@@ -17633,7 +16491,7 @@
           "earned": true,
           "at": 1751643158000,
           "rarity": 2,
-          "earnedRate": 28.9,
+          "earnedRate": 29,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR43471_00/8f881929-e09f-4b46-9928-0cb2cdd892d4.png"
         }
       ],
@@ -17651,8 +16509,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR14350_00_00D20733C8935EA45337EA5EA6BA2EA842F5F8CE52/0DBB044737B80AE1928BBF53ABE894057DD0AA1E.PNG",
       "grad": [
-        "#1a3a0a",
-        "#0a1604"
+        "#3a200a",
+        "#160b04"
       ],
       "trophies": [
         {
@@ -18125,8 +16983,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR21647_00/26efdb55-9e6d-4de9-943f-6b95768ae607.png",
       "grad": [
-        "#3a2a0a",
-        "#150f04"
+        "#0a1e3a",
+        "#040b18"
       ],
       "trophies": [
         {
@@ -18568,7 +17426,7 @@
           "earned": true,
           "at": 1726916391000,
           "rarity": 3,
-          "earnedRate": 65.7,
+          "earnedRate": 65.8,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR21647_00/5db1c774-34af-44cb-a2b7-2ae55b781ec3.png"
         },
         {
@@ -19180,8 +18038,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR09552_00_000BFD9328289682108939214D651B055CD8605F8E/99CB92928DD6E8BBBDAF606E90084AB3561EB770.PNG",
       "grad": [
-        "#0a2a3a",
-        "#041018"
+        "#2a0a20",
+        "#10040c"
       ],
       "trophies": [
         {
@@ -19948,7 +18806,7 @@
           "earned": true,
           "at": 1724492505000,
           "rarity": 2,
-          "earnedRate": 35.5,
+          "earnedRate": 35.4,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR09552_00_000BFD9328289682108939214D651B055CD8605F8E/8F58AAEE6ADB55A960D40EEB89FD8C174318D86E.PNG"
         },
         {
@@ -20150,8 +19008,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR18608_00_0042787A792D62DA9277FD303FDF5C91581E33A707/53531FD7417B91A201B47A6B5D6FC590A4D2698C.PNG",
       "grad": [
-        "#1a3a5c",
-        "#0a1e30"
+        "#1a3a0a",
+        "#0a1604"
       ],
       "trophies": [
         {
@@ -20429,8 +19287,8 @@
       "platformRaw": "PS5,PSPC",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22859_00/d7213b2e-8048-40ae-859e-3ce1863b9390.png",
       "grad": [
-        "#3a0a0a",
-        "#220404"
+        "#3a2a0a",
+        "#150f04"
       ],
       "trophies": [
         {
@@ -21485,8 +20343,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR24911_00_001E4CA70C9CC2B89EB83A64594A62D803B949E581/97E784A0B073A5BA7C974DCE7014FCB286B89E26.PNG",
       "grad": [
-        "#0a3a10",
-        "#041506"
+        "#0a2a3a",
+        "#041018"
       ],
       "trophies": [
         {
@@ -21954,8 +20812,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR28611_00/91c344a1-e96d-4f77-86ca-4e7cc5548352.png",
       "grad": [
-        "#2d0a3a",
-        "#130418"
+        "#1a3a5c",
+        "#0a1e30"
       ],
       "trophies": [
         {
@@ -22129,8 +20987,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR24058_00/c004c7e8-87aa-48fa-a52f-161de45758d6.png",
       "grad": [
-        "#3a200a",
-        "#160b04"
+        "#3a0a0a",
+        "#220404"
       ],
       "trophies": [
         {
@@ -22525,8 +21383,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR23844_00_00912CFF8779A0826B3716ECDC8A9E6E0EC43ECBDA/4103B5CC02704A09633790D07E0BCED30625A63C.PNG",
       "grad": [
-        "#0a1e3a",
-        "#040b18"
+        "#0a3a10",
+        "#041506"
       ],
       "trophies": [
         {
@@ -22791,8 +21649,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR20567_00_00EB1693CD75B00EF3CAD0D20B219CB4B01629F9EE/EDE580566744E9734D576CBF7E47FAD7E8EC1CBE.PNG",
       "grad": [
-        "#2a0a20",
-        "#10040c"
+        "#2d0a3a",
+        "#130418"
       ],
       "trophies": [],
       "dlcs": [
@@ -23159,8 +22017,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR52416_00/1e5214d6-10ce-4c84-9b65-0558e9456c30.png",
       "grad": [
-        "#1a3a0a",
-        "#0a1604"
+        "#3a200a",
+        "#160b04"
       ],
       "trophies": [
         {
@@ -23334,8 +22192,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR14179_00_009A075ECE3388AA6B634DE42D295AA5CE955FC65E/B4054E110680F4787D1C3AFAB21A55A51CE80BFF.PNG",
       "grad": [
-        "#3a2a0a",
-        "#150f04"
+        "#0a1e3a",
+        "#040b18"
       ],
       "trophies": [
         {
@@ -23652,8 +22510,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR10979_00_00B56D7900147A80DF060E64B22FD716A96ECDA724/4B7924D3FD5CE9A4D19DF70E79D01DC2A732E24C.PNG",
       "grad": [
-        "#0a2a3a",
-        "#041018"
+        "#2a0a20",
+        "#10040c"
       ],
       "trophies": [
         {
@@ -24551,8 +23409,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR18041_00_005939904E99277C7FBD3A6FFEE1A781FC684496B6/877A808A99C061E4B17D85E284654963545681B9.PNG",
       "grad": [
-        "#1a3a5c",
-        "#0a1e30"
+        "#1a3a0a",
+        "#0a1604"
       ],
       "trophies": [
         {
@@ -25129,8 +23987,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR10052_00_00870E7DAC2800E85D47D18734EC2DC3C175A21D64/BF03FBA7C277D1334680F5F4D050C031E104DF67.PNG",
       "grad": [
-        "#3a0a0a",
-        "#220404"
+        "#3a2a0a",
+        "#150f04"
       ],
       "trophies": [
         {
@@ -25395,8 +24253,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR19844_00_0071AF2B36F508234D364A8AB46CC1C9F379C01A3B/85668FD19AACEEC3E83AEE5F39725C11F1C5C0BC.PNG",
       "grad": [
-        "#0a3a10",
-        "#041506"
+        "#0a2a3a",
+        "#041018"
       ],
       "trophies": [
         {
@@ -25804,8 +24662,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR43217_00_002122EE0D2F236EF5C245E46059BED34D0A1A373C/EF6985423DF38E1024A36C9A776E4940BD213347.PNG",
       "grad": [
-        "#2d0a3a",
-        "#130418"
+        "#1a3a5c",
+        "#0a1e30"
       ],
       "trophies": [
         {
@@ -25922,7 +24780,7 @@
           "earned": true,
           "at": 1742084484000,
           "rarity": 3,
-          "earnedRate": 82.1,
+          "earnedRate": 82,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR43217_00_002122EE0D2F236EF5C245E46059BED34D0A1A373C/033C3E951587EB6B0DF1D3EB56B52E3FAF1E4711.PNG"
         },
         {
@@ -25966,8 +24824,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR17501_00_0046500E7E6DA4B43207C198A1D0FFD94C0D6DB5C5/4A3317A4DDD61B2C4689438D1F07894A923D0BE7.PNG",
       "grad": [
-        "#3a200a",
-        "#160b04"
+        "#3a0a0a",
+        "#220404"
       ],
       "trophies": [
         {
@@ -26258,8 +25116,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR10335_00_005C98DA4C63CDABFC0F0710BF3E19302C59D6D566/203BA9F1F3751F63236302A3426EDE2C2E77B78D.PNG",
       "grad": [
-        "#0a1e3a",
-        "#040b18"
+        "#0a3a10",
+        "#041506"
       ],
       "trophies": [
         {
@@ -26433,8 +25291,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR20384_00_00DB84CB5E06B2C1E11CB3D982DB2A01EF655FD760/14EB2E00A944A81B268C1DE59576ECCF77C7E3B1.PNG",
       "grad": [
-        "#2a0a20",
-        "#10040c"
+        "#2d0a3a",
+        "#130418"
       ],
       "trophies": [
         {
@@ -26460,7 +25318,7 @@
           "earned": true,
           "at": 1741449193000,
           "rarity": 1,
-          "earnedRate": 13.2,
+          "earnedRate": 13.3,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR20384_00_00DB84CB5E06B2C1E11CB3D982DB2A01EF655FD760/8D260677263ED3685007E7E3A49014B97147A4AF.PNG"
         },
         {
@@ -26738,8 +25596,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR16304_00_0024AADC3658FB319C2B75FE936E199C3EFC08749E/52D52AC0C490E7C97C22A7BADCAE952E1F1CE891.PNG",
       "grad": [
-        "#1a3a0a",
-        "#0a1604"
+        "#3a200a",
+        "#160b04"
       ],
       "trophies": [
         {
@@ -27251,8 +26109,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR12285_00_0034F3B5D31BF0428B52CA9C78E6982472375DCDA7/1A5EC0BC3C0B720984AB1B82856743C847E7EC6D.PNG",
       "grad": [
-        "#3a2a0a",
-        "#150f04"
+        "#0a1e3a",
+        "#040b18"
       ],
       "trophies": [
         {
@@ -27556,8 +26414,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR13211_00_00B97E973B2F847DE64A50C8CD5BD2DC20890B42E2/88AFFFD0B28B703B28CA71F6353F797230B9FB32.PNG",
       "grad": [
-        "#0a2a3a",
-        "#041018"
+        "#2a0a20",
+        "#10040c"
       ],
       "trophies": [
         {
@@ -29113,8 +27971,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR08142_00_003D563207D426EE2C1EE01C4653A61E17BDA2D40E/D5E13578C8B737B985357130994DBC58D1C27443.PNG",
       "grad": [
-        "#1a3a5c",
-        "#0a1e30"
+        "#1a3a0a",
+        "#0a1604"
       ],
       "trophies": [
         {
@@ -29634,7 +28492,7 @@
           "earned": true,
           "at": 1740487765000,
           "rarity": 2,
-          "earnedRate": 37.3,
+          "earnedRate": 37.2,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR08142_00_003D563207D426EE2C1EE01C4653A61E17BDA2D40E/D6BA6167D51B5BE3E83B9562EDB3B10D79550E5B.PNG"
         },
         {
@@ -29782,8 +28640,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR49118_00/c7b87f03-ae0a-4c6d-9e0c-f54a5ec15ac0.png",
       "grad": [
-        "#3a0a0a",
-        "#220404"
+        "#3a2a0a",
+        "#150f04"
       ],
       "trophies": [
         {
@@ -30113,8 +28971,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR09229_00_0083DE905271C970376786195C3A87FD9FB5AEAF16/80A2FFBE208F77346A5CEC1C31B99A98D83E8005.PNG",
       "grad": [
-        "#0a3a10",
-        "#041506"
+        "#0a2a3a",
+        "#041018"
       ],
       "trophies": [
         {
@@ -31240,8 +30098,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR11120_00_00E78D35CE3291D63037383E12CD6E98AA6881CAB0/214B87A536CF130780F1D193281C10C654A9C19A.PNG",
       "grad": [
-        "#2d0a3a",
-        "#130418"
+        "#1a3a5c",
+        "#0a1e30"
       ],
       "trophies": [
         {
@@ -31415,8 +30273,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42368_00/cc0ddad1-25a2-433e-9c65-2903b268ac4e.png",
       "grad": [
-        "#3a200a",
-        "#160b04"
+        "#3a0a0a",
+        "#220404"
       ],
       "trophies": [
         {
@@ -31481,7 +30339,7 @@
           "earned": false,
           "at": null,
           "rarity": 1,
-          "earnedRate": 10.5,
+          "earnedRate": 10.6,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42368_00/69b16309-b400-47ea-8840-13a9912e40d7.png"
         },
         {
@@ -31642,8 +30500,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR29079_00/c6253483-f62e-4c34-9e9c-7e805eef6af2.png",
       "grad": [
-        "#0a1e3a",
-        "#040b18"
+        "#0a3a10",
+        "#041506"
       ],
       "trophies": [
         {
@@ -31908,8 +30766,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR21820_00/a87581c6-6c0d-45f7-afff-7795a0bac215.png",
       "grad": [
-        "#2a0a20",
-        "#10040c"
+        "#2d0a3a",
+        "#130418"
       ],
       "trophies": [
         {
@@ -33041,8 +31899,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR37097_00/48f833c5-7978-4d21-992a-e1e36e1fc010.png",
       "grad": [
-        "#1a3a0a",
-        "#0a1604"
+        "#3a200a",
+        "#160b04"
       ],
       "trophies": [
         {
@@ -33172,7 +32030,7 @@
           "earned": true,
           "at": 1717776391000,
           "rarity": 1,
-          "earnedRate": 5.2,
+          "earnedRate": 5.3,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR37097_00/197de8df-28e0-4c6a-a531-c8105f53f6e2.png"
         },
         {
@@ -33263,7 +32121,7 @@
           "earned": true,
           "at": 1717777382000,
           "rarity": 2,
-          "earnedRate": 35.4,
+          "earnedRate": 35.5,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR37097_00/be30b903-9da2-4f6d-8415-7269c4f41b0a.png"
         },
         {
@@ -33497,7 +32355,7 @@
           "earned": true,
           "at": 1719239251000,
           "rarity": 2,
-          "earnedRate": 38.8,
+          "earnedRate": 38.9,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR37097_00/d8e82bd0-531c-4dcb-9a6d-c80d71075bdf.png"
         },
         {
@@ -33718,8 +32576,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR14663_00_00896E1E019FB03F6858AD4E60E7FB0CD331EBD0A4/30D9AE5FD1238D6BA75192EC83AA4617D588D1A1.PNG",
       "grad": [
-        "#3a2a0a",
-        "#150f04"
+        "#0a1e3a",
+        "#040b18"
       ],
       "trophies": [
         {
@@ -33802,8 +32660,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR44690_00/9e13be3d-36e0-4ff8-bd41-d483b83c1adb.png",
       "grad": [
-        "#0a2a3a",
-        "#041018"
+        "#2a0a20",
+        "#10040c"
       ],
       "trophies": [
         {
@@ -33977,8 +32835,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR38574_00/7a0d700c-2a79-4410-871c-ee2930ae1480.png",
       "grad": [
-        "#1a3a5c",
-        "#0a1e30"
+        "#1a3a0a",
+        "#0a1604"
       ],
       "trophies": [
         {
@@ -34095,7 +32953,7 @@
           "earned": true,
           "at": 1724141667000,
           "rarity": 3,
-          "earnedRate": 77.5,
+          "earnedRate": 77.4,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR38574_00/1557e8b6-b86a-464b-b0c1-4a12b1316ca6.png"
         },
         {
@@ -34139,8 +32997,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR24830_00/9b56defc-26a7-4272-9b47-40af01d1e139.png",
       "grad": [
-        "#3a0a0a",
-        "#220404"
+        "#3a2a0a",
+        "#150f04"
       ],
       "trophies": [
         {
@@ -34218,7 +33076,7 @@
           "earned": true,
           "at": 1728931093000,
           "rarity": 2,
-          "earnedRate": 47.3,
+          "earnedRate": 47.4,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR24830_00/342beba1-e173-4314-8591-e6685cf9de10.png"
         },
         {
@@ -34231,7 +33089,7 @@
           "earned": true,
           "at": 1728932197000,
           "rarity": 2,
-          "earnedRate": 28.7,
+          "earnedRate": 28.8,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR24830_00/6e5f3b5a-99b8-43b7-aed7-55b8a325280b.png"
         },
         {
@@ -34379,8 +33237,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR34589_00/3182a334-c570-4867-a014-708cdb217c0b.png",
       "grad": [
-        "#0a3a10",
-        "#041506"
+        "#0a2a3a",
+        "#041018"
       ],
       "trophies": [
         {
@@ -34450,8 +33308,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR24059_00/e64eede9-34dd-4459-bbd9-44261cf39552.png",
       "grad": [
-        "#2d0a3a",
-        "#130418"
+        "#1a3a5c",
+        "#0a1e30"
       ],
       "trophies": [
         {
@@ -34924,8 +33782,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR11435_00_00025CC40B8D85858575298BAA090D80E9E134D207/987B37AA2202ABB7055B12AD6E63A95EC077D01E.PNG",
       "grad": [
-        "#3a200a",
-        "#160b04"
+        "#3a0a0a",
+        "#220404"
       ],
       "trophies": [
         {
@@ -35315,7 +34173,7 @@
           "earned": false,
           "at": null,
           "rarity": 2,
-          "earnedRate": 29.5,
+          "earnedRate": 29.4,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR11435_00_00025CC40B8D85858575298BAA090D80E9E134D207/AC620BFE17FEE6A167E4AD3E8192622DC71B5F7F.PNG"
         },
         {
@@ -35393,7 +34251,7 @@
           "earned": false,
           "at": null,
           "rarity": 2,
-          "earnedRate": 40.5,
+          "earnedRate": 40.4,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR11435_00_00025CC40B8D85858575298BAA090D80E9E134D207/E4FA3FC9C52AF2CC84DF83E8AF9E5C944CBD2150.PNG"
         },
         {
@@ -35606,8 +34464,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR17775_00_00055C9188D41E00DAEE67E13B35C141275738A21E/0C3DD54F292A225971B07529C73C443530CA7FE2.PNG",
       "grad": [
-        "#0a1e3a",
-        "#040b18"
+        "#0a3a10",
+        "#041506"
       ],
       "trophies": [
         {
@@ -36288,8 +35146,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR19743_00_00CB943FB82E3208355B9F4927F3A240ADB56484EE/112722D4D6B262522A82071D65A8A65A3CAE2F30.PNG",
       "grad": [
-        "#2a0a20",
-        "#10040c"
+        "#2d0a3a",
+        "#130418"
       ],
       "trophies": [
         {
@@ -36775,8 +35633,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22022_00/920d4c14-5908-4085-9cc9-6132e1174146.png",
       "grad": [
-        "#1a3a0a",
-        "#0a1604"
+        "#3a200a",
+        "#160b04"
       ],
       "trophies": [
         {
@@ -37392,8 +36250,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR20188_00/9f84e2fc-0cd2-40f1-bfdb-6774fe3a69f6.png",
       "grad": [
-        "#3a2a0a",
-        "#150f04"
+        "#0a1e3a",
+        "#040b18"
       ],
       "trophies": [
         {
@@ -38089,8 +36947,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR29806_00/c5b226aa-8832-4fa3-97c2-f39d40e198e9.png",
       "grad": [
-        "#0a2a3a",
-        "#041018"
+        "#2a0a20",
+        "#10040c"
       ],
       "trophies": [
         {
@@ -38602,8 +37460,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR37092_00_004C2E1D66D8B9A8385CBE252AF55657C7C3E1E2B7/5621F055A5F2A6C3B809DC097F708838DF84F75D.PNG",
       "grad": [
-        "#1a3a5c",
-        "#0a1e30"
+        "#1a3a0a",
+        "#0a1604"
       ],
       "trophies": [
         {
@@ -38876,7 +37734,7 @@
           "earned": false,
           "at": null,
           "rarity": 2,
-          "earnedRate": 47.5,
+          "earnedRate": 47.4,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR37092_00_004C2E1D66D8B9A8385CBE252AF55657C7C3E1E2B7/EC3522BF1C1AD5BF77B7BA0E60FD63512A97760D.PNG"
         },
         {
@@ -39279,8 +38137,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR15691_00_005BE52A07D7F7E007410CE3616D5B1ED11ABB4D47/BFFE63C3CFC65483402266F073120B1C0EB8E53B.PNG",
       "grad": [
-        "#3a0a0a",
-        "#220404"
+        "#3a2a0a",
+        "#150f04"
       ],
       "trophies": [
         {
@@ -39800,7 +38658,7 @@
           "earned": false,
           "at": null,
           "rarity": 1,
-          "earnedRate": 12,
+          "earnedRate": 12.1,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR15691_00_005BE52A07D7F7E007410CE3616D5B1ED11ABB4D47/308B9D0B103E4F662AA2D12FD75AFEA7456C4F35.PNG"
         },
         {
@@ -39961,8 +38819,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR27329_00/a3874bde-db15-4c0f-9b0f-e48fb90435b2.png",
       "grad": [
-        "#0a3a10",
-        "#041506"
+        "#0a2a3a",
+        "#041018"
       ],
       "trophies": [
         {
@@ -40318,8 +39176,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR05542_00_00E4C4407A3A16A95392C7768854A71BB3EAE66598/75A7852A33844847C19E12881B35D958525F1F87.PNG",
       "grad": [
-        "#2d0a3a",
-        "#130418"
+        "#1a3a5c",
+        "#0a1e30"
       ],
       "trophies": [
         {
@@ -41236,7 +40094,7 @@
               "earned": false,
               "at": null,
               "rarity": 0,
-              "earnedRate": 0.9,
+              "earnedRate": 1,
               "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR05542_00_00E4C4407A3A16A95392C7768854A71BB3EAE66598/D3DFE847D8F9AF1FA15EC83D21C52BCDA1D2F4A3.PNG"
             },
             {
@@ -41880,8 +40738,8 @@
       "platformRaw": "PSVITA,PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR13830_00_007F59675B4A098391DE71D49D125882FCC6A81D35/7C414F13F9EF22F6D2834BCD897C1596B7FAC709.PNG",
       "grad": [
-        "#3a200a",
-        "#160b04"
+        "#3a0a0a",
+        "#220404"
       ],
       "trophies": [
         {
@@ -42037,7 +40895,7 @@
           "earned": false,
           "at": null,
           "rarity": 2,
-          "earnedRate": 40.8,
+          "earnedRate": 40.9,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR13830_00_007F59675B4A098391DE71D49D125882FCC6A81D35/23BE93CAC7A270EA39CAF1D97CD32D17B6ED7DAF.PNG"
         },
         {
@@ -42289,8 +41147,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR06510_00_00C40D8B4D4C52D172F09EB7AA7EAD46311B970762/9CB97ECED99A219144623D09C4806454B19C3B1B.PNG",
       "grad": [
-        "#0a1e3a",
-        "#040b18"
+        "#0a3a10",
+        "#041506"
       ],
       "trophies": [
         {
@@ -42615,7 +41473,7 @@
           "earned": false,
           "at": null,
           "rarity": 1,
-          "earnedRate": 7.6,
+          "earnedRate": 7.5,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR06510_00_00C40D8B4D4C52D172F09EB7AA7EAD46311B970762/609DA1AF4BDD4776A3F62A210DB4F8049D7B8928.PNG"
         },
         {
@@ -43274,8 +42132,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR08516_00_001AE9FF0FAAF27A158B0F4BFB3278F58708E28EE7/0F7A155F3C419377AD2EF1FB4947B6A43617900E.PNG",
       "grad": [
-        "#2a0a20",
-        "#10040c"
+        "#2d0a3a",
+        "#130418"
       ],
       "trophies": [
         {
@@ -44511,8 +43369,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR16035_00_00902F721C6B9B2030B65892FA6DE26DB748F7C5B2/C6741AD50C3DDC0AC8C29A909ED19898C4825DA5.PNG",
       "grad": [
-        "#1a3a0a",
-        "#0a1604"
+        "#3a200a",
+        "#160b04"
       ],
       "trophies": [
         {
@@ -44985,8 +43843,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR26169_00/7884003c-ebb9-4ea9-8831-76375771212d.png",
       "grad": [
-        "#3a2a0a",
-        "#150f04"
+        "#0a1e3a",
+        "#040b18"
       ],
       "trophies": [
         {
@@ -45160,8 +44018,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR37820_00/e10765a5-77ca-4019-979d-cb6cb5b13816.png",
       "grad": [
-        "#0a2a3a",
-        "#041018"
+        "#2a0a20",
+        "#10040c"
       ],
       "trophies": [
         {
@@ -45434,7 +44292,7 @@
           "earned": true,
           "at": 1720795333000,
           "rarity": 2,
-          "earnedRate": 47.2,
+          "earnedRate": 47.1,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR37820_00/b9e11a1a-4cf9-4ab3-990a-350b1f40b54b.png"
         },
         {
@@ -45621,8 +44479,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR41929_00/b0f42af7-32b8-4afc-bab0-c2574eb85bb7.png",
       "grad": [
-        "#1a3a5c",
-        "#0a1e30"
+        "#1a3a0a",
+        "#0a1604"
       ],
       "trophies": [
         {
@@ -45778,7 +44636,7 @@
           "earned": false,
           "at": null,
           "rarity": 2,
-          "earnedRate": 25.3,
+          "earnedRate": 25.4,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR41929_00/b2ac1fb6-b326-4308-ac2f-c1d78da84f83.png"
         },
         {
@@ -45921,7 +44779,7 @@
           "earned": false,
           "at": null,
           "rarity": 2,
-          "earnedRate": 30,
+          "earnedRate": 29.9,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR41929_00/b2ac1fb6-b326-4308-ac2f-c1d78da84f83.png"
         },
         {
@@ -46325,7 +45183,7 @@
               "earned": false,
               "at": null,
               "rarity": 2,
-              "earnedRate": 17.3,
+              "earnedRate": 17.4,
               "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR41929_00/ce47e160-496d-4946-808e-98dbec571967.png"
             },
             {
@@ -46743,7 +45601,7 @@
               "earned": false,
               "at": null,
               "rarity": 1,
-              "earnedRate": 7.1,
+              "earnedRate": 7.2,
               "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR41929_00/b2ac1fb6-b326-4308-ac2f-c1d78da84f83.png"
             },
             {
@@ -46972,7 +45830,7 @@
               "earned": false,
               "at": null,
               "rarity": 0,
-              "earnedRate": 3.5,
+              "earnedRate": 3.6,
               "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR41929_00/b2ac1fb6-b326-4308-ac2f-c1d78da84f83.png"
             },
             {
@@ -47056,8 +45914,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR07875_00_0026D95B298228B7F693D8DDBFF42C4F4BCC3FF2D2/ACC2A8C6C222E9B89D76B7A10E7209EDF1F56E0C.PNG",
       "grad": [
-        "#3a0a0a",
-        "#220404"
+        "#3a2a0a",
+        "#150f04"
       ],
       "trophies": [
         {
@@ -47868,8 +46726,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR11243_00_00BA59038C4D483C5AA9817CAFD98B3DA960E696D2/7BFFC34724C6B792D74A8FE8A11456B33C54F6D4.PNG",
       "grad": [
-        "#0a3a10",
-        "#041506"
+        "#0a2a3a",
+        "#041018"
       ],
       "trophies": [
         {
@@ -48290,8 +47148,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR37258_00/f537e4fe-0359-4ed8-a3ed-dd7816573562.png",
       "grad": [
-        "#2d0a3a",
-        "#130418"
+        "#1a3a5c",
+        "#0a1e30"
       ],
       "trophies": [
         {
@@ -48551,7 +47409,7 @@
           "earned": false,
           "at": null,
           "rarity": 2,
-          "earnedRate": 37.4,
+          "earnedRate": 37.3,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR37258_00/5b3a8388-351e-4d83-a0e7-e704dcfc15ea.png"
         },
         {
@@ -48634,8 +47492,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR05706_00_003C44BDCCF6EB21301F194F8CEF00BD1F4DC538D0/82D9739A2BD62B99475DD8B0E1ABE8C33C7A58D1.PNG",
       "grad": [
-        "#3a200a",
-        "#160b04"
+        "#3a0a0a",
+        "#220404"
       ],
       "trophies": [
         {
@@ -50396,8 +49254,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR38289_00_0059EE350DDB76966F1B4FCDFD94DD0AD2EC27B7CB/EC7DF04C99BBEBAEECE2D94E4888D7A879AD5863.PNG",
       "grad": [
-        "#0a1e3a",
-        "#040b18"
+        "#0a3a10",
+        "#041506"
       ],
       "trophies": [
         {
@@ -50519,8 +49377,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR40886_00_006C65EEF9B4AB07FA3003375CD18BF17AD18D0748/BF372450B55DF4AE3B2188EB6CAB177200DD9D14.PNG",
       "grad": [
-        "#2a0a20",
-        "#10040c"
+        "#2d0a3a",
+        "#130418"
       ],
       "trophies": [
         {
@@ -50585,7 +49443,7 @@
           "earned": true,
           "at": 1713468940000,
           "rarity": 2,
-          "earnedRate": 32.4,
+          "earnedRate": 32.5,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40886_00_006C65EEF9B4AB07FA3003375CD18BF17AD18D0748/0B1EDA64DAF016D63A5E84C1B03460584CE34FAC.PNG"
         },
         {
@@ -50598,7 +49456,7 @@
           "earned": true,
           "at": 1713467794000,
           "rarity": 3,
-          "earnedRate": 92.9,
+          "earnedRate": 92.8,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR40886_00_006C65EEF9B4AB07FA3003375CD18BF17AD18D0748/2CEC985D2619A7436E09F36C3C441A4A01A3C939.PNG"
         },
         {
@@ -50707,8 +49565,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR39822_00_00C28956AC85EF6D6145535834572FEE0B37548767/EE81D5FAD1E1BB7C6C1E98520331E09CCF3DDDEF.PNG",
       "grad": [
-        "#1a3a0a",
-        "#0a1604"
+        "#3a200a",
+        "#160b04"
       ],
       "trophies": [
         {
@@ -50760,7 +49618,7 @@
           "earned": true,
           "at": 1713382824000,
           "rarity": 3,
-          "earnedRate": 64.4,
+          "earnedRate": 64.5,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR39822_00_00C28956AC85EF6D6145535834572FEE0B37548767/BD8BA78B0A0282A6C68D84E04838C26DC55070C1.PNG"
         },
         {
@@ -50903,7 +49761,7 @@
           "earned": true,
           "at": 1713382744000,
           "rarity": 3,
-          "earnedRate": 95.4,
+          "earnedRate": 95.3,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR39822_00_00C28956AC85EF6D6145535834572FEE0B37548767/A2F96C17A640BB4A988D16C2E61CDE452BDF0B77.PNG"
         },
         {
@@ -50934,8 +49792,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42820_00/0abc466d-0a01-4ff6-bf9a-7499482dbf84.png",
       "grad": [
-        "#3a2a0a",
-        "#150f04"
+        "#0a1e3a",
+        "#040b18"
       ],
       "trophies": [
         {
@@ -51143,7 +50001,7 @@
           "earned": true,
           "at": 1713382428000,
           "rarity": 3,
-          "earnedRate": 97.4,
+          "earnedRate": 97.5,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42820_00/61c756b2-d0d1-4b74-a4a3-d82c52a8a028.png"
         },
         {
@@ -51169,7 +50027,7 @@
           "earned": true,
           "at": 1713382429000,
           "rarity": 3,
-          "earnedRate": 97.3,
+          "earnedRate": 97.4,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42820_00/bfd69b27-dbc5-48a2-abfd-e21b45fde56a.png"
         },
         {
@@ -51247,7 +50105,7 @@
           "earned": true,
           "at": 1713382431000,
           "rarity": 3,
-          "earnedRate": 97.1,
+          "earnedRate": 97.2,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42820_00/e774e48f-7731-41d8-9865-16f3d8c0d545.png"
         },
         {
@@ -51286,7 +50144,7 @@
           "earned": true,
           "at": 1713382432000,
           "rarity": 3,
-          "earnedRate": 97,
+          "earnedRate": 97.1,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42820_00/c14d23ed-c030-4708-88c8-f3d86f70f221.png"
         },
         {
@@ -51325,7 +50183,7 @@
           "earned": true,
           "at": 1713382444000,
           "rarity": 3,
-          "earnedRate": 95.8,
+          "earnedRate": 95.9,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42820_00/edff43d6-bb3c-449d-81da-0b64bcc9f757.png"
         },
         {
@@ -51338,7 +50196,7 @@
           "earned": true,
           "at": 1713382444000,
           "rarity": 3,
-          "earnedRate": 95.8,
+          "earnedRate": 95.9,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42820_00/4d31e523-2747-4745-98de-88c3c22c3e95.png"
         },
         {
@@ -51377,7 +50235,7 @@
           "earned": true,
           "at": 1713382446000,
           "rarity": 3,
-          "earnedRate": 95.7,
+          "earnedRate": 95.8,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42820_00/d94898c9-7efa-4798-844f-6ad3f83837b9.png"
         },
         {
@@ -51421,8 +50279,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR42246_00_0017BDA9AB3E35FA587998505D4FD003F5AA709A43/714D404014CF73D8552960211AA72CD3E6A58BD3.PNG",
       "grad": [
-        "#0a2a3a",
-        "#041018"
+        "#2a0a20",
+        "#10040c"
       ],
       "trophies": [
         {
@@ -52350,8 +51208,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42244_00/9269d54e-f63b-4bf6-bb8c-34e87486e3c3.png",
       "grad": [
-        "#1a3a5c",
-        "#0a1e30"
+        "#1a3a0a",
+        "#0a1604"
       ],
       "trophies": [
         {
@@ -53183,7 +52041,7 @@
           "earned": true,
           "at": 1713380467000,
           "rarity": 3,
-          "earnedRate": 92.7,
+          "earnedRate": 92.8,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42244_00/e73fda51-6509-4270-8980-7553e4c11bab.png"
         },
         {
@@ -53196,7 +52054,7 @@
           "earned": true,
           "at": 1713380480000,
           "rarity": 3,
-          "earnedRate": 92.7,
+          "earnedRate": 92.8,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42244_00/d40e7038-1e8a-4142-8bcf-bcf68cb6dba3.png"
         },
         {
@@ -53209,7 +52067,7 @@
           "earned": true,
           "at": 1713380549000,
           "rarity": 3,
-          "earnedRate": 92.7,
+          "earnedRate": 92.8,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42244_00/3776b578-72fd-40a5-a5a9-ee28565ea3b5.png"
         },
         {
@@ -53222,7 +52080,7 @@
           "earned": true,
           "at": 1713380562000,
           "rarity": 3,
-          "earnedRate": 92.7,
+          "earnedRate": 92.8,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42244_00/b237d729-ee7e-461a-8e44-94a42aaa6d1a.png"
         },
         {
@@ -53235,7 +52093,7 @@
           "earned": true,
           "at": 1713380573000,
           "rarity": 3,
-          "earnedRate": 92.7,
+          "earnedRate": 92.8,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42244_00/805a49b7-251a-4346-b86c-f3de0b2e6050.png"
         },
         {
@@ -53248,7 +52106,7 @@
           "earned": true,
           "at": 1713380584000,
           "rarity": 3,
-          "earnedRate": 92.7,
+          "earnedRate": 92.8,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR42244_00/9bb2d0cf-f53f-4b43-9e42-52970771bbb9.png"
         },
         {
@@ -53279,8 +52137,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR15927_00_00DD39E4E6A69DAE2992C24EAD7CB72002486B0C4B/44E3972F795992716F211E82330B6A17A0EAD5C9.PNG",
       "grad": [
-        "#3a0a0a",
-        "#220404"
+        "#3a2a0a",
+        "#150f04"
       ],
       "trophies": [
         {
@@ -53441,8 +52299,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR32512_00_004FD91512CE3A07ABF55AC60E07E5252D74AA70FD/5A040A6824BB2236CBD88FEFBEC399A5C11A95F4.PNG",
       "grad": [
-        "#0a3a10",
-        "#041506"
+        "#0a2a3a",
+        "#041018"
       ],
       "trophies": [
         {
@@ -53928,8 +52786,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR37766_00/4178addf-8cf9-48e4-b66e-f1a6292ed2ed.png",
       "grad": [
-        "#2d0a3a",
-        "#130418"
+        "#1a3a5c",
+        "#0a1e30"
       ],
       "trophies": [
         {
@@ -54116,8 +52974,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR13354_00_00A381C4CD43B1C0C316597E9B59F8A4AFF55EF018/20410E91FCB5A22B12C588FCD7F217A36271FD1A.PNG",
       "grad": [
-        "#3a200a",
-        "#160b04"
+        "#3a0a0a",
+        "#220404"
       ],
       "trophies": [
         {
@@ -54590,8 +53448,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR15055_00_00DD9DF8496BB96F23870991DFCE71EB6079372CC1/914F467317C296B05EFF9079CA56D21226B80A60.PNG",
       "grad": [
-        "#0a1e3a",
-        "#040b18"
+        "#0a3a10",
+        "#041506"
       ],
       "trophies": [
         {
@@ -55181,8 +54039,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR21810_00/1d1e1f55-2dd3-466a-aa38-9a6e114c15da.png",
       "grad": [
-        "#2a0a20",
-        "#10040c"
+        "#2d0a3a",
+        "#130418"
       ],
       "trophies": [
         {
@@ -55533,7 +54391,7 @@
           "earned": false,
           "at": null,
           "rarity": 2,
-          "earnedRate": 20.6,
+          "earnedRate": 20.5,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR21810_00/a437f68d-d14d-4a94-b142-359c0e1d3eb7.png"
         },
         {
@@ -55793,8 +54651,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR31650_00/b54e957c-575b-4473-bc66-18599dad36ac.png",
       "grad": [
-        "#1a3a0a",
-        "#0a1604"
+        "#3a200a",
+        "#160b04"
       ],
       "trophies": [
         {
@@ -55846,7 +54704,7 @@
           "earned": true,
           "at": 1693749279000,
           "rarity": 3,
-          "earnedRate": 66.5,
+          "earnedRate": 66.4,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR31650_00/a09e46da-2a20-4422-a826-cc82090dc12a.png"
         },
         {
@@ -55955,8 +54813,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR27648_00/560ea39d-691b-4880-b5db-f91aa6f0d613.png",
       "grad": [
-        "#3a2a0a",
-        "#150f04"
+        "#0a1e3a",
+        "#040b18"
       ],
       "trophies": [
         {
@@ -56125,7 +54983,7 @@
           "earned": true,
           "at": 1694354987000,
           "rarity": 2,
-          "earnedRate": 35.8,
+          "earnedRate": 35.9,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR27648_00/f6acf930-4db2-4aa8-9693-f6fdf7ada92a.png"
         },
         {
@@ -56156,8 +55014,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR34428_00/74352881-73cf-49aa-ae92-9438737095ad.png",
       "grad": [
-        "#0a2a3a",
-        "#041018"
+        "#2a0a20",
+        "#10040c"
       ],
       "trophies": [
         {
@@ -57098,8 +55956,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR27065_00/10688f8a-ceef-4fe9-a75d-1f1a02aa5096.png",
       "grad": [
-        "#1a3a5c",
-        "#0a1e30"
+        "#1a3a0a",
+        "#0a1604"
       ],
       "trophies": [
         {
@@ -57273,8 +56131,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR30353_00/d71ae54a-3594-48a1-9747-119ca4f9182d.png",
       "grad": [
-        "#3a0a0a",
-        "#220404"
+        "#3a2a0a",
+        "#150f04"
       ],
       "trophies": [
         {
@@ -57495,7 +56353,7 @@
           "earned": true,
           "at": 1693742156000,
           "rarity": 3,
-          "earnedRate": 98.7,
+          "earnedRate": 98.8,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR30353_00/79b29aff-02a1-4fef-ad6b-10bd8d847912.png"
         },
         {
@@ -58150,8 +57008,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33651_00/e0aaefcd-2762-42a2-b195-6a6fe0c3785f.png",
       "grad": [
-        "#0a3a10",
-        "#041506"
+        "#0a2a3a",
+        "#041018"
       ],
       "trophies": [
         {
@@ -58359,7 +57217,7 @@
           "earned": true,
           "at": 1693741911000,
           "rarity": 3,
-          "earnedRate": 98.4,
+          "earnedRate": 98.3,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33651_00/e737a2b5-08cd-4002-ae59-138a418b0186.png"
         },
         {
@@ -58372,7 +57230,7 @@
           "earned": true,
           "at": 1693741909000,
           "rarity": 3,
-          "earnedRate": 98.4,
+          "earnedRate": 98.3,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33651_00/00ce27e6-b0fe-4eb2-8519-838b5266e569.png"
         },
         {
@@ -58385,7 +57243,7 @@
           "earned": true,
           "at": 1693741907000,
           "rarity": 3,
-          "earnedRate": 98.4,
+          "earnedRate": 98.3,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33651_00/c0802bd6-d07a-4c3e-a746-312f1c8ddcbb.png"
         },
         {
@@ -58398,7 +57256,7 @@
           "earned": true,
           "at": 1693741905000,
           "rarity": 3,
-          "earnedRate": 98.4,
+          "earnedRate": 98.3,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33651_00/cb62e2fc-cfca-4134-93c6-f50849d9b743.png"
         },
         {
@@ -58411,7 +57269,7 @@
           "earned": true,
           "at": 1693741903000,
           "rarity": 3,
-          "earnedRate": 98.4,
+          "earnedRate": 98.3,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33651_00/c76cc059-52d5-47a3-9a8d-277596005cf2.png"
         },
         {
@@ -58593,7 +57451,7 @@
           "earned": true,
           "at": 1693741875000,
           "rarity": 3,
-          "earnedRate": 98.5,
+          "earnedRate": 98.4,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33651_00/05ef8610-eaae-4f91-b93f-63000034744a.png"
         },
         {
@@ -58606,7 +57464,7 @@
           "earned": true,
           "at": 1693741870000,
           "rarity": 3,
-          "earnedRate": 98.5,
+          "earnedRate": 98.4,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33651_00/a2906058-0adb-412f-b850-666a7737ce6c.png"
         },
         {
@@ -58619,7 +57477,7 @@
           "earned": true,
           "at": 1693741868000,
           "rarity": 3,
-          "earnedRate": 98.5,
+          "earnedRate": 98.4,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33651_00/0f61afc7-d8b0-4c38-aef3-fada0c612fad.png"
         },
         {
@@ -58632,7 +57490,7 @@
           "earned": true,
           "at": 1693741866000,
           "rarity": 3,
-          "earnedRate": 98.5,
+          "earnedRate": 98.4,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33651_00/06c43866-e7c8-4c45-a464-8cda53604359.png"
         },
         {
@@ -58697,7 +57555,7 @@
           "earned": true,
           "at": 1693741856000,
           "rarity": 3,
-          "earnedRate": 98.6,
+          "earnedRate": 98.5,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33651_00/0856e886-3c6d-4e8d-b29c-59294805a611.png"
         },
         {
@@ -58827,7 +57685,7 @@
           "earned": true,
           "at": 1693741818000,
           "rarity": 3,
-          "earnedRate": 98.7,
+          "earnedRate": 98.6,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33651_00/5c2bcb91-d5af-4c3e-84f0-cce63a55f2f8.png"
         },
         {
@@ -58905,7 +57763,7 @@
           "earned": true,
           "at": 1693741807000,
           "rarity": 3,
-          "earnedRate": 98.8,
+          "earnedRate": 98.7,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33651_00/683a2722-fd38-4ed1-baf4-a7ae48131080.png"
         },
         {
@@ -58918,7 +57776,7 @@
           "earned": true,
           "at": 1693741805000,
           "rarity": 3,
-          "earnedRate": 98.8,
+          "earnedRate": 98.7,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33651_00/b2a39ccb-d757-4231-8e22-c0684c757ab5.png"
         },
         {
@@ -58931,7 +57789,7 @@
           "earned": true,
           "at": 1693741803000,
           "rarity": 3,
-          "earnedRate": 98.8,
+          "earnedRate": 98.7,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33651_00/4576ed5c-9657-46e6-a1fc-62c42be4dc78.png"
         },
         {
@@ -59092,8 +57950,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33659_00/359d4b31-b6c3-4b16-98ce-ca1c6de2df71.png",
       "grad": [
-        "#2d0a3a",
-        "#130418"
+        "#1a3a5c",
+        "#0a1e30"
       ],
       "trophies": [
         {
@@ -60034,8 +58892,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR33709_00/5dac2d35-da89-4d0e-af56-c363d6371f85.png",
       "grad": [
-        "#3a200a",
-        "#160b04"
+        "#3a0a0a",
+        "#220404"
       ],
       "trophies": [
         {
@@ -60742,8 +59600,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR32183_00/caa00b5a-b1b3-474d-94b0-37f57f227dbf.png",
       "grad": [
-        "#0a1e3a",
-        "#040b18"
+        "#0a3a10",
+        "#041506"
       ],
       "trophies": [
         {
@@ -60782,7 +59640,7 @@
           "earned": true,
           "at": 1693738935000,
           "rarity": 3,
-          "earnedRate": 97.3,
+          "earnedRate": 97.2,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR32183_00/1480671d-219d-47d2-bbc0-5d0a851e414b.png"
         },
         {
@@ -60964,7 +59822,7 @@
           "earned": true,
           "at": 1693738835000,
           "rarity": 3,
-          "earnedRate": 97.4,
+          "earnedRate": 97.3,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR32183_00/5d44feb7-fbcd-479c-aa33-da895c268aa0.png"
         },
         {
@@ -60977,7 +59835,7 @@
           "earned": true,
           "at": 1693738830000,
           "rarity": 3,
-          "earnedRate": 97.4,
+          "earnedRate": 97.3,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR32183_00/0b0b7dc1-e7b0-4da0-bed2-05805291250e.png"
         },
         {
@@ -61302,7 +60160,7 @@
           "earned": true,
           "at": 1693738716000,
           "rarity": 3,
-          "earnedRate": 97.6,
+          "earnedRate": 97.5,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR32183_00/40e87ff0-1c26-4937-ab18-30eda5317ae7.png"
         },
         {
@@ -61354,7 +60212,7 @@
           "earned": true,
           "at": 1693738702000,
           "rarity": 3,
-          "earnedRate": 97.7,
+          "earnedRate": 97.6,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR32183_00/7c0f027d-8529-4d11-8202-63e9847c88e8.png"
         },
         {
@@ -61523,7 +60381,7 @@
           "earned": true,
           "at": 1693738586000,
           "rarity": 3,
-          "earnedRate": 98.1,
+          "earnedRate": 98,
           "iconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR32183_00/ba4c0d04-e8f4-43e2-a996-cd6e58da5340.png"
         },
         {
@@ -61684,8 +60542,8 @@
       "platformRaw": "PS5",
       "coverUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR34707_00/4b5f9fbf-4e4b-4603-aa0d-f5d759fd920a.png",
       "grad": [
-        "#2a0a20",
-        "#10040c"
+        "#2d0a3a",
+        "#130418"
       ],
       "trophies": [
         {
@@ -62626,8 +61484,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR27652_00_00E97CF00B1A49F65161AFC1724A88056ED3585068/F6908E3ED3288F932FAA63F5CAF66493FFA11EE0.PNG",
       "grad": [
-        "#1a3a0a",
-        "#0a1604"
+        "#3a200a",
+        "#160b04"
       ],
       "trophies": [
         {
@@ -62827,8 +61685,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR06221_00_00943B71B23B3A5D98EB6CA419684E0F0A07FA8707/A3E52C438318CCEC6346EB2A31DBF31164A95A25.PNG",
       "grad": [
-        "#3a2a0a",
-        "#150f04"
+        "#0a1e3a",
+        "#040b18"
       ],
       "trophies": [
         {
@@ -63882,8 +62740,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR25089_00_004410079BF498BDD619EB050E30EE238E0ED3F642/7CE260A1DD2947FB89A78704D2023173090AF9F9.PNG",
       "grad": [
-        "#0a2a3a",
-        "#041018"
+        "#2a0a20",
+        "#10040c"
       ],
       "trophies": [
         {
@@ -64057,8 +62915,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR11401_00_00E79CCF48EA4680189C9B5887677C4E558F6DFAC3/97EA73EF0FAF9D4DF8095C237BBEB396A6CB11B9.PNG",
       "grad": [
-        "#1a3a5c",
-        "#0a1e30"
+        "#1a3a0a",
+        "#0a1604"
       ],
       "trophies": [
         {
@@ -64544,8 +63402,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR07466_00_002B372EA023E6E03E3194E148C0B2BF285AD8CE49/7E97D451B278DACDDD0CA8D59AFF7BF62E1A6560.PNG",
       "grad": [
-        "#3a0a0a",
-        "#220404"
+        "#3a2a0a",
+        "#150f04"
       ],
       "trophies": [
         {
@@ -65771,8 +64629,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR18434_00_008C93E3E408BD5116DE04ED0A4083FF12797AD437/7B321575B2E6A0D9F0D7270B408B55F89AC9B2FA.PNG",
       "grad": [
-        "#0a3a10",
-        "#041506"
+        "#0a2a3a",
+        "#041018"
       ],
       "trophies": [
         {
@@ -67133,8 +65991,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR34051_00_00819F971683C1EBE7CFD407330FC3AAEAE444EEDA/8F89BE788C44EF5399EC21B24154ABEA5A4FC583.PNG",
       "grad": [
-        "#2d0a3a",
-        "#130418"
+        "#1a3a5c",
+        "#0a1e30"
       ],
       "trophies": [
         {
@@ -68075,8 +66933,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR35116_00_000BD852886E3A93D61B1533A46B8743FF220D2095/F395948340040C98EE5C926C83F5A6780268E9FF.PNG",
       "grad": [
-        "#3a200a",
-        "#160b04"
+        "#3a0a0a",
+        "#220404"
       ],
       "trophies": [
         {
@@ -69017,8 +67875,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR35212_00_004A49CF1AF56B659A334047F63947D5A4358D5752/FBFAAAFEB5B90BDCABF96C9FEF5365983C35B763.PNG",
       "grad": [
-        "#0a1e3a",
-        "#040b18"
+        "#0a3a10",
+        "#041506"
       ],
       "trophies": [
         {
@@ -69959,8 +68817,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR35180_00_002536BFD0D49B8CB0EDB6C1915CEAE566AF1E4C97/912BFA50286A48CCE278E672E194D3AC71A7C9F7.PNG",
       "grad": [
-        "#2a0a20",
-        "#10040c"
+        "#2d0a3a",
+        "#130418"
       ],
       "trophies": [
         {
@@ -70901,8 +69759,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR35574_00_0099D66A8396B5CB0222DEDA8774BFAEB0EF265156/9E7380E8283B8C76EA7F3E19A0FD05C61A1D1631.PNG",
       "grad": [
-        "#1a3a0a",
-        "#0a1604"
+        "#3a200a",
+        "#160b04"
       ],
       "trophies": [
         {
@@ -71843,8 +70701,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR35148_00_00D3064C0673682EB33FA0F541E9F6302835FCCBB2/4807EA60439BE53951FC91A7DBBE4E97C92F4268.PNG",
       "grad": [
-        "#3a2a0a",
-        "#150f04"
+        "#0a1e3a",
+        "#040b18"
       ],
       "trophies": [
         {
@@ -72785,8 +71643,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR12518_00_009C1232E900005FE409857E926767DFE9CAC7F371/CCDC60CADE4B3970C348FEFDE0094BA95C0A802F.PNG",
       "grad": [
-        "#0a2a3a",
-        "#041018"
+        "#2a0a20",
+        "#10040c"
       ],
       "trophies": [
         {
@@ -73285,8 +72143,8 @@
       "platformRaw": "PS3,PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR09453_00_00A5087485D327D6503CD06B5C88D8001F2085B1FC/DB31A5F0A8C0CEA149906C3A3FD7DF74AB0C8C4B.PNG",
       "grad": [
-        "#1a3a5c",
-        "#0a1e30"
+        "#1a3a0a",
+        "#0a1604"
       ],
       "trophies": [
         {
@@ -73837,8 +72695,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR29496_00_00D9857179F4FF0E27F8DEC91EBA3C0983DA960689/4B55BAC089B76B8662D780E7EF194ADC29334F90.PNG",
       "grad": [
-        "#3a0a0a",
-        "#220404"
+        "#3a2a0a",
+        "#150f04"
       ],
       "trophies": [
         {
@@ -73851,7 +72709,7 @@
           "earned": true,
           "at": 1693002190000,
           "rarity": 3,
-          "earnedRate": 94.7,
+          "earnedRate": 94.8,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR29496_00_00D9857179F4FF0E27F8DEC91EBA3C0983DA960689/2AFE04B0B278388565C9C34D3697C2450CE0C394.PNG"
         },
         {
@@ -74012,8 +72870,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR22363_00_0081DEB7FB4EF585942BD5535D01EFA07C7F9850E3/9BA3DD5E9BD64467B1B9D47473D1978A5727C80A.PNG",
       "grad": [
-        "#0a3a10",
-        "#041506"
+        "#0a2a3a",
+        "#041018"
       ],
       "trophies": [
         {
@@ -74499,8 +73357,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR28597_00_002BE4621F0731D8FD41D456EE5648C29878915A03/60339023508E9613EEB53469A8029AF2301F1FF2.PNG",
       "grad": [
-        "#2d0a3a",
-        "#130418"
+        "#1a3a5c",
+        "#0a1e30"
       ],
       "trophies": [
         {
@@ -74674,8 +73532,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR18798_00_00762ACF9C04085CFD17F9DB2CD8CA354EDE0599E9/EC94DFAF053475E26CA3C6E18A1FAE79041A5E5D.PNG",
       "grad": [
-        "#3a200a",
-        "#160b04"
+        "#3a0a0a",
+        "#220404"
       ],
       "trophies": [
         {
@@ -74901,8 +73759,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR29385_00_0060D7DC3E51F9FA8F4EDC81269B56D6D2BD2C134C/26C0515C79C97354B38BE40BC25124E99B71836C.PNG",
       "grad": [
-        "#0a1e3a",
-        "#040b18"
+        "#0a3a10",
+        "#041506"
       ],
       "trophies": [
         {
@@ -75076,8 +73934,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR34208_00_00DC61BED304CE49D30E59795160C48E799A17D87C/B05E2E39763E145388722C83A05A8804430518D9.PNG",
       "grad": [
-        "#2a0a20",
-        "#10040c"
+        "#2d0a3a",
+        "#130418"
       ],
       "trophies": [
         {
@@ -75706,8 +74564,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR38551_00_000EA01C6CAA29E4ED4AC4D9CA92FB54B61883579D/B898695B103BAC30419C9E03E422D4D9D4E14004.PNG",
       "grad": [
-        "#1a3a0a",
-        "#0a1604"
+        "#3a200a",
+        "#160b04"
       ],
       "trophies": [
         {
@@ -76336,8 +75194,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR32955_00_007D47E6B9F9DC7FD1D880A51EB918245F450D7B22/7A4A665EBF362E050C54D6F5B658EB997F92922F.PNG",
       "grad": [
-        "#3a2a0a",
-        "#150f04"
+        "#0a1e3a",
+        "#040b18"
       ],
       "trophies": [
         {
@@ -76823,8 +75681,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR33703_00_000BB068BD0DE4B76459200BEBD1AAAB7D553C2F8F/FE2C8A3A05F6C649C128FB096836586E270544E1.PNG",
       "grad": [
-        "#0a2a3a",
-        "#041018"
+        "#2a0a20",
+        "#10040c"
       ],
       "trophies": [
         {
@@ -77310,8 +76168,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR33701_00_003FBB498B87D176DE66F61A588B6EFC835B988416/20C8C2601F8186C8671C401A2247139032C273A3.PNG",
       "grad": [
-        "#1a3a5c",
-        "#0a1e30"
+        "#1a3a0a",
+        "#0a1604"
       ],
       "trophies": [
         {
@@ -77797,8 +76655,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR33410_00_0053ECA79774558FDDF77D4019D2B2415BD0E4CEFD/89022E68C15198BB7029159172098469E1F05656.PNG",
       "grad": [
-        "#3a0a0a",
-        "#220404"
+        "#3a2a0a",
+        "#150f04"
       ],
       "trophies": [
         {
@@ -78284,8 +77142,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR23624_00_0071B23B44E1AFAA039FD5FEFC66050A35717B1F19/66DCECE27B16E28FB319080E482C8305617118C5.PNG",
       "grad": [
-        "#0a3a10",
-        "#041506"
+        "#0a2a3a",
+        "#041018"
       ],
       "trophies": [
         {
@@ -78797,8 +77655,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR09921_00_003EE781881CD253436F47B136654659336BAE8773/0DC2B0C04F0A7204D2FCFD4ECFF20B7E65FD2B41.PNG",
       "grad": [
-        "#2d0a3a",
-        "#130418"
+        "#1a3a5c",
+        "#0a1e30"
       ],
       "trophies": [
         {
@@ -79349,8 +78207,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR09798_00_0004C451BA0D520B43DBB2C20D0EB0B47AEEB9FEAF/B4203E044C57963E48475359B3DF9E0C5E3885FC.PNG",
       "grad": [
-        "#3a200a",
-        "#160b04"
+        "#3a0a0a",
+        "#220404"
       ],
       "trophies": [
         {
@@ -80078,8 +78936,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR20195_00_005B84D81537A0B8DBD65D3F13CB99304EC013E276/F0E8BFFF595D3FEA875FF7C9B0054443FF5CB2E9.PNG",
       "grad": [
-        "#0a1e3a",
-        "#040b18"
+        "#0a3a10",
+        "#041506"
       ],
       "trophies": [
         {
@@ -80578,8 +79436,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR11906_00_004214644B22C6F4F211B9317C2D87B535187B432F/809296A0622E24E39565BF601B0875FD100D0070.PNG",
       "grad": [
-        "#2a0a20",
-        "#10040c"
+        "#2d0a3a",
+        "#130418"
       ],
       "trophies": [
         {
@@ -80872,8 +79730,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR36790_00_001D2DEA9A3BF3DA1D1BC78D8FA514CDFBA27658A8/9B85EE58F14934D623330E918C8B55C4FBCF25B3.PNG",
       "grad": [
-        "#1a3a0a",
-        "#0a1604"
+        "#3a200a",
+        "#160b04"
       ],
       "trophies": [
         {
@@ -81034,8 +79892,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR19904_00_00500ADADD2AA388911E637EE6A1B66B6F259FA3CA/608E2951C65C8140F5C709D6471D8B8820FE6C29.PNG",
       "grad": [
-        "#3a2a0a",
-        "#150f04"
+        "#0a1e3a",
+        "#040b18"
       ],
       "trophies": [
         {
@@ -81490,7 +80348,7 @@
           "earned": false,
           "at": null,
           "rarity": 2,
-          "earnedRate": 33.8,
+          "earnedRate": 33.7,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR19904_00_00500ADADD2AA388911E637EE6A1B66B6F259FA3CA/BC3FA8DEBD55094A9242CBFAC053E072777DF85C.PNG"
         },
         {
@@ -81802,8 +80660,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR21266_00_00D4EEDA67C8D5E2FF163B3822301CA202AE739B7C/8265EE97F33EBCFFB69DBBB83579757572F2337D.PNG",
       "grad": [
-        "#0a2a3a",
-        "#041018"
+        "#2a0a20",
+        "#10040c"
       ],
       "trophies": [
         {
@@ -82224,8 +81082,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR30255_00_00835411E51A1DEBBB8297F4C4A076901091885CF4/BB79DBA7F9D428C9185C01AA16B159CA12EEEE91.PNG",
       "grad": [
-        "#1a3a5c",
-        "#0a1e30"
+        "#1a3a0a",
+        "#0a1604"
       ],
       "trophies": [
         {
@@ -82386,8 +81244,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR16560_00_0007A02C97951137CEE4D2A048FD1C00709B5FB59B/81DBB28E72619BBDF7525F720738EC18E2E1DDFD.PNG",
       "grad": [
-        "#3a0a0a",
-        "#220404"
+        "#3a2a0a",
+        "#150f04"
       ],
       "trophies": [
         {
@@ -83029,8 +81887,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR11332_00_00721F944BD138F71D29A5466BAD604C9D48C90228/A58C4C2AEA8CF64154AD28D1FC51489AAA549052.PNG",
       "grad": [
-        "#0a3a10",
-        "#041506"
+        "#0a2a3a",
+        "#041018"
       ],
       "trophies": [
         {
@@ -83694,8 +82552,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR16731_00_00BDF92415DADAF2D93EF972B0E1BEBF4E9D1006CC/335478F974AB2D0A18D38EC89FF695AE0EEAAA8F.PNG",
       "grad": [
-        "#2d0a3a",
-        "#130418"
+        "#1a3a5c",
+        "#0a1e30"
       ],
       "trophies": [
         {
@@ -84207,8 +83065,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR10785_00_00CED98F2112743D2D48C82578C3069CFE624DD1B0/D914EF7E7C627BAA9CDF64062CDA87B1AC8E6313.PNG",
       "grad": [
-        "#3a200a",
-        "#160b04"
+        "#3a0a0a",
+        "#220404"
       ],
       "trophies": [
         {
@@ -84889,8 +83747,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR17071_00_00F879DA29D58D0FF2118D0590095129E83D5DAD65/B8C49D5ABE6FE4D3BCF7C25D7772A351FD0D39B0.PNG",
       "grad": [
-        "#0a1e3a",
-        "#040b18"
+        "#0a3a10",
+        "#041506"
       ],
       "trophies": [
         {
@@ -85501,8 +84359,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR12128_00_0012880DBC94ADC820F12FC201F1A5879223A25EE0/3BFB3D7DB4D527B26388D13B567B950C95E4A0D0.PNG",
       "grad": [
-        "#2a0a20",
-        "#10040c"
+        "#2d0a3a",
+        "#130418"
       ],
       "trophies": [
         {
@@ -85971,8 +84829,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR09687_00_0090890723F98AD458C3F4EC288C1888A48F880D21/08B0C827B453E9D45ED0DCBE0CB6FFA59BFFD53E.PNG",
       "grad": [
-        "#1a3a0a",
-        "#0a1604"
+        "#3a200a",
+        "#160b04"
       ],
       "trophies": [
         {
@@ -86653,8 +85511,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR05740_00_0017967C4188CE8097C9F90449BD2673428F2F5C4E/084BD02D892260735318CE1DE2BB2FB1D42F22BD.PNG",
       "grad": [
-        "#3a2a0a",
-        "#150f04"
+        "#0a1e3a",
+        "#040b18"
       ],
       "trophies": [
         {
@@ -87296,8 +86154,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR34703_00_00A4118A51FEC5B95C661CAC956CB35C7595D335EA/825E9CC12C41E4000A1C7ED3FA9C8A37A97A07BE.PNG",
       "grad": [
-        "#0a2a3a",
-        "#041018"
+        "#2a0a20",
+        "#10040c"
       ],
       "trophies": [
         {
@@ -88238,8 +87096,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR16793_00_009B0D365D424D75C3E19EBA6927D9C966DE105BEE/A083C85A8082E2EC91B371A9660B54CC6B2C8D91.PNG",
       "grad": [
-        "#1a3a5c",
-        "#0a1e30"
+        "#1a3a0a",
+        "#0a1604"
       ],
       "trophies": [
         {
@@ -88816,8 +87674,8 @@
       "platformRaw": "PS3,PSVITA,PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR09600_00_00B64262FF6CA815779869D549A64A2BCAC93EE503/EFAEF2BE9FEB6CE2B0EE46684CB8DA99058BB9EB.PNG",
       "grad": [
-        "#3a0a0a",
-        "#220404"
+        "#3a2a0a",
+        "#150f04"
       ],
       "trophies": [
         {
@@ -89095,8 +87953,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR20879_00_008F4E8AE21A9F352A940C64BB2570995390C5A999/F7F1FBD6BAD35744975B1CFF72AA892ACE853F05.PNG",
       "grad": [
-        "#0a3a10",
-        "#041506"
+        "#0a2a3a",
+        "#041018"
       ],
       "trophies": [
         {
@@ -89278,7 +88136,7 @@
           "earned": true,
           "at": 1677757547000,
           "rarity": 3,
-          "earnedRate": 52.6,
+          "earnedRate": 52.5,
           "iconUrl": "https://image.api.playstation.com/trophy/np/NPWR20879_00_008F4E8AE21A9F352A940C64BB2570995390C5A999/C2D889A9E9CAEE8CC614255446B021055DB95BE4.PNG"
         },
         {
@@ -89686,8 +88544,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR15392_00_00B328555F57A7EB196F9815925B5DDA1CF69206D8/31160C8D448D5EFD469D4E8B2A2D0745B2CEA041.PNG",
       "grad": [
-        "#2d0a3a",
-        "#130418"
+        "#1a3a5c",
+        "#0a1e30"
       ],
       "trophies": [
         {
@@ -89939,8 +88797,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR11740_00_007FEEF742B9D7FF57334A8D844CB1FC32C265CBCC/E14502FD0E84C7C01CD0511A38EBCD2586A397E4.PNG",
       "grad": [
-        "#3a200a",
-        "#160b04"
+        "#3a0a0a",
+        "#220404"
       ],
       "trophies": [
         {
@@ -90747,8 +89605,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR23511_00_00E71F5EE014EF5ECA6DB4C8DC08643B97C99FAF72/5A9A72F405A5B5B4E98D5604D7A0E9E6C530FEBB.PNG",
       "grad": [
-        "#0a1e3a",
-        "#040b18"
+        "#0a3a10",
+        "#041506"
       ],
       "trophies": [
         {
@@ -91208,8 +90066,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR25326_00_00171885D09330ACEECE8A0BBD14C6D5921F8BE09D/784C2FF8E0B60912DB6007B903818327AD095B86.PNG",
       "grad": [
-        "#2a0a20",
-        "#10040c"
+        "#2d0a3a",
+        "#130418"
       ],
       "trophies": [
         {
@@ -91604,8 +90462,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR11203_00_00831FADC9D507B3B4470ADD1E5A3DA9341D3D2DE1/E8BD2759DAF8D84289DB438AD8738BF238695D11.PNG",
       "grad": [
-        "#1a3a0a",
-        "#0a1604"
+        "#3a200a",
+        "#160b04"
       ],
       "trophies": [
         {
@@ -92021,8 +90879,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR31129_00_00C4D6B41D6C693F3E4EB91D599B31A77312FE6C7D/9B49E8A5629D9980BFDCE06C8EE2B8F1C3F87C7C.PNG",
       "grad": [
-        "#3a2a0a",
-        "#150f04"
+        "#0a1e3a",
+        "#040b18"
       ],
       "trophies": [
         {
@@ -92196,8 +91054,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR34399_00_00E7D0C0915FE3ADE210AEDED17C2A37D2D55D54DA/D2173B2238F7490E0E6B98F4345A39107D572043.PNG",
       "grad": [
-        "#0a2a3a",
-        "#041018"
+        "#2a0a20",
+        "#10040c"
       ],
       "trophies": [
         {
@@ -93138,8 +91996,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR08130_00_00492266DBDE9B2A8426F97CEECC56DDA95D58D31A/2D49CEA4DEA1437B6D7CE0BEF34FC9326A6F5E7A.PNG",
       "grad": [
-        "#1a3a5c",
-        "#0a1e30"
+        "#1a3a0a",
+        "#0a1604"
       ],
       "trophies": [
         {
@@ -93459,8 +92317,8 @@
       "platformRaw": "PS4",
       "coverUrl": "https://image.api.playstation.com/trophy/np/NPWR27446_00_0049A2E6F27D6E5841D5E71FFEE51EE07645707C81/5EE43009D5A78DB201C7037C9A3D1B036F0E0BF9.PNG",
       "grad": [
-        "#3a0a0a",
-        "#220404"
+        "#3a2a0a",
+        "#150f04"
       ],
       "trophies": [
         {
