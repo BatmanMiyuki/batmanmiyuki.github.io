@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft IA - Architecte Ultime</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --mc-green: #5D8C3E;
+            --mc-brown: #8B6F47;
+            --mc-dark: #1a1a1a;
+            --mc-gray: #3a3a3a;
+            --mc-light: #c6c6c6;
+            --mc-blue: #3C5DA8;
+            --mc-gold: #FFD700;
+            --mc-red: #CC3333;
+        }
+        
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: var(--mc-dark);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        /* Background animé style Minecraft */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        
+        .floating-block {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-size: cover;
+            opacity: 0.15;
+            animation: float 20s infinite linear;
+            image-rendering: pixelated;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); }
+            100% { transform: translateY(-100px) rotate(360deg); }
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(180deg, #2d5a1e 0%, #1a3a0f 100%);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #4a7a2e;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 20px,
+                rgba(0,0,0,0.1) 20px,
+                rgba(0,0,0,0.1) 40px
+            );
+        }
+        
+        h1 {
+            font-size: 1.8em;
+            color: #FFD700;
+            text-shadow: 3px 3px 0 #8B6F47, 
+                         -1px -1px 0 #000,
+                         1px -1px 0 #000,
+                         -1px 1px 0 #000;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .subtitle {
+            font-size: 0.7em;
+            color: #90EE90;
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Navigation */
+        nav {
+            background: var(--mc-gray);
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            border-bottom: 3px solid #2a2a2a;
+        }
+        
+        .nav-btn {
+            background: linear-gradient(180deg, #6a6a6a 0%, #4a4a4a 100%);
+            border: 3px outset #8a8a8a;
+            color: white;
+            padding: 10px 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6em;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+        
+        .nav-btn:hover {
+            background: linear-gradient(180deg, #7a7a7a 0%, #5a5a5a 100%);
+        }
+        
+        .nav-btn:active, .nav-btn.active {
+            border-style: inset;
+            background: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%);
+        }
+        
+        /* Main Content */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Structure Generator */
+        .generator-container {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            border: 4px outset #4a4a4a;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #90EE90;
+            font-size: 0.7em;
+        }
+        
+        .mc-input {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 3px inset #4a4a4a;
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8em;
+        }
+        
+        .mc-input:focus {
+            outline: none;
+            border-color: #5D8C3E;
+        }
+        
+        .mc-select {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 3px inset #4a4a4a;
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7em;
+        }
+        
+        .mc-btn {
+            background: linear-gradient(180deg, #5D8C3E 0%, #3a5a2a 100%);
+            border: 3px outset #7aaa5e;
+            color: white;
+            padding: 15px 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.1s;
+            text-transform: uppercase;
+        }
+        
+        .mc-btn:hover {
+            background: linear-gradient(180deg, #6a9a4e 0%, #4a6a3a 100%);
+        }
+        
+        .mc-btn:active {
+            border-style: inset;
+        }
+        
+        .mc-btn.secondary {
+            background: linear-gradient(180deg, #8B6F47 0%, #6a5a3a 100%);
+            border-color: #aa8f67;
+        }
+        
+        .mc-btn.danger {
+            background: linear-gradient(180deg, #CC3333 0%, #992222 100%);
+            border-color: #ee5555;
+        }
+        
+        /* Quick Build Buttons */
+        .quick-builds {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .quick-build-card {
+            background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
+            border: 3px outset #5a5a5a;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .quick-build-card:hover {
+            transform: translateY(-3px);
+            border-color: #FFD700;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .quick-build-card .icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .quick-build-card .name {
+            font-size: 0.6em;
+            color: #FFD700;
+        }
+        
+        .quick-build-card .desc {
+            font-size: 0.5em;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        /* 3D Viewer */
+        .viewer-container {
+            background: #1a1a1a;
+            border: 4px outset #4a4a4a;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .viewer-canvas {
+            width: 100%;
+            height: 500px;
+            cursor: grab;
+        }
+        
+        .viewer-canvas:active {
+            cursor: grabbing;
+        }
+        
+        .viewer-controls {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .view-btn {
+            background: var(--mc-gray);
+            border: 2px outset #6a6a6a;
+            color: white;
+            padding: 8px 12px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.5em;
+            cursor: pointer;
+        }
+        
+        .view-btn.active {
+            background: var(--mc-green);
+            border-style: inset;
+        }
+        
+        /* Materials List */
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .material-item {
+            background: #2a2a2a;
+            border: 2px solid #4a4a4a;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .material-icon {
+            width: 32px;
+            height: 32px;
+            image-rendering: pixelated;
+        }
+        
+        .material-info {
+            flex: 1;
+        }
+        
+        .material-name {
+            font-size: 0.6em;
+            color: #FFD700;
+        }
+        
+        .material-count {
+            font-size: 0.7em;
+            color: #90EE90;
+        }
+        
+        /* Tutorial Steps */
+        .tutorial-steps {
+            counter-reset: step;
+        }
+        
+        .step {
+            background: linear-gradient(90deg, #2a2a2a 0%, #1a1a1a 100%);
+            border: 3px outset #4a4a4a;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 80px;
+        }
+        
+        .step::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--mc-green);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            border: 3px outset #7aaa5e;
+        }
+        
+        .step-title {
+            font-size: 0.7em;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+        
+        .step-desc {
+            font-size: 0.6em;
+            color: #c6c6c6;
+            line-height: 1.8;
+        }
+        
+        .step-blocks {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border: 2px inset #4a4a4a;
+        }
+        
+        .step-blocks-title {
+            font-size: 0.5em;
+            color: #90EE90;
+            margin-bottom: 5px;
+        }
+        
+        /* Database Search */
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #2a2a2a;
+            border: 3px outset #4a4a4a;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+        
+        .search-results.active {
+            display: block;
+        }
+        
+        .search-item {
+            padding: 12px;
+            border-bottom: 1px solid #4a4a4a;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-item:hover {
+            background: #3a3a3a;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            background: #3a3a3a;
+            border: 2px outset #5a5a5a;
+            padding: 8px 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6em;
+            color: #999;
+            cursor: pointer;
+        }
+        
+        .tab.active {
+            background: var(--mc-green);
+            color: white;
+            border-style: inset;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Stats */
+        .stats-bar {
+            background: linear-gradient(90deg, var(--mc-green) 0%, #3a5a2a 100%);
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+            border: 3px outset #7aaa5e;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.2em;
+            color: #FFD700;
+        }
+        
+        .stat-label {
+            font-size: 0.5em;
+            color: #c6c6c6;
+            margin-top: 5px;
+        }
+        
+        /* Commands Section */
+        .command-card {
+            background: #2a2a2a;
+            border: 2px solid #4a4a4a;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .command-syntax {
+            background: #1a1a1a;
+            padding: 10px;
+            border: 2px inset #4a4a4a;
+            font-size: 0.7em;
+            color: #90EE90;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        
+        .command-desc {
+            font-size: 0.6em;
+            color: #c6c6c6;
+            line-height: 1.8;
+        }
+        
+        /* Items Grid */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        
+        .item-card {
+            background: #2a2a2a;
+            border: 2px outset #4a4a4a;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .item-card:hover {
+            transform: scale(1.05);
+            border-color: #FFD700;
+        }
+        
+        .item-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+        
+        .item-name {
+            font-size: 0.5em;
+            color: #FFD700;
+        }
+        
+        .item-id {
+            font-size: 0.4em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #4a4a4a;
+            border: 2px outset #6a6a6a;
+        }
+        
+        /* Export Section */
+        .export-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        /* Chat IA */
+        .chat-container {
+            background: #1a1a1a;
+            border: 4px outset #4a4a4a;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 5px;
+        }
+        
+        .message.user {
+            background: var(--mc-blue);
+            margin-left: 20%;
+            border: 2px outset #5a7aba;
+        }
+        
+        .message.ai {
+            background: var(--mc-green);
+            margin-right: 20%;
+            border: 2px outset #7aaa5e;
+        }
+        
+        .message-header {
+            font-size: 0.5em;
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+        
+        .message-text {
+            font-size: 0.6em;
+            line-height: 1.8;
+        }
+        
+        .chat-input-area {
+            display: flex;
+            padding: 15px;
+            gap: 10px;
+            border-top: 3px solid #4a4a4a;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            background: #2a2a2a;
+            border: 3px inset #4a4a4a;
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7em;
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+        
+        /* Schema Display */
+        .schema-container {
+            background: #0a0a0a;
+            border: 4px inset #4a4a4a;
+            padding: 20px;
+            overflow: auto;
+        }
+        
+        .layer-schema {
+            margin-bottom: 20px;
+        }
+        
+        .layer-title {
+            font-size: 0.7em;
+            color: #FFD700;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #2a2a2a;
+            border: 2px outset #4a4a4a;
+        }
+        
+        .block-grid {
+            display: inline-grid;
+            gap: 1px;
+            background: #333;
+            padding: 1px;
+        }
+        
+        .block-cell {
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.4em;
+            border: 1px solid #444;
+        }
+        
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--mc-green);
+            color: white;
+            padding: 15px 25px;
+            border: 3px outset #7aaa5e;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6em;
+            z-index: 1000;
+            animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s;
+            animation-fill-mode: forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); }
+            to { transform: translateX(100%); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.2em;
+            }
+            
+            .nav-btn {
+                font-size: 0.5em;
+                padding: 8px 12px;
+            }
+            
+            .quick-builds {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a1a;
+            color: #FFD700;
+            padding: 8px 12px;
+            font-size: 0.5em;
+            white-space: nowrap;
+            border: 2px outset #4a4a4a;
+            display: none;
+            z-index: 100;
+        }
+        
+        .tooltip:hover::after {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation" id="bgAnimation"></div>
+    
+    <header>
+        <h1>⛏️ MINECRAFT IA - ARCHITECTE ULTIME ⛏️</h1>
+        <p class="subtitle">L'intelligence artificielle qui connaît ABSOLUMENT tout de Minecraft !</p>
+    </header>
+    
+    <nav>
+        <button class="nav-btn active" data-section="generator">🏗️ Générateur</button>
+        <button class="nav-btn" data-section="database">📚 Base de Données</button>
+        <button class="nav-btn" data-section="commands">⌨️ Commandes</button>
+        <button class="nav-btn" data-section="chat">💬 Chat IA</button>
+        <button class="nav-btn" data-section="recipes">📋 Recettes</button>
+        <button class="nav-btn" data-section="biomes">🌍 Biomes</button>
+    </nav>
+    
+    <main>
+        <!-- Section Générateur -->
+        <section id="generator" class="section active">
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalBlocks">0</div>
+                    <div class="stat-label">Blocs nécessaires</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="uniqueBlocks">0</div>
+                    <div class="stat-label">Types de blocs</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="buildTime">~0 min</div>
+                    <div class="stat-label">Temps estimé</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="buildSize">0x0x0</div>
+                    <div class="stat-label">Dimensions</div>
+                </div>
+            </div>
+            
+            <div class="generator-container">
+                <h2 style="color: #FFD700; margin-bottom: 20px; font-size: 0.9em;">🎯 QUE VEUX-TU CONSTRUIRE ?</h2>
+                
+                <div class="input-group">
+                    <label>Décris ta structure :</label>
+                    <input type="text" class="mc-input" id="buildInput" placeholder="Ex: Un McDonald's, un château médiéval, une base secrète souterraine...">
+                </div>
+                
+                <div class="input-group">
+                    <label>Taille souhaitée :</label>
+                    <select class="mc-select" id="buildSize-select">
+                        <option value="small">Petit (16x16x16)</option>
+                        <option value="medium" selected>Moyen (32x32x32)</option>
+                        <option value="large">Grand (48x48x48)</option>
+                        <option value="huge">Énorme (64x64x64)</option>
+                        <option value="custom">Personnalisé</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label>Style architectural :</label>
+                    <select class="mc-select" id="buildStyle">
+                        <option value="realistic">Réaliste</option>
+                        <option value="fantasy">Fantaisie</option>
+                        <option value="medieval">Médiéval</option>
+                        <option value="modern">Moderne</option>
+                        <option value="japanese">Japonais</option>
+                        <option value="steampunk">Steampunk</option>
+                        <option value="nether">Nether</option>
+                        <option value="end">End</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="mc-btn" onclick="generateBuild()">🚀 GÉNÉRER LA STRUCTURE</button>
+                    <button class="mc-btn secondary" onclick="randomBuild()">🎲 CONSTRUCTION ALÉATOIRE</button>
+                    <button class="mc-btn danger" onclick="clearBuild()">🗑️ EFFACER</button>
+                </div>
+            </div>
+            
+            <h3 style="color: #FFD700; margin: 20px 0 15px; font-size: 0.8em;">⚡ CONSTRUCTIONS RAPIDES</h3>
+            <div class="quick-builds">
+                <div class="quick-build-card" onclick="quickBuild('mcdonalds')">
+                    <div class="icon">🍔</div>
+                    <div class="name">McDonald's</div>
+                    <div class="desc">Restaurant fast-food complet</div>
+                </div>
+                <div class="quick-build-card" onclick="quickBuild('castle')">
+                    <div class="icon">🏰</div>
+                    <div class="name">Château Fort</div>
+                    <div class="desc">Château médiéval avec douves</div>
+                </div>
+                <div class="quick-build-card" onclick="quickBuild('skyscraper')">
+                    <div class="icon">🏙️</div>
+                    <div class="name">Gratte-ciel</div>
+                    <div class="desc">Immeuble moderne 20 étages</div>
+                </div>
+                <div class="quick-build-card" onclick="quickBuild('treehouse')">
+                    <div class="icon">🌳</div>
+                    <div class="name">Cabane dans l'arbre</div>
+                    <div class="desc">Maison dans un géant arbre</div>
+                </div>
+                <div class="quick-build-card" onclick="quickBuild('pirate_ship')">
+                    <div class="icon">🏴‍☠️</div>
+                    <div class="name">Bateau Pirate</div>
+                    <div class="desc">Navire pirate détaillé</div>
+                </div>
+                <div class="quick-build-card" onclick="quickBuild('volcano_lair')">
+                    <div class="icon">🌋</div>
+                    <div class="name">Base Volcanique</div>
+                    <div class="desc">Base secrète dans un volcan</div>
+                </div>
+                <div class="quick-build-card" onclick="quickBuild('futuristic_house')">
+                    <div class="icon">🏠</div>
+                    <div class="name">Maison Futuriste</div>
+                    <div class="desc">Maison high-tech moderne</div>
+                </div>
+                <div class="quick-build-card" onclick="quickBuild('church')">
+                    <div class="icon">⛪</div>
+                    <div class="name">Église</div>
+                    <div class="desc">Église avec clocher</div>
+                </div>
+            </div>
+            
+            <!-- Visualisation 3D -->
+            <div class="viewer-container" id="viewerContainer" style="display: none;">
+                <canvas id="viewerCanvas" class="viewer-canvas"></canvas>
+                <div class="viewer-controls">
+                    <button class="view-btn active" data-view="perspective" onclick="setView('perspective')">Perspective</button>
+                    <button class="view-btn" data-view="front" onclick="setView('front')">Face</button>
+                    <button class="view-btn" data-view="side" onclick="setView('side')">Côté</button>
+                    <button class="view-btn" data-view="top" onclick="setView('top')">Dessus</button>
+                    <button class="view-btn" data-view="interior" onclick="setView('interior')">Intérieur</button>
+                    <button class="view-btn" data-view="rotate360" onclick="setView('rotate360')">360°</button>
+                </div>
+            </div>
+            
+            <!-- Matériaux nécessaires -->
+            <div id="materialsSection" style="display: none;">
+                <h3 style="color: #FFD700; margin: 20px 0 15px; font-size: 0.8em;">📦 MATÉRIAUX NÉCESSAIRES</h3>
+                <div class="materials-grid" id="materialsList"></div>
+                
+                <div class="export-options">
+                    <button class="mc-btn" onclick="exportMaterials()">📋 Copier la liste</button>
+                    <button class="mc-btn secondary" onclick="exportSchematic()">💾 Exporter Schéma</button>
+                    <button class="mc-btn secondary" onclick="shareBuild()">📤 Partager</button>
+                </div>
+            </div>
+            
+            <!-- Tutoriel pas-à-pas -->
+            <div id="tutorialSection" style="display: none;">
+                <h3 style="color: #FFD700; margin: 20px 0 15px; font-size: 0.8em;">📖 TUTORIEL PAS-À-PAS</h3>
+                
+                <div class="tabs">
+                    <button class="tab active" data-tab="overview" onclick="setTab('overview')">Vue d'ensemble</button>
+                    <button class="tab" data-tab="stepbystep" onclick="setTab('stepbystep')">Étapes détaillées</button>
+                    <button class="tab" data-tab="schema" onclick="setTab('schema')">Schéma par couche</button>
+                    <button class="tab" data-tab="tips" onclick="setTab('tips')">Astuces</button>
+                </div>
+                
+                <div id="tab-overview" class="tab-content active">
+                    <div id="overviewContent"></div>
+                </div>
+                
+                <div id="tab-stepbystep" class="tab-content">
+                    <div class="tutorial-steps" id="tutorialSteps"></div>
+                </div>
+                
+                <div id="tab-schema" class="tab-content">
+                    <div class="schema-container" id="schemaContent"></div>
+                </div>
+                
+                <div id="tab-tips" class="tab-content">
+                    <div id="tipsContent"></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section Base de Données -->
+        <section id="database" class="section">
+            <h2 style="color: #FFD700; margin-bottom: 20px; font-size: 0.9em;">📚 BASE DE DONNÉES MINECRAFT COMPLÈTE</h2>
+            
+            <div class="search-container">
+                <input type="text" class="mc-input" id="dbSearch" placeholder="🔍 Rechercher un item, bloc, entité..." oninput="searchDatabase(this.value)">
+                <div class="search-results" id="searchResults"></div>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="setDbTab('blocks')">🧱 Blocs (900+)</button>
+                <button class="tab" onclick="setDbTab('items')">⚔️ Items (1400+)</button>
+                <button class="tab" onclick="setDbTab('mobs')">👾 Mobs (73+)</button>
+                <button class="tab" onclick="setDbTab('enchantments')">✨ Enchantements</button>
+                <button class="tab" onclick="setDbTab('effects')">🧪 Effets</button>
+                <button class="tab" onclick="setDbTab('structures')">🏗️ Structures</button>
+            </div>
+            
+            <div id="db-blocks" class="tab-content active">
+                <div class="items-grid" id="blocksGrid"></div>
+            </div>
+            <div id="db-items" class="tab-content">
+                <div class="items-grid" id="itemsGrid"></div>
+            </div>
+            <div id="db-mobs" class="tab-content">
+                <div id="mobsContent"></div>
+            </div>
+            <div id="db-enchantments" class="tab-content">
+                <div id="enchantmentsContent"></div>
+            </div>
+            <div id="db-effects" class="tab-content">
+                <div id="effectsContent"></div>
+            </div>
+            <div id="db-structures" class="tab-content">
+                <div id="structuresContent"></div>
+            </div>
+        </section>
+        
+        <!-- Section Commandes -->
+        <section id="commands" class="section">
+            <h2 style="color: #FFD700; margin-bottom: 20px; font-size: 0.9em;">⌨️ TOUTES LES COMMANDES MINECRAFT</h2>
+            
+            <div class="search-container">
+                <input type="text" class="mc-input" placeholder="🔍 Rechercher une commande..." oninput="searchCommands(this.value)">
+            </div>
+            
+            <div id="commandsList"></div>
+        </section>
+        
+        <!-- Section Chat IA -->
+        <section id="chat" class="section">
+            <h2 style="color: #FFD700; margin-bottom: 20px; font-size: 0.9em;">💬 CHAT AVEC L'IA MINECRAFT</h2>
+            
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message ai">
+                        <div class="message-header">🤖 IA Minecraft</div>
+                        <div class="message-text">
+                            Salut ! Je suis ton assistant IA Minecraft ultra-intelligent ! 🎮<br><br>
+                            Je connais TOUT sur Minecraft :<br>
+                            • Tous les blocs et items (900+ blocs, 1400+ items)<br>
+                            • Toutes les commandes (/give, /tp, /effect...)<br>
+                            • Tous les mobs et leurs comportements<br>
+                            • Tous les enchantements et effets<br>
+                            • Toutes les recettes de craft<br>
+                            • Tous les biomes et structures<br><br>
+                            Pose-moi n'importe quelle question ou demande-moi de te créer un bâtiment !
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Pose ta question..." onkeypress="if(event.key==='Enter')sendChat()">
+                    <button class="mc-btn" onclick="sendChat()">📤</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section Recettes -->
+        <section id="recipes" class="section">
+            <h2 style="color: #FFD700; margin-bottom: 20px; font-size: 0.9em;">📋 RECETTES DE CRAFT</h2>
+            
+            <div class="search-container">
+                <input type="text" class="mc-input" placeholder="🔍 Rechercher une recette..." oninput="searchRecipes(this.value)">
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="setRecipeTab('all')">Toutes</button>
+                <button class="tab" onclick="setRecipeTab('tools')">Outils</button>
+                <button class="tab" onclick="setRecipeTab('weapons')">Armes</button>
+                <button class="tab" onclick="setRecipeTab('armor')">Armures</button>
+                <button class="tab" onclick="setRecipeTab('redstone')">Redstone</button>
+                <button class="tab" onclick="setRecipeTab('decoration')">Décoration</button>
+            </div>
+            
+            <div id="recipesList" class="items-grid"></div>
+        </section>
+        
+        <!-- Section Biomes -->
+        <section id="biomes" class="section">
+            <h2 style="color: #FFD700; margin-bottom: 20px; font-size: 0.9em;">🌍 BIOMES ET STRUCTURES</h2>
+            
+            <div id="biomesContent"></div>
+        </section>
+    </main>
+    
+    <script src="data.js"></script>
+    <script src="generator.js"></script>
+    <script src="viewer3d.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
