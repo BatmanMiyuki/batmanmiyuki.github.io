@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-16T22:20:39.268Z",
+  "generatedAt": "2026-07-17T19:03:12.528Z",
   "accounts": [
     {
       "key": "batman",
       "label": "BATMAN_Miyukii",
       "version": 1,
       "locale": "fr-FR",
-      "generatedAt": "2026-07-16T22:20:39.267Z",
+      "generatedAt": "2026-07-17T19:03:12.527Z",
       "profile": {
         "onlineId": "BATMAN_Miyukii",
         "avatarUrl": "",
@@ -15,9 +15,24 @@
       },
       "playStats": {
         "totalTitles": 213,
-        "totalDurationSeconds": 21214853,
-        "totalPlayCount": 5132,
+        "totalDurationSeconds": 21241210,
+        "totalPlayCount": 5140,
         "games": [
+          {
+            "titleId": "PPSA17221_00",
+            "conceptId": 212779,
+            "name": "Minecraft",
+            "originalName": "Minecraft",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202407/0401/670c294ded3baf4fa11068db2ec6758c63f7daeb266a35a1.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 125,
+            "playDuration": "PT99H36M8S",
+            "durationSeconds": 358568,
+            "firstPlayedDateTime": "2024-10-29T16:58:27.690000Z",
+            "lastPlayedDateTime": "2026-07-17T17:58:54.620000Z"
+          },
           {
             "titleId": "CUSA07027_00",
             "conceptId": 228418,
@@ -27,11 +42,41 @@
             "platform": "PS4",
             "category": "ps4_game",
             "service": "none(purchased)",
-            "playCount": 33,
-            "playDuration": "PT22H22M2S",
-            "durationSeconds": 80522,
+            "playCount": 36,
+            "playDuration": "PT23H31M27S",
+            "durationSeconds": 84687,
             "firstPlayedDateTime": "2025-01-25T13:29:26.430000Z",
-            "lastPlayedDateTime": "2026-07-16T21:34:30.970000Z"
+            "lastPlayedDateTime": "2026-07-17T12:41:41.040000Z"
+          },
+          {
+            "titleId": "CUSA11751_00",
+            "conceptId": 231948,
+            "name": "Fallout Shelter",
+            "originalName": "Fallout Shelter",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202009/2817/QVvcRaltIkDBdtTjBbpsDeIQ.png",
+            "platform": "PS4",
+            "category": "ps4_game",
+            "service": "none(purchased)",
+            "playCount": 98,
+            "playDuration": "PT52H37M1S",
+            "durationSeconds": 189421,
+            "firstPlayedDateTime": "2024-07-11T11:11:00.110000Z",
+            "lastPlayedDateTime": "2026-07-17T11:19:00.380000Z"
+          },
+          {
+            "titleId": "PPSA10990_00",
+            "conceptId": 223118,
+            "name": "Roblox",
+            "originalName": "Roblox",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202604/0801/f2bdf0b6807d0e43c432e4de00f444df6c97732065904006.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 206,
+            "playDuration": "PT503H50M59S",
+            "durationSeconds": 1813859,
+            "firstPlayedDateTime": "2026-04-17T11:18:57.630000Z",
+            "lastPlayedDateTime": "2026-07-17T10:33:33.460000Z"
           },
           {
             "titleId": "CUSA02979_00",
@@ -62,21 +107,6 @@
             "durationSeconds": 4718,
             "firstPlayedDateTime": "2025-03-16T00:19:26.260000Z",
             "lastPlayedDateTime": "2026-07-16T13:29:10.090000Z"
-          },
-          {
-            "titleId": "PPSA10990_00",
-            "conceptId": 223118,
-            "name": "Roblox",
-            "originalName": "Roblox",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202604/0801/f2bdf0b6807d0e43c432e4de00f444df6c97732065904006.png",
-            "platform": "PS5",
-            "category": "ps5_native_game",
-            "service": "none(purchased)",
-            "playCount": 205,
-            "playDuration": "PT503H8M27S",
-            "durationSeconds": 1811307,
-            "firstPlayedDateTime": "2026-04-17T11:18:57.630000Z",
-            "lastPlayedDateTime": "2026-07-16T08:08:09.450000Z"
           },
           {
             "titleId": "CUSA15138_00",
@@ -214,21 +244,6 @@
             "lastPlayedDateTime": "2026-07-12T21:12:06.730000Z"
           },
           {
-            "titleId": "CUSA11751_00",
-            "conceptId": 231948,
-            "name": "Fallout Shelter",
-            "originalName": "Fallout Shelter",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202009/2817/QVvcRaltIkDBdtTjBbpsDeIQ.png",
-            "platform": "PS4",
-            "category": "ps4_game",
-            "service": "none(purchased)",
-            "playCount": 95,
-            "playDuration": "PT51H57M23S",
-            "durationSeconds": 187043,
-            "firstPlayedDateTime": "2024-07-11T11:11:00.110000Z",
-            "lastPlayedDateTime": "2026-07-12T16:25:32.690000Z"
-          },
-          {
             "titleId": "CUSA05169_00",
             "conceptId": 222227,
             "name": "Clicker Heroes",
@@ -347,21 +362,6 @@
             "durationSeconds": 24757,
             "firstPlayedDateTime": "2024-12-10T19:03:35.670000Z",
             "lastPlayedDateTime": "2026-06-27T21:24:50.650000Z"
-          },
-          {
-            "titleId": "PPSA17221_00",
-            "conceptId": 212779,
-            "name": "Minecraft",
-            "originalName": "Minecraft",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202407/0401/670c294ded3baf4fa11068db2ec6758c63f7daeb266a35a1.png",
-            "platform": "PS5",
-            "category": "ps5_native_game",
-            "service": "none(purchased)",
-            "playCount": 124,
-            "playDuration": "PT94H48M26S",
-            "durationSeconds": 341306,
-            "firstPlayedDateTime": "2024-10-29T16:58:27.690000Z",
-            "lastPlayedDateTime": "2026-06-27T21:03:37.480000Z"
           },
           {
             "titleId": "PPSA27151_00",
