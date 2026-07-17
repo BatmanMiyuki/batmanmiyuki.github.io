@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Plan de Ville Minecraft — Outil de Planification</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#111;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden;height:100vh}
+  
+  /* Topbar */
+  .topbar{position:fixed;top:0;left:0;right:0;height:48px;background:#1a1a1a;border-bottom:1px solid #333;display:flex;align-items:center;padding:0 16px;z-index:100;gap:12px}
+  .topbar h1{font-size:14px;color:#FFD700;white-space:nowrap}
+  .topbar .sep{width:1px;height:24px;background:#333}
+  .topbar .info{font-size:11px;color:#888;font-family:monospace}
+  .tools{display:flex;gap:4px}
+  .tools button{background:#2a2a2a;border:1px solid #444;color:#ccc;padding:6px 12px;font-size:11px;cursor:pointer;transition:.15s;font-family:inherit}
+  .tools button:hover{border-color:#FFD700;color:#FFD700}
+  .tools button.active{background:#FFD700;color:#111;border-color:#FFD700}
+  .legend-btn{margin-left:auto;background:none;border:1px solid #444;color:#888;padding:6px 12px;font-size:11px;cursor:pointer;font-family:inherit}
+  .legend-btn:hover{border-color:#FFD700;color:#FFD700}
+  
+  /* Canvas */
+  #canvas{position:fixed;top:48px;left:0;right:0;bottom:0;cursor:grab}
+  #canvas.dragging{cursor:grabbing}
+  
+  /* Minimap */
+  .minimap{position:fixed;bottom:16px;right:16px;width:200px;height:150px;background:#1a1a1a;border:2px solid #444;border-radius:6px;z-index:50;overflow:hidden}
+  .minimap canvas{width:100%;height:100%}
+  .minimap .label{position:absolute;top:4px;left:6px;font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.05em}
+  
+  /* Legend panel */
+  .legend-panel{position:fixed;top:48px;right:0;width:260px;bottom:0;background:#1a1a1a;border-left:1px solid #333;z-index:90;transform:translateX(100%);transition:.2s;overflow-y:auto;padding:16px}
+  .legend-panel.show{transform:translateX(0)}
+  .legend-panel h3{font-size:12px;color:#FFD700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
+  .leg-item{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px}
+  .leg-swatch{width:16px;height:16px;border:1px solid #555;border-radius:2px;flex-shrink:0}
+  .leg-cat{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.04em;margin:16px 0 8px;border-bottom:1px solid #333;padding-bottom:4px}
+  
+  /* Tooltip */
+  .tooltip{position:fixed;background:#222;border:1px solid #FFD700;padding:8px 12px;border-radius:4px;font-size:11px;pointer-events:none;z-index:200;display:none;max-width:220px}
+  .tooltip .tt-name{font-weight:700;color:#FFD700;margin-bottom:2px}
+  .tooltip .tt-info{color:#aaa}
+  
+  /* Info panel */
+  .info-panel{position:fixed;top:48px;left:0;width:280px;bottom:0;background:#1a1a1a;border-right:1px solid #333;z-index:90;transform:translateX(-100%);transition:.2s;overflow-y:auto;padding:16px}
+  .info-panel.show{transform:translateX(0)}
+  .info-panel h3{font-size:12px;color:#87CEEB;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
+  .info-panel .stat{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #2a2a2a;font-size:12px}
+  .info-panel .stat b{color:#FFD700}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>🏙️ Plan de Ville Minecraft</h1>
+  <div class="sep"></div>
+  <div class="tools">
+    <button class="active" data-tool="pan" onclick="setTool('pan')">🖐️ Main</button>
+    <button data-tool="inspect" onclick="setTool('inspect')">🔍 Inspecter</button>
+  </div>
+  <div class="sep"></div>
+  <span class="info" id="coords">X: 0  Z: 0</span>
+  <span class="info" id="zoomLevel">Zoom: 100%</span>
+  <div class="sep"></div>
+  <button class="legend-btn" onclick="toggleLegend()">📋 Légende</button>
+  <button class="legend-btn" onclick="toggleInfo()">📊 Infos</button>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<div class="minimap">
+  <div class="label">Mini-carte</div>
+  <canvas id="minimap"></canvas>
+</div>
+
+<div class="tooltip" id="tooltip">
+  <div class="tt-name" id="ttName"></div>
+  <div class="tt-info" id="ttInfo"></div>
+</div>
+
+<div class="legend-panel" id="legendPanel">
+  <h3>Légende</h3>
+  <div class="leg-cat">Quartiers</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#6a6a8a"></div>Centre-Ville</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#4a7a5a"></div>Quartier Moderne</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#8B7355"></div>Quartier Médiéval</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#7a5a8a"></div>Quartier Chic</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#5a8a5a"></div>Quartier Sportif</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#5a5a5a"></div>Zone Industrielle</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#3a5a7a"></div>Zone Portuaire</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#2a8a3a"></div>Parc Central</div>
+  <div class="leg-cat">Routes</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#4a4a4a"></div>Grand Boulevard (8 blocs)</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#555"></div>Avenue (6 blocs)</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#5a5a5a"></div>Rue (4 blocs)</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#666;border-style:dashed"></div>Rocade</div>
+  <div class="leg-cat">Bâtiments</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#8a8aaa"></div>Hôtel de ville</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#aaa"></div>Église</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#C07040"></div>Commerce</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#A08060"></div>Maison</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#5a5a5a"></div>Entrepôt / Industriel</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#4a8aaa"></div>Eau</div>
+  <div class="leg-cat">Divers</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#FFD700;border-radius:50%"></div>Point d'intérêt</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#2a6a2a;border-radius:50%"></div>Arbre</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#FFA500;border-radius:50%"></div>Lampadaire</div>
+</div>
+
+<div class="info-panel" id="infoPanel">
+  <h3>📊 Statistiques de la ville</h3>
+  <div class="stat"><span>Emprise totale</span><b id="sFootprint">500 × 400</b></div>
+  <div class="stat"><span>Nombre de quartiers</span><b>8</b></div>
+  <div class="stat"><span>Bâtiments prévus</span><b id="sBuildings">—</b></div>
+  <div class="stat"><span>Routes (blocs)</span><b id="sRoads">—</b></div>
+  <div class="stat"><span>Arbres</span><b id="sTrees">—</b></div>
+  <div class="stat"><span>Lampadaires</span><b id="sLamps">—</b></div>
+  <div class="stat"><span>Total blocs estimé</span><b id="sTotal">—</b></div>
+  <div class="stat"><span>Temps estimé</span><b>~18h</b></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// PLAN DE VILLE MINECRAFT — MOTEUR 2D
+// ═══════════════════════════════════════
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const miniCanvas = document.getElementById('minimap');
+const miniCtx = miniCanvas.getContext('2d');
+
+// Camera state
+let cam = { x: 0, y: 0, zoom: 4 }; // zoom = pixels per block
+let dragging = false;
+let lastMX = 0, lastMY = 0;
+let currentTool = 'pan';
+let hoveredBuilding = null;
+
+// ═══ DONNÉES DE LA VILLE ═══
+// Tout est en coordonnées blocs (x, z) — y = hauteur ignorée pour la vue du dessus
+// Origine (0,0) = coin nord-ouest
+
+const BLOCK = 1; // 1 unit = 1 bloc Minecraft
+
+// Quartiers (zones rectangulaires)
+const quarters = [
+  { id:'industrial', name:'Zone Industrielle', x:0, z:0, w:500, h:80, color:'#5a5a5a', style:'Steampunk' },
+  { id:'medieval', name:'Quartier Médiéval', x:0, z:100, w:200, h:150, color:'#8B7355', style:'Médiéval' },
+  { id:'central_parc', name:'Parc Central', x:210, z:100, w:80, h:80, color:'#2a8a3a', style:'Nature' },
+  { id:'modern', name:'Quartier Moderne', x:300, z:100, w:200, h:150, color:'#4a7a5a', style:'Moderne' },
+  { id:'centre', name:'Centre-Ville', x:50, z:270, w:400, h:120, color:'#6a6a8a', style:'Classique' },
+  { id:'chic', name:'Quartier Chic', x:300, z:410, w:150, h:100, color:'#7a5a8a', style:'Élégant' },
+  { id:'sport', name:'Quartier Sportif', x:50, z:410, w:200, h:100, color:'#5a8a5a', style:'Sport' },
+  { id:'port', name:'Zone Portuaire', x:0, z:530, w:500, h:70, color:'#3a5a7a', style:'Maritime' },
+];
+
+// Routes principales
+const roads = [
+  // Grand Boulevard N-S (8 blocs large)
+  { name:'Grand Boulevard', x:246, z:0, w:8, h:500, main:true },
+  // Boulevard Est (6 blocs)
+  { name:'Boulevard de l\'Est', x:0, z:265, w:500, h:6, main:true },
+  // Boulevard Sud (6 blocs)
+  { name:'Boulevard du Sud', x:0, z:395, w:500, h:6, main:true },
+  // Rocade
+  { name:'Rocade', x:-10, z:-10, w:520, h:620, ring:true },
+  // Rues secondaires verticales
+  { name:'Rue de la Paix', x:80, z:100, w:4, h:300 },
+  { name:'Rue du Commerce', x:160, z:100, w:4, h:300 },
+  { name:'Rue des Artisans', x:340, z:100, w:4, h:300 },
+  { name:'Rue Victor Hugo', x:420, z:100, w:4, h:300 },
+  // Rues secondaires horizontales
+  { name:'Avenue des Fleurs', x:50, z:180, w:450, h:4 },
+  { name:'Avenue du Marché', x:50, z:340, w:450, h:4 },
+  { name:'Rue du Port', x:50, z:480, w:450, h:4 },
+];
+
+// Bâtiments
+const buildings = [
+  // ── CENTRE-VILLE ──
+  { name:'Hôtel de Ville', x:220, z:280, w:60, h:50, color:'#8a8aaa', cat:'public', desc:'Dôme doré, colonnes, place intérieure', hMax:18 },
+  { name:'Place Centrale', x:230, z:335, w:40, h:35, color:'#7a7a8a', cat:'place', desc:'Fontaine monumentale au centre', hMax:3 },
+  { name:'Fontaine', x:243, z:346, w:14, h:14, color:'#4a8aaa', cat:'deco', desc:'Fontaine dorée avec statue', hMax:5 },
+  { name:'Tour de l\'Horloge', x:248, z:272, w:6, h:6, color:'#8a8a8a', cat:'public', desc:'Tour de 25 blocs de haut avec horloge', hMax:25 },
+  { name:'Boulangerie', x:100, z:280, w:20, h:18, color:'#C07040', cat:'commerce', desc:'Pain, gâteaux, viennoiseries', hMax:6 },
+  { name:'Librairie', x:100, z:302, w:20, h:18, color:'#7070A0', cat:'commerce', desc:'Livres, cartes, parchemins', hMax:6 },
+  { name:'Armurerie', x:130, z:280, w:22, h:18, color:'#A07070', cat:'commerce', desc:'Épées, armures, boucliers', hMax:6 },
+  { name:'Alchimiste', x:130, z:302, w:22, h:18, color:'#70A070', cat:'commerce', desc:'Potions, ingrédients, chaudron', hMax:6 },
+  { name:'Banque', x:380, z:280, w:30, h:22, color:'#DAA520', cat:'commerce', desc:'Coffre-fort souterrain, colonnes', hMax:10 },
+  { name:'Restaurant "Le Gourmet"', x:380, z:306, w:28, h:20, color:'#CD853F', cat:'commerce', desc:'Cuisine fine, terrasse', hMax:6 },
+  { name:'Hôtel "Le Grand"', x:416, z:280, w:28, h:22, color:'#8FBC8F', cat:'commerce', desc:'20 chambres, réception luxueuse', hMax:12 },
+  { name:'Supérette', x:416, z:306, w:26, h:20, color:'#BDB76B', cat:'commerce', desc:'Tout pour la vie quotidienne', hMax:5 },
+  { name:'Café "Chez Marcel"', x:200, z:345, w:18, h:14, color:'#8B6F47', cat:'commerce', desc:'Terrasse avec vue sur la fontaine', hMax:4 },
+  { name:'Pharmacie', x:200, z:280, w:16, h:16, color:'#90EE90', cat:'commerce', desc:'Potions de soin', hMax:5 },
+
+  // ── QUARTIER MÉDIÉVAL ──
+  { name:'Taverne "Le Dragon d\'Or"', x:20, z:120, w:30, h:22, color:'#8B7355', cat:'commerce', desc:'Bière, musique, chambres', hMax:8 },
+  { name:'Forge du Forgeron', x:60, z:120, w:20, h:18, color:'#5a5a5a', cat:'commerce', desc:'Réparation, fabrication', hMax:6 },
+  { name:'Église Saint-Martin', x:100, z:120, w:25, h:35, color:'#aaa', cat:'public', desc:'Clocher de 30 blocs, vitraux', hMax:30 },
+  { name:'Marché Couvert', x:20, z:200, w:40, h:25, color:'#7a6a5a', cat:'commerce', desc:'Échoppes de vendeurs', hMax:5 },
+  { name:'Écuries Royales', x:120, z:200, w:30, h:20, color:'#6a5a4a', cat:'public', desc:'Chevaux, calèches', hMax:6 },
+  { name:'Puits du Village', x:95, z:170, w:8, h:8, color:'#4a8aaa', cat:'deco', desc:'Point de rassemblement', hMax:3 },
+  { name:'Maison du Bailli', x:60, z:150, w:22, h:18, color:'#A08060', cat:'maison', desc:'Plus grande maison du quartier', hMax:8 },
+  { name:'Maison Colombages 1', x:20, z:150, w:16, h:14, color:'#A08060', cat:'maison', desc:'Maison traditionnelle à colombages', hMax:6 },
+  { name:'Maison Colombages 2', x:20, z:170, w:16, h:14, color:'#907050', cat:'maison', desc:'Maison traditionnelle', hMax:6 },
+  { name:'Maison Colombages 3', x:40, z:150, w:16, h:14, color:'#A08060', cat:'maison', desc:'Avec petit jardin', hMax:6 },
+  { name:'Maison Colombages 4', x:140, z:120, w:16, h:14, color:'#907050', cat:'maison', desc:'Près de la forge', hMax:6 },
+  { name:'Maison Colombages 5', x:140, z:140, w:16, h:14, color:'#A08060', cat:'maison', desc:'Vue sur le rempart', hMax:6 },
+  { name:'Maison Colombages 6', x:160, z:120, w:16, h:14, color:'#907050', cat:'maison', desc:'Couleur chaude', hMax:6 },
+  { name:'Maison Colombages 7', x:160, z:150, w:16, h:14, color:'#A08060', cat:'maison', desc:'Jardin potager', hMax:6 },
+  { name:'Maison Colombages 8', x:140, z:170, w:16, h:14, color:'#907050', cat:'maison', desc:'Près du puits', hMax:6 },
+  { name:'Maison Colombages 9', x:160, z:170, w:16, h:14, color:'#A08060', cat:'maison', desc:'Petite tour', hMax:7 },
+  { name:'Rempart Nord', x:0, z:95, w:200, h:4, color:'#8a7a6a', cat:'public', desc:'Mur avec créneaux', hMax:8 },
+  { name:'Rempart Est', x:196, z:95, w:4, h:160, color:'#8a7a6a', cat:'public', desc:'Mur avec créneaux', hMax:8 },
+  { name:'Porte Médiévale', x:118, z:246, w:16, h:6, color:'#4a3a2a', cat:'public', desc:'Porte d\'entrée du quartier', hMax:10 },
+
+  // ── QUARTIER MODERNE ──
+  { name:'Villa Moderne 1', x:310, z:110, w:20, h:16, color:'#CFD5D6', cat:'maison', desc:'Villa avec piscine', hMax:8 },
+  { name:'Villa Moderne 2', x:340, z:110, w:20, h:16, color:'#e0e0e0', cat:'maison', desc:'Architecture minimaliste', hMax:8 },
+  { name:'Villa Moderne 3', x:370, z:110, w:22, h:16, color:'#CFD5D6', cat:'maison', desc:'Grand jardin', hMax:8 },
+  { name:'Villa Moderne 4', x:400, z:110, w:20, h:16, color:'#e0e0e0', cat:'maison', desc:'Garage double', hMax:8 },
+  { name:'Villa Moderne 5', x:440, z:110, w:22, h:16, color:'#CFD5D6', cat:'maison', desc:'Rooftop terrasse', hMax:10 },
+  { name:'Immeuble "Les Jardins"', x:310, z:140, w:30, h:40, color:'#b0b0b0', cat:'maison', desc:'4 étages, 12 appartements', hMax:16 },
+  { name:'Immeuble "La Tour"', x:360, z:140, w:25, h:50, color:'#a0a0a0', cat:'maison', desc:'6 étages, vue panoramique', hMax:22 },
+  { name:'Centre Commercial "MegaMall"', x:400, z:140, w:50, h:35, color:'#DAA520', cat:'commerce', desc:'20 boutiques, food court', hMax:10 },
+  { name:'Supérette "24/7"', x:310, z:190, w:18, h:14, color:'#BDB76B', cat:'commerce', desc:'Ouvert jour et nuit', hMax:5 },
+  { name:'Garage Auto', x:340, z:190, w:22, h:16, color:'#666', cat:'commerce', desc:'Réparation véhicules', hMax:5 },
+  { name:'Aire de Jeux', x:440, z:190, w:30, h:25, color:'#87CEEB', cat:'public', desc:'Toboggans, balançoires', hMax:4 },
+  { name:'Villa Piscine 1', x:310, z:210, w:22, h:18, color:'#CFD5D6', cat:'maison', desc:'Piscine privée', hMax:8 },
+  { name:'Villa Piscine 2', x:340, z:210, w:22, h:18, color:'#e0e0e0', cat:'maison', desc:'Jardin tropical', hMax:8 },
+  { name:'Parking', x:460, z:140, w:20, h:50, color:'#4a4a4a', cat:'public', desc:'50 places', hMax:1 },
+
+  // ── QUARTIER CHIC ──
+  { name:'Manoir du Baron', x:310, z:420, w:35, h:30, color:'#9a7aaa', cat:'maison', desc:'10 pièces, bibliothèque, cave à vin', hMax:14 },
+  { name:'Manoir de la Comtesse', x:360, z:420, w:30, h:28, color:'#8a6a9a', cat:'maison', desc:'Orangerie, jardin à la française', hMax:12 },
+  { name:'Manoir des Duval', x:400, z:420, w:28, h:26, color:'#9a7aaa', cat:'maison', desc:'Galerie d\'art privée', hMax:12 },
+  { name:'Manoir Saint-Clair', x:310, z:460, w:32, h:28, color:'#8a6a9a', cat:'maison', desc:'Écuries, lac privé', hMax:12 },
+  { name:'Manoir Beaumont', x:360, z:460, w:30, h:26, color:'#9a7aaa', cat:'maison', desc:'Salle de bal, chapelle', hMax:14 },
+  { name:'Jardin Public Chic', x:400, z:460, w:40, h:30, color:'#3a6a3a', cat:'public', desc:'Fontaines, sculptures, rosiers', hMax:3 },
+  { name:'Portail du Quartier Chic', x:300, z:410, w:8, h:4, color:'#DAA520', cat:'public', desc:'Entrée gardée', hMax:6 },
+
+  // ── QUARTIER SPORTIF ──
+  { name:'Grand Stade', x:60, z:420, w:60, h:50, color:'#4a8a4a', cat:'public', desc:'10 000 places, terrain gazonné', hMax:18 },
+  { name:'Piscine Olympique', x:140, z:420, w:40, h:30, color:'#4a8aaa', cat:'public', desc:'50m, plongeoir, tribunes', hMax:6 },
+  { name:'Court de Tennis 1', x:60, z:480, w:24, h:12, color:'#8FBC8F', cat:'public', desc:'Terrain en terre battue', hMax:1 },
+  { name:'Court de Tennis 2', x:90, z:480, w:24, h:12, color:'#8FBC8F', cat:'public',desc:'Terrain en gazon', hMax:1 },
+  { name:'Gymnase', x:140, z:460, w:30, h:22, color:'#708090', cat:'public', desc:'Sports intérieurs', hMax:10 },
+  { name:'Skatepark', x:180, z:480, w:25, h:18, color:'#888', cat:'public', desc:'Rampes, rails, half-pipe', hMax:3 },
+
+  // ── ZONE INDUSTRIELLE ──
+  { name:'Usine Principale', x:30, z:15, w:60, h:40, color:'#5a5a5a', cat:'industriel', desc:'Production, cheminées', hMax:15 },
+  { name:'Entrepôt Nord 1', x:110, z:15, w:40, h:30, color:'#6a6a6a', cat:'industriel', desc:'Stockage marchandises', hMax:8 },
+  { name:'Entrepôt Nord 2', x:160, z:15, w:40, h:30, color:'#6a6a6a', cat:'industriel', desc:'Stockage matières premières', hMax:8 },
+  { name:'Gare de Fret', x:220, z:10, w:80, h:40, color:'#4a4a4a', cat:'industriel', desc:'Rails, wagons, hangar', hMax:10 },
+  { name:'Centrale Électrique', x:320, z:15, w:50, h:35, color:'#5a4a4a', cat:'industriel', desc:'Fournit l\'énergie à la ville', hMax:20 },
+  { name:'Atelier Mécanique', x:390, z:15, w:30, h:25, color:'#6a5a5a', cat:'industriel', desc:'Réparation machines', hMax:6 },
+  { name:'Tour de Refroidissement', x:340, z:20, w:12, h:12, color:'#8a8a8a', cat:'industriel', desc:'30 blocs de haut', hMax:30 },
+  { name:'Parking Camions', x:440, z:15, w:40, h:35, color:'#4a4a4a', cat:'industriel', desc:'Espace logistique', hMax:1 },
+  { name:'Cheminée Usine 1', x:45, z:20, w:4, h:4, color:'#888', cat:'industriel', desc:'Fumée visible de loin', hMax:25 },
+  { name:'Cheminée Usine 2', x:75, z:20, w:4, h:4, color:'#888', cat:'industriel', desc:'Fumée visible de loin', hMax:25 },
+
+  // ── PARC CENTRAL ──
+  { name:'Lac Artificiel', x:230, z:120, w:40, h:30, color:'#4a8aaa', cat:'deco', desc:'Eau claire, poissons', hMax:1 },
+  { name:'Pont Principal', x:245, z:140, w:10, h:6, color:'#A08060', cat:'deco', desc:'Pont en pierre et bois', hMax:4 },
+  { name:'Pont Secondaire', x:232, z:130, w:6, h:4, color:'#A08060', cat:'deco', desc:'Petit pont romantique', hMax:3 },
+  { name:'Kiosque à Musique', x:225, z:155, w:12, h:12, color:'#DAA520', cat:'public', desc:'Concerts le dimanche', hMax:7 },
+  { name:'Aire de Pique-nique', x:260, z:155, w:20, h:15, color:'#90EE90', cat:'public', desc:'Tables, barbecue', hMax:1 },
+  { name:'Statue du Fondateur', x:245, z:115, w:6, h:6, color:'#aaa', cat:'deco', desc:'Monument historique', hMax:8 },
+  { name:'Jardin Botanique', x:215, z:170, w:25, h:15, color:'#3a8a3a', cat:'public', desc:'Fleurs rares, serre', hMax:4 },
+  { name:'Labyrinthe de Haies', x:260, z:120, w:20, h:20, color:'#4a6a4a', cat:'deco', desc:'Pour s\'amuser', hMax:3 },
+
+  // ── ZONE PORTUAIRE ──
+  { name:'Phare', x:15, z:535, w:8, h:8, color:'#FFD700', cat:'public', desc:'35 blocs de haut, visible de loin', hMax:35 },
+  { name:'Quai Principal', x:30, z:540, w:120, h:10, color:'#8B7355', cat:'public', desc:'Accueil des bateaux', hMax:3 },
+  { name:'Bateau Cargo', x:50, z:555, w:40, h:15, color:'#5a5a5a', cat:'transport', desc:'Transport de marchandises', hMax:12 },
+  { name:'Bateau de Pêche', x:100, z:555, w:20, h:8, color:'#8B7355', cat:'transport', desc:'Petit chalutier', hMax:5 },
+  { name:'Voilier de Luxe', x:130, z:555, w:25, h:10, color:'#e0e0e0', cat:'transport', desc:'3 mâts, cabines luxueuses', hMax:15 },
+  { name:'Marché aux Poissons', x:30, z:530, w:35, h:12, color:'#4a8aaa', cat:'commerce', desc:'Frais du jour', hMax:4 },
+  { name:'Entrepôt Portuaire', x:170, z:535, w:40, h:25, color:'#6a6a6a', cat:'industriel', desc:'Stockage import/export', hMax:8 },
+  { name:'Piste d\'Atterrissage', x:250, z:540, w:100, h:20, color:'#555', cat:'transport', desc:'Héliport + piste courte', hMax:1 },
+  { name:'Tour de Contrôle', x:260, z:535, w:10, h:10, color:'#8a8a8a', cat:'public', desc:'Surveillance aérienne', hMax:12 },
+  { name:'Hangar à Avions', x:280, z:545, w:30, h:15, color:'#6a6a6a', cat:'industriel', desc:'Petits avions et hélicos', hMax:8 },
+];
+
+// Arbres
+const trees = [];
+function generateTrees() {
+  // Parc central
+  for (let i = 0; i < 20; i++) {
+    trees.push({ x: 215 + Math.random()*65, z: 105 + Math.random()*75, r: 3+Math.random()*2 });
+  }
+  // Quartier chic
+  for (let i = 0; i < 12; i++) {
+    trees.push({ x: 305 + Math.random()*140, z: 415 + Math.random()*85, r: 2.5+Math.random()*2 });
+  }
+  // Bordures routes
+  for (let i = 0; i < 30; i++) {
+    trees.push({ x: 55 + Math.random()*440, z: 252 + Math.random()*2, r: 2 });
+    trees.push({ x: 55 + Math.random()*440, z: 402 + Math.random()*2, r: 2 });
+  }
+  // Quartier moderne
+  for (let i = 0; i < 10; i++) {
+    trees.push({ x: 305 + Math.random()*175, z: 105 + Math.random()*130, r: 2+Math.random()*1.5 });
+  }
+}
+generateTrees();
+
+// Lampadaires
+const lamps = [];
+function generateLamps() {
+  // Grand Boulevard
+  for (let z = 20; z < 500; z += 20) {
+    lamps.push({ x: 244, z }, { x: 256, z });
+  }
+  // Boulevard Est
+  for (let x = 20; x < 500; x += 20) {
+    lamps.push({ x, z: 263 }, { x, z: 273 });
+  }
+  // Boulevard Sud
+  for (let x = 20; x < 500; x += 20) {
+    lamps.push({ x, z: 393 }, { x, z: 403 });
+  }
+  // Centre-Ville
+  for (let x = 100; x < 450; x += 16) {
+    lamps.push({ x, z: 340 });
+  }
+}
+generateLamps();
+
+// ═══ RENDU ═══
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight - 48;
+  miniCanvas.width = 200;
+  miniCanvas.height = 150;
+  draw();
+}
+window.addEventListener('resize', resize);
+
+function draw() {
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  
+  // Background (herbe)
+  ctx.fillStyle = '#3a5a2a';
+  ctx.fillRect(0, 0, W, H);
+  
+  // Grid
+  const gridSize = cam.zoom * 10;
+  if (gridSize > 8) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 0.5;
+    const startX = (-cam.x * cam.zoom % gridSize + gridSize) % gridSize;
+    const startY = (-cam.y * cam.zoom % gridSize + gridSize) % gridSize;
+    for (let x = startX; x < W; x += gridSize) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let y = startY; y < H; y += gridSize) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+  }
+  
+  function toScreen(bx, bz) {
+    return { x: (bx - cam.x) * cam.zoom, y: (bz - cam.y) * cam.zoom };
+  }
+  
+  // Quartiers
+  quarters.forEach(q => {
+    const p = toScreen(q.x, q.z);
+    const w = q.w * cam.zoom, h = q.h * cam.zoom;
+    ctx.fillStyle = q.color + '40';
+    ctx.strokeStyle = q.color;
+    ctx.lineWidth = 2;
+    ctx.fillRect(p.x, p.y, w, h);
+    ctx.strokeRect(p.x, p.y, w, h);
+    
+    if (w > 80) {
+      ctx.fillStyle = q.color;
+      ctx.font = `bold ${Math.min(14, Math.max(9, cam.zoom * 2))}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(q.name, p.x + w/2, p.y + h/2 - 6);
+      ctx.font = `${Math.min(11, Math.max(8, cam.zoom * 1.5))}px sans-serif`;
+      ctx.fillStyle = '#ffffff80';
+      ctx.fillText(q.style, p.x + w/2, p.y + h/2 + 10);
+    }
+  });
+  
+  // Routes
+  roads.forEach(r => {
+    const p = toScreen(r.x, r.z);
+    const w = r.w * cam.zoom, h = r.h * cam.zoom;
+    if (r.ring) {
+      ctx.strokeStyle = '#888';
+      ctx.lineWidth = 3 * cam.zoom;
+      ctx.setLineDash([8, 6]);
+      ctx.strokeRect(p.x, p.y, r.w * cam.zoom, r.h * cam.zoom);
+      ctx.setLineDash([]);
+    } else {
+      ctx.fillStyle = r.main ? '#4a4a4a' : '#555';
+      ctx.fillRect(p.x, p.y, w, h);
+      // Ligne jaune centrale
+      ctx.strokeStyle = '#FFD70060';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([6, 4]);
+      if (r.w > r.h) {
+        ctx.beginPath(); ctx.moveTo(p.x, p.y + h/2); ctx.lineTo(p.x + w, p.y + h/2); ctx.stroke();
+      } else {
+        ctx.beginPath(); ctx.moveTo(p.x + w/2, p.y); ctx.lineTo(p.x + w/2, p.y + h); ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      
+      // Nom de la route
+      if (cam.zoom >= 3 && r.name && w > 40) {
+        ctx.fillStyle = '#FFD70080';
+        ctx.font = `${Math.min(10, Math.max(7, cam.zoom))}px sans-serif`;
+        ctx.textAlign = 'center';
+        if (r.w > r.h) {
+          ctx.fillText(r.name, p.x + w/2, p.y - 3);
+        } else {
+          ctx.save();
+          ctx.translate(p.x - 3, p.y + h/2);
+          ctx.rotate(-Math.PI/2);
+          ctx.fillText(r.name, 0, 0);
+          ctx.restore();
+        }
+      }
+    }
+  });
+  
+  // Arbres
+  trees.forEach(t => {
+    const p = toScreen(t.x, t.z);
+    const r = t.r * cam.zoom;
+    if (r > 1) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = '#2a6a2a';
+      ctx.fill();
+      ctx.strokeStyle = '#1a4a1a';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+  });
+  
+  // Lampadaires
+  lamps.forEach(l => {
+    const p = toScreen(l.x, l.z);
+    if (cam.zoom >= 3) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFA500';
+      ctx.fill();
+      // Glow
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,165,0,0.15)';
+      ctx.fill();
+    }
+  });
+  
+  // Bâtiments
+  hoveredBuilding = null;
+  buildings.forEach(b => {
+    const p = toScreen(b.x, b.z);
+    const w = b.w * cam.zoom, h = b.h * cam.zoom;
+    
+    // Hover detection
+    const mx = lastMX, my = lastMY - 48;
+    if (mx >= p.x && mx <= p.x + w && my >= p.y && my <= p.y + h) {
+      hoveredBuilding = b;
+    }
+    
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(p.x + 2, p.y + 2, w, h);
+    
+    // Building
+    ctx.fillStyle = b.color;
+    ctx.fillRect(p.x, p.y, w, h);
+    
+    // Border
+    const isHovered = hoveredBuilding === b;
+    ctx.strokeStyle = isHovered ? '#FFD700' : '#00000060';
+    ctx.lineWidth = isHovered ? 2 : 1;
+    ctx.strokeRect(p.x, p.y, w, h);
+    
+    // Name
+    if (cam.zoom >= 2.5 && w > 30) {
+      ctx.fillStyle = isHovered ? '#FFD700' : '#fff';
+      ctx.font = `bold ${Math.min(11, Math.max(7, cam.zoom * 1.2))}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(b.name, p.x + w/2, p.y + h/2 + 3);
+    }
+    
+    // Hauteur indicator
+    if (isHovered && b.hMax > 1) {
+      ctx.fillStyle = '#FFD70040';
+      ctx.fillRect(p.x, p.y - b.hMax * cam.zoom * 0.3, w, b.hMax * cam.zoom * 0.3);
+      ctx.fillStyle = '#FFD700';
+      ctx.font = '10px sans-serif';
+      ctx.fillText(`↑${b.hMax} blocs`, p.x + w/2, p.y - b.hMax * cam.zoom * 0.3 - 4);
+    }
+  });
+  
+  // Compass
+  ctx.save();
+  ctx.translate(W - 40, 40);
+  ctx.beginPath();
+  ctx.arc(0, 0, 20, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fill();
+  ctx.fillStyle = '#FF6B6B';
+  ctx.font = 'bold 12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('N', 0, -8);
+  ctx.fillStyle = '#fff';
+  ctx.font = '9px sans-serif';
+  ctx.fillText('S', 0, 14);
+  ctx.fillText('O', -12, 3);
+  ctx.fillText('E', 12, 3);
+  ctx.restore();
+  
+  // Scale bar
+  ctx.fillStyle = '#fff';
+  ctx.font = '10px sans-serif';
+  ctx.textAlign = 'left';
+  const scaleBlocks = 50;
+  const scalePx = scaleBlocks * cam.zoom;
+  ctx.fillRect(20, H - 30, scalePx, 3);
+  ctx.fillRect(20, H - 35, 1, 8);
+  ctx.fillRect(20 + scalePx, H - 35, 1, 8);
+  ctx.fillText(`${scaleBlocks} blocs`, 20, H - 12);
+  
+  // Coords
+  const worldX = Math.round(lastMX / cam.zoom + cam.x);
+  const worldZ = Math.round((lastMY - 48) / cam.zoom + cam.y);
+  document.getElementById('coords').textContent = `X: ${worldX}  Z: ${worldZ}`;
+  document.getElementById('zoomLevel').textContent = `Zoom: ${Math.round(cam.zoom * 100)}%`;
+  
+  // Tooltip
+  const tt = document.getElementById('tooltip');
+  if (hoveredBuilding) {
+    tt.style.display = 'block';
+    tt.style.left = (lastMX + 15) + 'px';
+    tt.style.top = (lastMY + 15) + 'px';
+    document.getElementById('ttName').textContent = hoveredBuilding.name;
+    document.getElementById('ttInfo').textContent = `${hoveredBuilding.desc} | Hauteur: ${hoveredBuilding.hMax} blocs`;
+  } else {
+    tt.style.display = 'none';
+  }
+  
+  // Minimap
+  drawMinimap();
+}
+
+function drawMinimap() {
+  const W = 200, H = 150;
+  miniCtx.fillStyle = '#2a4a1a';
+  miniCtx.fillRect(0, 0, W, H);
+  
+  const scaleX = W / 520;
+  const scaleZ = H / 620;
+  
+  // Quartiers
+  quarters.forEach(q => {
+    miniCtx.fillStyle = q.color + 'aa';
+    miniCtx.fillRect(q.x * scaleX, q.z * scaleZ, q.w * scaleX, q.h * scaleZ);
+  });
+  
+  // Routes
+  roads.forEach(r => {
+    if (!r.ring) {
+      miniCtx.fillStyle = '#4a4a4a';
+      miniCtx.fillRect(r.x * scaleX, r.z * scaleZ, r.w * scaleX, r.h * scaleZ);
+    }
+  });
+  
+  // Buildings (points)
+  buildings.forEach(b => {
+    miniCtx.fillStyle = b.color;
+    miniCtx.fillRect(b.x * scaleX, b.z * scaleZ, Math.max(2, b.w * scaleX), Math.max(2, b.h * scaleZ));
+  });
+  
+  // Viewport indicator
+  const vx = cam.x * scaleX;
+  const vy = cam.y * scaleZ;
+  const vw = (canvas.width / cam.zoom) * scaleX;
+  const vh = (canvas.height / cam.zoom) * scaleZ;
+  miniCtx.strokeStyle = '#FFD700';
+  miniCtx.lineWidth = 1.5;
+  miniCtx.strokeRect(vx, vy, vw, vh);
+}
+
+// ═══ INTERACTIONS ═══
+canvas.addEventListener('mousedown', e => {
+  dragging = true;
+  lastMX = e.clientX;
+  lastMY = e.clientY;
+  canvas.classList.add('dragging');
+});
+
+window.addEventListener('mousemove', e => {
+  const dx = e.clientX - lastMX;
+  const dy = e.clientY - lastMY;
+  lastMX = e.clientX;
+  lastMY = e.clientY;
+  
+  if (dragging && currentTool === 'pan') {
+    cam.x -= dx / cam.zoom;
+    cam.y -= dy / cam.zoom;
+  }
+  draw();
+});
+
+window.addEventListener('mouseup', () => {
+  dragging = false;
+  canvas.classList.remove('dragging');
+});
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const factor = e.deltaY > 0 ? 0.9 : 1.1;
+  const oldZoom = cam.zoom;
+  cam.zoom = Math.max(0.5, Math.min(20, cam.zoom * factor));
+  
+  // Zoom toward cursor
+  const mx = e.clientX, my = e.clientY - 48;
+  cam.x += mx / oldZoom - mx / cam.zoom;
+  cam.y += my / oldZoom - my / cam.zoom;
+  
+  draw();
+}, { passive: false });
+
+// Touch support
+let lastTouch = null;
+canvas.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) {
+    dragging = true;
+    lastMX = e.touches[0].clientX;
+    lastMY = e.touches[0].clientY;
+    lastTouch = { x: lastMX, y: lastMY };
+  }
+}, { passive: true });
+
+canvas.addEventListener('touchmove', e => {
+  if (e.touches.length === 1 && dragging) {
+    const dx = e.touches[0].clientX - lastMX;
+    const dy = e.touches[0].clientY - lastMY;
+    lastMX = e.touches[0].clientX;
+    lastMY = e.touches[0].clientY;
+    cam.x -= dx / cam.zoom;
+    cam.y -= dy / cam.zoom;
+    draw();
+  }
+}, { passive: true });
+
+canvas.addEventListener('touchend', () => { dragging = false; });
+
+// ═══ TOOLBAR ═══
+function setTool(t) {
+  currentTool = t;
+  document.querySelectorAll('.tools button').forEach(b => b.classList.toggle('active', b.dataset.tool === t));
+}
+
+function toggleLegend() {
+  document.getElementById('legendPanel').classList.toggle('show');
+}
+
+function toggleInfo() {
+  document.getElementById('infoPanel').classList.toggle('show');
+  updateStats();
+}
+
+function updateStats() {
+  document.getElementById('sBuildings').textContent = buildings.length;
+  document.getElementById('sRoads').textContent = roads.reduce((s,r) => s + (r.ring ? 0 : Math.round(r.w * r.h / 10)), 0);
+  document.getElementById('sTrees').textContent = trees.length;
+  document.getElementById('sLamps').textContent = lamps.length;
+  
+  const totalBlocks = buildings.reduce((s,b) => s + Math.round(b.w * b.h * (b.hMax || 1) * 0.4), 0)
+    + roads.reduce((s,r) => s + (r.ring ? 0 : Math.round(r.w * r.h * 0.3)), 0)
+    + trees.length * 50
+    + 5000; // détails
+  document.getElementById('sTotal').textContent = `~${(totalBlocks / 1000).toFixed(0)}k`;
+}
+
+// ═══ INIT ═══
+resize();
+// Center on city
+cam.x = 100;
+cam.y = 200;
+cam.zoom = 3;
+draw();
+
+// Stats initial
+updateStats();
+</script>
+
+</body>
+</html>
