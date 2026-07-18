@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-17T19:03:12.528Z",
+  "generatedAt": "2026-07-18T01:17:03.527Z",
   "accounts": [
     {
       "key": "batman",
       "label": "BATMAN_Miyukii",
       "version": 1,
       "locale": "fr-FR",
-      "generatedAt": "2026-07-17T19:03:12.527Z",
+      "generatedAt": "2026-07-18T01:17:03.526Z",
       "profile": {
         "onlineId": "BATMAN_Miyukii",
         "avatarUrl": "",
@@ -15,8 +15,8 @@
       },
       "playStats": {
         "totalTitles": 213,
-        "totalDurationSeconds": 21241210,
-        "totalPlayCount": 5140,
+        "totalDurationSeconds": 21251984,
+        "totalPlayCount": 5145,
         "games": [
           {
             "titleId": "PPSA17221_00",
@@ -27,11 +27,26 @@
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
-            "playCount": 125,
-            "playDuration": "PT99H36M8S",
-            "durationSeconds": 358568,
+            "playCount": 129,
+            "playDuration": "PT102H11M28S",
+            "durationSeconds": 367888,
             "firstPlayedDateTime": "2024-10-29T16:58:27.690000Z",
-            "lastPlayedDateTime": "2026-07-17T17:58:54.620000Z"
+            "lastPlayedDateTime": "2026-07-18T01:12:27.710000Z"
+          },
+          {
+            "titleId": "PPSA10990_00",
+            "conceptId": 223118,
+            "name": "Roblox",
+            "originalName": "Roblox",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202604/0801/f2bdf0b6807d0e43c432e4de00f444df6c97732065904006.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 207,
+            "playDuration": "PT504H15M13S",
+            "durationSeconds": 1815313,
+            "firstPlayedDateTime": "2026-04-17T11:18:57.630000Z",
+            "lastPlayedDateTime": "2026-07-17T22:49:02.640000Z"
           },
           {
             "titleId": "CUSA07027_00",
@@ -62,21 +77,6 @@
             "durationSeconds": 189421,
             "firstPlayedDateTime": "2024-07-11T11:11:00.110000Z",
             "lastPlayedDateTime": "2026-07-17T11:19:00.380000Z"
-          },
-          {
-            "titleId": "PPSA10990_00",
-            "conceptId": 223118,
-            "name": "Roblox",
-            "originalName": "Roblox",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202604/0801/f2bdf0b6807d0e43c432e4de00f444df6c97732065904006.png",
-            "platform": "PS5",
-            "category": "ps5_native_game",
-            "service": "none(purchased)",
-            "playCount": 206,
-            "playDuration": "PT503H50M59S",
-            "durationSeconds": 1813859,
-            "firstPlayedDateTime": "2026-04-17T11:18:57.630000Z",
-            "lastPlayedDateTime": "2026-07-17T10:33:33.460000Z"
           },
           {
             "titleId": "CUSA02979_00",
@@ -3216,9 +3216,9 @@
         ]
       },
       "library": {
-        "total": 272,
+        "total": 274,
         "owned": 168,
-        "psPlus": 104
+        "psPlus": 106
       },
       "warnings": [
         {
