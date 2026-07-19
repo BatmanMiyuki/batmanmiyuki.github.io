@@ -1,22 +1,22 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-18T01:17:03.527Z",
+  "generatedAt": "2026-07-19T07:35:58.757Z",
   "accounts": [
     {
       "key": "batman",
       "label": "BATMAN_Miyukii",
       "version": 1,
       "locale": "fr-FR",
-      "generatedAt": "2026-07-18T01:17:03.526Z",
+      "generatedAt": "2026-07-19T07:35:58.756Z",
       "profile": {
         "onlineId": "BATMAN_Miyukii",
         "avatarUrl": "",
         "isPlus": false
       },
       "playStats": {
-        "totalTitles": 213,
-        "totalDurationSeconds": 21251984,
-        "totalPlayCount": 5145,
+        "totalTitles": 214,
+        "totalDurationSeconds": 21268264,
+        "totalPlayCount": 5155,
         "games": [
           {
             "titleId": "PPSA17221_00",
@@ -27,11 +27,26 @@
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
-            "playCount": 129,
-            "playDuration": "PT102H11M28S",
-            "durationSeconds": 367888,
+            "playCount": 131,
+            "playDuration": "PT104H9M58S",
+            "durationSeconds": 374998,
             "firstPlayedDateTime": "2024-10-29T16:58:27.690000Z",
-            "lastPlayedDateTime": "2026-07-18T01:12:27.710000Z"
+            "lastPlayedDateTime": "2026-07-19T00:29:36.160000Z"
+          },
+          {
+            "titleId": "PPSA23364_00",
+            "conceptId": 10011130,
+            "name": "Train Sim World® 5",
+            "originalName": "Train Sim World® 5",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202407/3111/3b621ee46401017b8c0c27dc01d28a6df7d3cc008bfa0061.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "ps_plus",
+            "playCount": 4,
+            "playDuration": "PT58M58S",
+            "durationSeconds": 3538,
+            "firstPlayedDateTime": "2026-07-18T15:11:29.900000Z",
+            "lastPlayedDateTime": "2026-07-18T22:30:41.290000Z"
           },
           {
             "titleId": "PPSA10990_00",
@@ -42,11 +57,26 @@
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
-            "playCount": 207,
-            "playDuration": "PT504H15M13S",
-            "durationSeconds": 1815313,
+            "playCount": 209,
+            "playDuration": "PT505H23M53S",
+            "durationSeconds": 1819433,
             "firstPlayedDateTime": "2026-04-17T11:18:57.630000Z",
-            "lastPlayedDateTime": "2026-07-17T22:49:02.640000Z"
+            "lastPlayedDateTime": "2026-07-18T22:10:00.630000Z"
+          },
+          {
+            "titleId": "PPSA22293_00",
+            "conceptId": 10010695,
+            "name": "TENSEI",
+            "originalName": "TENSEI",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202403/2903/df42100fb851483578a95fe709c70e89dc06a0926c2e15ea.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 6,
+            "playDuration": "PT8H22M19S",
+            "durationSeconds": 30139,
+            "firstPlayedDateTime": "2025-07-01T15:59:38.790000Z",
+            "lastPlayedDateTime": "2026-07-18T16:22:01.610000Z"
           },
           {
             "titleId": "CUSA07027_00",
@@ -722,21 +752,6 @@
             "durationSeconds": 3438,
             "firstPlayedDateTime": "2024-10-27T22:35:27.270000Z",
             "lastPlayedDateTime": "2026-01-18T10:32:35.060000Z"
-          },
-          {
-            "titleId": "PPSA22293_00",
-            "conceptId": 10010695,
-            "name": "TENSEI",
-            "originalName": "TENSEI",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202403/2903/df42100fb851483578a95fe709c70e89dc06a0926c2e15ea.png",
-            "platform": "PS5",
-            "category": "ps5_native_game",
-            "service": "none(purchased)",
-            "playCount": 4,
-            "playDuration": "PT7H57M7S",
-            "durationSeconds": 28627,
-            "firstPlayedDateTime": "2025-07-01T15:59:38.790000Z",
-            "lastPlayedDateTime": "2025-12-07T11:03:04.940000Z"
           },
           {
             "titleId": "PPSA24157_00",
