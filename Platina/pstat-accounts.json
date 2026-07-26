@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-25T16:56:27.960Z",
+  "generatedAt": "2026-07-26T07:46:10.444Z",
   "accounts": [
     {
       "key": "batman",
       "label": "BATMAN_Miyukii",
       "version": 1,
       "locale": "fr-FR",
-      "generatedAt": "2026-07-25T16:56:27.959Z",
+      "generatedAt": "2026-07-26T07:46:10.443Z",
       "profile": {
         "onlineId": "BATMAN_Miyukii",
         "avatarUrl": "",
@@ -15,9 +15,39 @@
       },
       "playStats": {
         "totalTitles": 219,
-        "totalDurationSeconds": 21438838,
-        "totalPlayCount": 5227,
+        "totalDurationSeconds": 21460386,
+        "totalPlayCount": 5232,
         "games": [
+          {
+            "titleId": "PPSA10990_00",
+            "conceptId": 223118,
+            "name": "Roblox",
+            "originalName": "Roblox",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202604/0801/f2bdf0b6807d0e43c432e4de00f444df6c97732065904006.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 217,
+            "playDuration": "PT516H16M56S",
+            "durationSeconds": 1858616,
+            "firstPlayedDateTime": "2026-04-17T11:18:57.630000Z",
+            "lastPlayedDateTime": "2026-07-26T00:41:50.870000Z"
+          },
+          {
+            "titleId": "PPSA04540_00",
+            "conceptId": 10003386,
+            "name": "Rise of the Ronin™",
+            "originalName": "Rise of the Ronin™",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202212/2201/ZfPosZoz1CKZBHTIKUCQRy47.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "ps_plus",
+            "playCount": 3,
+            "playDuration": "PT3H9M29S",
+            "durationSeconds": 11369,
+            "firstPlayedDateTime": "2026-07-23T19:18:02.750000Z",
+            "lastPlayedDateTime": "2026-07-25T23:08:51.390000Z"
+          },
           {
             "titleId": "PPSA26339_00",
             "conceptId": 10012768,
@@ -27,11 +57,11 @@
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
-            "playCount": 35,
-            "playDuration": "PT30H10M56S",
-            "durationSeconds": 108656,
+            "playCount": 37,
+            "playDuration": "PT31H11M44S",
+            "durationSeconds": 112304,
             "firstPlayedDateTime": "2026-06-19T17:46:55.450000Z",
-            "lastPlayedDateTime": "2026-07-25T00:48:56.500000Z"
+            "lastPlayedDateTime": "2026-07-25T21:56:15.050000Z"
           },
           {
             "titleId": "CUSA00265_00",
@@ -122,21 +152,6 @@
             "durationSeconds": 24932,
             "firstPlayedDateTime": "2024-12-10T19:03:35.670000Z",
             "lastPlayedDateTime": "2026-07-24T02:54:34.180000Z"
-          },
-          {
-            "titleId": "PPSA04540_00",
-            "conceptId": 10003386,
-            "name": "Rise of the Ronin™",
-            "originalName": "Rise of the Ronin™",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202212/2201/ZfPosZoz1CKZBHTIKUCQRy47.png",
-            "platform": "PS5",
-            "category": "ps5_native_game",
-            "service": "ps_plus",
-            "playCount": 2,
-            "playDuration": "PT1H57M38S",
-            "durationSeconds": 7058,
-            "firstPlayedDateTime": "2026-07-23T19:18:02.750000Z",
-            "lastPlayedDateTime": "2026-07-24T02:45:16.960000Z"
           },
           {
             "titleId": "PPSA01721_00",
@@ -257,21 +272,6 @@
             "durationSeconds": 14244,
             "firstPlayedDateTime": "2025-01-25T13:04:18.690000Z",
             "lastPlayedDateTime": "2026-07-22T16:45:36.560000Z"
-          },
-          {
-            "titleId": "PPSA10990_00",
-            "conceptId": 223118,
-            "name": "Roblox",
-            "originalName": "Roblox",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202604/0801/f2bdf0b6807d0e43c432e4de00f444df6c97732065904006.png",
-            "platform": "PS5",
-            "category": "ps5_native_game",
-            "service": "none(purchased)",
-            "playCount": 215,
-            "playDuration": "PT512H30M27S",
-            "durationSeconds": 1845027,
-            "firstPlayedDateTime": "2026-04-17T11:18:57.630000Z",
-            "lastPlayedDateTime": "2026-07-22T13:06:05.540000Z"
           },
           {
             "titleId": "PPSA23364_00",
