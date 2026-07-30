@@ -1,0 +1,2914 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privara • Coffre-fort Photos &amp; Vidéos</title>
+
+    <!-- PWA Meta -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Privara">
+    <link rel="apple-touch-icon" href="icons/icon-180.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts (with fallback) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap" rel="stylesheet">
+    
+    <style>
+        /* ================================================
+           ROBUST FALLBACK CSS + APP STYLES
+           This file is 100% standalone.
+           Works even if Tailwind CDN fails to load.
+           ================================================ */
+        
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #000000;
+            color: #e2e8f0;
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
+        
+        /* === FALLBACK UTILITIES (so the app looks good even without Tailwind) === */
+        .max-w-screen-2xl { max-width: 1536px; margin: 0 auto; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-5 { gap: 1.25rem; }
+        .gap-x-2, .gap-x-3 { column-gap: 0.5rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .py-3\.5 { padding-top: 0.875rem; padding-bottom: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .font-extrabold { font-weight: 800; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .rounded-2xl { border-radius: 1rem; }
+        .rounded-3xl { border-radius: 1.5rem; }
+        .rounded-\[2rem\] { border-radius: 2rem; }
+        .border { border-width: 1px; }
+        .border-b { border-bottom-width: 1px; }
+        .border-slate-700 { border-color: #1a1a1a; }
+        .border-slate-600 { border-color: #222222; }
+        /* ============================================
+           ULTRA FORCED PURE BLACK THEME v4 - MAXIMUM AGGRESSIVE
+           Kills Tailwind CDN completely. Pure #000000 for full app + signature.
+           Repeated !important + attribute selectors + JS nuking
+           ============================================ */
+        html, body, 
+        html *, body *, 
+        .bg-slate-900, .bg-slate-800, .bg-slate-700, .bg-slate-600, .bg-slate-950,
+        .bg-slate-500, .bg-slate-400, .bg-slate-300, .bg-slate-200, .bg-slate-100,
+        [class*="bg-slate-"], [class*="bg-zinc-"], [class*="bg-gray-"], [class*="bg-neutral-"],
+        header, .vault-header, #sidebar, #media-container, .app-container,
+        .max-w-screen-2xl, .flex-1, .px-5, .pt-5, .pb-6,
+        div, section, article, aside, main, nav, footer,
+        .bg-slate-800, .bg-slate-700, .bg-slate-900, .bg-slate-950,
+        .px-3.py-3.bg-slate-900, .px-3.py-1\.5.bg-slate-900 {
+            background-color: #000000 !important;
+            background: #000000 !important;
+            background-image: none !important;
+        }
+        
+        /* Slightly darker panels (pure dark gray-black) for cards and containers */
+        .media-card, .stats-card, #media-container, .bg-slate-800.border,
+        #sidebar > div, tr, .px-3.py-3.bg-slate-900,
+        .bg-slate-700, .bg-slate-800, .vault-shadow,
+        .bg-slate-800.border.border-slate-700,
+        #media-list, table, .px-3.py-1\.5.bg-slate-900 {
+            background-color: #0a0a0a !important;
+            background: #0a0a0a !important;
+        }
+        
+        /* Force top-level containers absolutely */
+        body, html, .max-w-screen-2xl, .app-container, header.vault-header, 
+        #sidebar, #media-container, .flex-1.min-w-0 {
+            background: #000000 !important;
+            background-color: #000000 !important;
+        }
+        
+        /* Kill all Tailwind slate borders */
+        .border-slate-700, .border-slate-600, .border-slate-800, .border-slate-500 {
+            border-color: #222222 !important;
+        }
+        
+        /* Text colors */
+        .text-slate-200, .text-slate-300, .text-slate-400, .text-slate-500 {
+            color: #e2e8f0 !important;
+        }
+        
+        /* Signature section - pure black + good visibility */
+        .mt-8.pt-5.border-t, 
+        .mt-8.pt-5.border-t * {
+            background-color: #000000 !important;
+            background: #000000 !important;
+            border-color: #222222 !important;
+        }
+        
+        /* Extra safety: any element with bg- class */
+        [class*="bg-"] {
+            background-color: #000000 !important;
+        }
+        .media-card[class*="bg-"], .stats-card[class*="bg-"] {
+            background-color: #0a0a0a !important;
+        }
+        .bg-indigo-600 { background-color: #4f46e5; }
+        .bg-indigo-500 { background-color: #6366f1; }
+        .text-white { color: #fff; }
+        .text-slate-200 { color: #e2e8f0; }
+        .text-slate-300 { color: #cbd5e1; }
+        .text-slate-400 { color: #94a3b8; }
+        .hidden { display: none !important; }
+        .w-72 { width: 18rem; }
+        .flex-1 { flex: 1 1 0%; }
+        .min-w-0 { min-width: 0; }
+        .cursor-pointer { cursor: pointer; }
+        .transition-colors { transition: color 0.1s, background-color 0.1s; }
+        .w-full { width: 100%; }
+        
+        /* === CUSTOM APP STYLES (the beautiful design) === */
+        .font-display {
+            font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+            font-weight: 600;
+        }
+
+        .media-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #1a1a1a;
+            border: 1px solid #222222;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+        }
+        
+        .media-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 14px;
+        }
+
+        .thumbnail-container {
+            aspect-ratio: 1 / 1;
+            background-color: #111111;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .thumbnail-container img, .thumbnail-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .media-card:hover .thumbnail-container img,
+        .media-card:hover .thumbnail-container video {
+            transform: scale(1.05);
+        }
+
+        .nav-item {
+            transition: all 0.1s ease;
+            padding: 9px 12px;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.875rem;
+        }
+        
+        .nav-item:hover {
+            background-color: #1a1a1a;
+        }
+        
+        .nav-item.active {
+            background-color: #4f46e5;
+            color: white;
+            font-weight: 600;
+        }
+
+        .section-header {
+            font-size: 0.925rem;
+            letter-spacing: -.025em;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .vault-header {
+            background: #000000;
+            box-shadow: 0 1px 0 0 #111111;
+        }
+
+        .tree-item {
+            transition: background-color .1s ease;
+            padding: 5.5px 10px;
+            border-radius: 14px;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .tree-item:hover {
+            background-color: #1a1a1a;
+        }
+
+        .tree-item.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        .folder-tree {
+            max-height: 340px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #222222 #111111;
+        }
+
+        .custom-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #222222 #111111;
+        }
+
+        .grid-item {
+            box-shadow: 0 1px 3px rgb(15 23 42 / 0.1);
+        }
+
+        .file-type-badge {
+            font-size: 0.65rem;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-weight: 700;
+            letter-spacing: -.5px;
+        }
+
+        .overlay {
+            transition: opacity 0.2s ease;
+        }
+
+        .media-item:hover .overlay {
+            opacity: 1;
+        }
+
+        .gallery-grid {
+            scrollbar-width: thin;
+            scrollbar-color: #222222 #111111;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Sidebar toggle - RELIABLE CLASS-BASED (pure CSS) */
+        #sidebar {
+            width: 18rem;
+            flex: 0 0 18rem;
+            flex-shrink: 0;
+            transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), 
+                        flex 0.28s cubic-bezier(0.4, 0, 0.2, 1), 
+                        margin-right 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.2s ease;
+            overflow: hidden;
+            box-sizing: border-box;
+            margin-right: 1.25rem;
+            min-width: 0;
+        }
+        
+        #sidebar.sidebar-collapsed {
+            width: 0 !important;
+            flex: 0 0 0 !important;
+            flex-shrink: 0 !important;
+            margin-right: 0 !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            overflow: hidden !important;
+            min-width: 0 !important;
+        }
+        
+        /* Force-hide inner content when collapsed (stronger) */
+        #sidebar.sidebar-collapsed,
+        #sidebar.sidebar-collapsed * {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+        
+        /* Ensure the parent flex container respects collapse */
+        .app-container {
+            transition: gap 0.28s ease;
+        }
+
+        .vault-shadow {
+            box-shadow: 0 10px 10px -3px rgb(15 23 42 / 0.1),
+                        0 4px 6px -4px rgb(15 23 42 / 0.1);
+        }
+
+        .stats-card {
+            background: linear-gradient(145deg, #111111, #000000);
+        }
+
+        .media-count {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .thumbnail-placeholder {
+            background: linear-gradient(145deg, #1a1a1a, #111111);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal {
+            animation: fadeInScale 0.2s ease forwards;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body style="background:#000000 !important; color:#e2e8f0;" class="text-slate-200">
+    <!-- Header -->
+    <header class="vault-header border-b border-slate-700 sticky top-0 z-50">
+        <div class="max-w-screen-2xl mx-auto">
+            <div class="px-6 py-3.5 flex items-center justify-between">
+                <div class="flex items-center gap-x-3">
+                    <!-- Three bars (hamburger menu) - left side of the app -->
+                    <button id="hamburger-btn"
+                            class="flex items-center justify-center w-10 h-10 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-2xl text-3xl transition-all mr-1"
+                            title="Ouvrir / Fermer les dossiers">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+
+                    <!-- Logo -->
+                    <div class="flex items-center gap-x-2.5">
+                        <div class="w-11 h-11 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-inner">
+                            <i class="fa-solid fa-photo-video text-white text-3xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-display text-3xl font-extrabold tracking-tighter">Privara</span>
+                        </div>
+                    </div>
+                    
+                    <div class="px-3 py-1.5 bg-slate-800 rounded-3xl flex items-center text-sm">
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-globe text-emerald-400 mr-1.5"></i>
+                            <span class="text-emerald-300 text-xs font-semibold">Local</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Version indicator -->
+                    <div class="px-2 py-0.5 text-[10px] bg-emerald-900 text-emerald-300 font-bold rounded-full px-2.5" style="font-size:9.5px">
+                        v3.0 • PWA
+                    </div>
+
+                    <!-- PWA Install Button -->
+                    <button id="install-btn"
+                            class="hidden items-center gap-x-1.5 px-3 py-1 text-xs font-semibold bg-white text-black hover:bg-emerald-100 transition-colors rounded-2xl"
+                            title="Installer Privara comme application">
+                        <i class="fa-solid fa-download text-xs"></i>
+                        <span class="hidden sm:inline">Installer</span>
+                    </button>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-xl mx-6">
+                    <div class="relative group">
+                        <input id="search-input" 
+                               type="text" 
+                               placeholder="Rechercher des photos ou vidéos..." 
+                               class="w-full bg-slate-800 border border-slate-700 focus:border-indigo-500 transition-colors text-white placeholder-slate-400 pl-11 py-2.5 px-4 rounded-3xl text-sm focus:outline-none">
+                        <div class="absolute left-4 top-3 text-slate-400">
+                            <i class="fa-solid fa-search"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-x-2">
+                    <!-- Stats -->
+                    <div class="hidden md:flex items-center gap-x-1.5 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-3xl text-xs">
+                        <div class="flex items-center gap-x-[5px]">
+                            <i class="fa-solid fa-images text-indigo-400"></i>
+                            <span id="header-total-count" class="font-semibold media-count">0</span>
+                            <span class="text-slate-400">médias</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Upload Button -->
+                    <button onclick="triggerUpload()"
+                            class="flex items-center gap-x-2 px-5 py-[9.5px] bg-indigo-600 hover:bg-indigo-500 transition-colors rounded-3xl text-sm font-semibold shadow-sm">
+                        <i class="fa-solid fa-upload"></i>
+                        <span class="font-semibold">Téléverser</span>
+                    </button>
+                    
+                    <!-- New Folder -->
+                    <button onclick="createNewFolder()"
+                            class="flex items-center gap-x-2 px-4 py-[9.5px] bg-slate-700 hover:bg-slate-600 transition-colors rounded-3xl text-sm font-semibold border border-slate-600">
+                        <i class="fa-solid fa-folder-plus"></i>
+                        <span class="hidden sm:inline font-semibold">Nouveau dossier</span>
+                    </button>
+                    
+                    <div class="w-8 h-8 bg-slate-700 rounded-2xl overflow-hidden border border-slate-600">
+                        <img src="https://i.pravatar.cc/32?img=28" alt="Avatar" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="max-w-screen-2xl mx-auto px-5 pt-5 pb-6 flex gap-5 app-container">
+        
+        <!-- Sidebar (toggleable) -->
+        <div id="sidebar">
+            <div class="bg-slate-800 border border-slate-700 rounded-3xl p-1.5 flex flex-col h-full">
+                
+                <!-- Quick nav -->
+                <div class="px-2 pt-2 pb-1">
+                    <div onclick="navigateToView('all')" 
+                         class="nav-item cursor-pointer flex items-center px-3 py-[9px] gap-x-3 text-sm rounded-2xl mb-0.5 active" id="nav-all">
+                        <i class="fa-solid fa-th-large w-4 text-center"></i>
+                        <span class="font-medium">Tous les médias</span>
+                        <span id="count-all" class="ml-auto text-xs font-semibold px-2 py-0.5 bg-slate-700 text-slate-300 rounded-[10px]">0</span>
+                    </div>
+                    
+                    <div onclick="navigateToView('recent')" 
+                         class="nav-item cursor-pointer flex items-center px-3 py-[9px] gap-x-3 text-sm rounded-2xl" id="nav-recent">
+                        <i class="fa-solid fa-clock w-4 text-center"></i>
+                        <span class="font-medium">Récents</span>
+                    </div>
+                </div>
+                
+                <div class="px-2 mt-1">
+                    <div class="flex items-center justify-between px-3 py-1">
+                        <span class="section-header font-semibold text-slate-300 px-1">DOSSIERS</span>
+                        <button onclick="createNewFolder()" 
+                                class="text-indigo-400 hover:text-indigo-300 transition-colors px-1.5 py-0.5">
+                            <i class="fa-solid fa-plus text-sm"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Folders Tree -->
+                    <div id="folders-tree" class="folder-tree custom-scroll mt-1 px-1 space-y-0.5 text-sm">
+                        <!-- Populated dynamically by JS -->
+                    </div>
+                </div>
+                
+                <div class="mt-auto px-3 pt-4 pb-1">
+                    <div class="px-3 py-3 bg-slate-900 rounded-2xl border border-slate-700">
+                        <div class="flex justify-between items-center px-1 mb-2">
+                            <div>
+                                <span class="text-xs font-semibold text-slate-400">Stockage utilisé</span>
+                            </div>
+                            <span id="storage-used" class="font-bold text-xs">0 MB</span>
+                        </div>
+                        
+                        <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                            <div id="storage-bar" class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all" style="width: 12%"></div>
+                        </div>
+                        
+                        <div class="flex justify-between px-1 mt-1">
+                            <span class="text-[10px] text-slate-400">~12 GB / 100 GB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 min-w-0">
+            
+            <!-- Breadcrumb + Actions -->
+            <div class="flex items-center justify-between mb-4 px-1">
+                <div class="flex items-center gap-x-2">
+                    <!-- Breadcrumb -->
+                    <div id="breadcrumb" class="flex items-center text-sm">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-x-[7px]">
+                    <!-- View toggle -->
+                    <div class="bg-slate-800 border border-slate-700 rounded-3xl p-1 flex items-center text-xs">
+                        <button onclick="setViewMode('grid')" id="btn-grid"
+                                class="px-3 py-1.5 flex items-center rounded-[2rem] bg-slate-700 text-white">
+                            <i class="fa-solid fa-th-large mr-1.5 text-xs"></i>
+                            <span class="font-semibold text-xs">Grille</span>
+                        </button>
+                        <button onclick="setViewMode('list')" id="btn-list"
+                                class="px-3 py-1.5 flex items-center rounded-[2rem] text-slate-300 hover:text-slate-200">
+                            <i class="fa-solid fa-list mr-1.5 text-xs"></i>
+                            <span class="font-semibold text-xs">Liste</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Filters -->
+                    <div class="flex items-center bg-slate-800 border border-slate-700 rounded-3xl p-1 text-xs">
+                        <select id="filter-type" onchange="filterMedia()" class="bg-transparent px-3 text-sm outline-none font-medium">
+                            <option value="all">Tous</option>
+                            <option value="image">Photos</option>
+                            <option value="video">Vidéos</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Sort -->
+                    <div class="flex items-center bg-slate-800 border border-slate-700 rounded-3xl p-1 text-xs">
+                        <select id="sort-select" onchange="filterMedia()" class="bg-transparent px-3 text-sm outline-none font-medium">
+                            <option value="date-desc">Date (récent)</option>
+                            <option value="date-asc">Date (ancien)</option>
+                            <option value="name-asc">Nom (A-Z)</option>
+                            <option value="name-desc">Nom (Z-A)</option>
+                            <option value="size-desc">Taille (grande)</option>
+                        </select>
+                    </div>
+                    
+                    <!-- No sample data - clean empty app -->
+                </div>
+            </div>
+            
+            <!-- Current folder info -->
+                <div class="flex items-center justify-between mb-3 px-1">
+                <div class="flex items-center gap-x-3">
+                    <div>
+                        <h2 id="current-folder-name" class="font-display text-2xl font-extrabold tracking-tighter">Tous les médias</h2>
+                        <p id="current-folder-info" class="text-xs text-slate-400">0 médias • 0 dossiers</p>
+                    </div>
+                    
+                    <!-- Delete current folder button (only when inside a folder) -->
+                    <button id="delete-folder-btn" onclick="deleteCurrentFolder()" 
+                            class="hidden items-center gap-x-1.5 px-3 py-1.5 text-xs font-semibold bg-red-900 hover:bg-red-800 text-red-200 rounded-2xl transition-colors">
+                        <i class="fa-solid fa-trash text-xs"></i>
+                        <span>Supprimer ce dossier</span>
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <!-- Bulk actions -->
+                    <div id="bulk-actions" class="hidden items-center bg-slate-800 border border-slate-700 px-1.5 py-1.5 rounded-3xl gap-x-1">
+                        <div class="px-3 text-xs flex items-center">
+                            <span id="selected-count" class="font-bold">0</span>
+                            <span class="ml-1 text-xs text-slate-300">sélectionnés</span>
+                        </div>
+                        
+                        <button onclick="moveSelected()" 
+                                class="px-3 py-1 flex items-center text-xs font-semibold gap-x-1.5 hover:bg-slate-700 transition-colors px-2.5 rounded-[2rem]">
+                            <i class="fa-solid fa-folder-open text-xs"></i>
+                            <span>Déplacer</span>
+                        </button>
+                        
+                        <button onclick="deleteSelected()" 
+                                class="px-3 py-1 flex items-center text-xs font-semibold gap-x-1.5 hover:bg-red-900 transition-colors px-2.5 rounded-[2rem]">
+                            <i class="fa-solid fa-trash text-xs"></i>
+                            <span>Supprimer</span>
+                        </button>
+                        
+                        <button onclick="clearSelection()" class="px-2 text-xs hover:bg-slate-700 transition-colors flex items-center px-1.5 py-1 rounded-[2rem]">
+                            <i class="fa-solid fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="text-xs px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded-3xl flex items-center gap-2">
+                        <span id="media-count-display" class="font-semibold px-1">0</span>
+                        <span class="text-xs text-slate-400">éléments</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Media Content Area -->
+            <div id="media-container" 
+                 class="min-h-[560px] bg-slate-800 border border-slate-700 rounded-3xl p-4 gallery-grid overflow-auto custom-scroll"
+                 ondrop="handleDrop(event)" 
+                 ondragover="handleDragOver(event)"
+                 ondragleave="handleDragLeave(event)">
+                
+                <!-- Grid View -->
+                <div id="media-grid" class="media-grid">
+                    <!-- Media cards populated by JS -->
+                </div>
+                
+                <!-- List View (hidden by default) -->
+                <div id="media-list" class="hidden">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-700 text-left">
+                                <th class="px-4 py-3 w-8"><input type="checkbox" id="select-all" onchange="toggleSelectAll(this)" class="accent-indigo-500"></th>
+                                <th class="px-4 py-3 font-medium text-slate-300">Nom</th>
+                                <th class="px-4 py-3 font-medium text-slate-300 w-24">Type</th>
+                                <th class="px-4 py-3 font-medium text-slate-300 w-20">Taille</th>
+                                <th class="px-4 py-3 font-medium text-slate-300 w-28">Date</th>
+                                <th class="px-4 py-3 font-medium text-slate-300 w-8"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="media-list-body" class="text-sm">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Empty state -->
+                <div id="empty-state" class="hidden flex flex-col items-center justify-center py-10 text-center px-4">
+                    <div class="w-16 h-16 bg-slate-700 rounded-[2.5rem] flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-folder-open text-4xl text-slate-400"></i>
+                    </div>
+                    <h4 class="font-semibold">Ce dossier est vide</h4>
+                    <p class="text-sm text-slate-400 max-w-[200px] mt-1">Glissez-déposez des fichiers ici ou téléversez-en.</p>
+                    
+                    <button onclick="triggerUpload()" 
+                            class="mt-4 px-5 py-2 text-sm bg-indigo-600 hover:bg-indigo-500 transition-colors rounded-3xl flex items-center gap-x-2 text-white font-semibold text-xs">
+                        <i class="fa-solid fa-upload"></i>
+                        <span>Téléverser des fichiers</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex justify-between items-center mt-3 px-1 text-xs">
+                <div class="text-slate-400">
+                    <span id="total-files-info">Stockage local uniquement (IndexedDB)</span>
+                </div>
+                <div>
+                    <button onclick="showStorageInfo()" class="flex items-center gap-x-1 text-indigo-300 hover:text-indigo-400 transition-colors text-xs">
+                        <i class="fa-solid fa-info-circle"></i>
+                        <span class="font-medium">Infos stockage</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Signature -->
+            <div class="mt-8 pt-5 border-t border-slate-700 text-center">
+                <img src="signature.png" alt="Miyuki" style="max-height: 82px; width: auto; margin: 0 auto 12px; display: block; filter: brightness(1.15) contrast(1.05);">
+                <div class="text-[10px] text-slate-500 font-medium">
+                    Privara • Stockage local • Conçu avec ❤️ sur Arena.ai
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- Upload Dropzone Overlay -->
+    <div id="dropzone-overlay" 
+         class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[100]">
+        <div class="bg-slate-800 border border-slate-600 w-[320px] rounded-3xl p-5 text-center">
+            <div class="mx-auto flex justify-center mb-4">
+                <div class="w-11 h-11 bg-slate-700 rounded-[2rem] flex items-center justify-center">
+                    <i class="fa-solid fa-cloud-upload-alt text-3xl text-indigo-400"></i>
+                </div>
+            </div>
+            <h4 class="font-extrabold">Déposez vos fichiers ici</h4>
+            <p class="text-xs text-slate-300 mt-1">Photos et vidéos acceptées (max ~100MB par fichier)</p>
+            
+            <div class="mt-4">
+                <button onclick="triggerUpload(); hideDropzone()" 
+                        class="px-5 text-sm py-[7px] transition-colors bg-indigo-600 text-white text-xs font-bold px-6 rounded-3xl">
+                    Choisir des fichiers
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Preview Modal (Fullscreen Gallery Viewer) -->
+    <div id="preview-modal" onclick="if (event.target.id === 'preview-modal') closePreviewModal()" 
+         class="hidden fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[200]">
+        <div onclick="event.stopImmediatePropagation()" 
+             class="w-full max-w-[98%] md:max-w-[1100px] mx-2 md:mx-4 bg-slate-900 border border-slate-700 rounded-3xl overflow-hidden shadow-2xl">
+            
+            <!-- Modal Header -->
+            <div class="px-4 py-3 flex items-center justify-between bg-slate-950 border-b border-slate-800">
+                <div class="flex items-center gap-x-3 min-w-0">
+                    <div id="preview-type-badge" class="px-2.5 py-0.5 text-xs font-extrabold rounded-[2rem]"></div>
+                    <span id="preview-filename" class="font-semibold text-base md:text-lg truncate max-w-[280px]"></span>
+                    
+                    <!-- Navigation counter -->
+                    <div class="hidden md:flex items-center px-3 py-1 bg-slate-800 text-xs font-semibold rounded-2xl text-slate-300">
+                        <span id="preview-counter">1 / 1</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-x-1.5">
+                    <!-- Navigation arrows in header -->
+                    <button onclick="showPrevMedia()" 
+                            class="px-3 py-2 text-lg hover:bg-slate-800 transition-colors flex items-center justify-center w-9 h-9 rounded-2xl bg-slate-800 text-white"
+                            title="Précédent (←)">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button onclick="showNextMedia()" 
+                            class="px-3 py-2 text-lg hover:bg-slate-800 transition-colors flex items-center justify-center w-9 h-9 rounded-2xl bg-slate-800 text-white"
+                            title="Suivant (→)">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    
+                    <!-- Fullscreen button -->
+                    <button onclick="toggleFullscreenPreview()" 
+                            class="px-3 py-[6px] transition-colors hover:bg-slate-800 px-3 flex items-center gap-x-1.5 text-xs font-semibold rounded-2xl bg-slate-800 text-white ml-1"
+                            title="Plein écran">
+                        <i class="fa-solid fa-expand"></i>
+                        <span class="hidden md:inline text-xs">Plein écran</span>
+                    </button>
+                    
+                    <button onclick="downloadCurrentMedia()" 
+                            class="px-3 py-[6px] transition-colors hover:bg-slate-800 px-3 flex items-center gap-x-1.5 text-xs font-semibold rounded-2xl bg-slate-800">
+                        <i class="fa-solid fa-download"></i>
+                        <span class="hidden sm:inline">Télécharger</span>
+                    </button>
+                    
+                    <button onclick="deleteCurrentMedia()" 
+                            class="px-3 py-[6px] transition-colors hover:bg-red-900 px-3 flex items-center gap-x-1.5 text-xs font-semibold rounded-2xl bg-slate-800 text-red-300">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                    
+                    <button onclick="closePreviewModal()" 
+                            class="px-3 py-1 transition-colors hover:bg-slate-800 w-9 h-9 flex items-center justify-center rounded-2xl bg-slate-800">
+                        <i class="fa-solid fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Preview Content (clickable area for navigation) -->
+            <div class="relative p-2 bg-slate-900" style="min-height: 420px; max-height: 78vh;">
+                <div id="preview-content" 
+                     class="min-h-[380px] max-h-[78vh] flex items-center justify-center bg-black rounded-2xl overflow-hidden cursor-pointer"
+                     onclick="handlePreviewContentClick(event)">
+                    <!-- Dynamic content: img or video inserted here -->
+                </div>
+                
+                <!-- Overlay arrows for navigation -->
+                <button onclick="event.stopImmediatePropagation(); showPrevMedia();" 
+                        class="absolute left-4 top-1/2 -translate-y-1/2 px-4 py-3 bg-black bg-opacity-50 hover:bg-opacity-70 transition-all text-white rounded-2xl flex items-center justify-center text-2xl w-11 h-11">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                
+                <button onclick="event.stopImmediatePropagation(); showNextMedia();" 
+                        class="absolute right-4 top-1/2 -translate-y-1/2 px-4 py-3 bg-black bg-opacity-50 hover:bg-opacity-70 transition-all text-white rounded-2xl flex items-center justify-center text-2xl w-11 h-11">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <!-- Footer -->
+            <div class="px-4 py-3 bg-slate-950 border-t border-slate-800 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-x-4 text-slate-300">
+                    <div>
+                        <span class="font-semibold">Taille :</span> 
+                        <span id="preview-size" class="font-semibold"></span>
+                    </div>
+                    <div class="hidden sm:block">
+                        <span class="font-semibold">Ajouté :</span> 
+                        <span id="preview-date" class="font-semibold"></span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-x-2">
+                    <button onclick="moveCurrentMedia()" 
+                            class="flex items-center gap-x-2 text-xs px-3.5 py-[6px] bg-slate-800 hover:bg-slate-700 transition-colors rounded-2xl px-4">
+                        <i class="fa-solid fa-folder text-xs"></i>
+                        <span class="font-semibold">Déplacer</span>
+                    </button>
+                    
+                    <button onclick="closePreviewModal()" 
+                            class="px-4 py-[6px] text-xs font-semibold bg-slate-800 hover:bg-slate-700 transition-colors rounded-2xl">
+                        Fermer
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+    <!-- Folder selection modal for move -->
+    <div id="move-modal" onclick="if (event.target.id === 'move-modal') closeMoveModal()" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[220]">
+        <div onclick="event.stopImmediatePropagation()" class="bg-slate-800 border border-slate-700 w-full max-w-md mx-4 rounded-3xl p-5">
+            <h4 class="font-bold px-1 text-lg">Déplacer vers</h4>
+            
+            <div class="my-4">
+                <div id="move-folder-list" class="max-h-[260px] overflow-auto custom-scroll space-y-[1px]">
+                    <!-- Folders populated dynamically -->
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-end gap-x-2">
+                <button onclick="closeMoveModal()" class="px-4 py-[7px] text-xs transition-colors px-5 font-semibold bg-slate-700 hover:bg-slate-600 rounded-3xl">Annuler</button>
+                <button onclick="confirmMove()" id="confirm-move-btn"
+                        class="px-4 py-[7px] text-xs transition-colors px-5 font-semibold bg-indigo-600 hover:bg-indigo-500 rounded-3xl">Déplacer</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-[300] flex flex-col gap-y-2"></div>
+    
+    <script>
+        // Tailwind script
+        function initializeTailwind() {
+            document.documentElement.style.setProperty('--accent', '#6366f1');
+            
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            'display': ['Space Grotesk', 'system-ui', 'sans-serif']
+                        }
+                    }
+                }
+            };
+        }
+        
+        // Global state
+        let db = null;
+        let currentView = 'all'; // 'all', 'recent', or folderId
+        let currentFolderId = null; // no root folder - null means show all media
+        let currentMedia = null;
+        let selectedItems = new Set();
+        let viewMode = 'grid';
+        let allMedia = [];
+        let allFolders = [];
+        
+        // Gallery navigation state
+        let currentFilteredMedia = [];
+        let currentPreviewIndex = 0;
+        
+        // DB Setup
+        async function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('MediaVaultDB', 2);
+                
+                request.onerror = () => {
+                    console.error('Erreur IndexedDB');
+                    reject(request.error);
+                };
+                
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    resolve(db);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const dbInstance = event.target.result;
+                    
+                    // Folders store
+                    if (!dbInstance.objectStoreNames.contains('folders')) {
+                        const foldersStore = dbInstance.createObjectStore('folders', { keyPath: 'id' });
+                        foldersStore.createIndex('parentId', 'parentId', { unique: false });
+                    }
+                    
+                    // Media store
+                    if (!dbInstance.objectStoreNames.contains('media')) {
+                        const mediaStore = dbInstance.createObjectStore('media', { keyPath: 'id' });
+                        mediaStore.createIndex('folderId', 'folderId', { unique: false });
+                        mediaStore.createIndex('date', 'date', { unique: false });
+                    }
+                };
+            });
+        }
+        
+        // Initialize default folders - COMPLETELY EMPTY (no root folder)
+        async function initDefaultFolders() {
+            // Do nothing — user starts with zero folders.
+            // Folders will only be created by the user.
+            return Promise.resolve();
+        }
+        
+        // Load all folders — no forced root folder (user created only)
+        async function loadFolders() {
+            return new Promise((resolve) => {
+                const tx = db.transaction('folders', 'readonly');
+                const store = tx.objectStore('folders');
+                const request = store.getAll();
+                
+                request.onsuccess = () => {
+                    allFolders = request.result || [];
+                    // No default folders (user creates their own)
+                    resolve(allFolders);
+                };
+                
+                request.onerror = () => {
+                    allFolders = [];
+                    resolve(allFolders);
+                };
+            });
+        }
+        
+        // Load all media
+        async function loadAllMedia() {
+            return new Promise((resolve) => {
+                const tx = db.transaction('media', 'readonly');
+                const store = tx.objectStore('media');
+                const request = store.getAll();
+                
+                request.onsuccess = () => {
+                    allMedia = request.result || [];
+                    resolve(allMedia);
+                };
+                
+                request.onerror = () => {
+                    allMedia = [];
+                    resolve(allMedia);
+                };
+            });
+        }
+        
+        // Save media item to DB
+        async function saveMediaToDB(mediaItem) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('media', 'readwrite');
+                const store = tx.objectStore('media');
+                const request = store.put(mediaItem);
+                
+                request.onsuccess = () => resolve(mediaItem);
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        // Save folder to DB
+        async function saveFolderToDB(folder) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('folders', 'readwrite');
+                const store = tx.objectStore('folders');
+                const request = store.put(folder);
+                
+                request.onsuccess = () => resolve(folder);
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        // Delete media from DB
+        async function deleteMediaFromDB(id) {
+            return new Promise((resolve) => {
+                const tx = db.transaction('media', 'readwrite');
+                const store = tx.objectStore('media');
+                const request = store.delete(id);
+                
+                request.onsuccess = () => {
+                    // remove from global state
+                    allMedia = allMedia.filter(m => m.id !== id);
+                    resolve();
+                };
+                request.onerror = () => resolve();
+            });
+        }
+        
+        // Delete folder from DB
+        async function deleteFolderFromDB(id) {
+            return new Promise((resolve) => {
+                const tx = db.transaction(['folders', 'media'], 'readwrite');
+                
+                // First delete media in the folder (and subfolders if any)
+                const mediaStore = tx.objectStore('media');
+                const mediaIndex = mediaStore.index('folderId');
+                const mediaReq = mediaIndex.openCursor(IDBKeyRange.only(id));
+                
+                let mediaToDelete = [];
+                
+                mediaReq.onsuccess = (e) => {
+                    const cursor = e.target.result;
+                    if (cursor) {
+                        mediaToDelete.push(cursor.value.id);
+                        cursor.continue();
+                    } else {
+                        // Delete all collected
+                        mediaToDelete.forEach(mid => {
+                            mediaStore.delete(mid);
+                        });
+                        
+                        // Delete the folder
+                        const folderStore = tx.objectStore('folders');
+                        folderStore.delete(id);
+                        
+                        // Update global state
+                        allMedia = allMedia.filter(m => m.folderId !== id);
+                        allFolders = allFolders.filter(f => f.id !== id);
+                        
+                        // Also handle subfolders? (recursive delete)
+                        const subfolders = allFolders.filter(f => f.parentId === id);
+                        subfolders.forEach(sf => {
+                            deleteFolderFromDB(sf.id); // recursive
+                        });
+                        
+                        resolve();
+                    }
+                };
+                
+                mediaReq.onerror = () => resolve();
+            });
+        }
+        
+        // Generate thumbnail
+        async function generateThumbnail(file) {
+            return new Promise((resolve) => {
+                if (!file) {
+                    resolve(null);
+                    return;
+                }
+                
+                const isImage = file.type.startsWith('image/');
+                const isVideo = file.type.startsWith('video/');
+                
+                if (isImage) {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d', { alpha: false });
+                        
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        const MAX = 280;
+                        
+                        if (width > height) {
+                            if (width > MAX) {
+                                height = Math.round(height * (MAX / width));
+                                width = MAX;
+                            }
+                        } else {
+                            if (height > MAX) {
+                                width = Math.round(width * (MAX / height));
+                                height = MAX;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        canvas.toBlob((blob) => {
+                            URL.revokeObjectURL(img.src);
+                            resolve(blob || null);
+                        }, 'image/jpeg', 0.82);
+                    };
+                    
+                    img.onerror = () => {
+                        URL.revokeObjectURL(img.src);
+                        resolve(null);
+                    };
+                    
+                    img.src = URL.createObjectURL(file);
+                } else if (isVideo) {
+                    const video = document.createElement('video');
+                    video.muted = true;
+                    video.playsInline = true;
+                    
+                    video.onloadedmetadata = () => {
+                        // seek to 1 second or 10% if shorter
+                        video.currentTime = Math.min(1, video.duration * 0.1);
+                    };
+                    
+                    video.onseeked = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d', { alpha: false });
+                        
+                        let width = video.videoWidth || 320;
+                        let height = video.videoHeight || 180;
+                        
+                        const MAX = 280;
+                        
+                        if (width > height) {
+                            if (width > MAX) {
+                                height = Math.round(height * (MAX / width));
+                                width = MAX;
+                            }
+                        } else {
+                            if (height > MAX) {
+                                width = Math.round(width * (MAX / height));
+                                height = MAX;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        ctx.drawImage(video, 0, 0, width, height);
+                        
+                        canvas.toBlob((blob) => {
+                            URL.revokeObjectURL(video.src);
+                            resolve(blob || null);
+                        }, 'image/jpeg', 0.82);
+                    };
+                    
+                    video.onerror = () => {
+                        URL.revokeObjectURL(video.src);
+                        resolve(null);
+                    };
+                    
+                    video.src = URL.createObjectURL(file);
+                    video.load();
+                } else {
+                    resolve(null);
+                }
+            });
+        }
+        
+        // Upload files
+        async function uploadFiles(files, targetFolderId = null) {
+            if (!files || files.length === 0) return;
+            
+            const folderId = targetFolderId || currentFolderId;
+            const loadingToast = showToast(`Téléversement de ${files.length} fichier(s)...`, true);
+            
+            let successCount = 0;
+            
+            for (let file of files) {
+                try {
+                    // Check file size (very large allowed but warn)
+                    if (file.size > 150 * 1024 * 1024) { // 150MB
+                        showToast(`Fichier trop volumineux : ${file.name}`, false);
+                        continue;
+                    }
+                    
+                    const id = 'media-' + Date.now() + '-' + Math.random().toString(16).slice(2, 9);
+                    
+                    // Generate thumbnail
+                    const thumbnailBlob = await generateThumbnail(file);
+                    
+                    const mediaItem = {
+                        id: id,
+                        name: file.name,
+                        type: file.type.startsWith('image/') ? 'image' : 'video',
+                        size: file.size,
+                        date: new Date().toISOString(),
+                        folderId: folderId,
+                        originalBlob: file,
+                        thumbnailBlob: thumbnailBlob
+                    };
+                    
+                    // Save to DB
+                    await saveMediaToDB(mediaItem);
+                    
+                    // Add to global array
+                    allMedia.push(mediaItem);
+                    
+                    successCount++;
+                } catch (err) {
+                    console.error('Erreur upload fichier:', err);
+                    showToast(`Erreur pour ${file.name}`, false);
+                }
+            }
+            
+            // Hide loading toast
+            if (loadingToast && loadingToast.remove) loadingToast.remove();
+            
+            // Refresh UI
+            await refreshUI();
+            
+            // Show success toast
+            showToast(`${successCount} fichier(s) ajouté(s) avec succès !`, false, true);
+            
+            // Update stats
+            updateStats();
+        }
+        
+        // Create new folder
+        async function createNewFolder(parentId = null) {
+            const folderName = prompt('Nom du nouveau dossier :', 'Nouveau dossier');
+            
+            if (!folderName || folderName.trim() === '') return;
+            
+            const id = 'folder-' + Date.now() + '-' + Math.random().toString(16).slice(2, 8);
+            
+            const newFolder = {
+                id: id,
+                name: folderName.trim(),
+                parentId: parentId || currentFolderId,
+                created: new Date().toISOString()
+            };
+            
+            // Save to DB
+            await saveFolderToDB(newFolder);
+            
+            // Add to global
+            allFolders.push(newFolder);
+            
+            // Refresh folders UI
+            await renderFoldersTree();
+            
+            // Navigate to the new folder
+            navigateToFolder(id);
+            
+            showToast(`Dossier "${folderName}" créé !`, false, true);
+        }
+        
+        // Render folders tree (no root folder) - sorted alphabetically
+        async function renderFoldersTree() {
+            const container = document.getElementById('folders-tree');
+            container.innerHTML = '';
+            
+            // Get top level folders (no parent) — ALPHABETICAL
+            const topLevel = allFolders
+                .filter(f => !f.parentId)
+                .sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
+            
+            // Render top level folders only
+            topLevel.forEach(folder => {
+                const folderEl = createFolderTreeItem(folder, 0);
+                container.appendChild(folderEl);
+                
+                // Render children
+                renderSubFolders(folder.id, container, 1);
+            });
+            
+            // Add "All media" if not already
+            if (currentView === 'all') {
+                const allEl = document.getElementById('nav-all');
+                if (allEl) allEl.classList.add('active');
+            }
+        }
+        
+        function renderSubFolders(parentId, container, level) {
+            const children = allFolders
+                .filter(f => f.parentId === parentId)
+                .sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
+            
+            children.forEach(child => {
+                const childEl = createFolderTreeItem(child, level);
+                container.appendChild(childEl);
+                
+                // Recurse for deeper nesting
+                renderSubFolders(child.id, container, level + 1);
+            });
+        }
+        
+        function createFolderTreeItem(folder, level) {
+            const div = document.createElement('div');
+            div.className = `tree-item cursor-pointer flex items-center px-2 py-[5px] gap-x-2 text-sm rounded-xl mb-0.5`;
+            if (level > 0) div.style.paddingLeft = `${level * 14 + 8}px`;
+            
+            const count = getMediaCountInFolder(folder.id);
+            const countHTML = count > 0 
+                ? `<span class="ml-auto text-[10px] px-1.5 py-px bg-slate-700 text-slate-400 font-bold rounded px-1.5">${count}</span>` 
+                : '';
+            
+            div.innerHTML = `
+                <div class="flex items-center flex-1 min-w-0">
+                    <i class="fa-solid fa-folder text-indigo-300 w-3.5"></i>
+                    <span class="ml-2 font-medium text-sm truncate">${folder.name}</span>
+                    ${countHTML}
+                </div>
+            `;
+            
+            // Event listeners
+            div.onclick = (e) => {
+                e.stopImmediatePropagation();
+                navigateToFolder(folder.id);
+            };
+            
+            // Context menu for folders
+            div.oncontextmenu = (e) => {
+                e.preventDefault();
+                showFolderContextMenu(e, folder);
+            };
+            
+            return div;
+        }
+        
+        function getMediaCountInFolder(folderId) {
+            return allMedia.filter(m => m.folderId === folderId).length;
+        }
+        
+        // Navigate to a specific folder
+        function navigateToFolder(folderId) {
+            currentView = 'folder';
+            currentFolderId = folderId;
+            
+            // Update nav states
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            // Find the active tree item and highlight
+            renderFoldersTree(); // re-render to update active class
+            
+            // Update UI elements
+            updateBreadcrumb();
+            filterMedia();
+            
+            // Update current folder name
+            const folder = allFolders.find(f => f.id === folderId) || {name: 'Dossier'};
+            document.getElementById('current-folder-name').innerHTML = folder.name;
+            
+            // Update info
+            const mediaCount = getMediaCountInFolder(folderId);
+            const subfoldersCount = allFolders.filter(f => f.parentId === folderId).length;
+            
+            document.getElementById('current-folder-info').innerHTML = `${mediaCount} médias • ${subfoldersCount} dossiers`;
+        }
+        
+        function navigateToView(view) {
+            currentView = view;
+            
+            // reset active states
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            if (view === 'all') {
+                document.getElementById('nav-all').classList.add('active');
+                currentFolderId = null;
+                document.getElementById('current-folder-name').innerHTML = 'Tous les médias';
+                document.getElementById('current-folder-info').innerHTML = `${allMedia.length} médias • ${allFolders.length} dossiers`;
+            } else if (view === 'recent') {
+                document.getElementById('nav-recent').classList.add('active');
+                currentFolderId = null;
+                document.getElementById('current-folder-name').innerHTML = 'Récents';
+                document.getElementById('current-folder-info').innerHTML = `Derniers médias ajoutés`;
+            }
+            
+            // Render folders to clear active states
+            renderFoldersTree();
+            
+            filterMedia();
+        }
+        
+        function updateBreadcrumb() {
+            const container = document.getElementById('breadcrumb');
+            container.innerHTML = '';
+            
+            if (currentView === 'all') {
+                const el = document.createElement('div');
+                el.className = `flex items-center gap-x-[5px]`;
+                el.innerHTML = `
+                    <span class="px-3 py-[3px] text-xs font-extrabold bg-slate-700 text-white rounded-[2rem] px-3.5 py-1">Tous les médias</span>
+                `;
+                container.appendChild(el);
+                return;
+            }
+            
+            if (currentView === 'recent') {
+                const el = document.createElement('div');
+                el.className = `flex items-center gap-x-[5px]`;
+                el.innerHTML = `
+                    <span class="px-3 py-[3px] text-xs font-extrabold bg-slate-700 text-white rounded-[2rem] px-3.5 py-1">Récents</span>
+                `;
+                container.appendChild(el);
+                return;
+            }
+            
+            // For folder navigation: build path (no root folder)
+            let path = [];
+            let current = allFolders.find(f => f.id === currentFolderId);
+            
+            while (current) {
+                path.unshift(current);
+                if (!current.parentId) break;
+                current = allFolders.find(f => f.id === current.parentId);
+            }
+            
+            path.forEach((folder, idx) => {
+                const span = document.createElement('span');
+                
+                if (idx === path.length - 1) {
+                    // last
+                    span.className = `px-3 py-[3px] flex items-center gap-x-1 text-xs font-extrabold bg-indigo-700 text-white rounded-[2rem] px-3.5 py-1`;
+                    span.innerHTML = `<span>${folder.name}</span>`;
+                    span.onclick = () => navigateToFolder(folder.id);
+                } else {
+                    span.className = `px-3 cursor-pointer py-[3px] flex items-center text-xs font-medium hover:bg-slate-700 px-3.5 transition-colors bg-slate-700 text-white rounded-[2rem]`;
+                    span.innerHTML = `<span>${folder.name}</span>`;
+                    span.onclick = () => navigateToFolder(folder.id);
+                }
+                
+                container.appendChild(span);
+                
+                if (idx < path.length - 1) {
+                    const arrow = document.createElement('span');
+                    arrow.className = `px-[3px] text-slate-500 text-xs flex items-center`;
+                    arrow.innerHTML = `<i class="fa-solid fa-chevron-right text-xs"></i>`;
+                    container.appendChild(arrow);
+                }
+            });
+        }
+        
+        // Filter and render media
+        function filterMedia() {
+            const grid = document.getElementById('media-grid');
+            const listBody = document.getElementById('media-list-body');
+            const emptyState = document.getElementById('empty-state');
+            
+            grid.innerHTML = '';
+            listBody.innerHTML = '';
+            emptyState.classList.add('hidden');
+            
+            let filteredMedia = [...allMedia];
+            
+            // Filter by view
+            if (currentView === 'folder') {
+                filteredMedia = filteredMedia.filter(m => m.folderId === currentFolderId);
+            } else if (currentView === 'recent') {
+                filteredMedia.sort((a, b) => new Date(b.date) - new Date(a.date));
+                filteredMedia = filteredMedia.slice(0, 50);
+            }
+            
+            // Apply type filter
+            const typeFilter = document.getElementById('filter-type').value;
+            if (typeFilter !== 'all') {
+                filteredMedia = filteredMedia.filter(m => m.type === typeFilter);
+            }
+            
+            // Search filter
+            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+            if (searchTerm !== '') {
+                filteredMedia = filteredMedia.filter(m => 
+                    m.name.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Sort
+            const sortMode = document.getElementById('sort-select').value;
+            filteredMedia.sort((a, b) => {
+                switch (sortMode) {
+                    case 'date-desc':
+                        return new Date(b.date) - new Date(a.date);
+                    case 'date-asc':
+                        return new Date(a.date) - new Date(b.date);
+                    case 'name-asc':
+                        return a.name.localeCompare(b.name);
+                    case 'name-desc':
+                        return b.name.localeCompare(a.name);
+                    case 'size-desc':
+                        return b.size - a.size;
+                    default:
+                        return new Date(b.date) - new Date(a.date);
+                }
+            });
+            
+            // Store for gallery navigation
+            currentFilteredMedia = filteredMedia;
+            
+            // Render grid or list
+            if (viewMode === 'grid') {
+                document.getElementById('media-grid').classList.remove('hidden');
+                document.getElementById('media-list').classList.add('hidden');
+                
+                if (filteredMedia.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+                
+                filteredMedia.forEach(media => {
+                    const card = createMediaCard(media);
+                    grid.appendChild(card);
+                });
+            } else {
+                // List view
+                document.getElementById('media-grid').classList.add('hidden');
+                document.getElementById('media-list').classList.remove('hidden');
+                
+                if (filteredMedia.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+                
+                filteredMedia.forEach(media => {
+                    const row = createMediaListRow(media);
+                    listBody.appendChild(row);
+                });
+            }
+            
+            // Update counts
+            document.getElementById('media-count-display').innerHTML = filteredMedia.length;
+            
+            // Update folder info if needed
+            if (currentView === 'folder') {
+                const folder = allFolders.find(f => f.id === currentFolderId);
+                if (folder) {
+                    const subCount = allFolders.filter(f => f.parentId === currentFolderId).length;
+                    document.getElementById('current-folder-info').innerHTML = `${filteredMedia.length} médias • ${subCount} dossiers`;
+                    
+                    // Show delete folder button (always for user folders)
+                    const delBtn = document.getElementById('delete-folder-btn');
+                    if (delBtn) {
+                        delBtn.classList.remove('hidden');
+                        delBtn.classList.add('flex');
+                    }
+                }
+            } else {
+                // Hide delete folder button when not in a specific folder
+                const delBtn = document.getElementById('delete-folder-btn');
+                if (delBtn) {
+                    delBtn.classList.add('hidden');
+                    delBtn.classList.remove('flex');
+                }
+                
+                if (currentView === 'all') {
+                    document.getElementById('current-folder-info').innerHTML = `${filteredMedia.length} médias • ${allFolders.length} dossiers`;
+                }
+            }
+            
+            // Update select-all checkbox if list
+            if (viewMode === 'list') {
+                const selectAll = document.getElementById('select-all');
+                if (selectAll) selectAll.checked = false;
+            }
+            
+            // Re-render selected UI
+            updateBulkActionsUI();
+        }
+        
+        function createMediaCard(media) {
+            const div = document.createElement('div');
+            div.className = `media-card bg-slate-700 border border-slate-600 rounded-3xl overflow-hidden grid-item cursor-pointer media-item group`;
+            div.dataset.id = media.id;
+            
+            const isSelected = selectedItems.has(media.id);
+            
+            const sizeStr = formatFileSize(media.size);
+            const dateStr = new Date(media.date).toLocaleDateString('fr-FR', {day: 'numeric', month: 'short'});
+            
+            let thumbHTML = '';
+            
+            if (media.thumbnailBlob) {
+                const thumbUrl = URL.createObjectURL(media.thumbnailBlob);
+                // store url temporarily to revoke later if wanted
+                div.dataset.thumbUrl = thumbUrl;
+                
+                if (media.type === 'image') {
+                    thumbHTML = `<img src="${thumbUrl}" class="w-full h-full object-cover" alt="${media.name}">`;
+                } else {
+                    thumbHTML = `
+                        <div class="w-full h-full relative">
+                            <img src="${thumbUrl}" class="w-full h-full object-cover" alt="${media.name}">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-8 h-8 bg-black bg-opacity-60 flex items-center justify-center rounded-full">
+                                    <i class="fa-solid fa-play text-white ml-[2px] text-sm"></i>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                // Fallback thumbnail
+                if (media.type === 'image') {
+                    thumbHTML = `<div class="thumbnail-placeholder w-full h-full"><i class="fa-solid fa-image text-4xl text-slate-400"></i></div>`;
+                } else {
+                    thumbHTML = `<div class="thumbnail-placeholder w-full h-full"><i class="fa-solid fa-video text-4xl text-slate-400"></i></div>`;
+                }
+            }
+            
+            div.innerHTML = `
+                <div class="thumbnail-container">
+                    ${thumbHTML}
+                    
+                    <!-- Selection checkbox -->
+                    <div class="absolute top-2 left-2 z-10 ${isSelected ? '' : 'opacity-0 group-hover:opacity-100'} transition-opacity">
+                        <div onclick="event.stopImmediatePropagation(); toggleSelectItem('${media.id}', this)" class="w-[17px] h-[17px] bg-white bg-opacity-90 rounded-md border border-slate-300 flex items-center justify-center shadow-sm">
+                            <input type="checkbox" ${isSelected ? 'checked' : ''} class="accent-indigo-600 pointer-events-none" style="width:13px; height:13px;">
+                        </div>
+                    </div>
+                    
+                    <!-- Type badge -->
+                    <div class="absolute top-2 right-2">
+                        <span class="file-type-badge ${media.type === 'image' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'} px-1.5 py-px">
+                            ${media.type === 'image' ? 'PHOTO' : 'VIDÉO'}
+                        </span>
+                    </div>
+                    
+                    <!-- Overlay info -->
+                    <div class="overlay absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-2.5 pt-5 pb-[6px] flex items-end">
+                        <div class="flex-1 min-w-0">
+                            <div class="text-white text-xs font-extrabold leading-none truncate">${media.name}</div>
+                            <div class="text-emerald-200 text-[9.8px] flex items-center mt-[1px]">
+                                <span>${sizeStr}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="px-3 py-[7px] flex justify-between items-center text-xs bg-slate-800">
+                    <div class="flex items-center">
+                        <span class="text-emerald-300 font-medium text-xs">${dateStr}</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-x-px">
+                        <button onclick="event.stopImmediatePropagation(); showPreview('${media.id}');" class="px-[5px] py-1 hover:bg-slate-700 transition-colors rounded-xl">
+                            <i class="fa-solid fa-eye text-xs text-indigo-300"></i>
+                        </button>
+                        
+                        <button onclick="event.stopImmediatePropagation(); showContextMenu(event, '${media.id}');" class="px-[5px] py-1 hover:bg-slate-700 transition-colors rounded-xl">
+                            <i class="fa-solid fa-ellipsis-h text-xs text-slate-300"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Click to preview
+            div.onclick = () => {
+                if (selectedItems.size > 0) {
+                    // if in selection mode, toggle select
+                    toggleSelectItem(media.id, null);
+                } else {
+                    showPreview(media.id);
+                }
+            };
+            
+            // Long press or right click for select
+            div.oncontextmenu = (e) => {
+                e.preventDefault();
+                toggleSelectItem(media.id, null);
+            };
+            
+            // Drag support
+            div.draggable = true;
+            div.ondragstart = (e) => {
+                e.dataTransfer.setData('text/plain', media.id);
+                e.dataTransfer.effectAllowed = 'move';
+            };
+            
+            return div;
+        }
+        
+        function createMediaListRow(media) {
+            const tr = document.createElement('tr');
+            tr.className = `border-b border-slate-700 hover:bg-slate-700 transition-colors group`;
+            tr.dataset.id = media.id;
+            
+            const isSelected = selectedItems.has(media.id);
+            const sizeStr = formatFileSize(media.size);
+            const dateStr = new Date(media.date).toLocaleDateString('fr-FR', {day: 'numeric', month: 'short', year: 'numeric'});
+            
+            let typeLabel = media.type === 'image' ? 
+                `<span class="px-2 text-[10px] py-[1px] bg-emerald-700 text-emerald-200 font-extrabold rounded-[8px]">PHOTO</span>` : 
+                `<span class="px-2 text-[10px] py-[1px] bg-rose-700 text-rose-200 font-extrabold rounded-[8px]">VIDÉO</span>`;
+            
+            tr.innerHTML = `
+                <td class="px-4 py-3">
+                    <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleSelectItem('${media.id}', this)" class="accent-indigo-600">
+                </td>
+                <td class="px-4 py-3">
+                    <div class="flex items-center gap-x-2.5">
+                        <div class="w-8 h-8 bg-slate-700 rounded-xl flex-shrink-0 overflow-hidden border border-slate-600">
+                            ${media.thumbnailBlob ? 
+                                `<img src="${URL.createObjectURL(media.thumbnailBlob)}" class="w-full h-full object-cover">` : 
+                                `<div class="w-full h-full flex items-center justify-center"><i class="fa-solid ${media.type === 'image' ? 'fa-image' : 'fa-video'} text-slate-400"></i></div>`
+                            }
+                        </div>
+                        <div class="min-w-0">
+                            <div class="font-medium truncate text-sm">${media.name}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-4 py-3">${typeLabel}</td>
+                <td class="px-4 py-3 text-xs font-medium text-slate-300">${sizeStr}</td>
+                <td class="px-4 py-3 text-xs font-medium">${dateStr}</td>
+                <td class="px-4 py-3">
+                    <div class="flex items-center gap-1">
+                        <button onclick="event.stopImmediatePropagation(); showPreview('${media.id}');" class="px-1.5 py-1 hover:bg-slate-600 transition-colors rounded-xl text-xs">
+                            <i class="fa-solid fa-eye text-indigo-300"></i>
+                        </button>
+                        
+                        <button onclick="event.stopImmediatePropagation(); showContextMenu(event, '${media.id}');" class="px-1.5 py-1 hover:bg-slate-600 transition-colors rounded-xl text-xs">
+                            <i class="fa-solid fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+            
+            tr.onclick = (e) => {
+                // only if not clicking checkbox or buttons
+                if (e.target.tagName === 'INPUT' || e.target.closest('button')) return;
+                
+                if (selectedItems.size > 0) {
+                    toggleSelectItem(media.id, null);
+                } else {
+                    showPreview(media.id);
+                }
+            };
+            
+            return tr;
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+        
+        // Show preview modal - FULLSCREEN GALLERY WITH ARROWS
+        function showPreview(mediaId) {
+            const media = allMedia.find(m => m.id === mediaId);
+            if (!media) return;
+            
+            currentMedia = media;
+            
+            // Find the index in the current filtered list for gallery navigation
+            currentPreviewIndex = currentFilteredMedia.findIndex(m => m.id === mediaId);
+            if (currentPreviewIndex === -1) {
+                // fallback: use allMedia
+                currentPreviewIndex = allMedia.findIndex(m => m.id === mediaId);
+                currentFilteredMedia = [...allMedia];
+            }
+            
+            const modal = document.getElementById('preview-modal');
+            const content = document.getElementById('preview-content');
+            content.innerHTML = '';
+            
+            // Update header info
+            document.getElementById('preview-filename').innerHTML = media.name;
+            
+            const badge = document.getElementById('preview-type-badge');
+            if (media.type === 'image') {
+                badge.innerHTML = `<span class="px-3 py-[1px] rounded-[2rem] bg-emerald-600 text-xs font-extrabold px-[7px]">PHOTO</span>`;
+            } else {
+                badge.innerHTML = `<span class="px-3 py-[1px] rounded-[2rem] bg-rose-600 text-xs font-extrabold px-[7px]">VIDÉO</span>`;
+            }
+            
+            // Update metadata
+            document.getElementById('preview-size').innerHTML = formatFileSize(media.size);
+            document.getElementById('preview-date').innerHTML = new Date(media.date).toLocaleDateString('fr-FR', { 
+                day: 'numeric', month: 'short', year: 'numeric' 
+            });
+            
+            // Update counter
+            updatePreviewCounter();
+            
+            // Create preview element (large)
+            if (media.type === 'image') {
+                if (media.originalBlob) {
+                    const url = URL.createObjectURL(media.originalBlob);
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.className = `max-h-[78vh] max-w-full object-contain rounded-xl shadow-inner`;
+                    img.style.maxHeight = '78vh';
+                    content.appendChild(img);
+                    content.dataset.previewUrl = url;
+                } else {
+                    const img = document.createElement('img');
+                    // Fallback placeholder only when original file is missing (very rare)
+                    img.src = 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%271200%27 height=%27900%27%3E%3Crect fill=%27%23334155%27 width=%271200%27 height=%27900%27/%3E%3Ctext x=%2750%25%27 y=%2750%25%27 dominant-baseline=%27middle%27 text-anchor=%27middle%27 fill=%27%2394a3b8%27 font-size=%2732%27%3EImage non disponible%3C/text%3E%3C/svg%3E';
+                    img.className = `max-h-[78vh] max-w-full object-contain rounded-xl`;
+                    content.appendChild(img);
+                }
+            } else {
+                // Video - large and centered
+                if (media.originalBlob) {
+                    const url = URL.createObjectURL(media.originalBlob);
+                    const video = document.createElement('video');
+                    video.src = url;
+                    video.controls = true;
+                    video.autoplay = true;
+                    video.className = `max-h-[78vh] max-w-full rounded-xl shadow-inner`;
+                    video.style.maxHeight = '78vh';
+                    content.appendChild(video);
+                    content.dataset.previewUrl = url;
+                } else {
+                    const placeholder = document.createElement('div');
+                    placeholder.className = `w-full h-[420px] flex flex-col items-center justify-center bg-slate-900 rounded-2xl`;
+                    placeholder.innerHTML = `
+                        <i class="fa-solid fa-video text-6xl text-slate-400 mb-4"></i>
+                        <span class="font-bold text-xl">Vidéo non disponible</span>
+                    `;
+                    content.appendChild(placeholder);
+                }
+            }
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Keyboard support for arrows + escape
+            document.addEventListener('keydown', handlePreviewKeyboard, { once: true });
+        }
+        
+        function updatePreviewCounter() {
+            const counterEl = document.getElementById('preview-counter');
+            if (counterEl && currentFilteredMedia.length > 0) {
+                counterEl.textContent = `${currentPreviewIndex + 1} / ${currentFilteredMedia.length}`;
+            }
+        }
+        
+        function showPrevMedia() {
+            if (!currentFilteredMedia.length || currentPreviewIndex <= 0) return;
+            
+            currentPreviewIndex--;
+            const prevMedia = currentFilteredMedia[currentPreviewIndex];
+            
+            // Clean up previous preview
+            const content = document.getElementById('preview-content');
+            if (content.dataset.previewUrl) {
+                URL.revokeObjectURL(content.dataset.previewUrl);
+            }
+            
+            showPreview(prevMedia.id);
+        }
+        
+        function showNextMedia() {
+            if (!currentFilteredMedia.length || currentPreviewIndex >= currentFilteredMedia.length - 1) return;
+            
+            currentPreviewIndex++;
+            const nextMedia = currentFilteredMedia[currentPreviewIndex];
+            
+            const content = document.getElementById('preview-content');
+            if (content.dataset.previewUrl) {
+                URL.revokeObjectURL(content.dataset.previewUrl);
+            }
+            
+            showPreview(nextMedia.id);
+        }
+        
+        function handlePreviewContentClick(e) {
+            // Click on the content area: go to next (if not video controls)
+            const target = e.target;
+            if (target.tagName === 'VIDEO' || target.closest('video')) return;
+            
+            // Right side of image = next, left side = previous
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            
+            if (clickX > rect.width / 2) {
+                showNextMedia();
+            } else {
+                showPrevMedia();
+            }
+        }
+        
+        function handlePreviewKeyboard(e) {
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                showNextMedia();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                showPrevMedia();
+            } else if (e.key === 'Escape') {
+                closePreviewModal();
+            } else if (e.key.toLowerCase() === 'f') {
+                e.preventDefault();
+                toggleFullscreenPreview();
+            }
+        }
+        
+        function toggleFullscreenPreview() {
+            const modal = document.getElementById('preview-modal');
+            const contentContainer = modal.querySelector('.max-w-\\[98\\%\\]');
+            
+            if (!document.fullscreenElement) {
+                if (modal.requestFullscreen) {
+                    modal.requestFullscreen();
+                } else if (modal.webkitRequestFullscreen) {
+                    modal.webkitRequestFullscreen();
+                } else if (modal.msRequestFullscreen) {
+                    modal.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+        
+        function closePreviewModal() {
+            const modal = document.getElementById('preview-modal');
+            const content = document.getElementById('preview-content');
+            
+            // Revoke preview URL if any
+            if (content.dataset.previewUrl) {
+                URL.revokeObjectURL(content.dataset.previewUrl);
+                delete content.dataset.previewUrl;
+            }
+            
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            content.innerHTML = '';
+            currentMedia = null;
+        }
+        
+        // Download current media
+        function downloadCurrentMedia() {
+            if (!currentMedia || !currentMedia.originalBlob) {
+                showToast('Impossible de télécharger ce fichier.', false);
+                return;
+            }
+            
+            const url = URL.createObjectURL(currentMedia.originalBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = currentMedia.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+            }, 1500);
+        }
+        
+        // Delete current media
+        async function deleteCurrentMedia() {
+            if (!currentMedia) return;
+            
+            if (!confirm(`Supprimer "${currentMedia.name}" ?`)) return;
+            
+            await deleteMediaFromDB(currentMedia.id);
+            
+            closePreviewModal();
+            await refreshUI();
+            
+            showToast('Média supprimé.', false);
+        }
+        
+        // Move current media
+        function moveCurrentMedia() {
+            if (!currentMedia) return;
+            
+            closePreviewModal();
+            showMoveModal([currentMedia.id]);
+        }
+        
+        // Show context menu for single item
+        function showContextMenu(e, mediaId) {
+            e.stopImmediatePropagation();
+            
+            // remove existing menus
+            document.querySelectorAll('.context-menu').forEach(el => el.remove());
+            
+            const media = allMedia.find(m => m.id === mediaId);
+            if (!media) return;
+            
+            const menu = document.createElement('div');
+            menu.className = `context-menu absolute z-[250] bg-slate-800 border border-slate-600 shadow-xl rounded-2xl py-1 w-44 text-sm`;
+            menu.style.top = `${e.pageY}px`;
+            menu.style.left = `${e.pageX}px`;
+            
+            menu.innerHTML = `
+                <div class="py-1 px-1">
+                    <div onclick="showPreview('${mediaId}'); removeContextMenus();" class="flex items-center gap-2 px-3 py-[6.5px] hover:bg-slate-700 cursor-pointer rounded-xl mx-1">
+                        <i class="fa-solid fa-eye w-4"></i>
+                        <span>Aperçu</span>
+                    </div>
+                    
+                    <div onclick="downloadMedia('${mediaId}'); removeContextMenus();" class="flex items-center gap-2 px-3 py-[6.5px] hover:bg-slate-700 cursor-pointer rounded-xl mx-1">
+                        <i class="fa-solid fa-download w-4"></i>
+                        <span>Télécharger</span>
+                    </div>
+                    
+                    <div class="my-1 border-t border-slate-700 mx-1"></div>
+                    
+                    <div onclick="showMoveModal(['${mediaId}']); removeContextMenus();" class="flex items-center gap-2 px-3 py-[6.5px] hover:bg-slate-700 cursor-pointer rounded-xl mx-1">
+                        <i class="fa-solid fa-folder-open w-4"></i>
+                        <span>Déplacer</span>
+                    </div>
+                    
+                    <div onclick="deleteMediaItem('${mediaId}'); removeContextMenus();" class="flex items-center gap-2 px-3 py-[6.5px] text-red-300 hover:bg-red-900 hover:bg-opacity-20 cursor-pointer rounded-xl mx-1">
+                        <i class="fa-solid fa-trash w-4"></i>
+                        <span>Supprimer</span>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(menu);
+            
+            // Click outside to close
+            setTimeout(() => {
+                document.addEventListener('click', function handler(ev) {
+                    if (!menu.contains(ev.target)) {
+                        menu.remove();
+                        document.removeEventListener('click', handler);
+                    }
+                }, { once: true });
+            }, 10);
+            
+            // Also close on escape
+            document.addEventListener('keydown', function escHandler(ev) {
+                if (ev.key === 'Escape') {
+                    menu.remove();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            }, { once: true });
+        }
+        
+        function removeContextMenus() {
+            document.querySelectorAll('.context-menu').forEach(el => el.remove());
+        }
+        
+        async function deleteMediaItem(mediaId) {
+            if (!confirm('Supprimer ce média ?')) return;
+            
+            await deleteMediaFromDB(mediaId);
+            await refreshUI();
+            showToast('Média supprimé', false);
+        }
+        
+        function downloadMedia(mediaId) {
+            const media = allMedia.find(m => m.id === mediaId);
+            if (!media || !media.originalBlob) {
+                showToast('Fichier non disponible.', false);
+                return;
+            }
+            
+            const url = URL.createObjectURL(media.originalBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = media.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            setTimeout(() => URL.revokeObjectURL(url), 1200);
+        }
+        
+        // Toggle select item
+        function toggleSelectItem(mediaId, element = null) {
+            if (selectedItems.has(mediaId)) {
+                selectedItems.delete(mediaId);
+            } else {
+                selectedItems.add(mediaId);
+            }
+            
+            // Re-render the current view to update UI
+            filterMedia();
+            
+            // If checkbox element passed, ensure sync
+            updateBulkActionsUI();
+        }
+        
+        function updateBulkActionsUI() {
+            const bulkBar = document.getElementById('bulk-actions');
+            const countEl = document.getElementById('selected-count');
+            
+            if (selectedItems.size > 0) {
+                bulkBar.style.display = 'flex';
+                countEl.innerHTML = selectedItems.size;
+            } else {
+                bulkBar.style.display = 'none';
+            }
+        }
+        
+        function clearSelection() {
+            selectedItems.clear();
+            filterMedia();
+            updateBulkActionsUI();
+        }
+        
+        function toggleSelectAll(checkbox) {
+            const listBody = document.getElementById('media-list-body');
+            const rows = listBody.querySelectorAll('tr');
+            
+            if (checkbox.checked) {
+                rows.forEach(row => {
+                    const id = row.dataset.id;
+                    if (id) selectedItems.add(id);
+                });
+            } else {
+                rows.forEach(row => {
+                    const id = row.dataset.id;
+                    selectedItems.delete(id);
+                });
+            }
+            
+            filterMedia();
+            updateBulkActionsUI();
+        }
+        
+        // Delete selected
+        async function deleteSelected() {
+            if (selectedItems.size === 0) return;
+            
+            if (!confirm(`Supprimer les ${selectedItems.size} éléments sélectionnés ?`)) {
+                return;
+            }
+            
+            const ids = Array.from(selectedItems);
+            
+            for (let id of ids) {
+                await deleteMediaFromDB(id);
+            }
+            
+            selectedItems.clear();
+            await refreshUI();
+            showToast(`${ids.length} médias supprimés`, false);
+        }
+        
+        // Move selected
+        function moveSelected() {
+            if (selectedItems.size === 0) return;
+            showMoveModal(Array.from(selectedItems));
+        }
+        
+        // Show move modal
+        function showMoveModal(mediaIds) {
+            const modal = document.getElementById('move-modal');
+            const container = document.getElementById('move-folder-list');
+            container.innerHTML = '';
+            
+            // Store the ids globally for the confirm
+            window.currentMoveIds = mediaIds;
+            
+            // Get all folders except current if in folder view — sorted alphabetically
+            let availableFolders = [...allFolders].sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
+            
+            
+            availableFolders.forEach(folder => {
+                const item = document.createElement('div');
+                item.className = `px-4 py-[8.5px] flex items-center cursor-pointer hover:bg-slate-700 rounded-2xl gap-x-3`;
+                
+                const icon = 'fa-folder';
+                
+                item.innerHTML = `
+                    <div class="flex items-center gap-x-[9px] flex-1">
+                        <i class="fa-solid ${icon} text-lg text-indigo-300 w-5"></i>
+                        <div>
+                            <span class="font-semibold">${folder.name}</span>
+                        </div>
+                    </div>
+                `;
+                
+                item.onclick = () => {
+                    // highlight selection
+                    document.querySelectorAll('#move-folder-list > div').forEach(el => {
+                        el.classList.remove('bg-indigo-700', 'bg-opacity-30');
+                    });
+                    item.classList.add('bg-indigo-700', 'bg-opacity-30');
+                    
+                    // store the target
+                    window.selectedMoveTarget = folder.id;
+                };
+                
+                container.appendChild(item);
+            });
+            
+            // Show modal
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // default select current folder if applicable
+            setTimeout(() => {
+                window.selectedMoveTarget = currentFolderId || null;
+            }, 200);
+        }
+        
+        function closeMoveModal() {
+            const modal = document.getElementById('move-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            
+            window.selectedMoveTarget = null;
+            window.currentMoveIds = null;
+        }
+        
+        async function confirmMove() {
+            const targetId = window.selectedMoveTarget;
+            const ids = window.currentMoveIds;
+            
+            if (!targetId || !ids || ids.length === 0) {
+                closeMoveModal();
+                return;
+            }
+            
+            // Update media items
+            let movedCount = 0;
+            
+            for (let id of ids) {
+                const media = allMedia.find(m => m.id === id);
+                if (media) {
+                    media.folderId = targetId;
+                    
+                    // Save to DB
+                    await saveMediaToDB(media);
+                    movedCount++;
+                }
+            }
+            
+            selectedItems.clear();
+            closeMoveModal();
+            await refreshUI();
+            
+            showToast(`${movedCount} élément(s) déplacé(s)`, false, true);
+        }
+        
+        // Update statistics
+        function updateStats() {
+            // Total count
+            const totalCount = allMedia.length;
+            document.getElementById('header-total-count').innerHTML = totalCount;
+            document.getElementById('count-all').innerHTML = totalCount;
+            
+            // Storage
+            let totalBytes = 0;
+            allMedia.forEach(m => {
+                totalBytes += m.size || 0;
+            });
+            
+            const usedMB = (totalBytes / (1024 * 1024)).toFixed(1);
+            document.getElementById('storage-used').innerHTML = `${usedMB} MB`;
+            
+            // Progress bar (simulated)
+            const percent = Math.min(Math.floor((totalBytes / (1024 * 1024 * 1024 * 100)) * 100), 100);
+            document.getElementById('storage-bar').style.width = `${Math.max(percent, 3)}%`;
+        }
+        
+        // Filter on search input
+        function setupSearch() {
+            const searchInput = document.getElementById('search-input');
+            
+            let debounce;
+            searchInput.addEventListener('input', () => {
+                clearTimeout(debounce);
+                debounce = setTimeout(() => {
+                    filterMedia();
+                }, 160);
+            });
+            
+            // Also allow enter to clear on empty
+            searchInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Escape') {
+                    searchInput.value = '';
+                    filterMedia();
+                }
+            });
+        }
+        
+        function setupFilters() {
+            const typeFilter = document.getElementById('filter-type');
+            const sortSelect = document.getElementById('sort-select');
+            
+            typeFilter.addEventListener('change', filterMedia);
+            sortSelect.addEventListener('change', filterMedia);
+        }
+        
+        // Drag and drop support
+        function handleDragOver(e) {
+            e.preventDefault();
+            const container = document.getElementById('media-container');
+            container.classList.add('!border-indigo-500', 'border-2');
+        }
+        
+        function handleDragLeave(e) {
+            const container = document.getElementById('media-container');
+            container.classList.remove('!border-indigo-500', 'border-2');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            const container = document.getElementById('media-container');
+            container.classList.remove('!border-indigo-500', 'border-2');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                uploadFiles(files);
+            }
+        }
+        
+        function setupDropzone() {
+            const container = document.getElementById('media-container');
+            
+            // Show overlay when dragging files globally
+            document.addEventListener('dragover', (e) => {
+                if (e.dataTransfer.types.includes('Files')) {
+                    e.preventDefault();
+                    document.getElementById('dropzone-overlay').classList.remove('hidden');
+                    document.getElementById('dropzone-overlay').classList.add('flex');
+                }
+            });
+            
+            const overlay = document.getElementById('dropzone-overlay');
+            
+            overlay.addEventListener('dragleave', () => {
+                overlay.classList.remove('flex');
+                overlay.classList.add('hidden');
+            });
+            
+            overlay.addEventListener('drop', (e) => {
+                e.preventDefault();
+                overlay.classList.remove('flex');
+                overlay.classList.add('hidden');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    uploadFiles(files);
+                }
+            });
+            
+            // Also click to upload on the overlay
+            overlay.onclick = (e) => {
+                if (e.target.id === 'dropzone-overlay') {
+                    overlay.classList.remove('flex');
+                    overlay.classList.add('hidden');
+                }
+            };
+        }
+        
+        function triggerUpload() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.accept = 'image/*,video/*';
+            
+            input.onchange = (e) => {
+                if (e.target.files.length > 0) {
+                    uploadFiles(e.target.files);
+                }
+            };
+            
+            input.click();
+        }
+        
+        // Sample data function completely removed - app starts 100% empty
+        // No predefined photos or videos
+        
+        // Show folder context menu
+        function showFolderContextMenu(e, folder) {
+            e.preventDefault();
+            
+            document.querySelectorAll('.context-menu').forEach(el => el.remove());
+            
+            const menu = document.createElement('div');
+            menu.className = `context-menu absolute z-[250] bg-slate-800 border border-slate-600 shadow-xl rounded-2xl py-1 w-48 text-sm`;
+            menu.style.top = `${e.pageY + 5}px`;
+            menu.style.left = `${e.pageX}px`;
+            
+            menu.innerHTML = `
+                <div class="py-1 px-1">
+                    <div onclick="renameFolder('${folder.id}'); removeContextMenus();" class="flex items-center gap-2 px-3 py-[6.5px] hover:bg-slate-700 cursor-pointer rounded-xl mx-1">
+                        <i class="fa-solid fa-edit w-4"></i>
+                        <span>Renommer</span>
+                    </div>
+                    
+                    <div onclick="createNewFolder('${folder.id}'); removeContextMenus();" class="flex items-center gap-2 px-3 py-[6.5px] hover:bg-slate-700 cursor-pointer rounded-xl mx-1">
+                        <i class="fa-solid fa-folder-plus w-4"></i>
+                        <span>Nouveau sous-dossier</span>
+                    </div>
+                    
+                    <div class="my-1 border-t border-slate-700 mx-1"></div>
+                    
+                    <div onclick="deleteFolder('${folder.id}'); removeContextMenus();" class="flex items-center gap-2 px-3 py-[6.5px] text-red-300 hover:bg-red-900 hover:bg-opacity-20 cursor-pointer rounded-xl mx-1">
+                        <i class="fa-solid fa-trash w-4"></i>
+                        <span>Supprimer dossier</span>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(menu);
+            
+            setTimeout(() => {
+                document.addEventListener('click', function handler(ev) {
+                    if (!menu.contains(ev.target)) {
+                        menu.remove();
+                        document.removeEventListener('click', handler);
+                    }
+                }, { once: true });
+            }, 10);
+        }
+        
+        async function renameFolder(folderId) {
+            const folder = allFolders.find(f => f.id === folderId);
+            if (!folder) return;
+            
+            const newName = prompt('Nouveau nom du dossier :', folder.name);
+            if (!newName || newName.trim() === '') return;
+            
+            folder.name = newName.trim();
+            
+            await saveFolderToDB(folder);
+            
+            await renderFoldersTree();
+            await refreshUI();
+            
+            showToast('Dossier renommé.', false, true);
+        }
+        
+        async function deleteFolder(folderId) {
+            const folder = allFolders.find(f => f.id === folderId);
+            if (!folder) return;
+            
+            const mediaCount = allMedia.filter(m => m.folderId === folderId).length;
+            const subfolders = allFolders.filter(f => f.parentId === folderId).length;
+            
+            const confirmMsg = `Supprimer le dossier "${folder.name}" ?\n\n${mediaCount} médias et ${subfolders} sous-dossiers seront aussi supprimés.`;
+            if (!confirm(confirmMsg)) return;
+            
+            await deleteFolderFromDB(folderId);
+            
+            // navigate back to all if needed
+            if (currentFolderId === folderId) {
+                navigateToView('all');
+            }
+            
+            await refreshUI();
+            showToast('Dossier supprimé avec succès.', false);
+        }
+
+        // Delete the currently viewed folder (button in UI)
+        function deleteCurrentFolder() {
+            if (currentView !== 'folder' || !currentFolderId) {
+                showToast('Aucun dossier à supprimer.', false);
+                return;
+            }
+            deleteFolder(currentFolderId);
+        }
+        
+        // Refresh full UI
+        async function refreshUI() {
+            await loadAllMedia();
+            await loadFolders();
+            
+            // Re-render folders
+            await renderFoldersTree();
+            
+            // Re-filter media
+            filterMedia();
+            
+            // Update stats
+            updateStats();
+            
+            // Update folder count in header
+            const totalMediaCount = allMedia.length;
+            document.getElementById('count-all').innerHTML = totalMediaCount;
+        }
+        
+        function showToast(message, persistent = false, success = false) {
+            const container = document.getElementById('toast-container');
+            
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-[9px] flex items-center shadow-lg max-w-xs gap-x-3 rounded-3xl border ${success ? 'bg-emerald-800 border-emerald-700' : 'bg-slate-800 border-slate-700'} text-sm`;
+            
+            let icon = success ? 
+                `<i class="fa-solid fa-check-circle text-emerald-300"></i>` : 
+                `<i class="fa-solid fa-info-circle text-indigo-300"></i>`;
+            
+            toast.innerHTML = `
+                <div class="flex items-center gap-x-3 px-1">
+                    <div>${icon}</div>
+                    <span class="font-medium">${message}</span>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            if (!persistent) {
+                setTimeout(() => {
+                    if (toast && toast.parentNode) toast.parentNode.removeChild(toast);
+                }, 2800);
+            }
+            
+            return toast;
+        }
+        
+        function setViewMode(mode) {
+            viewMode = mode;
+            
+            // update buttons
+            const gridBtn = document.getElementById('btn-grid');
+            const listBtn = document.getElementById('btn-list');
+            
+            if (mode === 'grid') {
+                gridBtn.classList.add('bg-slate-700', 'text-white');
+                listBtn.classList.remove('bg-slate-700', 'text-white');
+                listBtn.classList.add('text-slate-300');
+            } else {
+                listBtn.classList.add('bg-slate-700', 'text-white');
+                gridBtn.classList.remove('bg-slate-700', 'text-white');
+                gridBtn.classList.add('text-slate-300');
+            }
+            
+            filterMedia();
+        }
+        
+        async function updateFolderCounts() {
+            // This is handled in renderFoldersTree already
+        }
+        
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                if (e.key === '/' && document.activeElement.tagName === 'BODY') {
+                    e.preventDefault();
+                    document.getElementById('search-input').focus();
+                }
+                
+                if (e.metaKey && e.key === 'u') {
+                    e.preventDefault();
+                    triggerUpload();
+                }
+                
+                if (e.key === 'Escape') {
+                    const modal = document.getElementById('preview-modal');
+                    if (!modal.classList.contains('hidden')) {
+                        closePreviewModal();
+                    } else {
+                        const moveModal = document.getElementById('move-modal');
+                        if (!moveModal.classList.contains('hidden')) {
+                            closeMoveModal();
+                        } else {
+                            // clear selections
+                            if (selectedItems.size > 0) clearSelection();
+                        }
+                    }
+                }
+                
+                if (e.key.toLowerCase() === 'n' && e.metaKey) {
+                    e.preventDefault();
+                    createNewFolder();
+                }
+            });
+            
+            // hint on search
+            const search = document.getElementById('search-input');
+            search.placeholder = 'Rechercher des photos ou vidéos... (/)';
+        }
+        
+        function initializeSelection() {
+            // Clear selection on outside clicks
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#media-grid') && 
+                    !e.target.closest('#media-list') && 
+                    !e.target.closest('#bulk-actions')) {
+                    
+                    // Only clear if not clicking on a card or bulk bar
+                    if (selectedItems.size > 0 && !e.target.closest('.media-card')) {
+                        // don't auto clear, user can click elsewhere intentionally
+                    }
+                }
+            });
+        }
+
+        // Toggle sidebar (open / close) - SIMPLE + ROBUST CLASS-BASED
+        function toggleSidebar(e) {
+            if (e) e.preventDefault();
+            
+            console.log('%c🍔 HAMBURGER CLICKED - toggleSidebar running', 'color:#c026ff; font-weight:700');
+            
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar) {
+                console.error('Sidebar not found');
+                return;
+            }
+            
+            // Force reflow before change (helps some flex layouts)
+            void sidebar.offsetWidth;
+            
+            const isCollapsed = sidebar.classList.contains('sidebar-collapsed');
+            
+            // Clear any leftover inline styles so CSS classes control everything
+            sidebar.style.cssText = '';
+            
+            if (isCollapsed) {
+                // OPEN
+                sidebar.classList.remove('sidebar-collapsed');
+                console.log('%c✅ Sidebar OPENED', 'color:#22c55e');
+            } else {
+                // CLOSE
+                sidebar.classList.add('sidebar-collapsed');
+                console.log('%c✅ Sidebar CLOSED', 'color:#f59e0b');
+            }
+            
+            // Force another reflow + repaint after class change
+            void sidebar.offsetWidth;
+            requestAnimationFrame(() => {
+                // double check computed style in case
+                const cs = window.getComputedStyle(sidebar);
+                console.log('%c[Sidebar] computed width after toggle:', 'color:#64748b', cs.width);
+            });
+            
+            localStorage.setItem('mediavault_sidebar_collapsed', !isCollapsed);
+        }
+
+        // Restore sidebar state on load (class only - CSS controls everything)
+        function restoreSidebarState() {
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar) return;
+            
+            const collapsed = localStorage.getItem('mediavault_sidebar_collapsed') === 'true';
+            
+            // Always clear inline styles first
+            sidebar.style.cssText = '';
+            
+            if (collapsed) {
+                sidebar.classList.add('sidebar-collapsed');
+            } else {
+                sidebar.classList.remove('sidebar-collapsed');
+            }
+        }
+        
+        async function initializeApp() {
+            initializeTailwind();
+            
+            // Init IndexedDB
+            try {
+                await initDB();
+                await initDefaultFolders();
+                await loadFolders();
+                await loadAllMedia();
+            } catch (err) {
+                console.error('DB init error:', err);
+                // Fallback to memory only - completely empty (no root)
+                showToast('Stockage local limité (erreur DB)', false);
+                allFolders = [];
+                allMedia = [];
+            }
+            
+            // Initial render
+            await renderFoldersTree();
+            
+            // Set initial view: All media
+            document.getElementById('nav-all').classList.add('active');
+            document.getElementById('current-folder-name').innerHTML = 'Tous les médias';
+            document.getElementById('current-folder-info').innerHTML = `${allMedia.length} médias • 0 dossiers`;
+            
+            // Render initial media
+            filterMedia();
+            
+            // Update stats
+            updateStats();
+            
+            // Setup listeners
+            setupSearch();
+            setupFilters();
+            setupDropzone();
+            setupKeyboardShortcuts();
+            initializeSelection();
+            
+            // Restore sidebar collapsed state
+            restoreSidebarState();
+            
+            // Attach hamburger click listener (reliable, no inline onclick)
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            if (hamburgerBtn) {
+                // Remove any old onclick just in case
+                hamburgerBtn.onclick = null;
+                hamburgerBtn.addEventListener('click', toggleSidebar, { passive: false });
+                console.log('%c[Hamburger] Click listener attached successfully', 'color:#64748b');
+            } else {
+                console.error('Hamburger button not found for listener attachment');
+            }
+            
+            // Set default view mode
+            setViewMode('grid');
+            
+            // Initial update
+            document.getElementById('media-count-display').innerHTML = allMedia.length;
+            
+            // Show welcome toast if empty (no sample data)
+            if (allMedia.length === 0 && allFolders.length <= 1) {
+                setTimeout(() => {
+                    const welcome = showToast('Application vide. Créez des dossiers et téléversez vos médias.', false, true);
+                }, 1600);
+            }
+            
+            console.log('%c[Privara] Application initialisée. 100% vide au démarrage.', 'color:#64748b');
+
+            // === ULTRA AGGRESSIVE BLACK THEME v4 (MAXIMUM - beats Tailwind CDN) ===
+            // Pure #000000 everywhere. Repeated + MutationObserver + console logs
+            function forceBlackTheme() {
+                const PURE_BLACK = '#000000';
+                const PANEL_DARK = '#0a0a0a';
+                
+                try {
+                    // 1. Root + body + html - direct + inline
+                    document.documentElement.style.setProperty('background-color', PURE_BLACK, 'important');
+                    document.documentElement.style.setProperty('background', PURE_BLACK, 'important');
+                    
+                    document.body.style.setProperty('background-color', PURE_BLACK, 'important');
+                    document.body.style.setProperty('background', PURE_BLACK, 'important');
+                    document.body.style.setProperty('color', '#e2e8f0', 'important');
+                    
+                    // Force inline attribute too
+                    document.body.setAttribute('style', 'background:#000000 !important; color:#e2e8f0;');
+                    
+                    // 2. Mass nuke + force EVERY element
+                    const allEls = document.querySelectorAll('*');
+                    allEls.forEach(el => {
+                        if (!el || el.tagName === 'SCRIPT' || el.tagName === 'STYLE' || el.tagName === 'LINK') return;
+                        
+                        // Aggressively remove all possible Tailwind dark slate/gray/zinc classes
+                        const classesToRemove = [
+                            'bg-slate-900', 'bg-slate-800', 'bg-slate-700', 'bg-slate-600', 'bg-slate-950',
+                            'bg-slate-500', 'bg-slate-400', 'bg-slate-300', 'bg-slate-200', 'bg-slate-100',
+                            'bg-zinc-900', 'bg-zinc-800', 'bg-zinc-700', 'bg-zinc-600', 'bg-zinc-950',
+                            'bg-gray-900', 'bg-gray-800', 'bg-gray-700', 'bg-gray-600', 'bg-gray-950',
+                            'bg-neutral-900', 'bg-neutral-800', 'bg-neutral-700'
+                        ];
+                        classesToRemove.forEach(cls => el.classList.remove(cls));
+                        
+                        // Remove any remaining bg-slate* via className regex (last resort)
+                        if (el.className && typeof el.className === 'string') {
+                            el.className = el.className.replace(/\bbg-(slate|gray|zinc|neutral)-\d{1,3}\b/g, '');
+                        }
+                        
+                        // Decide force target
+                        const tag = el.tagName;
+                        const id = el.id;
+                        const cls = el.className || '';
+                        
+                        const isRoot = el === document.body || tag === 'HTML' || tag === 'BODY';
+                        const isMainContainer = id === 'sidebar' || 
+                                                cls.includes('vault-header') || 
+                                                cls.includes('max-w-screen-2xl') || 
+                                                cls.includes('app-container') ||
+                                                cls.includes('media-container') ||
+                                                id === 'media-container';
+                        
+                        const isCard = cls.includes('media-card') || 
+                                       cls.includes('stats-card') || 
+                                       cls.includes('bg-slate-800') || 
+                                       cls.includes('bg-slate-700');
+                        
+                        if (isRoot || isMainContainer) {
+                            el.style.setProperty('background-color', PURE_BLACK, 'important');
+                            el.style.setProperty('background', PURE_BLACK, 'important');
+                        } else if (isCard) {
+                            el.style.setProperty('background-color', PANEL_DARK, 'important');
+                            el.style.setProperty('background', PANEL_DARK, 'important');
+                        } else if (tag === 'HEADER' || tag === 'DIV' || tag === 'SECTION' || tag === 'ASIDE' || tag === 'NAV') {
+                            // Force pure black on almost everything else
+                            el.style.setProperty('background-color', PURE_BLACK, 'important');
+                        }
+                        
+                        // Force border overrides
+                        if (cls.includes('border-slate')) {
+                            el.style.setProperty('border-color', '#222222', 'important');
+                        }
+                    });
+                    
+                    // 3. Hardcoded key selectors - multiple passes
+                    const criticalSelectors = [
+                        'body', 'html', 'header', '#sidebar', '#media-container', 
+                        '.vault-header', '.app-container', '.max-w-screen-2xl',
+                        '#media-grid', '#media-list', '.media-card', '.stats-card',
+                        '.px-3.py-3.bg-slate-900', 'div[class*="bg-slate"]',
+                        '.mt-8.pt-5.border-t', 'div.mt-8'
+                    ];
+                    
+                    criticalSelectors.forEach(selector => {
+                        try {
+                            document.querySelectorAll(selector).forEach(el => {
+                                el.style.setProperty('background-color', PURE_BLACK, 'important');
+                                el.style.setProperty('background', PURE_BLACK, 'important');
+                            });
+                        } catch(e) {}
+                    });
+                    
+                    // 4. Signature area - extra black
+                    const sigContainers = document.querySelectorAll('.mt-8, .pt-5.border-t, img[src*="signature"]');
+                    sigContainers.forEach(el => {
+                        el.style.setProperty('background-color', PURE_BLACK, 'important');
+                        el.style.setProperty('background', PURE_BLACK, 'important');
+                    });
+                    
+                    // 5. Also force the main wrapper
+                    const mainWrap = document.querySelector('.max-w-screen-2xl');
+                    if (mainWrap) mainWrap.style.setProperty('background', PURE_BLACK, 'important');
+                    
+                    // Log for debugging (user can open console)
+                    if (Math.random() < 0.15) {
+                        console.log('%c[forceBlackTheme] Applied pure #000000 theme (v4)', 'color:#22c55e; font-size:9px');
+                    }
+                } catch (err) {
+                    console.warn('[forceBlackTheme] minor error', err);
+                }
+            }
+            
+            // Run aggressively on load + many timed passes
+            forceBlackTheme();
+            setTimeout(forceBlackTheme, 30);
+            setTimeout(forceBlackTheme, 90);
+            setTimeout(forceBlackTheme, 180);
+            setTimeout(forceBlackTheme, 320);
+            setTimeout(forceBlackTheme, 550);
+            setTimeout(forceBlackTheme, 850);
+            setTimeout(forceBlackTheme, 1300);
+            setTimeout(forceBlackTheme, 2000);
+            setTimeout(forceBlackTheme, 2800);
+            setTimeout(forceBlackTheme, 3800);
+            
+            // Keep forcing periodically (every 1.8s)
+            setInterval(forceBlackTheme, 1800);
+            
+            // Force on every click / interaction (Tailwind can re-apply on render)
+            document.addEventListener('click', () => setTimeout(forceBlackTheme, 20), true);
+            document.addEventListener('mousedown', () => setTimeout(forceBlackTheme, 30), true);
+            
+            // MutationObserver: catch any DOM changes, re-apply black instantly
+            const observer = new MutationObserver(() => {
+                // Debounce a bit
+                clearTimeout(window._blackThemeTimeout);
+                window._blackThemeTimeout = setTimeout(forceBlackTheme, 40);
+            });
+            observer.observe(document.documentElement, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['class', 'style']
+            });
+            
+            // Initial force on DOMContentLoaded too (backup)
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', forceBlackTheme);
+            } else {
+                setTimeout(forceBlackTheme, 10);
+            }
+
+            // === PWA Service Worker Registration ===
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js')
+                        .then((registration) => {
+                            console.log('%c[Privara PWA] Service Worker registered successfully', 'color:#22c55e');
+                        })
+                        .catch((error) => {
+                            console.log('%c[Privara PWA] Service Worker registration failed', 'color:#ef4444', error);
+                        });
+                });
+            }
+
+            // === PWA Install Prompt ===
+            let deferredPrompt;
+            const installBtn = document.getElementById('install-btn');
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                if (installBtn) {
+                    installBtn.classList.remove('hidden');
+                    installBtn.classList.add('flex');
+                }
+            });
+
+            if (installBtn) {
+                installBtn.addEventListener('click', async () => {
+                    if (!deferredPrompt) return;
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log('%c[Privara PWA] Install prompt outcome:', 'color:#64748b', outcome);
+                    deferredPrompt = null;
+                    installBtn.classList.add('hidden');
+                    installBtn.classList.remove('flex');
+                });
+            }
+
+            // Hide install button if already installed
+            window.addEventListener('appinstalled', () => {
+                if (installBtn) installBtn.classList.add('hidden');
+                console.log('%c[Privara PWA] App installed successfully!', 'color:#22c55e');
+            });
+            
+            // Debug helpers (no samples)
+            window.PRIVARA = {
+                refresh: refreshUI,
+                clearAll: async () => {
+                    if (!confirm('Effacer TOUT le contenu (médias + dossiers) ?')) return;
+                    const tx1 = db.transaction('media', 'readwrite');
+                    tx1.objectStore('media').clear();
+                    
+                    const tx2 = db.transaction('folders', 'readwrite');
+                    tx2.objectStore('folders').clear();
+                    
+                    allMedia = [];
+                    allFolders = [];
+                    await refreshUI();
+                    await initDefaultFolders();
+                    await loadFolders();
+                    await loadAllMedia();
+                    await renderFoldersTree();
+                }
+            };
+        }
+        
+        function showStorageInfo() {
+            const totalBytes = allMedia.reduce((acc, m) => acc + (m.size || 0), 0);
+            const usedMB = (totalBytes / 1024 / 1024).toFixed(2);
+            
+            const msg = `Stockage utilisé : ${usedMB} MB\n\nMédias : ${allMedia.length}\nDossiers : ${allFolders.length}\n\nLes données sont stockées localement dans votre navigateur (IndexedDB). Elles persistent jusqu'à ce que vous les effaciez manuellement.`;
+            
+            alert(msg);
+        }
+        
+        // Boot the app
+        window.onload = function() {
+            initializeApp();
+        }
+        
+        // Additional: allow dropping on the whole body in case
+        document.addEventListener('DOMContentLoaded', () => {
+            // Any final setup
+        });
+    </script>
+</body>
+</html>
