@@ -2,21 +2,22 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Privara • Coffre-fort Photos &amp; Vidéos</title>
 
-    <!-- PWA Meta -->
-    <link rel="manifest" href="manifest.json">
+    <!-- PWA Meta (inline-ready) -->
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Privara">
+    <meta name="mobile-web-app-capable" content="yes">
+    <!-- Apple Touch Icon (new lock logo) -->
     <link rel="apple-touch-icon" href="icons/icon-180.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- Google Fonts (with fallback) -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap" rel="stylesheet">
@@ -24,8 +25,6 @@
     <style>
         /* ================================================
            ROBUST FALLBACK CSS + APP STYLES
-           This file is 100% standalone.
-           Works even if Tailwind CDN fails to load.
            ================================================ */
         
         *, *::before, *::after {
@@ -45,11 +44,11 @@
             line-height: 1.5;
         }
         
-        /* === FALLBACK UTILITIES (so the app looks good even without Tailwind) === */
+        /* === FALLBACK UTILITIES === */
         .max-w-screen-2xl { max-width: 1536px; margin: 0 auto; }
         .flex { display: flex; }
         .items-center { align-items: center; }
-        .justify-between { justify-content: space-between; }
+        .justify-between { justify-between; }
         .gap-2 { gap: 0.5rem; }
         .gap-3 { gap: 0.75rem; }
         .gap-5 { gap: 1.25rem; }
@@ -78,11 +77,8 @@
         .border-b { border-bottom-width: 1px; }
         .border-slate-700 { border-color: #1a1a1a; }
         .border-slate-600 { border-color: #222222; }
-        /* ============================================
-           ULTRA FORCED PURE BLACK THEME v4 - MAXIMUM AGGRESSIVE
-           Kills Tailwind CDN completely. Pure #000000 for full app + signature.
-           Repeated !important + attribute selectors + JS nuking
-           ============================================ */
+        
+        /* ULTRA FORCED PURE BLACK THEME */
         html, body, 
         html *, body *, 
         .bg-slate-900, .bg-slate-800, .bg-slate-700, .bg-slate-600, .bg-slate-950,
@@ -98,7 +94,6 @@
             background-image: none !important;
         }
         
-        /* Slightly darker panels (pure dark gray-black) for cards and containers */
         .media-card, .stats-card, #media-container, .bg-slate-800.border,
         #sidebar > div, tr, .px-3.py-3.bg-slate-900,
         .bg-slate-700, .bg-slate-800, .vault-shadow,
@@ -108,32 +103,20 @@
             background: #0a0a0a !important;
         }
         
-        /* Force top-level containers absolutely */
         body, html, .max-w-screen-2xl, .app-container, header.vault-header, 
         #sidebar, #media-container, .flex-1.min-w-0 {
             background: #000000 !important;
             background-color: #000000 !important;
         }
         
-        /* Kill all Tailwind slate borders */
         .border-slate-700, .border-slate-600, .border-slate-800, .border-slate-500 {
             border-color: #222222 !important;
         }
         
-        /* Text colors */
         .text-slate-200, .text-slate-300, .text-slate-400, .text-slate-500 {
             color: #e2e8f0 !important;
         }
         
-        /* Signature section - pure black + good visibility */
-        .mt-8.pt-5.border-t, 
-        .mt-8.pt-5.border-t * {
-            background-color: #000000 !important;
-            background: #000000 !important;
-            border-color: #222222 !important;
-        }
-        
-        /* Extra safety: any element with bg- class */
         [class*="bg-"] {
             background-color: #000000 !important;
         }
@@ -154,7 +137,7 @@
         .transition-colors { transition: color 0.1s, background-color 0.1s; }
         .w-full { width: 100%; }
         
-        /* === CUSTOM APP STYLES (the beautiful design) === */
+        /* === CUSTOM APP STYLES === */
         .font-display {
             font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
             font-weight: 600;
@@ -293,7 +276,7 @@
             margin-right: auto;
         }
 
-        /* Sidebar toggle - RELIABLE CLASS-BASED (pure CSS) */
+        /* Sidebar toggle */
         #sidebar {
             width: 18rem;
             flex: 0 0 18rem;
@@ -319,7 +302,6 @@
             min-width: 0 !important;
         }
         
-        /* Force-hide inner content when collapsed (stronger) */
         #sidebar.sidebar-collapsed,
         #sidebar.sidebar-collapsed * {
             opacity: 0 !important;
@@ -327,7 +309,6 @@
             pointer-events: none !important;
         }
         
-        /* Ensure the parent flex container respects collapse */
         .app-container {
             transition: gap 0.28s ease;
         }
@@ -360,15 +341,188 @@
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
+
+        /* === PIN LOCK STYLES (NEW) === */
+        .pin-screen {
+            position: fixed;
+            inset: 0;
+            background: #000000;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .pin-container {
+            width: 100%;
+            max-width: 360px;
+            padding: 2rem 1.5rem;
+        }
+        
+        .pin-dots {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin-bottom: 2.5rem;
+        }
+        
+        .pin-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 9999px;
+            border: 2px solid #444444;
+            transition: all 0.2s ease;
+        }
+        
+        .pin-dot.filled {
+            background: #6366f1;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+        
+        .pin-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+        
+        .pin-key {
+            width: 72px;
+            height: 72px;
+            background: #111111;
+            border: 1px solid #222222;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.65rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            transition: all 0.1s ease;
+            user-select: none;
+        }
+        
+        .pin-key:active {
+            background: #1f2937;
+            transform: scale(0.95);
+        }
+        
+        .pin-key.zero {
+            grid-column: 2;
+        }
+        
+        .pin-key.delete {
+            background: #1f2937;
+            font-size: 1.35rem;
+        }
+        
+        .pin-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .pin-header h1 {
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: -.025em;
+        }
+        
+        .pin-header p {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-top: 6px;
+        }
+        
+        .pin-error {
+            color: #f87171;
+            font-size: 0.875rem;
+            text-align: center;
+            height: 22px;
+            margin-top: 10px;
+        }
+        
+        /* PWA Install button enhancements */
+        #install-btn {
+            transition: all 0.2s ease;
+        }
     </style>
 </head>
 <body style="background:#000000 !important; color:#e2e8f0;" class="text-slate-200">
+    
+    <!-- ===================== PIN LOCK SCREEN (NEW) ===================== -->
+    <div id="pin-screen" class="pin-screen hidden">
+        <div class="pin-container">
+            <!-- Header -->
+            <div class="pin-header">
+                    <div class="flex justify-center mb-4">
+                        <div class="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-inner overflow-hidden border border-slate-700">
+                            <img src="icons/icon-180.png" alt="Privara" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                <h1 id="pin-title" class="font-display text-white">Créer votre code</h1>
+                <p id="pin-subtitle">Choisissez un code à 6 chiffres</p>
+            </div>
+            
+            <!-- PIN Dots -->
+            <div class="pin-dots" id="pin-dots">
+                <div class="pin-dot" data-index="0"></div>
+                <div class="pin-dot" data-index="1"></div>
+                <div class="pin-dot" data-index="2"></div>
+                <div class="pin-dot" data-index="3"></div>
+                <div class="pin-dot" data-index="4"></div>
+                <div class="pin-dot" data-index="5"></div>
+            </div>
+            
+            <!-- Keypad -->
+            <div class="pin-keypad">
+                <div onclick="addPinDigit(1)" class="pin-key">1</div>
+                <div onclick="addPinDigit(2)" class="pin-key">2</div>
+                <div onclick="addPinDigit(3)" class="pin-key">3</div>
+                
+                <div onclick="addPinDigit(4)" class="pin-key">4</div>
+                <div onclick="addPinDigit(5)" class="pin-key">5</div>
+                <div onclick="addPinDigit(6)" class="pin-key">6</div>
+                
+                <div onclick="addPinDigit(7)" class="pin-key">7</div>
+                <div onclick="addPinDigit(8)" class="pin-key">8</div>
+                <div onclick="addPinDigit(9)" class="pin-key">9</div>
+                
+                <div onclick="clearPin()" class="pin-key delete"><i class="fa-solid fa-times"></i></div>
+                <div onclick="addPinDigit(0)" class="pin-key zero">0</div>
+                <div onclick="deleteLastPinDigit()" class="pin-key delete"><i class="fa-solid fa-backspace"></i></div>
+            </div>
+            
+            <div id="pin-error" class="pin-error"></div>
+            
+            <!-- Action buttons -->
+            <div class="mt-8 flex justify-center gap-3">
+                <button onclick="cancelPinSetup()" id="pin-cancel-btn"
+                        class="px-6 py-3 text-sm font-semibold bg-slate-800 hover:bg-slate-700 rounded-3xl transition-colors px-8 hidden">
+                    Annuler
+                </button>
+                <button onclick="confirmPin()" id="pin-confirm-btn"
+                        class="px-8 py-3 text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 rounded-3xl transition-colors hidden">
+                    Confirmer
+                </button>
+            </div>
+            
+            <div class="text-center mt-6">
+                <button onclick="forgotPin()" class="text-xs text-slate-400 hover:text-slate-300 transition-colors">
+                    Mot de passe oublié ?
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Header -->
     <header class="vault-header border-b border-slate-700 sticky top-0 z-50">
         <div class="max-w-screen-2xl mx-auto">
             <div class="px-6 py-3.5 flex items-center justify-between">
                 <div class="flex items-center gap-x-3">
-                    <!-- Three bars (hamburger menu) - left side of the app -->
+                    <!-- Hamburger -->
                     <button id="hamburger-btn"
                             class="flex items-center justify-center w-10 h-10 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-2xl text-3xl transition-all mr-1"
                             title="Ouvrir / Fermer les dossiers">
@@ -377,8 +531,8 @@
 
                     <!-- Logo -->
                     <div class="flex items-center gap-x-2.5">
-                        <div class="w-11 h-11 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-inner">
-                            <i class="fa-solid fa-photo-video text-white text-3xl"></i>
+                        <div class="w-11 h-11 bg-white rounded-2xl flex items-center justify-center shadow-inner overflow-hidden">
+                            <img src="icons/icon-180.png" alt="Privara" class="w-full h-full object-cover">
                         </div>
                         <div>
                             <span class="font-display text-3xl font-extrabold tracking-tighter">Privara</span>
@@ -394,7 +548,7 @@
                     
                     <!-- Version indicator -->
                     <div class="px-2 py-0.5 text-[10px] bg-emerald-900 text-emerald-300 font-bold rounded-full px-2.5" style="font-size:9.5px">
-                        v3.0 • PWA
+                        v4.0 • PWA
                     </div>
 
                     <!-- PWA Install Button -->
@@ -453,7 +607,7 @@
     
     <div class="max-w-screen-2xl mx-auto px-5 pt-5 pb-6 flex gap-5 app-container">
         
-        <!-- Sidebar (toggleable) -->
+        <!-- Sidebar -->
         <div id="sidebar">
             <div class="bg-slate-800 border border-slate-700 rounded-3xl p-1.5 flex flex-col h-full">
                 
@@ -555,20 +709,17 @@
                             <option value="size-desc">Taille (grande)</option>
                         </select>
                     </div>
-                    
-                    <!-- No sample data - clean empty app -->
                 </div>
             </div>
             
             <!-- Current folder info -->
-                <div class="flex items-center justify-between mb-3 px-1">
+            <div class="flex items-center justify-between mb-3 px-1">
                 <div class="flex items-center gap-x-3">
                     <div>
                         <h2 id="current-folder-name" class="font-display text-2xl font-extrabold tracking-tighter">Tous les médias</h2>
                         <p id="current-folder-info" class="text-xs text-slate-400">0 médias • 0 dossiers</p>
                     </div>
                     
-                    <!-- Delete current folder button (only when inside a folder) -->
                     <button id="delete-folder-btn" onclick="deleteCurrentFolder()" 
                             class="hidden items-center gap-x-1.5 px-3 py-1.5 text-xs font-semibold bg-red-900 hover:bg-red-800 text-red-200 rounded-2xl transition-colors">
                         <i class="fa-solid fa-trash text-xs"></i>
@@ -620,7 +771,7 @@
                     <!-- Media cards populated by JS -->
                 </div>
                 
-                <!-- List View (hidden by default) -->
+                <!-- List View -->
                 <div id="media-list" class="hidden">
                     <table class="w-full text-sm">
                         <thead>
@@ -669,9 +820,8 @@
 
             <!-- Signature -->
             <div class="mt-8 pt-5 border-t border-slate-700 text-center">
-                <img src="signature.png" alt="Miyuki" style="max-height: 82px; width: auto; margin: 0 auto 12px; display: block; filter: brightness(1.15) contrast(1.05);">
-                <div class="text-[10px] text-slate-500 font-medium">
-                </div>
+                <img src="https://batmanmiyuki.github.io/Privara/signature.png" alt="Miyuki" style="max-height: 82px; width: auto; margin: 0 auto 12px; display: block; filter: brightness(1.15) contrast(1.05);">
+                <div class="text-[10px] text-slate-500 font-medium"></div>
             </div>
         </div>
         
@@ -698,26 +848,23 @@
         </div>
     </div>
     
-    <!-- Preview Modal (Fullscreen Gallery Viewer) -->
+    <!-- Preview Modal -->
     <div id="preview-modal" onclick="if (event.target.id === 'preview-modal') closePreviewModal()" 
          class="hidden fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[200]">
         <div onclick="event.stopImmediatePropagation()" 
              class="w-full max-w-[98%] md:max-w-[1100px] mx-2 md:mx-4 bg-slate-900 border border-slate-700 rounded-3xl overflow-hidden shadow-2xl">
             
-            <!-- Modal Header -->
             <div class="px-4 py-3 flex items-center justify-between bg-slate-950 border-b border-slate-800">
                 <div class="flex items-center gap-x-3 min-w-0">
                     <div id="preview-type-badge" class="px-2.5 py-0.5 text-xs font-extrabold rounded-[2rem]"></div>
                     <span id="preview-filename" class="font-semibold text-base md:text-lg truncate max-w-[280px]"></span>
                     
-                    <!-- Navigation counter -->
                     <div class="hidden md:flex items-center px-3 py-1 bg-slate-800 text-xs font-semibold rounded-2xl text-slate-300">
                         <span id="preview-counter">1 / 1</span>
                     </div>
                 </div>
                 
                 <div class="flex items-center gap-x-1.5">
-                    <!-- Navigation arrows in header -->
                     <button onclick="showPrevMedia()" 
                             class="px-3 py-2 text-lg hover:bg-slate-800 transition-colors flex items-center justify-center w-9 h-9 rounded-2xl bg-slate-800 text-white"
                             title="Précédent (←)">
@@ -729,7 +876,6 @@
                         <i class="fa-solid fa-chevron-right"></i>
                     </button>
                     
-                    <!-- Fullscreen button -->
                     <button onclick="toggleFullscreenPreview()" 
                             class="px-3 py-[6px] transition-colors hover:bg-slate-800 px-3 flex items-center gap-x-1.5 text-xs font-semibold rounded-2xl bg-slate-800 text-white ml-1"
                             title="Plein écran">
@@ -755,27 +901,22 @@
                 </div>
             </div>
             
-            <!-- Preview Content (clickable area for navigation) -->
             <div class="relative p-2 bg-slate-900" style="min-height: 420px; max-height: 78vh;">
                 <div id="preview-content" 
                      class="min-h-[380px] max-h-[78vh] flex items-center justify-center bg-black rounded-2xl overflow-hidden cursor-pointer"
                      onclick="handlePreviewContentClick(event)">
-                    <!-- Dynamic content: img or video inserted here -->
                 </div>
                 
-                <!-- Overlay arrows for navigation -->
                 <button onclick="event.stopImmediatePropagation(); showPrevMedia();" 
                         class="absolute left-4 top-1/2 -translate-y-1/2 px-4 py-3 bg-black bg-opacity-50 hover:bg-opacity-70 transition-all text-white rounded-2xl flex items-center justify-center text-2xl w-11 h-11">
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
-                
                 <button onclick="event.stopImmediatePropagation(); showNextMedia();" 
                         class="absolute right-4 top-1/2 -translate-y-1/2 px-4 py-3 bg-black bg-opacity-50 hover:bg-opacity-70 transition-all text-white rounded-2xl flex items-center justify-center text-2xl w-11 h-11">
                     <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
             
-            <!-- Footer -->
             <div class="px-4 py-3 bg-slate-950 border-t border-slate-800 flex items-center justify-between text-xs">
                 <div class="flex items-center gap-x-4 text-slate-300">
                     <div>
@@ -805,14 +946,14 @@
         </div>
     </div>
     
-    <!-- Folder selection modal for move -->
+    <!-- Move Modal -->
     <div id="move-modal" onclick="if (event.target.id === 'move-modal') closeMoveModal()" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[220]">
         <div onclick="event.stopImmediatePropagation()" class="bg-slate-800 border border-slate-700 w-full max-w-md mx-4 rounded-3xl p-5">
             <h4 class="font-bold px-1 text-lg">Déplacer vers</h4>
             
             <div class="my-4">
                 <div id="move-folder-list" class="max-h-[260px] overflow-auto custom-scroll space-y-[1px]">
-                    <!-- Folders populated dynamically -->
+                    <!-- Populated dynamically -->
                 </div>
             </div>
             
@@ -828,7 +969,340 @@
     <div id="toast-container" class="fixed bottom-4 right-4 z-[300] flex flex-col gap-y-2"></div>
     
     <script>
-        // Tailwind script
+        // ===================== PIN LOCK SYSTEM (NEW) =====================
+        let currentPin = '';
+        let isFirstTime = false;
+        let pinMode = 'create'; // 'create' | 'confirm' | 'unlock'
+        
+        // Secure hash function (SHA-256)
+        async function hashPin(pin) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(pin);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        
+        function showPinScreen(mode = 'unlock') {
+            const screen = document.getElementById('pin-screen');
+            const title = document.getElementById('pin-title');
+            const subtitle = document.getElementById('pin-subtitle');
+            const errorEl = document.getElementById('pin-error');
+            const cancelBtn = document.getElementById('pin-cancel-btn');
+            const confirmBtn = document.getElementById('pin-confirm-btn');
+            
+            screen.classList.remove('hidden');
+            screen.style.display = 'flex';
+            
+            pinMode = mode;
+            currentPin = '';
+            updatePinDots();
+            errorEl.textContent = '';
+            
+            if (mode === 'create') {
+                isFirstTime = true;
+                title.textContent = 'Créer votre code';
+                subtitle.textContent = 'Choisissez un code à 6 chiffres sécurisé';
+                cancelBtn.classList.add('hidden');
+                confirmBtn.classList.add('hidden');
+            } else if (mode === 'confirm') {
+                title.textContent = 'Confirmer le code';
+                subtitle.textContent = 'Entrez à nouveau votre code';
+                cancelBtn.classList.remove('hidden');
+                confirmBtn.classList.add('hidden');
+            } else {
+                // unlock
+                isFirstTime = false;
+                title.textContent = 'Déverrouiller Privara';
+                subtitle.textContent = 'Entrez votre code à 6 chiffres';
+                cancelBtn.classList.add('hidden');
+                confirmBtn.classList.add('hidden');
+            }
+            
+            // Hide confirm button initially
+            confirmBtn.style.display = 'none';
+        }
+        
+        function updatePinDots() {
+            const dots = document.querySelectorAll('#pin-dots .pin-dot');
+            dots.forEach((dot, index) => {
+                if (index < currentPin.length) {
+                    dot.classList.add('filled');
+                } else {
+                    dot.classList.remove('filled');
+                }
+            });
+        }
+        
+        function addPinDigit(digit) {
+            const errorEl = document.getElementById('pin-error');
+            errorEl.textContent = '';
+            
+            if (currentPin.length < 6) {
+                currentPin += digit;
+                updatePinDots();
+                
+                // Auto-submit when 6 digits entered
+                if (currentPin.length === 6) {
+                    setTimeout(() => {
+                        if (pinMode === 'create') {
+                            handleCreatePin();
+                        } else if (pinMode === 'confirm') {
+                            handleConfirmPin();
+                        } else {
+                            handleUnlock();
+                        }
+                    }, 180);
+                }
+            }
+        }
+        
+        function deleteLastPinDigit() {
+            if (currentPin.length > 0) {
+                currentPin = currentPin.slice(0, -1);
+                updatePinDots();
+            }
+        }
+        
+        function clearPin() {
+            currentPin = '';
+            updatePinDots();
+            document.getElementById('pin-error').textContent = '';
+        }
+        
+        async function handleCreatePin() {
+            const errorEl = document.getElementById('pin-error');
+            
+            if (currentPin.length !== 6) {
+                errorEl.textContent = 'Le code doit contenir 6 chiffres';
+                return;
+            }
+            
+            // Switch to confirmation mode
+            pinMode = 'confirm';
+            const firstPin = currentPin;
+            currentPin = '';
+            updatePinDots();
+            
+            const title = document.getElementById('pin-title');
+            const subtitle = document.getElementById('pin-subtitle');
+            const cancelBtn = document.getElementById('pin-cancel-btn');
+            const confirmBtn = document.getElementById('pin-confirm-btn');
+            
+            title.textContent = 'Confirmer le code';
+            subtitle.textContent = 'Entrez à nouveau votre code';
+            cancelBtn.classList.remove('hidden');
+            confirmBtn.style.display = 'inline-block';
+            
+            // Store first PIN temporarily
+            window.tempFirstPin = firstPin;
+        }
+        
+        async function handleConfirmPin() {
+            const errorEl = document.getElementById('pin-error');
+            const firstPin = window.tempFirstPin;
+            
+            if (currentPin !== firstPin) {
+                errorEl.textContent = 'Les codes ne correspondent pas';
+                currentPin = '';
+                updatePinDots();
+                return;
+            }
+            
+            // Save hashed PIN
+            const hashedPin = await hashPin(currentPin);
+            localStorage.setItem('privara_pin_hash', hashedPin);
+            
+            // Success!
+            const screen = document.getElementById('pin-screen');
+            screen.style.transition = 'opacity 0.3s ease';
+            screen.style.opacity = '0';
+            
+            setTimeout(() => {
+                screen.style.display = 'none';
+                screen.style.opacity = '1';
+                screen.style.transition = '';
+                window.tempFirstPin = null;
+                
+                // Initialize the main app
+                initializeAppAfterPin();
+            }, 300);
+        }
+        
+        async function handleUnlock() {
+            const errorEl = document.getElementById('pin-error');
+            const storedHash = localStorage.getItem('privara_pin_hash');
+            
+            if (!storedHash) {
+                // Shouldn't happen
+                showPinScreen('create');
+                return;
+            }
+            
+            const enteredHash = await hashPin(currentPin);
+            
+            if (enteredHash === storedHash) {
+                // Success
+                const screen = document.getElementById('pin-screen');
+                screen.style.transition = 'opacity 0.25s ease';
+                screen.style.opacity = '0';
+                
+                setTimeout(() => {
+                    screen.style.display = 'none';
+                    screen.style.opacity = '1';
+                    screen.style.transition = '';
+                    
+                    initializeAppAfterPin();
+                }, 250);
+            } else {
+                errorEl.textContent = 'Code incorrect';
+                currentPin = '';
+                updatePinDots();
+                
+                // Shake animation
+                const dotsContainer = document.getElementById('pin-dots');
+                dotsContainer.style.transition = 'transform 0.1s';
+                dotsContainer.style.transform = 'translateX(8px)';
+                
+                setTimeout(() => {
+                    dotsContainer.style.transform = 'translateX(-8px)';
+                    setTimeout(() => {
+                        dotsContainer.style.transform = 'translateX(0)';
+                        dotsContainer.style.transition = '';
+                    }, 80);
+                }, 80);
+            }
+        }
+        
+        function cancelPinSetup() {
+            const screen = document.getElementById('pin-screen');
+            screen.style.display = 'none';
+            
+            // Go back to create mode if needed
+            if (pinMode === 'confirm') {
+                showPinScreen('create');
+            }
+        }
+        
+        function forgotPin() {
+            if (confirm('Voulez-vous réinitialiser le code PIN ?\n\nAttention : Toutes les données resteront intactes mais vous devrez créer un nouveau code.')) {
+                localStorage.removeItem('privara_pin_hash');
+                const screen = document.getElementById('pin-screen');
+                screen.style.display = 'none';
+                showPinScreen('create');
+            }
+        }
+        
+        function updatePinDotsVisual() {
+            // Already handled in updatePinDots()
+        }
+        
+        // ===================== PWA INLINE ENHANCEMENTS =====================
+        
+        // Create inline manifest (self-contained PWA) - using new lock logo
+        function registerInlineManifest() {
+            const manifest = {
+                "name": "Privara",
+                "short_name": "Privara",
+                "description": "Coffre-fort Photos & Vidéos sécurisé",
+                "start_url": "./",
+                "display": "standalone",
+                "background_color": "#000000",
+                "theme_color": "#000000",
+                "orientation": "portrait",
+                "icons": [
+                    {
+                        "src": "icons/icon-512.png",
+                        "sizes": "512x512",
+                        "type": "image/png"
+                    },
+                    {
+                        "src": "icons/icon-192.png",
+                        "sizes": "192x192",
+                        "type": "image/png"
+                    },
+                    {
+                        "src": "icons/icon-180.png",
+                        "sizes": "180x180",
+                        "type": "image/png"
+                    }
+                ],
+                "categories": ["productivity", "utilities"],
+                "lang": "fr"
+            };
+            
+            // Inject manifest as data URL
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(manifest));
+            document.head.appendChild(link);
+        }
+        
+        // Inline Service Worker registration + minimal SW code
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                // Create inline service worker via Blob
+                const swCode = `
+                    const CACHE_NAME = 'privara-v4';
+                    const ASSETS = [
+                        './',
+                        './index.html'
+                    ];
+                    
+                    self.addEventListener('install', (event) => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+                        );
+                        self.skipWaiting();
+                    });
+                    
+                    self.addEventListener('activate', (event) => {
+                        event.waitUntil(
+                            caches.keys().then(keys => 
+                                Promise.all(
+                                    keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+                                )
+                            )
+                        );
+                        self.clients.claim();
+                    });
+                    
+                    self.addEventListener('fetch', (event) => {
+                        if (event.request.method !== 'GET') return;
+                        
+                        event.respondWith(
+                            caches.match(event.request).then(response => {
+                                return response || fetch(event.request).then(fetchRes => {
+                                    return caches.open(CACHE_NAME).then(cache => {
+                                        cache.put(event.request, fetchRes.clone());
+                                        return fetchRes;
+                                    });
+                                });
+                            }).catch(() => {
+                                // Offline fallback
+                                if (event.request.destination === 'document') {
+                                    return caches.match('./');
+                                }
+                            })
+                        );
+                    });
+                `;
+                
+                const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(swBlob);
+                
+                navigator.serviceWorker.register(swUrl)
+                    .then(registration => {
+                        console.log('%c[Privara PWA] Service Worker inline registered', 'color:#22c55e');
+                    })
+                    .catch(err => {
+                        console.log('%c[Privara PWA] SW registration failed', 'color:#ef4444', err);
+                    });
+            }
+        }
+        
+        // ===================== ORIGINAL APP CODE (kept intact) =====================
+        
         function initializeTailwind() {
             document.documentElement.style.setProperty('--accent', '#6366f1');
             
@@ -845,19 +1319,16 @@
         
         // Global state
         let db = null;
-        let currentView = 'all'; // 'all', 'recent', or folderId
-        let currentFolderId = null; // no root folder - null means show all media
+        let currentView = 'all';
+        let currentFolderId = null;
         let currentMedia = null;
         let selectedItems = new Set();
         let viewMode = 'grid';
         let allMedia = [];
         let allFolders = [];
-        
-        // Gallery navigation state
         let currentFilteredMedia = [];
         let currentPreviewIndex = 0;
         
-        // DB Setup
         async function initDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open('MediaVaultDB', 2);
@@ -875,13 +1346,11 @@
                 request.onupgradeneeded = (event) => {
                     const dbInstance = event.target.result;
                     
-                    // Folders store
                     if (!dbInstance.objectStoreNames.contains('folders')) {
                         const foldersStore = dbInstance.createObjectStore('folders', { keyPath: 'id' });
                         foldersStore.createIndex('parentId', 'parentId', { unique: false });
                     }
                     
-                    // Media store
                     if (!dbInstance.objectStoreNames.contains('media')) {
                         const mediaStore = dbInstance.createObjectStore('media', { keyPath: 'id' });
                         mediaStore.createIndex('folderId', 'folderId', { unique: false });
@@ -891,14 +1360,10 @@
             });
         }
         
-        // Initialize default folders - COMPLETELY EMPTY (no root folder)
         async function initDefaultFolders() {
-            // Do nothing — user starts with zero folders.
-            // Folders will only be created by the user.
             return Promise.resolve();
         }
         
-        // Load all folders — no forced root folder (user created only)
         async function loadFolders() {
             return new Promise((resolve) => {
                 const tx = db.transaction('folders', 'readonly');
@@ -907,7 +1372,6 @@
                 
                 request.onsuccess = () => {
                     allFolders = request.result || [];
-                    // No default folders (user creates their own)
                     resolve(allFolders);
                 };
                 
@@ -918,7 +1382,6 @@
             });
         }
         
-        // Load all media
         async function loadAllMedia() {
             return new Promise((resolve) => {
                 const tx = db.transaction('media', 'readonly');
@@ -937,7 +1400,6 @@
             });
         }
         
-        // Save media item to DB
         async function saveMediaToDB(mediaItem) {
             return new Promise((resolve, reject) => {
                 const tx = db.transaction('media', 'readwrite');
@@ -949,7 +1411,6 @@
             });
         }
         
-        // Save folder to DB
         async function saveFolderToDB(folder) {
             return new Promise((resolve, reject) => {
                 const tx = db.transaction('folders', 'readwrite');
@@ -961,7 +1422,6 @@
             });
         }
         
-        // Delete media from DB
         async function deleteMediaFromDB(id) {
             return new Promise((resolve) => {
                 const tx = db.transaction('media', 'readwrite');
@@ -969,7 +1429,6 @@
                 const request = store.delete(id);
                 
                 request.onsuccess = () => {
-                    // remove from global state
                     allMedia = allMedia.filter(m => m.id !== id);
                     resolve();
                 };
@@ -977,12 +1436,10 @@
             });
         }
         
-        // Delete folder from DB
         async function deleteFolderFromDB(id) {
             return new Promise((resolve) => {
                 const tx = db.transaction(['folders', 'media'], 'readwrite');
                 
-                // First delete media in the folder (and subfolders if any)
                 const mediaStore = tx.objectStore('media');
                 const mediaIndex = mediaStore.index('folderId');
                 const mediaReq = mediaIndex.openCursor(IDBKeyRange.only(id));
@@ -995,23 +1452,19 @@
                         mediaToDelete.push(cursor.value.id);
                         cursor.continue();
                     } else {
-                        // Delete all collected
                         mediaToDelete.forEach(mid => {
                             mediaStore.delete(mid);
                         });
                         
-                        // Delete the folder
                         const folderStore = tx.objectStore('folders');
                         folderStore.delete(id);
                         
-                        // Update global state
                         allMedia = allMedia.filter(m => m.folderId !== id);
                         allFolders = allFolders.filter(f => f.id !== id);
                         
-                        // Also handle subfolders? (recursive delete)
                         const subfolders = allFolders.filter(f => f.parentId === id);
                         subfolders.forEach(sf => {
-                            deleteFolderFromDB(sf.id); // recursive
+                            deleteFolderFromDB(sf.id);
                         });
                         
                         resolve();
@@ -1022,7 +1475,6 @@
             });
         }
         
-        // Generate thumbnail
         async function generateThumbnail(file) {
             return new Promise((resolve) => {
                 if (!file) {
@@ -1041,7 +1493,6 @@
                         
                         let width = img.width;
                         let height = img.height;
-                        
                         const MAX = 280;
                         
                         if (width > height) {
@@ -1058,7 +1509,6 @@
                         
                         canvas.width = width;
                         canvas.height = height;
-                        
                         ctx.drawImage(img, 0, 0, width, height);
                         
                         canvas.toBlob((blob) => {
@@ -1079,7 +1529,6 @@
                     video.playsInline = true;
                     
                     video.onloadedmetadata = () => {
-                        // seek to 1 second or 10% if shorter
                         video.currentTime = Math.min(1, video.duration * 0.1);
                     };
                     
@@ -1089,7 +1538,6 @@
                         
                         let width = video.videoWidth || 320;
                         let height = video.videoHeight || 180;
-                        
                         const MAX = 280;
                         
                         if (width > height) {
@@ -1106,7 +1554,6 @@
                         
                         canvas.width = width;
                         canvas.height = height;
-                        
                         ctx.drawImage(video, 0, 0, width, height);
                         
                         canvas.toBlob((blob) => {
@@ -1128,7 +1575,6 @@
             });
         }
         
-        // Upload files
         async function uploadFiles(files, targetFolderId = null) {
             if (!files || files.length === 0) return;
             
@@ -1139,15 +1585,13 @@
             
             for (let file of files) {
                 try {
-                    // Check file size (very large allowed but warn)
-                    if (file.size > 150 * 1024 * 1024) { // 150MB
+                    if (file.size > 150 * 1024 * 1024) {
                         showToast(`Fichier trop volumineux : ${file.name}`, false);
                         continue;
                     }
                     
                     const id = 'media-' + Date.now() + '-' + Math.random().toString(16).slice(2, 9);
                     
-                    // Generate thumbnail
                     const thumbnailBlob = await generateThumbnail(file);
                     
                     const mediaItem = {
@@ -1161,12 +1605,8 @@
                         thumbnailBlob: thumbnailBlob
                     };
                     
-                    // Save to DB
                     await saveMediaToDB(mediaItem);
-                    
-                    // Add to global array
                     allMedia.push(mediaItem);
-                    
                     successCount++;
                 } catch (err) {
                     console.error('Erreur upload fichier:', err);
@@ -1174,20 +1614,13 @@
                 }
             }
             
-            // Hide loading toast
             if (loadingToast && loadingToast.remove) loadingToast.remove();
             
-            // Refresh UI
             await refreshUI();
-            
-            // Show success toast
             showToast(`${successCount} fichier(s) ajouté(s) avec succès !`, false, true);
-            
-            // Update stats
             updateStats();
         }
         
-        // Create new folder
         async function createNewFolder(parentId = null) {
             const folderName = prompt('Nom du nouveau dossier :', 'Nouveau dossier');
             
@@ -1202,41 +1635,29 @@
                 created: new Date().toISOString()
             };
             
-            // Save to DB
             await saveFolderToDB(newFolder);
-            
-            // Add to global
             allFolders.push(newFolder);
             
-            // Refresh folders UI
             await renderFoldersTree();
-            
-            // Navigate to the new folder
             navigateToFolder(id);
             
             showToast(`Dossier "${folderName}" créé !`, false, true);
         }
         
-        // Render folders tree (no root folder) - sorted alphabetically
         async function renderFoldersTree() {
             const container = document.getElementById('folders-tree');
             container.innerHTML = '';
             
-            // Get top level folders (no parent) — ALPHABETICAL
             const topLevel = allFolders
                 .filter(f => !f.parentId)
                 .sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
             
-            // Render top level folders only
             topLevel.forEach(folder => {
                 const folderEl = createFolderTreeItem(folder, 0);
                 container.appendChild(folderEl);
-                
-                // Render children
                 renderSubFolders(folder.id, container, 1);
             });
             
-            // Add "All media" if not already
             if (currentView === 'all') {
                 const allEl = document.getElementById('nav-all');
                 if (allEl) allEl.classList.add('active');
@@ -1251,8 +1672,6 @@
             children.forEach(child => {
                 const childEl = createFolderTreeItem(child, level);
                 container.appendChild(childEl);
-                
-                // Recurse for deeper nesting
                 renderSubFolders(child.id, container, level + 1);
             });
         }
@@ -1275,13 +1694,11 @@
                 </div>
             `;
             
-            // Event listeners
             div.onclick = (e) => {
                 e.stopImmediatePropagation();
                 navigateToFolder(folder.id);
             };
             
-            // Context menu for folders
             div.oncontextmenu = (e) => {
                 e.preventDefault();
                 showFolderContextMenu(e, folder);
@@ -1294,26 +1711,20 @@
             return allMedia.filter(m => m.folderId === folderId).length;
         }
         
-        // Navigate to a specific folder
         function navigateToFolder(folderId) {
             currentView = 'folder';
             currentFolderId = folderId;
             
-            // Update nav states
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             
-            // Find the active tree item and highlight
-            renderFoldersTree(); // re-render to update active class
+            renderFoldersTree();
             
-            // Update UI elements
             updateBreadcrumb();
             filterMedia();
             
-            // Update current folder name
             const folder = allFolders.find(f => f.id === folderId) || {name: 'Dossier'};
             document.getElementById('current-folder-name').innerHTML = folder.name;
             
-            // Update info
             const mediaCount = getMediaCountInFolder(folderId);
             const subfoldersCount = allFolders.filter(f => f.parentId === folderId).length;
             
@@ -1323,7 +1734,6 @@
         function navigateToView(view) {
             currentView = view;
             
-            // reset active states
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             
             if (view === 'all') {
@@ -1338,9 +1748,7 @@
                 document.getElementById('current-folder-info').innerHTML = `Derniers médias ajoutés`;
             }
             
-            // Render folders to clear active states
             renderFoldersTree();
-            
             filterMedia();
         }
         
@@ -1368,7 +1776,6 @@
                 return;
             }
             
-            // For folder navigation: build path (no root folder)
             let path = [];
             let current = allFolders.find(f => f.id === currentFolderId);
             
@@ -1382,7 +1789,6 @@
                 const span = document.createElement('span');
                 
                 if (idx === path.length - 1) {
-                    // last
                     span.className = `px-3 py-[3px] flex items-center gap-x-1 text-xs font-extrabold bg-indigo-700 text-white rounded-[2rem] px-3.5 py-1`;
                     span.innerHTML = `<span>${folder.name}</span>`;
                     span.onclick = () => navigateToFolder(folder.id);
@@ -1403,7 +1809,6 @@
             });
         }
         
-        // Filter and render media
         function filterMedia() {
             const grid = document.getElementById('media-grid');
             const listBody = document.getElementById('media-list-body');
@@ -1415,7 +1820,6 @@
             
             let filteredMedia = [...allMedia];
             
-            // Filter by view
             if (currentView === 'folder') {
                 filteredMedia = filteredMedia.filter(m => m.folderId === currentFolderId);
             } else if (currentView === 'recent') {
@@ -1423,13 +1827,11 @@
                 filteredMedia = filteredMedia.slice(0, 50);
             }
             
-            // Apply type filter
             const typeFilter = document.getElementById('filter-type').value;
             if (typeFilter !== 'all') {
                 filteredMedia = filteredMedia.filter(m => m.type === typeFilter);
             }
             
-            // Search filter
             const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
             if (searchTerm !== '') {
                 filteredMedia = filteredMedia.filter(m => 
@@ -1437,7 +1839,6 @@
                 );
             }
             
-            // Sort
             const sortMode = document.getElementById('sort-select').value;
             filteredMedia.sort((a, b) => {
                 switch (sortMode) {
@@ -1456,10 +1857,8 @@
                 }
             });
             
-            // Store for gallery navigation
             currentFilteredMedia = filteredMedia;
             
-            // Render grid or list
             if (viewMode === 'grid') {
                 document.getElementById('media-grid').classList.remove('hidden');
                 document.getElementById('media-list').classList.add('hidden');
@@ -1474,7 +1873,6 @@
                     grid.appendChild(card);
                 });
             } else {
-                // List view
                 document.getElementById('media-grid').classList.add('hidden');
                 document.getElementById('media-list').classList.remove('hidden');
                 
@@ -1489,17 +1887,14 @@
                 });
             }
             
-            // Update counts
             document.getElementById('media-count-display').innerHTML = filteredMedia.length;
             
-            // Update folder info if needed
             if (currentView === 'folder') {
                 const folder = allFolders.find(f => f.id === currentFolderId);
                 if (folder) {
                     const subCount = allFolders.filter(f => f.parentId === currentFolderId).length;
                     document.getElementById('current-folder-info').innerHTML = `${filteredMedia.length} médias • ${subCount} dossiers`;
                     
-                    // Show delete folder button (always for user folders)
                     const delBtn = document.getElementById('delete-folder-btn');
                     if (delBtn) {
                         delBtn.classList.remove('hidden');
@@ -1507,7 +1902,6 @@
                     }
                 }
             } else {
-                // Hide delete folder button when not in a specific folder
                 const delBtn = document.getElementById('delete-folder-btn');
                 if (delBtn) {
                     delBtn.classList.add('hidden');
@@ -1519,13 +1913,11 @@
                 }
             }
             
-            // Update select-all checkbox if list
             if (viewMode === 'list') {
                 const selectAll = document.getElementById('select-all');
                 if (selectAll) selectAll.checked = false;
             }
             
-            // Re-render selected UI
             updateBulkActionsUI();
         }
         
@@ -1543,7 +1935,6 @@
             
             if (media.thumbnailBlob) {
                 const thumbUrl = URL.createObjectURL(media.thumbnailBlob);
-                // store url temporarily to revoke later if wanted
                 div.dataset.thumbUrl = thumbUrl;
                 
                 if (media.type === 'image') {
@@ -1561,7 +1952,6 @@
                     `;
                 }
             } else {
-                // Fallback thumbnail
                 if (media.type === 'image') {
                     thumbHTML = `<div class="thumbnail-placeholder w-full h-full"><i class="fa-solid fa-image text-4xl text-slate-400"></i></div>`;
                 } else {
@@ -1573,21 +1963,18 @@
                 <div class="thumbnail-container">
                     ${thumbHTML}
                     
-                    <!-- Selection checkbox -->
                     <div class="absolute top-2 left-2 z-10 ${isSelected ? '' : 'opacity-0 group-hover:opacity-100'} transition-opacity">
                         <div onclick="event.stopImmediatePropagation(); toggleSelectItem('${media.id}', this)" class="w-[17px] h-[17px] bg-white bg-opacity-90 rounded-md border border-slate-300 flex items-center justify-center shadow-sm">
                             <input type="checkbox" ${isSelected ? 'checked' : ''} class="accent-indigo-600 pointer-events-none" style="width:13px; height:13px;">
                         </div>
                     </div>
                     
-                    <!-- Type badge -->
                     <div class="absolute top-2 right-2">
                         <span class="file-type-badge ${media.type === 'image' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'} px-1.5 py-px">
                             ${media.type === 'image' ? 'PHOTO' : 'VIDÉO'}
                         </span>
                     </div>
                     
-                    <!-- Overlay info -->
                     <div class="overlay absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-2.5 pt-5 pb-[6px] flex items-end">
                         <div class="flex-1 min-w-0">
                             <div class="text-white text-xs font-extrabold leading-none truncate">${media.name}</div>
@@ -1615,23 +2002,19 @@
                 </div>
             `;
             
-            // Click to preview
             div.onclick = () => {
                 if (selectedItems.size > 0) {
-                    // if in selection mode, toggle select
                     toggleSelectItem(media.id, null);
                 } else {
                     showPreview(media.id);
                 }
             };
             
-            // Long press or right click for select
             div.oncontextmenu = (e) => {
                 e.preventDefault();
                 toggleSelectItem(media.id, null);
             };
             
-            // Drag support
             div.draggable = true;
             div.ondragstart = (e) => {
                 e.dataTransfer.setData('text/plain', media.id);
@@ -1663,8 +2046,7 @@
                         <div class="w-8 h-8 bg-slate-700 rounded-xl flex-shrink-0 overflow-hidden border border-slate-600">
                             ${media.thumbnailBlob ? 
                                 `<img src="${URL.createObjectURL(media.thumbnailBlob)}" class="w-full h-full object-cover">` : 
-                                `<div class="w-full h-full flex items-center justify-center"><i class="fa-solid ${media.type === 'image' ? 'fa-image' : 'fa-video'} text-slate-400"></i></div>`
-                            }
+                                `<div class="w-full h-full flex items-center justify-center"><i class="fa-solid ${media.type === 'image' ? 'fa-image' : 'fa-video'} text-slate-400"></i></div>`}
                         </div>
                         <div class="min-w-0">
                             <div class="font-medium truncate text-sm">${media.name}</div>
@@ -1688,7 +2070,6 @@
             `;
             
             tr.onclick = (e) => {
-                // only if not clicking checkbox or buttons
                 if (e.target.tagName === 'INPUT' || e.target.closest('button')) return;
                 
                 if (selectedItems.size > 0) {
@@ -1709,17 +2090,14 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
         }
         
-        // Show preview modal - FULLSCREEN GALLERY WITH ARROWS
         function showPreview(mediaId) {
             const media = allMedia.find(m => m.id === mediaId);
             if (!media) return;
             
             currentMedia = media;
             
-            // Find the index in the current filtered list for gallery navigation
             currentPreviewIndex = currentFilteredMedia.findIndex(m => m.id === mediaId);
             if (currentPreviewIndex === -1) {
-                // fallback: use allMedia
                 currentPreviewIndex = allMedia.findIndex(m => m.id === mediaId);
                 currentFilteredMedia = [...allMedia];
             }
@@ -1728,7 +2106,6 @@
             const content = document.getElementById('preview-content');
             content.innerHTML = '';
             
-            // Update header info
             document.getElementById('preview-filename').innerHTML = media.name;
             
             const badge = document.getElementById('preview-type-badge');
@@ -1738,16 +2115,13 @@
                 badge.innerHTML = `<span class="px-3 py-[1px] rounded-[2rem] bg-rose-600 text-xs font-extrabold px-[7px]">VIDÉO</span>`;
             }
             
-            // Update metadata
             document.getElementById('preview-size').innerHTML = formatFileSize(media.size);
             document.getElementById('preview-date').innerHTML = new Date(media.date).toLocaleDateString('fr-FR', { 
                 day: 'numeric', month: 'short', year: 'numeric' 
             });
             
-            // Update counter
             updatePreviewCounter();
             
-            // Create preview element (large)
             if (media.type === 'image') {
                 if (media.originalBlob) {
                     const url = URL.createObjectURL(media.originalBlob);
@@ -1759,13 +2133,11 @@
                     content.dataset.previewUrl = url;
                 } else {
                     const img = document.createElement('img');
-                    // Fallback placeholder only when original file is missing (very rare)
                     img.src = 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%271200%27 height=%27900%27%3E%3Crect fill=%27%23334155%27 width=%271200%27 height=%27900%27/%3E%3Ctext x=%2750%25%27 y=%2750%25%27 dominant-baseline=%27middle%27 text-anchor=%27middle%27 fill=%27%2394a3b8%27 font-size=%2732%27%3EImage non disponible%3C/text%3E%3C/svg%3E';
                     img.className = `max-h-[78vh] max-w-full object-contain rounded-xl`;
                     content.appendChild(img);
                 }
             } else {
-                // Video - large and centered
                 if (media.originalBlob) {
                     const url = URL.createObjectURL(media.originalBlob);
                     const video = document.createElement('video');
@@ -1790,7 +2162,6 @@
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             
-            // Keyboard support for arrows + escape
             document.addEventListener('keydown', handlePreviewKeyboard, { once: true });
         }
         
@@ -1807,7 +2178,6 @@
             currentPreviewIndex--;
             const prevMedia = currentFilteredMedia[currentPreviewIndex];
             
-            // Clean up previous preview
             const content = document.getElementById('preview-content');
             if (content.dataset.previewUrl) {
                 URL.revokeObjectURL(content.dataset.previewUrl);
@@ -1831,11 +2201,9 @@
         }
         
         function handlePreviewContentClick(e) {
-            // Click on the content area: go to next (if not video controls)
             const target = e.target;
             if (target.tagName === 'VIDEO' || target.closest('video')) return;
             
-            // Right side of image = next, left side = previous
             const rect = e.currentTarget.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
             
@@ -1863,7 +2231,6 @@
         
         function toggleFullscreenPreview() {
             const modal = document.getElementById('preview-modal');
-            const contentContainer = modal.querySelector('.max-w-\\[98\\%\\]');
             
             if (!document.fullscreenElement) {
                 if (modal.requestFullscreen) {
@@ -1888,7 +2255,6 @@
             const modal = document.getElementById('preview-modal');
             const content = document.getElementById('preview-content');
             
-            // Revoke preview URL if any
             if (content.dataset.previewUrl) {
                 URL.revokeObjectURL(content.dataset.previewUrl);
                 delete content.dataset.previewUrl;
@@ -1900,7 +2266,6 @@
             currentMedia = null;
         }
         
-        // Download current media
         function downloadCurrentMedia() {
             if (!currentMedia || !currentMedia.originalBlob) {
                 showToast('Impossible de télécharger ce fichier.', false);
@@ -1920,7 +2285,6 @@
             }, 1500);
         }
         
-        // Delete current media
         async function deleteCurrentMedia() {
             if (!currentMedia) return;
             
@@ -1934,7 +2298,6 @@
             showToast('Média supprimé.', false);
         }
         
-        // Move current media
         function moveCurrentMedia() {
             if (!currentMedia) return;
             
@@ -1942,11 +2305,9 @@
             showMoveModal([currentMedia.id]);
         }
         
-        // Show context menu for single item
         function showContextMenu(e, mediaId) {
             e.stopImmediatePropagation();
             
-            // remove existing menus
             document.querySelectorAll('.context-menu').forEach(el => el.remove());
             
             const media = allMedia.find(m => m.id === mediaId);
@@ -1985,7 +2346,6 @@
             
             document.body.appendChild(menu);
             
-            // Click outside to close
             setTimeout(() => {
                 document.addEventListener('click', function handler(ev) {
                     if (!menu.contains(ev.target)) {
@@ -1995,7 +2355,6 @@
                 }, { once: true });
             }, 10);
             
-            // Also close on escape
             document.addEventListener('keydown', function escHandler(ev) {
                 if (ev.key === 'Escape') {
                     menu.remove();
@@ -2034,7 +2393,6 @@
             setTimeout(() => URL.revokeObjectURL(url), 1200);
         }
         
-        // Toggle select item
         function toggleSelectItem(mediaId, element = null) {
             if (selectedItems.has(mediaId)) {
                 selectedItems.delete(mediaId);
@@ -2042,10 +2400,7 @@
                 selectedItems.add(mediaId);
             }
             
-            // Re-render the current view to update UI
             filterMedia();
-            
-            // If checkbox element passed, ensure sync
             updateBulkActionsUI();
         }
         
@@ -2087,7 +2442,6 @@
             updateBulkActionsUI();
         }
         
-        // Delete selected
         async function deleteSelected() {
             if (selectedItems.size === 0) return;
             
@@ -2106,34 +2460,27 @@
             showToast(`${ids.length} médias supprimés`, false);
         }
         
-        // Move selected
         function moveSelected() {
             if (selectedItems.size === 0) return;
             showMoveModal(Array.from(selectedItems));
         }
         
-        // Show move modal
         function showMoveModal(mediaIds) {
             const modal = document.getElementById('move-modal');
             const container = document.getElementById('move-folder-list');
             container.innerHTML = '';
             
-            // Store the ids globally for the confirm
             window.currentMoveIds = mediaIds;
             
-            // Get all folders except current if in folder view — sorted alphabetically
             let availableFolders = [...allFolders].sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
-            
             
             availableFolders.forEach(folder => {
                 const item = document.createElement('div');
                 item.className = `px-4 py-[8.5px] flex items-center cursor-pointer hover:bg-slate-700 rounded-2xl gap-x-3`;
                 
-                const icon = 'fa-folder';
-                
                 item.innerHTML = `
                     <div class="flex items-center gap-x-[9px] flex-1">
-                        <i class="fa-solid ${icon} text-lg text-indigo-300 w-5"></i>
+                        <i class="fa-solid fa-folder text-lg text-indigo-300 w-5"></i>
                         <div>
                             <span class="font-semibold">${folder.name}</span>
                         </div>
@@ -2141,24 +2488,20 @@
                 `;
                 
                 item.onclick = () => {
-                    // highlight selection
                     document.querySelectorAll('#move-folder-list > div').forEach(el => {
                         el.classList.remove('bg-indigo-700', 'bg-opacity-30');
                     });
                     item.classList.add('bg-indigo-700', 'bg-opacity-30');
                     
-                    // store the target
                     window.selectedMoveTarget = folder.id;
                 };
                 
                 container.appendChild(item);
             });
             
-            // Show modal
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             
-            // default select current folder if applicable
             setTimeout(() => {
                 window.selectedMoveTarget = currentFolderId || null;
             }, 200);
@@ -2182,15 +2525,12 @@
                 return;
             }
             
-            // Update media items
             let movedCount = 0;
             
             for (let id of ids) {
                 const media = allMedia.find(m => m.id === id);
                 if (media) {
                     media.folderId = targetId;
-                    
-                    // Save to DB
                     await saveMediaToDB(media);
                     movedCount++;
                 }
@@ -2203,14 +2543,11 @@
             showToast(`${movedCount} élément(s) déplacé(s)`, false, true);
         }
         
-        // Update statistics
         function updateStats() {
-            // Total count
             const totalCount = allMedia.length;
             document.getElementById('header-total-count').innerHTML = totalCount;
             document.getElementById('count-all').innerHTML = totalCount;
             
-            // Storage
             let totalBytes = 0;
             allMedia.forEach(m => {
                 totalBytes += m.size || 0;
@@ -2219,12 +2556,10 @@
             const usedMB = (totalBytes / (1024 * 1024)).toFixed(1);
             document.getElementById('storage-used').innerHTML = `${usedMB} MB`;
             
-            // Progress bar (simulated)
             const percent = Math.min(Math.floor((totalBytes / (1024 * 1024 * 1024 * 100)) * 100), 100);
             document.getElementById('storage-bar').style.width = `${Math.max(percent, 3)}%`;
         }
         
-        // Filter on search input
         function setupSearch() {
             const searchInput = document.getElementById('search-input');
             
@@ -2236,7 +2571,6 @@
                 }, 160);
             });
             
-            // Also allow enter to clear on empty
             searchInput.addEventListener('keyup', (e) => {
                 if (e.key === 'Escape') {
                     searchInput.value = '';
@@ -2253,7 +2587,6 @@
             sortSelect.addEventListener('change', filterMedia);
         }
         
-        // Drag and drop support
         function handleDragOver(e) {
             e.preventDefault();
             const container = document.getElementById('media-container');
@@ -2279,7 +2612,6 @@
         function setupDropzone() {
             const container = document.getElementById('media-container');
             
-            // Show overlay when dragging files globally
             document.addEventListener('dragover', (e) => {
                 if (e.dataTransfer.types.includes('Files')) {
                     e.preventDefault();
@@ -2306,7 +2638,6 @@
                 }
             });
             
-            // Also click to upload on the overlay
             overlay.onclick = (e) => {
                 if (e.target.id === 'dropzone-overlay') {
                     overlay.classList.remove('flex');
@@ -2330,10 +2661,6 @@
             input.click();
         }
         
-        // Sample data function completely removed - app starts 100% empty
-        // No predefined photos or videos
-        
-        // Show folder context menu
         function showFolderContextMenu(e, folder) {
             e.preventDefault();
             
@@ -2406,7 +2733,6 @@
             
             await deleteFolderFromDB(folderId);
             
-            // navigate back to all if needed
             if (currentFolderId === folderId) {
                 navigateToView('all');
             }
@@ -2414,8 +2740,7 @@
             await refreshUI();
             showToast('Dossier supprimé avec succès.', false);
         }
-
-        // Delete the currently viewed folder (button in UI)
+        
         function deleteCurrentFolder() {
             if (currentView !== 'folder' || !currentFolderId) {
                 showToast('Aucun dossier à supprimer.', false);
@@ -2424,21 +2749,16 @@
             deleteFolder(currentFolderId);
         }
         
-        // Refresh full UI
         async function refreshUI() {
             await loadAllMedia();
             await loadFolders();
             
-            // Re-render folders
             await renderFoldersTree();
             
-            // Re-filter media
             filterMedia();
             
-            // Update stats
             updateStats();
             
-            // Update folder count in header
             const totalMediaCount = allMedia.length;
             document.getElementById('count-all').innerHTML = totalMediaCount;
         }
@@ -2474,7 +2794,6 @@
         function setViewMode(mode) {
             viewMode = mode;
             
-            // update buttons
             const gridBtn = document.getElementById('btn-grid');
             const listBtn = document.getElementById('btn-list');
             
@@ -2489,10 +2808,6 @@
             }
             
             filterMedia();
-        }
-        
-        async function updateFolderCounts() {
-            // This is handled in renderFoldersTree already
         }
         
         function setupKeyboardShortcuts() {
@@ -2516,7 +2831,6 @@
                         if (!moveModal.classList.contains('hidden')) {
                             closeMoveModal();
                         } else {
-                            // clear selections
                             if (selectedItems.size > 0) clearSelection();
                         }
                     }
@@ -2528,75 +2842,52 @@
                 }
             });
             
-            // hint on search
             const search = document.getElementById('search-input');
             search.placeholder = 'Rechercher des photos ou vidéos... (/)';
         }
         
         function initializeSelection() {
-            // Clear selection on outside clicks
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('#media-grid') && 
                     !e.target.closest('#media-list') && 
                     !e.target.closest('#bulk-actions')) {
                     
-                    // Only clear if not clicking on a card or bulk bar
                     if (selectedItems.size > 0 && !e.target.closest('.media-card')) {
-                        // don't auto clear, user can click elsewhere intentionally
+                        // do nothing
                     }
                 }
             });
         }
-
-        // Toggle sidebar (open / close) - SIMPLE + ROBUST CLASS-BASED
+        
         function toggleSidebar(e) {
             if (e) e.preventDefault();
             
-            console.log('%c🍔 HAMBURGER CLICKED - toggleSidebar running', 'color:#c026ff; font-weight:700');
-            
             const sidebar = document.getElementById('sidebar');
-            if (!sidebar) {
-                console.error('Sidebar not found');
-                return;
-            }
+            if (!sidebar) return;
             
-            // Force reflow before change (helps some flex layouts)
             void sidebar.offsetWidth;
             
             const isCollapsed = sidebar.classList.contains('sidebar-collapsed');
             
-            // Clear any leftover inline styles so CSS classes control everything
             sidebar.style.cssText = '';
             
             if (isCollapsed) {
-                // OPEN
                 sidebar.classList.remove('sidebar-collapsed');
-                console.log('%c✅ Sidebar OPENED', 'color:#22c55e');
             } else {
-                // CLOSE
                 sidebar.classList.add('sidebar-collapsed');
-                console.log('%c✅ Sidebar CLOSED', 'color:#f59e0b');
             }
             
-            // Force another reflow + repaint after class change
             void sidebar.offsetWidth;
-            requestAnimationFrame(() => {
-                // double check computed style in case
-                const cs = window.getComputedStyle(sidebar);
-                console.log('%c[Sidebar] computed width after toggle:', 'color:#64748b', cs.width);
-            });
             
             localStorage.setItem('mediavault_sidebar_collapsed', !isCollapsed);
         }
-
-        // Restore sidebar state on load (class only - CSS controls everything)
+        
         function restoreSidebarState() {
             const sidebar = document.getElementById('sidebar');
             if (!sidebar) return;
             
             const collapsed = localStorage.getItem('mediavault_sidebar_collapsed') === 'true';
             
-            // Always clear inline styles first
             sidebar.style.cssText = '';
             
             if (collapsed) {
@@ -2606,10 +2897,11 @@
             }
         }
         
-        async function initializeApp() {
+        // ===================== INITIALIZATION WITH PIN =====================
+        
+        async function initializeAppAfterPin() {
             initializeTailwind();
             
-            // Init IndexedDB
             try {
                 await initDB();
                 await initDefaultFolders();
@@ -2617,86 +2909,62 @@
                 await loadAllMedia();
             } catch (err) {
                 console.error('DB init error:', err);
-                // Fallback to memory only - completely empty (no root)
                 showToast('Stockage local limité (erreur DB)', false);
                 allFolders = [];
                 allMedia = [];
             }
             
-            // Initial render
             await renderFoldersTree();
             
-            // Set initial view: All media
             document.getElementById('nav-all').classList.add('active');
             document.getElementById('current-folder-name').innerHTML = 'Tous les médias';
             document.getElementById('current-folder-info').innerHTML = `${allMedia.length} médias • 0 dossiers`;
             
-            // Render initial media
             filterMedia();
-            
-            // Update stats
             updateStats();
             
-            // Setup listeners
             setupSearch();
             setupFilters();
             setupDropzone();
             setupKeyboardShortcuts();
             initializeSelection();
             
-            // Restore sidebar collapsed state
             restoreSidebarState();
             
-            // Attach hamburger click listener (reliable, no inline onclick)
             const hamburgerBtn = document.getElementById('hamburger-btn');
             if (hamburgerBtn) {
-                // Remove any old onclick just in case
                 hamburgerBtn.onclick = null;
                 hamburgerBtn.addEventListener('click', toggleSidebar, { passive: false });
-                console.log('%c[Hamburger] Click listener attached successfully', 'color:#64748b');
-            } else {
-                console.error('Hamburger button not found for listener attachment');
             }
             
-            // Set default view mode
             setViewMode('grid');
             
-            // Initial update
             document.getElementById('media-count-display').innerHTML = allMedia.length;
             
-            // Show welcome toast if empty (no sample data)
             if (allMedia.length === 0 && allFolders.length <= 1) {
                 setTimeout(() => {
-                    const welcome = showToast('Application vide. Créez des dossiers et téléversez vos médias.', false, true);
+                    showToast('Application vide. Créez des dossiers et téléversez vos médias.', false, true);
                 }, 1600);
             }
             
-            console.log('%c[Privara] Application initialisée. 100% vide au démarrage.', 'color:#64748b');
-
-            // === ULTRA AGGRESSIVE BLACK THEME v4 (MAXIMUM - beats Tailwind CDN) ===
-            // Pure #000000 everywhere. Repeated + MutationObserver + console logs
+            // Black theme enforcement
             function forceBlackTheme() {
                 const PURE_BLACK = '#000000';
                 const PANEL_DARK = '#0a0a0a';
                 
                 try {
-                    // 1. Root + body + html - direct + inline
                     document.documentElement.style.setProperty('background-color', PURE_BLACK, 'important');
                     document.documentElement.style.setProperty('background', PURE_BLACK, 'important');
                     
                     document.body.style.setProperty('background-color', PURE_BLACK, 'important');
                     document.body.style.setProperty('background', PURE_BLACK, 'important');
                     document.body.style.setProperty('color', '#e2e8f0', 'important');
-                    
-                    // Force inline attribute too
                     document.body.setAttribute('style', 'background:#000000 !important; color:#e2e8f0;');
                     
-                    // 2. Mass nuke + force EVERY element
                     const allEls = document.querySelectorAll('*');
                     allEls.forEach(el => {
                         if (!el || el.tagName === 'SCRIPT' || el.tagName === 'STYLE' || el.tagName === 'LINK') return;
                         
-                        // Aggressively remove all possible Tailwind dark slate/gray/zinc classes
                         const classesToRemove = [
                             'bg-slate-900', 'bg-slate-800', 'bg-slate-700', 'bg-slate-600', 'bg-slate-950',
                             'bg-slate-500', 'bg-slate-400', 'bg-slate-300', 'bg-slate-200', 'bg-slate-100',
@@ -2704,14 +2972,13 @@
                             'bg-gray-900', 'bg-gray-800', 'bg-gray-700', 'bg-gray-600', 'bg-gray-950',
                             'bg-neutral-900', 'bg-neutral-800', 'bg-neutral-700'
                         ];
+                        
                         classesToRemove.forEach(cls => el.classList.remove(cls));
                         
-                        // Remove any remaining bg-slate* via className regex (last resort)
                         if (el.className && typeof el.className === 'string') {
                             el.className = el.className.replace(/\bbg-(slate|gray|zinc|neutral)-\d{1,3}\b/g, '');
                         }
                         
-                        // Decide force target
                         const tag = el.tagName;
                         const id = el.id;
                         const cls = el.className || '';
@@ -2721,7 +2988,7 @@
                                                 cls.includes('vault-header') || 
                                                 cls.includes('max-w-screen-2xl') || 
                                                 cls.includes('app-container') ||
-                                                cls.includes('media-container') ||
+                                                cls.includes('media-container') || 
                                                 id === 'media-container';
                         
                         const isCard = cls.includes('media-card') || 
@@ -2736,17 +3003,14 @@
                             el.style.setProperty('background-color', PANEL_DARK, 'important');
                             el.style.setProperty('background', PANEL_DARK, 'important');
                         } else if (tag === 'HEADER' || tag === 'DIV' || tag === 'SECTION' || tag === 'ASIDE' || tag === 'NAV') {
-                            // Force pure black on almost everything else
                             el.style.setProperty('background-color', PURE_BLACK, 'important');
                         }
                         
-                        // Force border overrides
                         if (cls.includes('border-slate')) {
                             el.style.setProperty('border-color', '#222222', 'important');
                         }
                     });
                     
-                    // 3. Hardcoded key selectors - multiple passes
                     const criticalSelectors = [
                         'body', 'html', 'header', '#sidebar', '#media-container', 
                         '.vault-header', '.app-container', '.max-w-screen-2xl',
@@ -2764,51 +3028,31 @@
                         } catch(e) {}
                     });
                     
-                    // 4. Signature area - extra black
                     const sigContainers = document.querySelectorAll('.mt-8, .pt-5.border-t, img[src*="signature"]');
                     sigContainers.forEach(el => {
                         el.style.setProperty('background-color', PURE_BLACK, 'important');
                         el.style.setProperty('background', PURE_BLACK, 'important');
                     });
                     
-                    // 5. Also force the main wrapper
                     const mainWrap = document.querySelector('.max-w-screen-2xl');
                     if (mainWrap) mainWrap.style.setProperty('background', PURE_BLACK, 'important');
                     
-                    // Log for debugging (user can open console)
-                    if (Math.random() < 0.15) {
-                        console.log('%c[forceBlackTheme] Applied pure #000000 theme (v4)', 'color:#22c55e; font-size:9px');
-                    }
-                } catch (err) {
-                    console.warn('[forceBlackTheme] minor error', err);
-                }
+                } catch (err) {}
             }
             
-            // Run aggressively on load + many timed passes
             forceBlackTheme();
             setTimeout(forceBlackTheme, 30);
-            setTimeout(forceBlackTheme, 90);
-            setTimeout(forceBlackTheme, 180);
-            setTimeout(forceBlackTheme, 320);
-            setTimeout(forceBlackTheme, 550);
-            setTimeout(forceBlackTheme, 850);
-            setTimeout(forceBlackTheme, 1300);
-            setTimeout(forceBlackTheme, 2000);
-            setTimeout(forceBlackTheme, 2800);
-            setTimeout(forceBlackTheme, 3800);
+            setTimeout(forceBlackTheme, 120);
+            setTimeout(forceBlackTheme, 300);
+            setTimeout(forceBlackTheme, 700);
+            setTimeout(forceBlackTheme, 1500);
+            setInterval(forceBlackTheme, 2200);
             
-            // Keep forcing periodically (every 1.8s)
-            setInterval(forceBlackTheme, 1800);
+            document.addEventListener('click', () => setTimeout(forceBlackTheme, 30), true);
             
-            // Force on every click / interaction (Tailwind can re-apply on render)
-            document.addEventListener('click', () => setTimeout(forceBlackTheme, 20), true);
-            document.addEventListener('mousedown', () => setTimeout(forceBlackTheme, 30), true);
-            
-            // MutationObserver: catch any DOM changes, re-apply black instantly
             const observer = new MutationObserver(() => {
-                // Debounce a bit
                 clearTimeout(window._blackThemeTimeout);
-                window._blackThemeTimeout = setTimeout(forceBlackTheme, 40);
+                window._blackThemeTimeout = setTimeout(forceBlackTheme, 50);
             });
             observer.observe(document.documentElement, {
                 childList: true,
@@ -2817,30 +3061,10 @@
                 attributeFilter: ['class', 'style']
             });
             
-            // Initial force on DOMContentLoaded too (backup)
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', forceBlackTheme);
-            } else {
-                setTimeout(forceBlackTheme, 10);
-            }
-
-            // === PWA Service Worker Registration ===
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./sw.js')
-                        .then((registration) => {
-                            console.log('%c[Privara PWA] Service Worker registered successfully', 'color:#22c55e');
-                        })
-                        .catch((error) => {
-                            console.log('%c[Privara PWA] Service Worker registration failed', 'color:#ef4444', error);
-                        });
-                });
-            }
-
-            // === PWA Install Prompt ===
+            // PWA Install Prompt
             let deferredPrompt;
             const installBtn = document.getElementById('install-btn');
-
+            
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
@@ -2849,30 +3073,27 @@
                     installBtn.classList.add('flex');
                 }
             });
-
+            
             if (installBtn) {
                 installBtn.addEventListener('click', async () => {
                     if (!deferredPrompt) return;
                     deferredPrompt.prompt();
                     const { outcome } = await deferredPrompt.userChoice;
-                    console.log('%c[Privara PWA] Install prompt outcome:', 'color:#64748b', outcome);
                     deferredPrompt = null;
                     installBtn.classList.add('hidden');
                     installBtn.classList.remove('flex');
                 });
             }
-
-            // Hide install button if already installed
+            
             window.addEventListener('appinstalled', () => {
                 if (installBtn) installBtn.classList.add('hidden');
-                console.log('%c[Privara PWA] App installed successfully!', 'color:#22c55e');
             });
             
-            // Debug helpers (no samples)
+            // Debug helpers
             window.PRIVARA = {
                 refresh: refreshUI,
                 clearAll: async () => {
-                    if (!confirm('Effacer TOUT le contenu (médias + dossiers) ?')) return;
+                    if (!confirm('Effacer TOUT le contenu ?')) return;
                     const tx1 = db.transaction('media', 'readwrite');
                     tx1.objectStore('media').clear();
                     
@@ -2882,32 +3103,87 @@
                     allMedia = [];
                     allFolders = [];
                     await refreshUI();
-                    await initDefaultFolders();
-                    await loadFolders();
-                    await loadAllMedia();
-                    await renderFoldersTree();
+                },
+                resetPin: () => {
+                    localStorage.removeItem('privara_pin_hash');
+                    location.reload();
                 }
             };
+            
+            console.log('%c[Privara] Application initialisée avec protection PIN + PWA inline', 'color:#22c55e');
         }
         
         function showStorageInfo() {
             const totalBytes = allMedia.reduce((acc, m) => acc + (m.size || 0), 0);
             const usedMB = (totalBytes / 1024 / 1024).toFixed(2);
             
-            const msg = `Stockage utilisé : ${usedMB} MB\n\nMédias : ${allMedia.length}\nDossiers : ${allFolders.length}\n\nLes données sont stockées localement dans votre navigateur (IndexedDB). Elles persistent jusqu'à ce que vous les effaciez manuellement.`;
+            const msg = `Stockage utilisé : ${usedMB} MB\n\nMédias : ${allMedia.length}\nDossiers : ${allFolders.length}\n\nLes données sont stockées localement dans votre navigateur (IndexedDB).`;
             
             alert(msg);
         }
         
-        // Boot the app
-        window.onload = function() {
-            initializeApp();
+        // ===================== BOOT SEQUENCE =====================
+        function hideDropzone() {
+            const overlay = document.getElementById('dropzone-overlay');
+            overlay.classList.remove('flex');
+            overlay.classList.add('hidden');
         }
         
-        // Additional: allow dropping on the whole body in case
-        document.addEventListener('DOMContentLoaded', () => {
-            // Any final setup
+        // Main boot
+        window.onload = function() {
+            // Register inline PWA features first
+            registerInlineManifest();
+            registerServiceWorker();
+            
+            // Check for existing PIN
+            const storedHash = localStorage.getItem('privara_pin_hash');
+            
+            if (!storedHash) {
+                // First time - create PIN
+                setTimeout(() => {
+                    showPinScreen('create');
+                }, 450);
+            } else {
+                // Show unlock screen
+                setTimeout(() => {
+                    showPinScreen('unlock');
+                }, 450);
+            }
+            
+            // Attach hamburger listener (fallback)
+            setTimeout(() => {
+                const hamburgerBtn = document.getElementById('hamburger-btn');
+                if (hamburgerBtn && !hamburgerBtn.onclick) {
+                    hamburgerBtn.addEventListener('click', toggleSidebar, { passive: false });
+                }
+            }, 1200);
+        }
+        
+        // Keyboard support on PIN screen
+        document.addEventListener('keydown', function(e) {
+            const pinScreen = document.getElementById('pin-screen');
+            if (!pinScreen || pinScreen.style.display === 'none') return;
+            
+            if (e.key >= '0' && e.key <= '9') {
+                e.preventDefault();
+                addPinDigit(parseInt(e.key));
+            } else if (e.key === 'Backspace') {
+                e.preventDefault();
+                deleteLastPinDigit();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                const errorEl = document.getElementById('pin-error');
+                if (currentPin.length === 6) {
+                    if (pinMode === 'create') {
+                        handleCreatePin();
+                    } else if (pinMode === 'confirm') {
+                        handleConfirmPin();
+                    } else {
+                        handleUnlock();
+                    }
+                }
+            }
         });
     </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a236412f7afb1624',t:'MTc4NTQzNDMzOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
