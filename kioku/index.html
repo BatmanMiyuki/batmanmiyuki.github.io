@@ -153,19 +153,36 @@ a { color: inherit; text-decoration: none; }
   max-width: 1540px; margin: 0 auto; height: var(--nav-h);
   padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 18px;
 }
-.brand { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.brand { display: flex; align-items: center; gap: 12px; flex-shrink: 0; text-decoration: none; }
 .brand-mark {
-  width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center;
+  width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center;
   background: var(--grad); box-shadow: var(--glow-pink); font-size: 21px;
-  transition: transform .5s var(--ease);
+  transition: transform .5s var(--ease); overflow: hidden;
+  flex-shrink: 0;
 }
-.brand:hover .brand-mark { transform: rotate(-12deg) scale(1.06); }
-.brand-txt { display: flex; flex-direction: column; line-height: 1; }
+.brand:hover .brand-mark { transform: rotate(-10deg) scale(1.05); }
+.brand-icon-img {
+  width: 100%; height: 100%; object-fit: cover; border-radius: 13px;
+  display: block;
+}
+.brand-txt { display: flex; flex-direction: column; justify-content: center; line-height: 1; }
+.brand-logo-img {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 0 10px rgba(255, 61, 139, .35));
+  transition: transform .3s var(--ease), filter .3s;
+}
+.brand:hover .brand-logo-img {
+  transform: scale(1.03);
+  filter: drop-shadow(0 0 16px rgba(255, 61, 139, .6));
+}
 .brand-name {
   font-size: 22px; font-weight: 800; letter-spacing: .16em;
   background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-.brand-sub { font-size: 10.5px; color: var(--muted-2); letter-spacing: .32em; margin-top: 3px; }
+.brand-sub { font-size: 10px; color: var(--muted-2); letter-spacing: .32em; margin-top: 1px; }
 
 .tabs { display: flex; gap: 6px; margin-left: 20px; }
 .tab {
@@ -889,10 +906,14 @@ input:checked + .slider::before { transform: translateX(22px); }
 <!-- ══════════ Barre du haut ══════════ -->
 <header class="topbar">
   <div class="topbar-in">
-    <a class="brand" href="#seen">
-      <div class="brand-mark">🌸</div>
+    <a class="brand" href="#seen" title="KIOKU — Accueil">
+      <div class="brand-mark" id="brand-mark">
+        <img src="icon.png" alt="Icon" class="brand-icon-img" onerror="this.onerror=null;this.src='icon-192.png';this.onerror=()=>{this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='grid';}" />
+        <span class="brand-icon-fallback" style="display:none">🌸</span>
+      </div>
       <div class="brand-txt">
-        <div class="brand-name">KIOKU</div>
+        <img src="logo.png" alt="KIOKU" class="brand-logo-img" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';" />
+        <div class="brand-name" style="display:none">KIOKU</div>
         <div class="brand-sub">記憶 · ANIME</div>
       </div>
     </a>
@@ -1284,29 +1305,41 @@ function normalize(a) {
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 
 /**
- * Normalise le titre pour regrouper les saisons d'un même anime
+ * Normalise le titre pour regrouper les saisons, arcs, parties et films d'un même anime
  * sans fusionner des œuvres distinctes (ex: Naruto vs Naruto Shippuden).
  */
 function getAnimeBaseKey(title) {
   if (!title) return '';
   let s = title.trim().toLowerCase();
-  
-  // 1. Mentions "Saison finale", "Final Season"
-  s = s.replace(/[:\-–—]?\s*(?:the\s+|la\s+)?(?:final\s+season|saison\s+finale)\b/gi, '');
+  s = s.replace(/[\–—]/g, '-');
 
-  // 2. Mentions de saison / partie (ex: "Saison 2", "Season 3", "2ème saison", "Part 2", "Cour 1")
-  s = s.replace(/[:\-–—]?\s*\b\d+\s*(?:ère|ere|ème|eme)?\s*(?:saisons?|seasons?)\b/gi, '');
-  s = s.replace(/[:\-–—]?\s*(?:la\s+)?(?:saisons?|seasons?)\s*\d*/gi, '');
-  s = s.replace(/[:\-–—]?\s*\b(?:\d+(?:st|nd|rd|th))\s+season\b/gi, '');
-  s = s.replace(/[:\-–—]?\s*\b(?:partie|part|cour)\s*\d*\b/gi, '');
-  s = s.replace(/\b[sS]\d{1,2}\b/g, '');
+  // 1. Supprimer les suffixes de films / OAV / spéciaux / movie
+  s = s.replace(/\b(?:the\s+)?movie\b.*$/gi, '');
+  s = s.replace(/\bfilm\b.*$/gi, '');
+  s = s.replace(/\b(?:oav|ova|special|specials)\b.*$/gi, '');
 
-  // 3. Chiffres / chiffres romains terminaux (ex: "Anime 1", "Anime 2", "Anime II")
-  s = s.replace(/\s+(?:[1-9]|10)\b$/g, '');
+  // 2. Supprimer les arcs et chapitres (ex: "Swordsmith Village Arc", "Mugen Train Arc", "Entertainment District Arc", "Hashira Training Arc", "Arc TV")
+  s = s.replace(/[:\-]?\s*[^:\-]+?\s+arc\b.*$/gi, '');
+  s = s.replace(/[:\-]?\s*[^:\-]+?\s+hen\b.*$/gi, '');
+  s = s.replace(/[:\-]?\s*[^:\-]+?\s+chapter\b.*$/gi, '');
+
+  // 3. Mentions "Saison finale", "Final Season", "Part", "Cour", "Saison X", "Season X"
+  s = s.replace(/[:\-]?\s*(?:the\s+|la\s+)?(?:final\s+season|saison\s+finale)\b.*$/gi, '');
+  s = s.replace(/[:\-]?\s*\b\d+\s*(?:ère|ere|ème|eme)?\s*(?:saisons?|seasons?)\b.*$/gi, '');
+  s = s.replace(/[:\-]?\s*(?:la\s+)?(?:saisons?|seasons?)\s*\d*.*$/gi, '');
+  s = s.replace(/[:\-]?\s*\b(?:\d+(?:st|nd|rd|th))\s+season\b.*$/gi, '');
+  s = s.replace(/[:\-]?\s*\b(?:partie|part|cour)\s*\d*.*$/gi, '');
+  s = s.replace(/\b[sS]\d{1,2}\b.*$/g, '');
+
+  // 4. Chiffres / chiffres romains terminaux (y compris 0 pour les films comme JJK 0)
+  s = s.replace(/\s+(?:0|[1-9]|10)\b$/g, '');
   s = s.replace(/\s+(?:i|ii|iii|iv|v|vi|vii|viii|ix|x)\b$/gi, '');
 
-  // 4. Nettoyage de ponctuation résiduelle en fin de chaîne
-  s = s.replace(/[:\-–—\s]+$/g, '').trim();
+  // 5. Sous-titre après "!-"
+  s = s.replace(/!-\s*.*$/g, '');
+
+  // 6. Nettoyage de ponctuation résiduelle en fin de chaîne
+  s = s.replace(/[:\-–—!?,.\s]+$/g, '').trim();
 
   return s || title.trim().toLowerCase();
 }
@@ -1892,34 +1925,60 @@ const Stats = {
   },
 
   getGroupedTop(all) {
+    const active = all.filter(a => Calc.watchedMin(a) > 0);
+    const items = active.map(a => ({
+      anime: a,
+      key: getAnimeBaseKey(a.title),
+      min: Calc.watchedMin(a),
+      eps: Calc.watchedEps(a),
+      totalEps: Calc.totalEps(a),
+    }));
+
+    // Trouver les clés racines pour fusionner intelligemment les préfixes (ex: Demon Slayer, Konosuba)
+    const uniqueKeys = Array.from(new Set(items.map(x => x.key))).sort((a, b) => a.length - b.length);
+    const rootMap = {};
+    uniqueKeys.forEach(k => {
+      if (k === "naruto: shippuden" || k === "naruto shippuden" || k === "dragon ball z" || k === "dragon ball super") {
+        rootMap[k] = k;
+        return;
+      }
+      const parent = uniqueKeys.find(p => p !== k && (k.startsWith(p + ":") || k.startsWith(p + " -") || k.startsWith(p + " ") || k.startsWith(p + "-")));
+      rootMap[k] = parent ? rootMap[parent] || parent : k;
+    });
+
     const groups = {};
-    all.filter(a => Calc.watchedMin(a) > 0).forEach(a => {
-      const baseKey = getAnimeBaseKey(a.title);
-      if (!groups[baseKey]) {
-        let cleanTitle = a.title.replace(/[:\-–—]?\s*(?:the\s+|la\s+)?(?:final\s+season|saison\s+finale)\b/gi, '')
-                                .replace(/[:\-–—]?\s*\b\d+\s*(?:ère|ere|ème|eme)?\s*(?:saisons?|seasons?)\b/gi, '')
-                                .replace(/[:\-–—]?\s*(?:la\s+)?(?:saisons?|seasons?)\s*\d*/gi, '')
-                                .replace(/[:\-–—]?\s*\b(?:\d+(?:st|nd|rd|th))\s+season\b/gi, '')
-                                .replace(/[:\-–—]?\s*\b(?:partie|part|cour)\s*\d*\b/gi, '')
-                                .replace(/\b[sS]\d{1,2}\b/g, '')
-                                .replace(/[:\-–—\s]+$/g, '').trim();
-        groups[baseKey] = {
-          key: baseKey,
-          title: cleanTitle || a.title,
-          cover: a.cover || a.banner,
-          banner: a.banner || a.cover,
+    items.forEach(({ anime, key, min, eps, totalEps }) => {
+      const rootKey = rootMap[key] || key;
+      if (!groups[rootKey]) {
+        let displayTitle = anime.title
+          .replace(/[:\-–—]?\s*(?:the\s+|la\s+)?(?:final\s+season|saison\s+finale)\b.*$/gi, '')
+          .replace(/[:\-–—]?\s*\b\d+\s*(?:ère|ere|ème|eme)?\s*(?:saisons?|seasons?)\b.*$/gi, '')
+          .replace(/[:\-–—]?\s*(?:la\s+)?(?:saisons?|seasons?)\s*\d*.*$/gi, '')
+          .replace(/[:\-–—]?\s*\b(?:\d+(?:st|nd|rd|th))\s+season\b.*$/gi, '')
+          .replace(/[:\-–—]?\s*\b(?:partie|part|cour)\s*\d*.*$/gi, '')
+          .replace(/[:\-–—]?\s*[^:\-]+?\s+arc\b.*$/gi, '')
+          .replace(/\b(?:the\s+)?movie\b.*$/gi, '')
+          .replace(/\bfilm\b.*$/gi, '')
+          .replace(/!-\s*.*$/g, '')
+          .replace(/[:\-–—\s]+$/g, '').trim();
+
+        groups[rootKey] = {
+          key: rootKey,
+          title: displayTitle || anime.title,
+          cover: anime.cover || anime.banner,
+          banner: anime.banner || anime.cover,
           watchedMin: 0,
           watchedEps: 0,
           totalEps: 0,
           entries: [],
         };
       }
-      groups[baseKey].watchedMin += Calc.watchedMin(a);
-      groups[baseKey].watchedEps += Calc.watchedEps(a);
-      groups[baseKey].totalEps += Calc.totalEps(a);
-      groups[baseKey].entries.push(a);
-      if (!groups[baseKey].banner && (a.banner || a.cover)) {
-        groups[baseKey].banner = a.banner || a.cover;
+      groups[rootKey].watchedMin += min;
+      groups[rootKey].watchedEps += eps;
+      groups[rootKey].totalEps += totalEps;
+      groups[rootKey].entries.push(anime);
+      if (!groups[rootKey].banner && (anime.banner || anime.cover)) {
+        groups[rootKey].banner = anime.banner || anime.cover;
       }
     });
 
@@ -2792,5 +2851,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2e1c433af62ad85',t:'MTc4NzIzMjc3MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2e1f3d00f392e37',t:'MTc4NzIzNDcyMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
