@@ -441,19 +441,127 @@ h1.title em { font-style: normal; background: var(--grad); -webkit-background-cl
 .stat-val { font-size: 30px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
 .stat-lab { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-top: 5px; font-weight: 600; }
 
+/* Bloc de navigation par mois */
+.stat-month {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.stat-month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.month-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface-2);
+  padding: 3px 6px;
+  border-radius: 99px;
+  border: 1px solid var(--stroke-2);
+}
+.m-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  color: var(--text);
+  background: rgba(255,255,255,.08);
+  transition: .15s;
+}
+.m-btn:hover:not(:disabled) {
+  background: var(--pink);
+  color: #fff;
+}
+.m-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cyan-lt);
+  text-transform: capitalize;
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
 .panel {
   padding: 22px; border-radius: var(--r-lg); background: var(--surface);
   border: 1px solid var(--stroke); margin-top: 18px;
 }
-.panel h3 { font-size: 15px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; font-weight: 700; }
+.panel h3 { font-size: 15px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
 
-.bar-row { display: grid; grid-template-columns: 1fr; gap: 6px; margin-bottom: 14px; }
+/* En-tête Top Visionnage cliquable */
+.panel-top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--stroke);
+  transition: .2s;
+}
+.panel-top-header:hover h3 { color: var(--pink-lt); }
+.panel-sub-hint { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.bar-row { display: grid; grid-template-columns: 1fr; gap: 6px; margin-bottom: 14px; transition: transform .18s; }
+.bar-row:hover { transform: translateX(3px); }
 .bar-head { display: flex; justify-content: space-between; gap: 12px; font-size: 13.5px; }
 .bar-head b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bar-head span { color: var(--muted); flex-shrink: 0; }
 .bar { height: 9px; border-radius: 99px; background: rgba(255,255,255,.08); overflow: hidden; }
 .bar > i { display: block; height: 100%; border-radius: 99px; background: var(--grad); animation: barIn .8s var(--ease); }
 @keyframes barIn { from { width: 0 !important; } }
+
+/* Rang dans le classement complet */
+.ranking-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--stroke);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: transform .2s, background .2s, border-color .2s;
+}
+.ranking-row:hover {
+  transform: translateY(-2px);
+  background: rgba(255,61,139,.1);
+  border-color: var(--pink);
+}
+.ranking-num {
+  font-size: 15px;
+  font-weight: 800;
+  min-width: 34px;
+  text-align: center;
+  color: var(--muted);
+}
+.ranking-num.top1 { color: #ffd700; font-size: 20px; }
+.ranking-num.top2 { color: #c0c0c0; font-size: 20px; }
+.ranking-num.top3 { color: #cd7f32; font-size: 20px; }
+.ranking-info {
+  flex: 1;
+  min-width: 0;
+}
+.ranking-title {
+  font-weight: 700;
+  font-size: 14.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ranking-meta {
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+}
 
 .donut-wrap { display: flex; gap: 26px; align-items: center; flex-wrap: wrap; }
 .donut { width: 168px; height: 168px; border-radius: 50%; flex-shrink: 0; position: relative; }
@@ -769,6 +877,7 @@ h1.title em { font-style: normal; background: var(--grad); -webkit-background-cl
   height: 75px;
   width: 150px;
   border-radius: var(--r-sm);
+  object-fit: contain;
 }
 </style>
 </head>
@@ -985,6 +1094,28 @@ h1.title em { font-style: normal; background: var(--grad); -webkit-background-cl
   </div>
 </div>
 
+<!-- ══════════ Modale classement complet ══════════ -->
+<div class="modal-back" id="ranking-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ranking-title" style="max-width:680px">
+    <div class="modal-head">
+      <h2 id="ranking-title">🏆 Classement temps de visionnage</h2>
+      <button class="btn btn-icon" onclick="Stats.closeRankingModal()" aria-label="Fermer">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="muted" style="font-size:13.5px;margin-bottom:14px">
+        Classement complet de tous les animes regardés, avec toutes leurs saisons combinées.
+      </p>
+      <div class="field" style="margin-bottom:14px">
+        <input class="input" type="search" id="ranking-search-input" placeholder="Rechercher un anime dans le classement…" oninput="Stats.filterRanking(this.value)" />
+      </div>
+      <div id="ranking-list" style="max-height:480px;overflow-y:auto;padding-right:4px"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" onclick="Stats.closeRankingModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ============================================================
    KIOKU · 記憶 — Anime Tracker
@@ -999,7 +1130,7 @@ const KEY = 'kioku.v1';
 const DEFAULT_DUR = 22;
 
 const Store = {
-  data: { animes: [], settings: { newsCache: null, newsCachedAt: 0 } },
+  data: { animes: [], watchLog: [], settings: { newsCache: null, newsCachedAt: 0 } },
 
   load() {
     try {
@@ -1007,6 +1138,7 @@ const Store = {
       if (raw) {
         const parsed = JSON.parse(raw);
         this.data.animes = Array.isArray(parsed.animes) ? parsed.animes : [];
+        this.data.watchLog = Array.isArray(parsed.watchLog) ? parsed.watchLog : [];
         this.data.settings = Object.assign(this.data.settings, parsed.settings || {});
       }
     } catch (e) { console.warn('[KIOKU] lecture impossible', e); }
@@ -1025,7 +1157,13 @@ const Store = {
   all()      { return this.data.animes; },
   get(id)    { return this.data.animes.find(a => a.id === id) || null; },
   add(a)     { this.data.animes.unshift(a); this.save(); },
-  remove(id) { this.data.animes = this.data.animes.filter(a => a.id !== id); this.save(); },
+  remove(id) {
+    this.data.animes = this.data.animes.filter(a => a.id !== id);
+    if (this.data.watchLog) {
+      this.data.watchLog = this.data.watchLog.filter(log => log.id !== id);
+    }
+    this.save();
+  },
 };
 
 function normalize(a) {
@@ -1489,9 +1627,17 @@ function isoAniDate(d) {
 }
 
 /* ------------------------------------------------------------
-   8. Page « Stats » (Films & Déduplication intelligente)
+   8. Page « Stats » (Épisodes par mois & Classement complet)
 ------------------------------------------------------------ */
 const Stats = {
+  monthOffset: 0,
+  _rankingSearch: '',
+
+  changeMonth(delta) {
+    this.monthOffset = Math.min(0, (this.monthOffset || 0) + delta);
+    this.render();
+  },
+
   render() {
     const all = Store.all();
     const seen      = all.filter(a => a.status !== 'planned' && a.status !== 'soon');
@@ -1499,7 +1645,6 @@ const Stats = {
     const soon      = all.filter(a => a.status === 'soon');
 
     // Déduplication par franchise / série pour éviter de compter chaque saison comme un anime distinct
-    // (ne compte pas 2 fois les animes vus même si vus plusieurs fois)
     const uniqueSeenCount = new Set(seen.map(a => getAnimeBaseKey(a.title))).size;
     const uniquePlannedCount = new Set(planned.map(a => getAnimeBaseKey(a.title))).size;
 
@@ -1512,6 +1657,26 @@ const Stats = {
     const minPlanned = planned.reduce((n, a) => n + Calc.totalMin(a), 0);
     // Saisons suivies (les films ne comptent pas comme saisons)
     const seasons    = all.filter(a => !a.isMovie).reduce((n, a) => n + a.seasons.length, 0);
+
+    // Calcul des épisodes vus durant le mois sélectionné
+    const now = new Date();
+    const targetDate = new Date(now.getFullYear(), now.getMonth() + (this.monthOffset || 0), 1);
+    const targetY = targetDate.getFullYear();
+    const targetM = targetDate.getMonth();
+    const monthLabel = targetDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    const monthShort = targetDate.toLocaleDateString('fr-FR', { month: 'short' });
+
+    const watchLog = Store.data.watchLog || [];
+    let monthEps = 0;
+    if (watchLog.length > 0) {
+      monthEps = watchLog.filter(entry => {
+        const d = new Date(entry.date);
+        return d.getFullYear() === targetY && d.getMonth() === targetM;
+      }).length;
+    } else {
+      // Fallback si pas encore d'historique daté
+      monthEps = (this.monthOffset === 0) ? epsWatched : 0;
+    }
 
     const box = document.getElementById('stats-content');
     if (!all.length) {
@@ -1537,7 +1702,18 @@ const Stats = {
         ${this.stat('🔖', uniquePlannedCount, 'À regarder')}
         ${this.stat('🎞️', epsWatched.toLocaleString('fr-FR'), 'Épisodes vus')}
         ${this.stat('🗂️', seasons, 'Saisons suivies')}
-        ${this.stat('🗓️', soon.length, 'Sorties suivies')}
+        <div class="stat stat-month">
+          <div class="stat-month-nav">
+            <div class="stat-ico" style="margin-bottom:0">📅</div>
+            <div class="month-controls">
+              <button class="m-btn" onclick="event.stopPropagation();Stats.changeMonth(-1)" title="Mois précédent">◀</button>
+              <span class="m-title">${monthLabel}</span>
+              <button class="m-btn" onclick="event.stopPropagation();Stats.changeMonth(1)" title="Mois suivant" ${(this.monthOffset || 0) >= 0 ? 'disabled style="opacity:.3;cursor:default"' : ''}>▶</button>
+            </div>
+          </div>
+          <div class="stat-val" style="margin-top:8px">${monthEps.toLocaleString('fr-FR')} <span style="font-size:14px;font-weight:600;color:var(--muted)">ép.</span></div>
+          <div class="stat-lab">${(this.monthOffset || 0) === 0 ? 'Épisodes ce mois-ci' : 'Épisodes en ' + monthShort}</div>
+        </div>
       </div>
 
       <div class="panel">
@@ -1601,17 +1777,130 @@ const Stats = {
   },
 
   topPanel(all) {
-    const top = all.filter(a => Calc.watchedMin(a) > 0)
-      .sort((x, y) => Calc.watchedMin(y) - Calc.watchedMin(x)).slice(0, 6);
-    if (!top.length) return '';
-    const max = Calc.watchedMin(top[0]) || 1;
-    return `<div class="panel"><h3>Top temps de visionnage</h3>
-      ${top.map(a => `
-        <div class="bar-row">
-          <div class="bar-head"><b>${esc(a.title)}</b><span>${fmtDuration(Calc.watchedMin(a))}</span></div>
-          <div class="bar"><i style="width:${Calc.watchedMin(a) / max * 100}%"></i></div>
-        </div>`).join('')}
-    </div>`;
+    const grouped = this.getGroupedTop(all);
+    if (!grouped.length) return '';
+    const top = grouped.slice(0, 6);
+    const max = top[0]?.watchedMin || 1;
+
+    return `
+      <div class="panel">
+        <div class="panel-top-header" onclick="Stats.openRankingModal()" title="Cliquer pour voir le classement complet">
+          <div>
+            <h3>Top temps de visionnage</h3>
+            <div class="panel-sub-hint">Clique pour voir le classement de tous les animes (${grouped.length})</div>
+          </div>
+          <button class="btn btn-sm" onclick="event.stopPropagation();Stats.openRankingModal()">🏆 Voir tout (1→${grouped.length})</button>
+        </div>
+        <div style="margin-top:14px">
+          ${top.map((a, i) => `
+            <div class="bar-row" style="cursor:pointer" onclick="Router.go('anime/${a.entries[0]?.id}')" title="Voir la fiche de ${esc(a.title)}">
+              <div class="bar-head">
+                <b><span style="color:var(--cyan-lt);margin-right:6px">#${i + 1}</span> ${esc(a.title)} ${a.entries.length > 1 ? `<small style="color:var(--muted);font-weight:normal">(${a.entries.length} saisons réunies)</small>` : ''}</b>
+                <span>${fmtDuration(a.watchedMin)} · ${a.watchedEps} ép.</span>
+              </div>
+              <div class="bar"><i style="width:${a.watchedMin / max * 100}%"></i></div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  },
+
+  /**
+   * Regroupe tous les animes par franchise/série en additionnant leurs saisons
+   */
+  getGroupedTop(all) {
+    const groups = {};
+    all.filter(a => Calc.watchedMin(a) > 0).forEach(a => {
+      const baseKey = getAnimeBaseKey(a.title);
+      if (!groups[baseKey]) {
+        let cleanTitle = a.title.replace(/[:\-–—]?\s*(?:the\s+|la\s+)?(?:final\s+season|saison\s+finale)\b/gi, '')
+                                .replace(/[:\-–—]?\s*\b\d+\s*(?:ère|ere|ème|eme)?\s*(?:saisons?|seasons?)\b/gi, '')
+                                .replace(/[:\-–—]?\s*(?:la\s+)?(?:saisons?|seasons?)\s*\d*/gi, '')
+                                .replace(/[:\-–—]?\s*\b(?:\d+(?:st|nd|rd|th))\s+season\b/gi, '')
+                                .replace(/[:\-–—]?\s*\b(?:partie|part|cour)\s*\d*\b/gi, '')
+                                .replace(/\b[sS]\d{1,2}\b/g, '')
+                                .replace(/[:\-–—\s]+$/g, '').trim();
+        groups[baseKey] = {
+          key: baseKey,
+          title: cleanTitle || a.title,
+          cover: a.cover || a.banner,
+          banner: a.banner || a.cover,
+          watchedMin: 0,
+          watchedEps: 0,
+          totalEps: 0,
+          entries: [],
+        };
+      }
+      groups[baseKey].watchedMin += Calc.watchedMin(a);
+      groups[baseKey].watchedEps += Calc.watchedEps(a);
+      groups[baseKey].totalEps += Calc.totalEps(a);
+      groups[baseKey].entries.push(a);
+      if (!groups[baseKey].banner && (a.banner || a.cover)) {
+        groups[baseKey].banner = a.banner || a.cover;
+      }
+    });
+
+    return Object.values(groups).sort((x, y) => y.watchedMin - x.watchedMin);
+  },
+
+  openRankingModal() {
+    this._rankingSearch = '';
+    const modal = document.getElementById('ranking-modal');
+    if (modal) {
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      const input = document.getElementById('ranking-search-input');
+      if (input) input.value = '';
+      this.renderRankingList();
+    }
+  },
+
+  closeRankingModal() {
+    const modal = document.getElementById('ranking-modal');
+    if (modal) {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  },
+
+  filterRanking(q) {
+    this._rankingSearch = (q || '').toLowerCase().trim();
+    this.renderRankingList();
+  },
+
+  renderRankingList() {
+    const box = document.getElementById('ranking-list');
+    if (!box) return;
+    const all = Store.all();
+    const grouped = this.getGroupedTop(all);
+    const q = this._rankingSearch || '';
+    
+    let list = grouped;
+    if (q) {
+      list = list.filter(g => g.title.toLowerCase().includes(q) || g.entries.some(e => e.title.toLowerCase().includes(q)));
+    }
+
+    if (!list.length) {
+      box.innerHTML = `<p class="muted center" style="padding:30px">Aucun anime trouvé.</p>`;
+      return;
+    }
+
+    const max = grouped[0]?.watchedMin || 1;
+    box.innerHTML = list.map((a, i) => {
+      const rank = grouped.indexOf(a) + 1;
+      const rankBadge = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+      return `
+        <div class="ranking-row" onclick="Stats.closeRankingModal();Router.go('anime/${a.entries[0]?.id}')" title="Voir la fiche de ${esc(a.title)}">
+          <div class="ranking-num ${rank <= 3 ? 'top' + rank : ''}">${rankBadge}</div>
+          <div class="ranking-info">
+            <div class="ranking-title">${esc(a.title)} ${a.entries.length > 1 ? `<small style="color:var(--muted);font-weight:normal">(${a.entries.length} saisons réunies)</small>` : ''}</div>
+            <div class="ranking-meta">
+              <span>⏱️ <b>${fmtDuration(a.watchedMin)}</b></span>
+              <span>📼 <b>${a.watchedEps}</b> épisodes vus</span>
+            </div>
+            <div class="bar" style="margin-top:6px;height:6px"><i style="width:${a.watchedMin / max * 100}%"></i></div>
+          </div>
+        </div>`;
+    }).join('');
   },
 
   genrePanel(all) {
@@ -1771,6 +2060,22 @@ const Detail = {
       nextCount = (curCount >= 5) ? 0 : curCount + 1;
     }
 
+    // Gestion du log de visionnage avec timestamp pour les stats mensuelles
+    if (!Store.data.watchLog) Store.data.watchLog = [];
+    if (nextCount > curCount) {
+      for (let i = 0; i < (nextCount - curCount); i++) {
+        Store.data.watchLog.push({ id: a.id, sid, ep: n, date: Date.now() });
+      }
+    } else if (nextCount < curCount) {
+      let toRemove = curCount - nextCount;
+      for (let i = Store.data.watchLog.length - 1; i >= 0 && toRemove > 0; i--) {
+        if (Store.data.watchLog[i].id === a.id && Store.data.watchLog[i].sid === sid && Store.data.watchLog[i].ep === n) {
+          Store.data.watchLog.splice(i, 1);
+          toRemove--;
+        }
+      }
+    }
+
     // Retirer toutes les entrées existantes pour l'épisode n
     s.watched = s.watched.filter(x => x !== n);
     // Ajouter n le nombre de fois correspondant
@@ -1798,10 +2103,12 @@ const Detail = {
    */
   rewatchAll() {
     const a = Store.get(this.id); if (!a) return;
+    if (!Store.data.watchLog) Store.data.watchLog = [];
     let totalAddedMin = 0;
     for (const s of a.seasons) {
       for (let n = 1; n <= s.episodes; n++) {
         s.watched.push(n);
+        Store.data.watchLog.push({ id: a.id, sid: s.id, ep: n, date: Date.now() });
         totalAddedMin += s.duration;
       }
       s.watched.sort((x, y) => x - y);
@@ -1819,14 +2126,17 @@ const Detail = {
   markSeason(sid, isAdd) {
     const a = Store.get(this.id); if (!a) return;
     const s = a.seasons.find(x => x.id === sid); if (!s) return;
+    if (!Store.data.watchLog) Store.data.watchLog = [];
     if (isAdd) {
       for (let n = 1; n <= s.episodes; n++) {
         s.watched.push(n);
+        Store.data.watchLog.push({ id: a.id, sid: s.id, ep: n, date: Date.now() });
       }
       s.watched.sort((x, y) => x - y);
       toast(`${s.name} · +1 visionnage sur tous les épisodes`);
     } else {
       s.watched = [];
+      Store.data.watchLog = Store.data.watchLog.filter(log => !(log.id === a.id && log.sid === sid));
       toast(`${s.name} réinitialisée (0 visionnage)`);
     }
     this.open[sid] = true;
@@ -1837,12 +2147,16 @@ const Detail = {
 
   nextEp() {
     const a = Store.get(this.id); if (!a) return;
+    if (!Store.data.watchLog) Store.data.watchLog = [];
     // Trouver le premier épisode non vu
     for (const s of a.seasons) {
       for (let n = 1; n <= s.episodes; n++) {
         if (!s.watched.includes(n)) {
-          s.watched.push(n); s.watched.sort((x, y) => x - y);
-          this.autoStatus(a); Store.save();
+          s.watched.push(n);
+          s.watched.sort((x, y) => x - y);
+          Store.data.watchLog.push({ id: a.id, sid: s.id, ep: n, date: Date.now() });
+          this.autoStatus(a);
+          Store.save();
           this.open[s.id] = true;
           this.render(this.id);
           toast(`${s.name} · ${a.isMovie ? 'Film coché' : 'Épisode ' + n + ' coché'} (+${s.duration} min)`);
@@ -2103,7 +2417,7 @@ const UI = {
 ------------------------------------------------------------ */
 const Data = {
   export() {
-    const blob = new Blob([JSON.stringify({ animes: Store.all() }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ animes: Store.all(), watchLog: Store.data.watchLog || [] }, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `kioku-${new Date().toISOString().slice(0, 10)}.json`;
@@ -2125,6 +2439,9 @@ const Data = {
           if (!Array.isArray(list)) throw new Error('format');
           if (!confirm(`Importer ${list.length} anime(s) ? Les entrées actuelles seront conservées.`)) return;
           list.forEach(a => { a.id = uid(); Store.data.animes.push(normalize(a)); });
+          if (Array.isArray(json.watchLog)) {
+            Store.data.watchLog = (Store.data.watchLog || []).concat(json.watchLog);
+          }
           Store.save(); Router.refresh();
           toast(`${list.length} anime(s) importé(s)`);
         } catch (e) { toast('Fichier invalide', 'err'); }
@@ -2137,6 +2454,7 @@ const Data = {
   reset() {
     if (!confirm('Effacer TOUTES tes données KIOKU ? Cette action est irréversible.')) return;
     Store.data.animes = [];
+    Store.data.watchLog = [];
     Store.save(); Router.refresh();
     toast('Données effacées');
   }
@@ -2239,10 +2557,17 @@ function boot() {
   document.getElementById('form-modal').addEventListener('mousedown', e => {
     if (e.target.id === 'form-modal') UI.closeForm();
   });
+  document.getElementById('ranking-modal').addEventListener('mousedown', e => {
+    if (e.target.id === 'ranking-modal') Stats.closeRankingModal();
+  });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') UI.closeForm();
+    if (e.key === 'Escape') {
+      UI.closeForm();
+      Stats.closeRankingModal();
+    }
     const formOpen = document.getElementById('form-modal').classList.contains('open');
-    if (e.key === 'n' && !formOpen && !/input|textarea|select/i.test(document.activeElement.tagName)) UI.openForm();
+    const rankOpen = document.getElementById('ranking-modal').classList.contains('open');
+    if (e.key === 'n' && !formOpen && !rankOpen && !/input|textarea|select/i.test(document.activeElement.tagName)) UI.openForm();
   });
 
   // PWA Service Worker
