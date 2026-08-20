@@ -1,5 +1,5 @@
 // ── KIOKU · Service Worker ───────────────────────────────────────────────────
-const CACHE = 'kioku-v1';
+const CACHE = 'kioku-v2';
 
 const SHELL = [
   './',
@@ -7,7 +7,7 @@ const SHELL = [
   './style.css',
   './app.js',
   './manifest.json',
-  './icon.svg',
+  './icon-192.png',
   './icon-512.png',
 ];
 
