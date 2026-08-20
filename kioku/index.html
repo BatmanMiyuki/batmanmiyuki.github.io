@@ -151,7 +151,7 @@ a { color: inherit; text-decoration: none; }
 }
 .topbar-in {
   max-width: 1240px; margin: 0 auto; height: var(--nav-h);
-  padding: 0 18px; display: flex; align-items: center; gap: 18px;
+  padding: 0 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
 .brand { display: flex; align-items: center; gap: 11px; flex-shrink: 0; }
 .brand-mark {
@@ -185,12 +185,12 @@ a { color: inherit; text-decoration: none; }
 .topbar-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   flex-shrink: 0;
 }
 
 /* Bouton signature dans la barre du haut */
-.signature-btn {
+.header-signature {
   margin-left: 300px;
   display: flex;
   align-items: center;
@@ -204,40 +204,39 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid var(--stroke-2);
   cursor: pointer;
   overflow: hidden;
-  box-shadow: 0 4px 14px rgba(0,0,0,.35);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .35);
   transition: transform .2s var(--ease), border-color .2s, box-shadow .2s;
   flex-shrink: 0;
 }
-.signature-btn:hover {
-  transform: translateY(-2px) scale(1.04);
+.header-signature:hover {
+  transform: translateY(-2px) scale(1.03);
   border-color: var(--pink);
   box-shadow: var(--glow-pink);
 }
-.sig-display {
+.header-signature .sig-inner {
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.sig-display img {
-  max-height: 34px;
-  max-width: 130px;
+.header-signature img {
+  max-height: 38px;
+  max-width: 150px;
   width: auto;
   height: auto;
   object-fit: contain;
   display: block;
 }
-.sig-ph-top {
+.header-signature .sig-fallback {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 600;
   color: var(--muted);
   white-space: nowrap;
 }
-.sig-ph-top span { font-size: 15px; }
-.sig-ph-top i { font-style: normal; }
+.header-signature .sig-fallback span { font-size: 16px; }
 
 /* Barre mobile */
 .mobilebar {
@@ -270,7 +269,7 @@ main { max-width: 1240px; margin: 0 auto; padding: 30px 18px 40px; }
 .page.active { display: block; }
 @keyframes pageIn { from { opacity: 0; transform: translateY(14px); } }
 
-/* En-tête de page & Signature Hero */
+/* En-tête de page */
 .page-head {
   display: flex;
   align-items: center;
@@ -288,70 +287,6 @@ main { max-width: 1240px; margin: 0 auto; padding: 30px 18px 40px; }
 h1.title { font-size: clamp(28px, 5vw, 42px); font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
 h1.title em { font-style: normal; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .subtitle { color: var(--muted); margin-top: 8px; font-size: 15px; max-width: 62ch; }
-
-/* Carte de signature dans l'en-tête */
-.hero-signature {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
-  cursor: pointer;
-  flex-shrink: 0;
-  padding: 10px 18px;
-  border-radius: var(--r);
-  background: linear-gradient(135deg, rgba(255,61,139,.13), rgba(155,92,255,.09) 50%, rgba(53,230,255,.11));
-  border: 1px solid var(--stroke-2);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  transition: transform .25s var(--ease), border-color .25s, box-shadow .25s;
-}
-.hero-signature:hover {
-  transform: translateY(-3px) scale(1.02);
-  border-color: var(--pink);
-  box-shadow: 0 14px 34px rgba(0,0,0,.5), var(--glow-pink);
-}
-.hero-signature-label {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  color: var(--pink-lt);
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.hero-sig-display {
-  min-height: 52px;
-  min-width: 140px;
-  max-width: 250px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.hero-sig-display img {
-  max-height: 64px;
-  max-width: 230px;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  display: block;
-  filter: drop-shadow(0 3px 10px rgba(0,0,0,.6));
-}
-.sig-ph-hero {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--muted);
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: 1px dashed var(--stroke-2);
-  background: rgba(255,255,255,.03);
-}
-.sig-ph-hero span { font-size: 17px; }
-.sig-ph-hero i { font-style: normal; }
 
 /* Toolbar */
 .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 20px 0 22px; }
@@ -442,6 +377,10 @@ h1.title em { font-style: normal; background: var(--grad); -webkit-background-cl
 .badge.planned   { color: #041e26; background: var(--cyan); border-color: transparent; }
 .badge.dropped   { color: #fff; background: rgba(120,110,150,.85); border-color: transparent; }
 .badge.soon      { color: #2a1c00; background: var(--gold); border-color: transparent; }
+.badge.movie     {
+  position: absolute; top: 12px; left: auto; right: 48px; z-index: 4;
+  color: #fff; background: linear-gradient(120deg, var(--violet), var(--pink)); border-color: transparent;
+}
 
 .fav-star {
   position: absolute; top: 10px; right: 10px; z-index: 5; width: 34px; height: 34px;
@@ -582,15 +521,47 @@ h1.title em { font-style: normal; background: var(--grad); -webkit-background-cl
 
 .ep-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 7px; margin-top: 4px; }
 .ep {
-  aspect-ratio: 1; border-radius: 11px; display: grid; place-items: center;
-  font-size: 13px; font-weight: 700; color: var(--muted);
-  background: rgba(255,255,255,.05); border: 1px solid var(--stroke);
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  background: rgba(255,255,255,.05);
+  border: 1px solid var(--stroke);
   transition: transform .15s var(--ease), background .2s, color .2s, box-shadow .2s;
   font-variant-numeric: tabular-nums;
+  user-select: none;
 }
-.ep:hover { transform: translateY(-2px) scale(1.06); color: var(--text); border-color: var(--stroke-2); }
+.ep:hover {
+  transform: translateY(-2px) scale(1.06);
+  color: var(--text);
+  border-color: var(--stroke-2);
+}
 .ep.on {
-  color: #fff; background: var(--grad); border-color: transparent; box-shadow: 0 4px 16px rgba(255,61,139,.35);
+  color: #fff;
+  background: var(--grad);
+  border-color: transparent;
+  box-shadow: 0 4px 16px rgba(255,61,139,.35);
+}
+.ep.on.mult {
+  background: linear-gradient(135deg, #ff3d8b, #9b5cff 60%, #35e6ff);
+  box-shadow: 0 0 18px rgba(155,92,255,.5);
+}
+.ep-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--gold);
+  color: #1a1200;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 99px;
+  line-height: 1.1;
+  box-shadow: 0 2px 6px rgba(0,0,0,.5);
 }
 .season-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 
@@ -642,6 +613,39 @@ h1.title em { font-style: normal; background: var(--grad); -webkit-background-cl
 .field select option { background: #14102a; }
 .row { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
 .row-3 { display: grid; gap: 14px; grid-template-columns: repeat(3, 1fr); }
+
+/* Case à cocher Film */
+.movie-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--stroke);
+  cursor: pointer;
+  user-select: none;
+  transition: .2s;
+  margin-bottom: 16px;
+}
+.movie-toggle:hover { border-color: var(--pink); background: rgba(255,61,139,.08); }
+.movie-toggle input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--pink);
+  cursor: pointer;
+}
+.movie-toggle-txt {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.movie-toggle-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-left: auto;
+}
 
 .season-edit {
   display: grid; grid-template-columns: 1.6fr .8fr .8fr auto; gap: 10px; align-items: end;
@@ -745,8 +749,6 @@ h1.title em { font-style: normal; background: var(--grad); -webkit-background-cl
   body { padding-bottom: calc(env(safe-area-inset-bottom) + 88px); }
   main { padding: 22px 14px 30px; }
   .page-head { flex-direction: column; align-items: flex-start; gap: 14px; }
-  .hero-signature { align-self: stretch; align-items: center; }
-  .hero-sig-display { width: 100%; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 13px; }
   .card-title { font-size: 14px; }
   .detail-info { padding: 0 16px 20px; }
@@ -756,6 +758,7 @@ h1.title em { font-style: normal; background: var(--grad); -webkit-background-cl
   .row, .row-3 { grid-template-columns: 1fr; }
   .modal { margin: 0 auto; }
   .modal-back { padding: 0; }
+  .ma-photo { margin-left: auto; }
 }
 @media (max-width: 420px) {
   .grid { grid-template-columns: repeat(2, 1fr); gap: 11px; }
@@ -765,9 +768,8 @@ h1.title em { font-style: normal; background: var(--grad); -webkit-background-cl
   margin-left: 250px;
   height: 75px;
   width: 150px;
-border-radius: var(--r-sm);
+  border-radius: var(--r-sm);
 }
-
 </style>
 </head>
 <body>
@@ -797,8 +799,7 @@ border-radius: var(--r-sm);
 
     <div class="topbar-actions">
       <button class="btn btn-primary btn-add" onclick="UI.openForm()">＋ Ajouter</button>
-      <img src="signature.png" alt="Description de la photo" class="ma-photo">
-
+      <img src="signature.png" alt="Signature" class="ma-photo" onerror="this.style.display='none'">
     </div>
   </div>
 </header>
@@ -834,10 +835,6 @@ border-radius: var(--r-sm);
         <h1 class="title">À <em>regarder</em></h1>
         <p class="subtitle">Ta pile de la honte, joliment rangée. Le temps total estimé t'attend en bas de chaque carte.</p>
       </div>
-      <div class="hero-signature" onclick="Signature.openModal()" title="Photo de signature (cliquer pour modifier)">
-        <span class="hero-signature-label">🔖 Watchlist de</span>
-        <div class="hero-sig-display"></div>
-      </div>
     </div>
     <div class="toolbar">
       <div class="search"><input type="search" id="plan-search" placeholder="Rechercher dans la watchlist…" /></div>
@@ -860,10 +857,6 @@ border-radius: var(--r-sm);
         <h1 class="title">Nouveautés &amp; <em>prochainement</em></h1>
         <p class="subtitle">La saison en cours et les sorties à venir, en direct d'AniList. Plus tes propres sorties surveillées.</p>
       </div>
-      <div class="hero-signature" onclick="Signature.openModal()" title="Photo de signature (cliquer pour modifier)">
-        <span class="hero-signature-label">✨ Radar de</span>
-        <div class="hero-sig-display"></div>
-      </div>
     </div>
     <div class="toolbar">
       <div class="chips" id="news-chips">
@@ -884,10 +877,6 @@ border-radius: var(--r-sm);
         <div class="eyebrow">Bilan</div>
         <h1 class="title">Mes <em>statistiques</em></h1>
         <p class="subtitle">Chaque épisode coché nourrit ces chiffres. Retrouve ici le résumé de tes visionnages.</p>
-      </div>
-      <div class="hero-signature" onclick="Signature.openModal()" title="Photo de signature (cliquer pour modifier)">
-        <span class="hero-signature-label">📊 Bilan de</span>
-        <div class="hero-sig-display"></div>
       </div>
     </div>
     <div id="stats-content"></div>
@@ -918,11 +907,18 @@ border-radius: var(--r-sm);
       <div class="assist">
         <div class="assist-title">🔎 Remplissage automatique <span class="muted" style="font-weight:500">(AniList)</span></div>
         <div class="assist-row">
-          <input class="input" id="assist-q" placeholder="Ex : Frieren, Jujutsu Kaisen…" autocomplete="off" />
+          <input class="input" id="assist-q" placeholder="Ex : Frieren, Jujutsu Kaisen, Your Name…" autocomplete="off" />
           <button class="btn btn-primary btn-sm" id="assist-btn">Chercher</button>
         </div>
         <div class="assist-res" id="assist-res"></div>
       </div>
+
+      <!-- Option Film -->
+      <label class="movie-toggle" for="f-movie">
+        <input type="checkbox" id="f-movie" onchange="UI.syncMovieFields()" />
+        <span class="movie-toggle-txt">🎬 Cet anime est un film</span>
+        <span class="movie-toggle-sub">1 épisode / durée du film</span>
+      </label>
 
       <div class="field">
         <label for="f-title">Titre *</label>
@@ -974,10 +970,10 @@ border-radius: var(--r-sm);
       </div>
 
       <div class="field">
-        <label>Saisons &amp; épisodes *</label>
+        <label id="f-seasons-label">Saisons &amp; épisodes *</label>
         <div id="f-seasons"></div>
-        <button class="btn btn-sm" onclick="UI.addSeasonRow()">＋ Ajouter une saison</button>
-        <div class="hint">Durée par épisode en minutes — 22 min par défaut. Le temps de visionnage se calcule à partir de ces valeurs.</div>
+        <button class="btn btn-sm" id="btn-add-season" onclick="UI.addSeasonRow()">＋ Ajouter une saison</button>
+        <div class="hint">Durée par épisode en minutes — 22 min par défaut (ou durée complète pour un film).</div>
       </div>
 
     </div>
@@ -985,35 +981,6 @@ border-radius: var(--r-sm);
       <button class="btn btn-danger" id="f-delete" onclick="UI.deleteCurrent()" style="margin-right:auto">🗑️ Supprimer</button>
       <button class="btn btn-ghost" onclick="UI.closeForm()">Annuler</button>
       <button class="btn btn-primary" onclick="UI.saveForm()">💾 Enregistrer</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ Modale signature ══════════ -->
-<div class="modal-back" id="sig-modal">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="sig-title" style="max-width:480px">
-    <div class="modal-head">
-      <h2 id="sig-title">Photo de signature</h2>
-      <button class="btn btn-icon" onclick="Signature.closeModal()" aria-label="Fermer">✕</button>
-    </div>
-    <div class="modal-body">
-      <p class="muted" style="font-size:14px;margin-bottom:16px">
-        Personnalise ta photo de signature affichée dans le header et en haut de ta collection. Choisis une image sur ton appareil ou colle une URL.
-      </p>
-      <div class="field">
-        <label for="sig-file">Importer une image</label>
-        <input class="input" type="file" id="sig-file" accept="image/*" onchange="Signature.uploadFile(this.files[0])" />
-      </div>
-      <div class="field">
-        <label for="sig-url">Ou entrer l'URL d'une image</label>
-        <input class="input" id="sig-url" type="url" placeholder="https://…/signature.png" oninput="Signature.previewUrl(this.value)" />
-      </div>
-      <div class="preview-banner" id="sig-prev" style="height:90px;margin-top:10px">Aperçu de la signature</div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-danger" onclick="Signature.reset()" style="margin-right:auto">🗑️ Réinitialiser</button>
-      <button class="btn btn-ghost" onclick="Signature.closeModal()">Annuler</button>
-      <button class="btn btn-primary" onclick="Signature.saveUrl()">💾 Enregistrer</button>
     </div>
   </div>
 </div>
@@ -1069,6 +1036,7 @@ function normalize(a) {
   a.cover     = a.cover     || '';
   a.synopsis  = a.synopsis  || '';
   a.status    = a.status    || 'completed';
+  a.isMovie   = !!a.isMovie;
   a.genres    = Array.isArray(a.genres) ? a.genres : [];
   a.favorite  = !!a.favorite;
   a.rating    = typeof a.rating === 'number' ? a.rating : null;
@@ -1077,29 +1045,60 @@ function normalize(a) {
   a.seasons   = Array.isArray(a.seasons) ? a.seasons : [];
   a.seasons.forEach((s, i) => {
     s.id       = s.id || uid();
-    s.name     = s.name || `Saison ${i + 1}`;
+    s.name     = s.name || (a.isMovie ? 'Film' : `Saison ${i + 1}`);
     s.episodes = Math.max(0, parseInt(s.episodes, 10) || 0);
-    s.duration = Math.max(1, parseInt(s.duration, 10) || DEFAULT_DUR);
-    s.watched  = Array.isArray(s.watched) ? s.watched.filter(n => n >= 1 && n <= s.episodes) : [];
+    s.duration = Math.max(1, parseInt(s.duration, 10) || (a.isMovie ? 100 : DEFAULT_DUR));
+    s.watched  = Array.isArray(s.watched) ? s.watched.filter(n => typeof n === 'number' && n >= 1 && n <= s.episodes) : [];
   });
   return a;
 }
 
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 
+/**
+ * Normalise le titre pour regrouper les saisons d'un même anime
+ * sans fusionner des œuvres distinctes (ex: Naruto vs Naruto Shippuden).
+ */
+function getAnimeBaseKey(title) {
+  if (!title) return '';
+  let s = title.trim().toLowerCase();
+  
+  // 1. Mentions "Saison finale", "Final Season"
+  s = s.replace(/[:\-–—]?\s*(?:the\s+|la\s+)?(?:final\s+season|saison\s+finale)\b/gi, '');
+
+  // 2. Mentions de saison / partie (ex: "Saison 2", "Season 3", "2ème saison", "Part 2", "Cour 1")
+  s = s.replace(/[:\-–—]?\s*\b\d+\s*(?:ère|ere|ème|eme)?\s*(?:saisons?|seasons?)\b/gi, '');
+  s = s.replace(/[:\-–—]?\s*(?:la\s+)?(?:saisons?|seasons?)\s*\d*/gi, '');
+  s = s.replace(/[:\-–—]?\s*\b(?:\d+(?:st|nd|rd|th))\s+season\b/gi, '');
+  s = s.replace(/[:\-–—]?\s*\b(?:partie|part|cour)\s*\d*\b/gi, '');
+  s = s.replace(/\b[sS]\d{1,2}\b/g, '');
+
+  // 3. Chiffres / chiffres romains terminaux (ex: "Anime 1", "Anime 2", "Anime II")
+  s = s.replace(/\s+(?:[1-9]|10)\b$/g, '');
+  s = s.replace(/\s+(?:i|ii|iii|iv|v|vi|vii|viii|ix|x)\b$/gi, '');
+
+  // 4. Nettoyage de ponctuation résiduelle en fin de chaîne
+  s = s.replace(/[:\-–—\s]+$/g, '').trim();
+
+  return s || title.trim().toLowerCase();
+}
+
 /* ------------------------------------------------------------
-   2. Calculs
+   2. Calculs (Prend en compte les re-visionnages multiples)
 ------------------------------------------------------------ */
 const Calc = {
   totalEps:   a => a.seasons.reduce((n, s) => n + s.episodes, 0),
+  // Total des épisodes vus (chaque re-visionnage d'épisode compte +1)
   watchedEps: a => a.seasons.reduce((n, s) => n + s.watched.length, 0),
   totalMin:   a => a.seasons.reduce((n, s) => n + s.episodes * s.duration, 0),
+  // Temps total regardé (multiplié par le nombre de visionnages de chaque épisode)
   watchedMin: a => a.seasons.reduce((n, s) => n + s.watched.length * s.duration, 0),
   pct(a) {
     const t = Calc.totalEps(a);
-    return t ? Math.round(Calc.watchedEps(a) / t * 100) : 0;
+    const uniqueDone = a.seasons.reduce((n, s) => n + new Set(s.watched).size, 0);
+    return t ? Math.min(100, Math.round(uniqueDone / t * 100)) : 0;
   },
-  remainingMin: a => Calc.totalMin(a) - Calc.watchedMin(a),
+  remainingMin: a => Math.max(0, Calc.totalMin(a) - a.seasons.reduce((n, s) => n + new Set(s.watched).size * s.duration, 0)),
 };
 
 function fmtDuration(min) {
@@ -1159,13 +1158,14 @@ function cardHTML(a, i, opts = {}) {
     <div class="card-media">
       ${mediaHTML(a, opts.cover)}
       <span class="badge ${a.status}">${st.ico} ${st.label}</span>
+      ${a.isMovie ? `<span class="badge movie">🎬 Film</span>` : ''}
       <button class="fav-star ${a.favorite ? 'on' : ''}" title="Favori"
               onclick="event.stopPropagation();UI.toggleFav('${a.id}')">${a.favorite ? '⭐' : '☆'}</button>
     </div>
     <div class="card-body">
       <h3 class="card-title">${esc(a.title)}</h3>
       <div class="card-meta">
-        <span>📼 <b>${done}</b>/${total} ép.</span>
+        <span>${a.isMovie ? '🎬' : '📼'} <b>${done}</b>/${total} ép.</span>
         <span>⏱️ ${fmtDuration(time)}</span>
         ${a.rating != null ? `<span>⭐ <b>${a.rating}</b>/10</span>` : ''}
       </div>
@@ -1312,11 +1312,12 @@ const News = {
       <div class="card-media">
         ${mediaHTML(a)}
         <span class="badge soon">🗓️ Prochainement</span>
+        ${a.isMovie ? `<span class="badge movie">🎬 Film</span>` : ''}
       </div>
       <div class="card-body">
         <h3 class="card-title">${esc(a.title)}</h3>
         <div class="news-date">📅 ${esc(date)} ${cd}</div>
-        <div class="card-meta" style="margin-top:8px"><span>📼 ${Calc.totalEps(a)} ép. prévus</span></div>
+        <div class="card-meta" style="margin-top:8px"><span>${a.isMovie ? '🎬' : '📼'} ${Calc.totalEps(a)} ép. prévus</span></div>
       </div>
     </article>`;
   },
@@ -1350,6 +1351,7 @@ const News = {
       <div class="card-media">
         ${img ? `<img src="${esc(img)}" alt="" loading="lazy" />` : '<div class="card-fallback">🌸</div>'}
         ${m.score ? `<span class="badge" style="background:var(--gold);color:#2a1c00;border-color:transparent">★ ${m.score / 10}</span>` : ''}
+        ${m.format === 'MOVIE' ? `<span class="badge movie">🎬 Film</span>` : ''}
       </div>
       <div class="card-body">
         <h3 class="card-title">${esc(m.title)}</h3>
@@ -1369,6 +1371,7 @@ const News = {
     const m = items[idx];
     if (!m) return;
     const planned = this.filter === 'season';
+    const isMovie = m.format === 'MOVIE';
     Store.add(normalize({
       id: uid(),
       anilistId: m.id,
@@ -1379,9 +1382,16 @@ const News = {
       synopsis: m.description || '',
       genres: m.genres || [],
       status: planned ? 'planned' : 'soon',
+      isMovie,
       release: m.startDateISO || '',
       addedAt: Date.now(),
-      seasons: [{ id: uid(), name: 'Saison 1', episodes: m.episodes || 12, duration: m.duration || DEFAULT_DUR, watched: [] }],
+      seasons: [{
+        id: uid(),
+        name: isMovie ? 'Film' : 'Saison 1',
+        episodes: m.episodes || 1,
+        duration: m.duration || (isMovie ? 100 : DEFAULT_DUR),
+        watched: []
+      }],
     }));
     toast(`${m.title} ajouté à ${planned ? 'ta watchlist' : 'tes sorties'}`);
     this.render();
@@ -1409,7 +1419,7 @@ const News = {
       description(asHtml: false)
       bannerImage
       coverImage { extraLarge large }
-      episodes duration genres averageScore
+      episodes duration genres averageScore format
       startDate { year month day }
       nextAiringEpisode { episode timeUntilAiring }`;
 
@@ -1437,7 +1447,7 @@ const News = {
         description: (mm.description || '').replace(/<[^>]+>/g, '').slice(0, 600),
         banner: mm.bannerImage || '',
         cover: mm.coverImage?.extraLarge || mm.coverImage?.large || '',
-        episodes: mm.episodes, duration: mm.duration,
+        episodes: mm.episodes, duration: mm.duration, format: mm.format,
         genres: mm.genres || [], score: mm.averageScore,
         startDate: fmtAniDate(mm.startDate),
         startDateISO: isoAniDate(mm.startDate),
@@ -1479,7 +1489,7 @@ function isoAniDate(d) {
 }
 
 /* ------------------------------------------------------------
-   8. Page « Stats » (Simplifiée)
+   8. Page « Stats » (Films & Déduplication intelligente)
 ------------------------------------------------------------ */
 const Stats = {
   render() {
@@ -1488,12 +1498,20 @@ const Stats = {
     const planned   = all.filter(a => a.status === 'planned');
     const soon      = all.filter(a => a.status === 'soon');
 
+    // Déduplication par franchise / série pour éviter de compter chaque saison comme un anime distinct
+    // (ne compte pas 2 fois les animes vus même si vus plusieurs fois)
+    const uniqueSeenCount = new Set(seen.map(a => getAnimeBaseKey(a.title))).size;
+    const uniquePlannedCount = new Set(planned.map(a => getAnimeBaseKey(a.title))).size;
+
+    // Films regardés (qui comptent aussi dans le total d'animes vus)
+    const moviesWatched = seen.filter(a => a.isMovie).length;
+
+    // Total d'épisodes et temps total (chaque visionnage est multiplié)
     const epsWatched = all.reduce((n, a) => n + Calc.watchedEps(a), 0);
     const minWatched = all.reduce((n, a) => n + Calc.watchedMin(a), 0);
     const minPlanned = planned.reduce((n, a) => n + Calc.totalMin(a), 0);
-    const seasons    = all.reduce((n, a) => n + a.seasons.length, 0);
-    const rated      = all.filter(a => a.rating != null);
-    const avg        = rated.length ? (rated.reduce((n, a) => n + a.rating, 0) / rated.length) : null;
+    // Saisons suivies (les films ne comptent pas comme saisons)
+    const seasons    = all.filter(a => !a.isMovie).reduce((n, a) => n + a.seasons.length, 0);
 
     const box = document.getElementById('stats-content');
     if (!all.length) {
@@ -1515,8 +1533,8 @@ const Stats = {
       </div>
 
       <div class="stat-grid">
-        ${this.stat('📺', seen.length, 'Animes vus')}
-        ${this.stat('🔖', planned.length, 'À regarder')}
+        ${this.stat('📺', uniqueSeenCount, 'Animes vus')}
+        ${this.stat('🔖', uniquePlannedCount, 'À regarder')}
         ${this.stat('🎞️', epsWatched.toLocaleString('fr-FR'), 'Épisodes vus')}
         ${this.stat('🗂️', seasons, 'Saisons suivies')}
         ${this.stat('🗓️', soon.length, 'Sorties suivies')}
@@ -1526,22 +1544,21 @@ const Stats = {
         <h3>Répartition de la collection</h3>
         <div class="donut-wrap">
           ${this.donut([
-            ['Animes vus',    seen.length,    '#ff3d8b'],
-            ['À regarder',    planned.length, '#35e6ff'],
-            ['Prochainement', soon.length,    '#ffce4f'],
-          ], all.length)}
+            ['Animes vus',    uniqueSeenCount,    '#ff3d8b'],
+            ['À regarder',    uniquePlannedCount, '#35e6ff'],
+            ['Prochainement', soon.length,        '#ffce4f'],
+          ], (uniqueSeenCount + uniquePlannedCount + soon.length))}
         </div>
       </div>
 
       <div class="stat-grid" style="margin-top:18px">
         ${this.stat('📚', fmtDuration(minPlanned), 'Watchlist à venir')}
-        ${this.stat('⭐', avg != null ? avg.toFixed(1).replace('.', ',') + '/10' : '—', 'Note moyenne')}
-        ${this.stat('🎬', epsWatched ? Math.round(minWatched / epsWatched) + ' min' : '—', 'Durée moyenne / ép.')}
+        ${this.stat('🎬', moviesWatched, 'Films regardés')}
+        ${this.stat('⏱️', epsWatched ? Math.round(minWatched / epsWatched) + ' min' : '—', 'Durée moyenne / ép.')}
       </div>
 
       ${this.topPanel(all)}
       ${this.genrePanel(all)}
-      ${this.ratingPanel(rated)}
 
       <div class="panel">
         <h3>Données</h3>
@@ -1572,7 +1589,7 @@ const Stats = {
     }).join(', ');
     return `
       <div class="donut" style="background:conic-gradient(${stops})">
-        <div class="donut-mid"><div><b>${total}</b><span>Animes</span></div></div>
+        <div class="donut-mid"><div><b>${total}</b><span>Œuvres</span></div></div>
       </div>
       <div class="legend">
         ${rows.map(([n, v, c]) => `
@@ -1605,26 +1622,11 @@ const Stats = {
     return `<div class="panel"><h3>Genres favoris</h3>
       <div class="tag-cloud">${rows.map(([g, n]) => `<span class="tag">${esc(g)} <b>${n}</b></span>`).join('')}</div>
     </div>`;
-  },
-
-  ratingPanel(rated) {
-    if (rated.length < 2) return '';
-    const buckets = [0, 0, 0, 0, 0];
-    rated.forEach(a => { buckets[Math.min(4, Math.floor(a.rating / 2))]++; });
-    const labels = ['0–2', '2–4', '4–6', '6–8', '8–10'];
-    const max = Math.max(...buckets) || 1;
-    return `<div class="panel"><h3>Mes notes</h3>
-      ${buckets.map((v, i) => `
-        <div class="bar-row">
-          <div class="bar-head"><b>${labels[i]}</b><span>${v} anime${v > 1 ? 's' : ''}</span></div>
-          <div class="bar"><i style="width:${v / max * 100}%"></i></div>
-        </div>`).join('')}
-    </div>`;
   }
 };
 
 /* ------------------------------------------------------------
-   9. Page « Détail »
+   9. Page « Détail » (Re-visionnage anime & épisodes)
 ------------------------------------------------------------ */
 const Detail = {
   id: null,
@@ -1643,6 +1645,11 @@ const Detail = {
     const st = STATUS[a.status] || STATUS.watching;
     const img = a.banner || a.cover;
 
+    // Calcul du nombre de visionnages complets
+    const minViews = (total && a.seasons.length)
+      ? Math.min(...a.seasons.flatMap(s => Array.from({length: s.episodes}, (_, i) => s.watched.filter(x => x === i+1).length)))
+      : 0;
+
     box.innerHTML = `
       <button class="btn btn-sm" onclick="history.length>1?history.back():Router.go('seen')" style="margin-bottom:16px">← Retour</button>
 
@@ -1651,7 +1658,11 @@ const Detail = {
           ${img ? `<img src="${esc(img)}" alt="" onerror="this.remove()" />` : ''}
         </div>
         <div class="detail-info">
-          <span class="badge ${a.status}" style="position:static;display:inline-block;margin-bottom:10px">${st.ico} ${st.label}</span>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+            <span class="badge ${a.status}" style="position:static;display:inline-block">${st.ico} ${st.label}</span>
+            ${a.isMovie ? `<span class="badge movie" style="position:static;display:inline-block">🎬 Film</span>` : ''}
+            ${minViews > 1 ? `<span class="badge" style="position:static;display:inline-block;background:var(--gold);color:#1a1200">🔁 Vu ${minViews} fois</span>` : ''}
+          </div>
           <h1 class="detail-title">${esc(a.title)}</h1>
           ${a.jp ? `<div class="detail-jp">${esc(a.jp)}</div>` : ''}
           ${a.genres.length ? `<div class="detail-tags">${a.genres.map(g => `<span class="tag">${esc(g)}</span>`).join('')}</div>` : ''}
@@ -1669,7 +1680,8 @@ const Detail = {
           <div class="progress ${pct === 100 ? 'done' : ''}" style="margin-top:16px"><i style="width:${pct}%"></i></div>
 
           <div class="detail-actions">
-            <button class="btn btn-primary" onclick="Detail.nextEp()">▶️ Épisode suivant</button>
+            <button class="btn btn-primary" onclick="Detail.nextEp()">${a.isMovie ? '🎬 Marquer le film comme vu' : '▶️ Épisode suivant'}</button>
+            <button class="btn" onclick="Detail.rewatchAll()" title="Ajoute +1 visionnage à tous les épisodes">🔁 Revoir tout l'anime (+1)</button>
             <button class="btn" onclick="UI.openForm('${a.id}')">✏️ Modifier</button>
             <button class="btn" onclick="UI.toggleFav('${a.id}',true)">${a.favorite ? '⭐ Retirer des favoris' : '☆ Ajouter aux favoris'}</button>
             <select class="input" style="width:auto" onchange="Detail.setStatus(this.value)">
@@ -1680,7 +1692,7 @@ const Detail = {
         </div>
       </div>
 
-      <div class="section-title">Saisons <span class="count">${a.seasons.length}</span></div>
+      <div class="section-title">${a.isMovie ? 'Contenu' : 'Saisons'} <span class="count">${a.seasons.length}</span></div>
       ${a.seasons.length
         ? a.seasons.map((s, i) => this.seasonHTML(a, s, i)).join('')
         : `<p class="muted">Aucune saison enregistrée. <button class="btn btn-sm" onclick="UI.openForm('${a.id}')">Ajouter une saison</button></p>`}
@@ -1692,13 +1704,26 @@ const Detail = {
   },
 
   seasonHTML(a, s, idx) {
-    const pct = s.episodes ? Math.round(s.watched.length / s.episodes * 100) : 0;
+    const uniqueWatched = new Set(s.watched).size;
+    const totalWatched = s.watched.length;
+    const pct = s.episodes ? Math.min(100, Math.round(uniqueWatched / s.episodes * 100)) : 0;
     const isOpen = this.open[s.id] ?? (pct < 100);
     const eps = [];
     for (let n = 1; n <= s.episodes; n++) {
-      const on = s.watched.includes(n);
-      eps.push(`<button class="ep ${on ? 'on' : ''}" onclick="Detail.toggleEp('${s.id}',${n})"
-                 title="Épisode ${n}${on ? ' — vu' : ''}">${n}</button>`);
+      const count = s.watched.filter(x => x === n).length;
+      if (count === 0) {
+        eps.push(`<button class="ep" onclick="Detail.toggleEp('${s.id}',${n})"
+                   oncontextmenu="event.preventDefault();Detail.toggleEp('${s.id}',${n},0)"
+                   title="Épisode ${n} — non vu (clic: +1, clic droit: 0)">${n}</button>`);
+      } else if (count === 1) {
+        eps.push(`<button class="ep on" onclick="Detail.toggleEp('${s.id}',${n})"
+                   oncontextmenu="event.preventDefault();Detail.toggleEp('${s.id}',${n},0)"
+                   title="Épisode ${n} — vu 1 fois (clic: +1, clic droit: 0)">${n}</button>`);
+      } else {
+        eps.push(`<button class="ep on mult" onclick="Detail.toggleEp('${s.id}',${n})"
+                   oncontextmenu="event.preventDefault();Detail.toggleEp('${s.id}',${n},0)"
+                   title="Épisode ${n} — vu ${count} fois (clic: +1, clic droit: 0)">${n}<span class="ep-badge">×${count}</span></button>`);
+      }
     }
     return `
     <div class="season ${isOpen ? 'open' : ''}" id="season-${s.id}">
@@ -1708,7 +1733,7 @@ const Detail = {
           <div class="season-sub">${s.episodes} ép. × ${s.duration} min · ${fmtDuration(s.episodes * s.duration)}</div>
         </div>
         <div class="season-right">
-          <span class="season-pct">${s.watched.length}/${s.episodes} · ${pct} %</span>
+          <span class="season-pct">${totalWatched > uniqueWatched ? `${totalWatched} vus (${uniqueWatched}/${s.episodes})` : `${uniqueWatched}/${s.episodes}`} · ${pct} %</span>
           <span class="caret">▾</span>
         </div>
       </div>
@@ -1716,8 +1741,8 @@ const Detail = {
         <div class="progress ${pct === 100 ? 'done' : ''}" style="margin:0 0 14px"><i style="width:${pct}%"></i></div>
         <div class="ep-grid">${eps.join('') || '<p class="muted">Aucun épisode.</p>'}</div>
         <div class="season-tools">
-          <button class="btn btn-sm" onclick="Detail.markSeason('${s.id}',true)">✅ Tout marquer vu</button>
-          <button class="btn btn-sm" onclick="Detail.markSeason('${s.id}',false)">↺ Tout décocher</button>
+          <button class="btn btn-sm" onclick="Detail.markSeason('${s.id}',true)">✅ Tout marquer vu (+1)</button>
+          <button class="btn btn-sm" onclick="Detail.markSeason('${s.id}',false)">↺ Tout décocher (0)</button>
         </div>
       </div>
     </div>`;
@@ -1730,32 +1755,89 @@ const Detail = {
     this.open[sid] = open;
   },
 
-  toggleEp(sid, n) {
+  /**
+   * Clic sur un épisode : incrémente le nombre de visionnages
+   * 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 0 (ou clic droit / forceCount=0 pour remettre à 0)
+   */
+  toggleEp(sid, n, forceCount = null) {
     const a = Store.get(this.id); if (!a) return;
     const s = a.seasons.find(x => x.id === sid); if (!s) return;
-    const i = s.watched.indexOf(n);
-    if (i >= 0) s.watched.splice(i, 1);
-    else s.watched.push(n);
+
+    const curCount = s.watched.filter(x => x === n).length;
+    let nextCount;
+    if (forceCount !== null) {
+      nextCount = forceCount;
+    } else {
+      nextCount = (curCount >= 5) ? 0 : curCount + 1;
+    }
+
+    // Retirer toutes les entrées existantes pour l'épisode n
+    s.watched = s.watched.filter(x => x !== n);
+    // Ajouter n le nombre de fois correspondant
+    for (let i = 0; i < nextCount; i++) {
+      s.watched.push(n);
+    }
     s.watched.sort((x, y) => x - y);
+
     this.open[sid] = true;
     this.autoStatus(a);
     Store.save();
     this.render(this.id);
+
+    if (nextCount === 0) {
+      toast(`${s.name} · Épisode ${n} décoché (0x)`);
+    } else if (nextCount === 1) {
+      toast(`${s.name} · Épisode ${n} coché (+${s.duration} min)`);
+    } else {
+      toast(`${s.name} · Épisode ${n} vu ${nextCount} fois (+${s.duration} min) 🎉`);
+    }
   },
 
-  markSeason(sid, all) {
+  /**
+   * Revoir tout l'anime (+1 visionnage sur tous les épisodes de toutes les saisons)
+   */
+  rewatchAll() {
+    const a = Store.get(this.id); if (!a) return;
+    let totalAddedMin = 0;
+    for (const s of a.seasons) {
+      for (let n = 1; n <= s.episodes; n++) {
+        s.watched.push(n);
+        totalAddedMin += s.duration;
+      }
+      s.watched.sort((x, y) => x - y);
+      this.open[s.id] = true;
+    }
+    this.autoStatus(a);
+    Store.save();
+    this.render(this.id);
+    toast(`« ${a.title} » marqué comme revu (+${fmtDuration(totalAddedMin)}) 🎉`);
+  },
+
+  /**
+   * Tout marquer vu dans une saison (+1x ou réinitialisation 0x)
+   */
+  markSeason(sid, isAdd) {
     const a = Store.get(this.id); if (!a) return;
     const s = a.seasons.find(x => x.id === sid); if (!s) return;
-    s.watched = all ? Array.from({ length: s.episodes }, (_, i) => i + 1) : [];
+    if (isAdd) {
+      for (let n = 1; n <= s.episodes; n++) {
+        s.watched.push(n);
+      }
+      s.watched.sort((x, y) => x - y);
+      toast(`${s.name} · +1 visionnage sur tous les épisodes`);
+    } else {
+      s.watched = [];
+      toast(`${s.name} réinitialisée (0 visionnage)`);
+    }
     this.open[sid] = true;
     this.autoStatus(a);
     Store.save();
     this.render(this.id);
-    toast(all ? `${s.name} marquée comme vue` : `${s.name} réinitialisée`);
   },
 
   nextEp() {
     const a = Store.get(this.id); if (!a) return;
+    // Trouver le premier épisode non vu
     for (const s of a.seasons) {
       for (let n = 1; n <= s.episodes; n++) {
         if (!s.watched.includes(n)) {
@@ -1763,12 +1845,12 @@ const Detail = {
           this.autoStatus(a); Store.save();
           this.open[s.id] = true;
           this.render(this.id);
-          toast(`${s.name} · épisode ${n} coché (+${s.duration} min)`);
+          toast(`${s.name} · ${a.isMovie ? 'Film coché' : 'Épisode ' + n + ' coché'} (+${s.duration} min)`);
           return;
         }
       }
     }
-    toast('Tous les épisodes sont déjà vus 🎉');
+    toast('Tous les épisodes sont déjà vus ! Utilise « 🔁 Revoir tout l\'anime » ou clique sur un épisode pour le revoir 🎉');
   },
 
   setStatus(v) {
@@ -1783,8 +1865,9 @@ const Detail = {
     }
     if (a.status === 'dropped') return;
     const t = Calc.totalEps(a);
-    if (t && Calc.watchedEps(a) === t) a.status = 'completed';
-    else if (a.status === 'completed') a.status = 'watching';
+    const uniqueDone = a.seasons.reduce((n, s) => n + new Set(s.watched).size, 0);
+    if (t && uniqueDone >= t) a.status = 'completed';
+    else if (a.status === 'completed' && uniqueDone < t) a.status = 'watching';
   }
 };
 
@@ -1805,6 +1888,7 @@ const UI = {
     v('f-syn', a?.synopsis); v('f-genres', (a?.genres || []).join(', '));
     v('f-rating', a?.rating); v('f-release', a?.release);
     document.getElementById('f-status').value = a?.status || presetStatus || 'completed';
+    document.getElementById('f-movie').checked = !!a?.isMovie;
     document.getElementById('assist-q').value = '';
     document.getElementById('assist-res').innerHTML = '';
     this._cover = a?.cover || '';
@@ -1813,8 +1897,9 @@ const UI = {
     const box = document.getElementById('f-seasons');
     box.innerHTML = '';
     if (a && a.seasons.length) a.seasons.forEach(s => this.addSeasonRow(s));
-    else this.addSeasonRow();
+    else this.addSeasonRow(null, !!a?.isMovie);
 
+    this.syncMovieFields();
     this.syncStatusFields();
     this.previewBanner();
     document.getElementById('form-modal').classList.add('open');
@@ -1825,6 +1910,24 @@ const UI = {
     document.getElementById('form-modal').classList.remove('open');
     document.body.style.overflow = '';
     this.editing = null;
+  },
+
+  syncMovieFields() {
+    const isMovie = document.getElementById('f-movie').checked;
+    const btn = document.getElementById('btn-add-season');
+    const lbl = document.getElementById('f-seasons-label');
+    if (btn) btn.style.display = isMovie ? 'none' : 'inline-flex';
+    if (lbl) lbl.textContent = isMovie ? 'Détails du film *' : 'Saisons & épisodes *';
+
+    const rows = document.querySelectorAll('#f-seasons .season-edit');
+    if (isMovie && rows.length === 1 && !this.editing) {
+      const nameInput = rows[0].querySelector('.s-name');
+      const epsInput = rows[0].querySelector('.s-eps');
+      const durInput = rows[0].querySelector('.s-dur');
+      if (nameInput && nameInput.value.startsWith('Saison')) nameInput.value = 'Film';
+      if (epsInput) epsInput.value = 1;
+      if (durInput && durInput.value === '22') durInput.value = 100;
+    }
   },
 
   syncStatusFields() {
@@ -1840,20 +1943,24 @@ const UI = {
       : 'Aperçu de la bannière';
   },
 
-  addSeasonRow(s) {
+  addSeasonRow(s, isMovie = false) {
     const box = document.getElementById('f-seasons');
     const n = box.children.length + 1;
     const row = document.createElement('div');
     row.className = 'season-edit';
     row.dataset.sid = s?.id || '';
     row.dataset.watched = JSON.stringify(s?.watched || []);
+    const defaultName = isMovie ? 'Film' : (s?.name || `Saison ${n}`);
+    const defaultEps = isMovie ? 1 : (s?.episodes ?? 12);
+    const defaultDur = isMovie ? 100 : (s?.duration ?? DEFAULT_DUR);
+
     row.innerHTML = `
       <div class="field"><label>Nom</label>
-        <input class="s-name" value="${esc(s?.name || 'Saison ' + n)}" placeholder="Saison ${n}" /></div>
+        <input class="s-name" value="${esc(defaultName)}" placeholder="${defaultName}" /></div>
       <div class="field"><label>Épisodes</label>
-        <input class="s-eps" type="number" min="0" max="9999" value="${s?.episodes ?? 12}" /></div>
+        <input class="s-eps" type="number" min="0" max="9999" value="${defaultEps}" /></div>
       <div class="field"><label>Min/ép.</label>
-        <input class="s-dur" type="number" min="1" max="600" value="${s?.duration ?? DEFAULT_DUR}" /></div>
+        <input class="s-dur" type="number" min="1" max="600" value="${defaultDur}" /></div>
       <button class="mini-del" title="Supprimer" onclick="this.closest('.season-edit').remove()">🗑️</button>`;
     box.appendChild(row);
   },
@@ -1863,19 +1970,21 @@ const UI = {
     const title = g('f-title');
     if (!title) { toast('Le titre est obligatoire', 'err'); document.getElementById('f-title').focus(); return; }
 
+    const isMovie = document.getElementById('f-movie').checked;
+
     const seasons = [...document.querySelectorAll('#f-seasons .season-edit')].map((row, i) => {
       const eps = Math.max(0, parseInt(row.querySelector('.s-eps').value, 10) || 0);
       let watched = [];
-      try { watched = JSON.parse(row.dataset.watched || '[]').filter(n => n <= eps); } catch (e) {}
+      try { watched = JSON.parse(row.dataset.watched || '[]').filter(n => typeof n === 'number' && n <= eps); } catch (e) {}
       return {
         id: row.dataset.sid || uid(),
-        name: row.querySelector('.s-name').value.trim() || `Saison ${i + 1}`,
+        name: row.querySelector('.s-name').value.trim() || (isMovie ? 'Film' : `Saison ${i + 1}`),
         episodes: eps,
-        duration: Math.max(1, parseInt(row.querySelector('.s-dur').value, 10) || DEFAULT_DUR),
+        duration: Math.max(1, parseInt(row.querySelector('.s-dur').value, 10) || (isMovie ? 100 : DEFAULT_DUR)),
         watched,
       };
     });
-    if (!seasons.length) { toast('Ajoute au moins une saison', 'err'); return; }
+    if (!seasons.length) { toast('Ajoute au moins une saison ou le film', 'err'); return; }
 
     const ratingRaw = g('f-rating');
     const payload = {
@@ -1886,6 +1995,7 @@ const UI = {
       synopsis: g('f-syn'),
       genres: g('f-genres').split(',').map(x => x.trim()).filter(Boolean),
       status: document.getElementById('f-status').value,
+      isMovie,
       rating: ratingRaw === '' ? null : Math.min(10, Math.max(0, parseFloat(ratingRaw))),
       release: g('f-release'),
       seasons,
@@ -1948,7 +2058,7 @@ const UI = {
           <img src="${esc(m.coverImage?.large || '')}" alt="" />
           <span>
             <b>${esc(m.title.english || m.title.romaji)}</b>
-            <small>${esc(m.title.native || '')} · ${m.episodes || '?'} ép. · ${m.duration || DEFAULT_DUR} min · ${m.seasonYear || '—'}</small>
+            <small>${m.format === 'MOVIE' ? '🎬 Film · ' : ''}${esc(m.title.native || '')} · ${m.episodes || '?'} ép. · ${m.duration || DEFAULT_DUR} min · ${m.seasonYear || '—'}</small>
           </span>
         </button>`).join('');
     } catch (e) {
@@ -1958,12 +2068,14 @@ const UI = {
 
   assistPick(i) {
     const m = this._results?.[i]; if (!m) return;
+    const isMovie = (m.format === 'MOVIE');
     const set = (id, val) => { document.getElementById(id).value = val ?? ''; };
     set('f-title', m.title.english || m.title.romaji);
     set('f-jp', m.title.native || '');
     set('f-banner', m.bannerImage || m.coverImage?.extraLarge || '');
     set('f-syn', (m.description || '').replace(/<[^>]+>/g, '').trim());
     set('f-genres', (m.genres || []).join(', '));
+    document.getElementById('f-movie').checked = isMovie;
     const iso = isoAniDate(m.startDate);
     if (iso) set('f-release', iso);
     this._cover = m.coverImage?.extraLarge || m.coverImage?.large || '';
@@ -1971,136 +2083,23 @@ const UI = {
 
     const box = document.getElementById('f-seasons');
     box.innerHTML = '';
-    this.addSeasonRow({ id: uid(), name: 'Saison 1', episodes: m.episodes || 12, duration: m.duration || DEFAULT_DUR, watched: [] });
+    this.addSeasonRow({
+      id: uid(),
+      name: isMovie ? 'Film' : 'Saison 1',
+      episodes: m.episodes || 1,
+      duration: m.duration || (isMovie ? 100 : DEFAULT_DUR),
+      watched: []
+    }, isMovie);
 
+    this.syncMovieFields();
     this.previewBanner();
     document.getElementById('assist-res').innerHTML = '';
-    toast('Champs pré-remplis — ajuste tes saisons');
+    toast('Champs pré-remplis avec succès');
   }
 };
 
 /* ------------------------------------------------------------
-   11. Gestion Signature (Robuste & Sans Bug)
------------------------------------------------------------- */
-const Signature = {
-  KEY: 'kioku.signature',
-
-  get() {
-    return localStorage.getItem(this.KEY) || '';
-  },
-
-  render() {
-    const sig = this.get();
-    const topBox = document.getElementById('top-sig-display');
-    const heroBoxes = document.querySelectorAll('.hero-sig-display');
-
-    if (sig) {
-      const imgHtml = `<img src="${esc(sig)}" alt="Signature" onerror="Signature.handleImgError(this)" />`;
-      if (topBox) topBox.innerHTML = imgHtml;
-      heroBoxes.forEach(box => { box.innerHTML = imgHtml; });
-    } else {
-      const placeholderTop = `<div class="sig-ph-top"><span>✍️</span> <i>Signature</i></div>`;
-      const placeholderHero = `<div class="sig-ph-hero"><span>✍️</span> <i>Ajouter une signature</i></div>`;
-      if (topBox) topBox.innerHTML = placeholderTop;
-      heroBoxes.forEach(box => { box.innerHTML = placeholderHero; });
-    }
-  },
-
-  handleImgError(img) {
-    img.style.display = 'none';
-    const parent = img.parentElement;
-    if (parent) {
-      if (parent.classList.contains('sig-display')) {
-        parent.innerHTML = `<div class="sig-ph-top"><span>✍️</span> <i>Signature</i></div>`;
-      } else {
-        parent.innerHTML = `<div class="sig-ph-hero"><span>✍️</span> <i>Ajouter une signature</i></div>`;
-      }
-    }
-  },
-
-  openModal() {
-    document.getElementById('sig-modal').classList.add('open');
-    document.body.style.overflow = 'hidden';
-    const current = this.get();
-    const isData = current.startsWith('data:');
-    document.getElementById('sig-url').value = isData ? '' : current;
-    document.getElementById('sig-file').value = '';
-    this.previewUrl(current);
-  },
-
-  closeModal() {
-    document.getElementById('sig-modal').classList.remove('open');
-    document.body.style.overflow = '';
-  },
-
-  previewUrl(url) {
-    const box = document.getElementById('sig-prev');
-    if (!box) return;
-    const clean = (url || '').trim();
-    box.innerHTML = clean
-      ? `<img src="${esc(clean)}" alt="" style="max-height:100%;max-width:100%;object-fit:contain" onerror="this.parentNode.textContent='Image introuvable'" />`
-      : 'Aperçu de la signature';
-  },
-
-  uploadFile(file) {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const maxW = 500;
-        const maxH = 200;
-        let w = img.width;
-        let h = img.height;
-        if (w > maxW || h > maxH) {
-          const ratio = Math.min(maxW / w, maxH / h);
-          w = Math.round(w * ratio);
-          h = Math.round(h * ratio);
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        const dataUrl = canvas.toDataURL('image/png');
-        try {
-          localStorage.setItem(this.KEY, dataUrl);
-          this.render();
-          toast('Photo de signature enregistrée !');
-          this.closeModal();
-        } catch (err) {
-          toast('Erreur lors de l\'enregistrement', 'err');
-        }
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  },
-
-  saveUrl() {
-    const url = document.getElementById('sig-url').value.trim();
-    if (url) {
-      localStorage.setItem(this.KEY, url);
-      this.render();
-      toast('Photo de signature enregistrée !');
-    } else {
-      localStorage.removeItem(this.KEY);
-      this.render();
-      toast('Signature réinitialisée');
-    }
-    this.closeModal();
-  },
-
-  reset() {
-    localStorage.removeItem(this.KEY);
-    this.render();
-    this.closeModal();
-    toast('Signature réinitialisée');
-  }
-};
-
-/* ------------------------------------------------------------
-   12. Import / export
+   11. Import / export
 ------------------------------------------------------------ */
 const Data = {
   export() {
@@ -2144,7 +2143,7 @@ const Data = {
 };
 
 /* ------------------------------------------------------------
-   13. Routage
+   12. Routage
 ------------------------------------------------------------ */
 const Router = {
   current: 'seen',
@@ -2184,7 +2183,7 @@ const Router = {
 };
 
 /* ------------------------------------------------------------
-   14. Décor : pétales
+   13. Décor : pétales
 ------------------------------------------------------------ */
 function spawnPetals(n = 14) {
   const box = document.getElementById('petals');
@@ -2203,11 +2202,10 @@ function spawnPetals(n = 14) {
 }
 
 /* ------------------------------------------------------------
-   15. Démarrage
+   14. Démarrage
 ------------------------------------------------------------ */
 function boot() {
   Store.load();
-  Signature.render();
   spawnPetals();
 
   window.addEventListener('hashchange', () => Router.handle());
@@ -2241,14 +2239,10 @@ function boot() {
   document.getElementById('form-modal').addEventListener('mousedown', e => {
     if (e.target.id === 'form-modal') UI.closeForm();
   });
-  document.getElementById('sig-modal').addEventListener('mousedown', e => {
-    if (e.target.id === 'sig-modal') Signature.closeModal();
-  });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { UI.closeForm(); Signature.closeModal(); }
+    if (e.key === 'Escape') UI.closeForm();
     const formOpen = document.getElementById('form-modal').classList.contains('open');
-    const sigOpen = document.getElementById('sig-modal').classList.contains('open');
-    if (e.key === 'n' && !formOpen && !sigOpen && !/input|textarea|select/i.test(document.activeElement.tagName)) UI.openForm();
+    if (e.key === 'n' && !formOpen && !/input|textarea|select/i.test(document.activeElement.tagName)) UI.openForm();
   });
 
   // PWA Service Worker
