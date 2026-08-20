@@ -1008,30 +1008,21 @@ const Data = {
 };
 
 /* ------------------------------------------------------------
-   11b. Signature (photo de signature du header)
+   11b. Signature (photo de signature)
 ------------------------------------------------------------ */
 const Signature = {
   KEY: 'kioku.signature',
 
   init() {
     const saved = localStorage.getItem(this.KEY);
-    const img = document.getElementById('signature-img');
-    const ph = document.getElementById('signature-placeholder');
-    if (saved) {
-      if (img) {
-        img.src = saved;
-        img.style.display = 'block';
-        if (ph) ph.style.display = 'none';
-      }
-    } else if (img) {
-      img.src = 'signature.png';
-    }
+    this.update(saved || 'signature.png');
   },
 
   handleImgError(img) {
-    img.style.display = 'none';
-    const ph = document.getElementById('signature-placeholder');
-    if (ph) ph.style.display = 'flex';
+    const badge = img.closest('.signature-badge');
+    const hero = img.closest('.hero-signature');
+    if (badge) badge.classList.add('no-img');
+    if (hero) hero.classList.add('no-img');
   },
 
   openModal() {
@@ -1096,13 +1087,13 @@ const Signature = {
   },
 
   update(src) {
-    const img = document.getElementById('signature-img');
-    const ph = document.getElementById('signature-placeholder');
-    if (img) {
+    document.querySelectorAll('.signature-badge, .hero-signature').forEach(el => {
+      el.classList.remove('no-img');
+    });
+    document.querySelectorAll('.signature-img-el').forEach(img => {
       img.style.display = 'block';
       img.src = src;
-    }
-    if (ph) ph.style.display = 'none';
+    });
   }
 };
 
