@@ -44,7 +44,15 @@
       <a class="tab" href="#stats"><span class="tab-ico">📊</span> Stats</a>
     </nav>
 
-    <button class="btn btn-primary btn-add" onclick="UI.openForm()">＋ Ajouter</button>
+    <div class="topbar-actions">
+      <button class="btn btn-primary btn-add" onclick="UI.openForm()">＋ Ajouter</button>
+      <div class="signature-badge" id="signature-badge" onclick="Signature.openModal()" title="Photo de signature (cliquer pour modifier)">
+        <img id="signature-img" src="signature.png" alt="Signature" onerror="Signature.handleImgError(this)" />
+        <div class="signature-placeholder" id="signature-placeholder">
+          <span>✍️</span>
+        </div>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -54,17 +62,10 @@
     <div class="page-head">
       <div class="eyebrow">Ma collection</div>
       <h1 class="title">Animes <em>vus</em></h1>
-      <p class="subtitle">Tout ce que tu as terminé ou commencé. Clique sur une carte pour cocher tes épisodes saison par saison.</p>
+      <p class="subtitle">Tout ce que tu as regardé. Clique sur une carte pour cocher tes épisodes saison par saison.</p>
     </div>
     <div class="toolbar">
       <div class="search"><input type="search" id="seen-search" placeholder="Rechercher un titre, un genre…" /></div>
-      <div class="chips" id="seen-chips">
-        <button class="chip active" data-f="all">Tous</button>
-        <button class="chip" data-f="completed">✅ Terminés</button>
-        <button class="chip" data-f="watching">▶️ En cours</button>
-        <button class="chip" data-f="dropped">⏸️ Abandonnés</button>
-        <button class="chip" data-f="fav">⭐ Favoris</button>
-      </div>
       <select class="input" id="seen-sort" style="width:auto;min-width:170px">
         <option value="recent">Ajout récent</option>
         <option value="title">Titre (A→Z)</option>
@@ -120,7 +121,7 @@
     <div class="page-head">
       <div class="eyebrow">Bilan</div>
       <h1 class="title">Mes <em>statistiques</em></h1>
-      <p class="subtitle">Chaque épisode coché nourrit ces chiffres. Attention aux dégâts.</p>
+      <p class="subtitle">Chaque épisode coché nourrit ces chiffres. Retrouve ici le résumé de tes visionnages.</p>
     </div>
     <div id="stats-content"></div>
   </section>
@@ -169,8 +170,8 @@
         <div class="field">
           <label for="f-status">Statut</label>
           <select id="f-status">
+            <option value="completed">✅ Terminé / Vu</option>
             <option value="watching">▶️ En cours</option>
-            <option value="completed">✅ Terminé</option>
             <option value="planned">🔖 À regarder</option>
             <option value="dropped">⏸️ Abandonné</option>
             <option value="soon">🗓️ Prochainement</option>
@@ -217,6 +218,35 @@
       <button class="btn btn-danger" id="f-delete" onclick="UI.deleteCurrent()" style="margin-right:auto">🗑️ Supprimer</button>
       <button class="btn btn-ghost" onclick="UI.closeForm()">Annuler</button>
       <button class="btn btn-primary" onclick="UI.saveForm()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ Modale signature ══════════ -->
+<div class="modal-back" id="sig-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="sig-title" style="max-width:480px">
+    <div class="modal-head">
+      <h2 id="sig-title">Photo de signature</h2>
+      <button class="btn btn-icon" onclick="Signature.closeModal()" aria-label="Fermer">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="muted" style="font-size:14px;margin-bottom:16px">
+        Personnalise ta photo de signature affichée dans le header à droite. Tu peux importer une image, renseigner une URL ou placer un fichier <code>signature.png</code> à la racine du projet.
+      </p>
+      <div class="field">
+        <label for="sig-file">Importer une image</label>
+        <input class="input" type="file" id="sig-file" accept="image/*" onchange="Signature.uploadFile(this.files[0])" />
+      </div>
+      <div class="field">
+        <label for="sig-url">Ou entrer l'URL d'une image</label>
+        <input class="input" id="sig-url" type="url" placeholder="https://…/photo.png" oninput="Signature.previewUrl(this.value)" />
+      </div>
+      <div class="preview-banner" id="sig-prev" style="height:90px;margin-top:10px">Aperçu de la signature</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-danger" onclick="Signature.reset()" style="margin-right:auto">🗑️ Réinitialiser</button>
+      <button class="btn btn-ghost" onclick="Signature.closeModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="Signature.saveUrl()">💾 Enregistrer</button>
     </div>
   </div>
 </div>
