@@ -209,14 +209,10 @@ a { color: inherit; text-decoration: none; }
 
 /* Photo signature dans le header */
 .ma-photo {
-  height: 60px;
-  width: auto;
-  max-width: 170px;
+  margin-left: 75px;
+  height: 75px;
+  width: 150px;
   border-radius: var(--r-sm);
-  object-fit: contain;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,.6));
-  cursor: pointer;
-  transition: transform .2s;
 }
 .ma-photo:hover { transform: scale(1.04); }
 
@@ -924,10 +920,10 @@ input:checked + .slider::before { transform: translateX(22px); }
       <a class="tab" href="#news"><span class="tab-ico">✨</span> Nouveautés</a>
       <a class="tab" href="#stats"><span class="tab-ico">📊</span> Stats</a>
       <a class="tab" href="#settings"><span class="tab-ico">⚙️</span> Paramètres</a>
+      <button class="btn btn-primary btn-add" onclick="UI.openForm()">＋ Ajouter</button>
     </nav>
 
     <div class="topbar-actions">
-      <button class="btn btn-primary btn-add" onclick="UI.openForm()">＋ Ajouter</button>
       <img src="signature.png" alt="Signature" class="ma-photo" id="top-sig-img" onclick="Router.go('settings')" title="Signature (Cliquer pour gérer dans les paramètres)" onerror="Signature.handleImgError(this)" />
     </div>
   </div>
