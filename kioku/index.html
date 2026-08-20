@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#ff3d8b" />
+<meta name="description" content="KIOKU — Suivi d'animes : vus, à regarder, nouveautés et statistiques de visionnage." />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="KIOKU" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>KIOKU — Anime Tracker</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icon-512.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="bg-fx"></div>
+<div class="grid-fx"></div>
+<div class="petals" id="petals" aria-hidden="true"></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<!-- ══════════ Barre du haut ══════════ -->
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#seen">
+      <div class="brand-mark">🌸</div>
+      <div class="brand-txt">
+        <div class="brand-name">KIOKU</div>
+        <div class="brand-sub">記憶 · ANIME</div>
+      </div>
+    </a>
+
+    <nav class="tabs" id="tabs">
+      <a class="tab" href="#seen"><span class="tab-ico">📺</span> Vus</a>
+      <a class="tab" href="#plan"><span class="tab-ico">🔖</span> À regarder</a>
+      <a class="tab" href="#news"><span class="tab-ico">✨</span> Nouveautés</a>
+      <a class="tab" href="#stats"><span class="tab-ico">📊</span> Stats</a>
+    </nav>
+
+    <button class="btn btn-primary btn-add" onclick="UI.openForm()">＋ Ajouter</button>
+  </div>
+</header>
+
+<main>
+  <!-- ══════════ Page : Vus ══════════ -->
+  <section class="page" id="page-seen">
+    <div class="page-head">
+      <div class="eyebrow">Ma collection</div>
+      <h1 class="title">Animes <em>vus</em></h1>
+      <p class="subtitle">Tout ce que tu as terminé ou commencé. Clique sur une carte pour cocher tes épisodes saison par saison.</p>
+    </div>
+    <div class="toolbar">
+      <div class="search"><input type="search" id="seen-search" placeholder="Rechercher un titre, un genre…" /></div>
+      <div class="chips" id="seen-chips">
+        <button class="chip active" data-f="all">Tous</button>
+        <button class="chip" data-f="completed">✅ Terminés</button>
+        <button class="chip" data-f="watching">▶️ En cours</button>
+        <button class="chip" data-f="dropped">⏸️ Abandonnés</button>
+        <button class="chip" data-f="fav">⭐ Favoris</button>
+      </div>
+      <select class="input" id="seen-sort" style="width:auto;min-width:170px">
+        <option value="recent">Ajout récent</option>
+        <option value="title">Titre (A→Z)</option>
+        <option value="time">Temps regardé</option>
+        <option value="progress">Progression</option>
+        <option value="rating">Note</option>
+      </select>
+    </div>
+    <div class="grid" id="seen-grid"></div>
+  </section>
+
+  <!-- ══════════ Page : À regarder ══════════ -->
+  <section class="page" id="page-plan">
+    <div class="page-head">
+      <div class="eyebrow">Ma watchlist</div>
+      <h1 class="title">À <em>regarder</em></h1>
+      <p class="subtitle">Ta pile de la honte, joliment rangée. Le temps total estimé t'attend en bas de chaque carte.</p>
+    </div>
+    <div class="toolbar">
+      <div class="search"><input type="search" id="plan-search" placeholder="Rechercher dans la watchlist…" /></div>
+      <select class="input" id="plan-sort" style="width:auto;min-width:190px">
+        <option value="recent">Ajout récent</option>
+        <option value="title">Titre (A→Z)</option>
+        <option value="short">Le plus court d'abord</option>
+        <option value="long">Le plus long d'abord</option>
+      </select>
+    </div>
+    <div id="plan-summary"></div>
+    <div class="grid" id="plan-grid"></div>
+  </section>
+
+  <!-- ══════════ Page : Nouveautés ══════════ -->
+  <section class="page" id="page-news">
+    <div class="page-head">
+      <div class="eyebrow">Radar</div>
+      <h1 class="title">Nouveautés &amp; <em>prochainement</em></h1>
+      <p class="subtitle">La saison en cours et les sorties à venir, en direct d'AniList. Plus tes propres sorties surveillées.</p>
+    </div>
+    <div class="toolbar">
+      <div class="chips" id="news-chips">
+        <button class="chip active" data-f="mine">🔔 Mes sorties</button>
+        <button class="chip" data-f="season">🔥 Saison en cours</button>
+        <button class="chip" data-f="upcoming">🗓️ Prochainement</button>
+      </div>
+      <button class="btn btn-sm" onclick="News.load(true)">🔄 Actualiser</button>
+      <button class="btn btn-sm btn-primary" onclick="UI.openForm(null,'soon')">＋ Sortie à surveiller</button>
+    </div>
+    <div id="news-content"></div>
+  </section>
+
+  <!-- ══════════ Page : Stats ══════════ -->
+  <section class="page" id="page-stats">
+    <div class="page-head">
+      <div class="eyebrow">Bilan</div>
+      <h1 class="title">Mes <em>statistiques</em></h1>
+      <p class="subtitle">Chaque épisode coché nourrit ces chiffres. Attention aux dégâts.</p>
+    </div>
+    <div id="stats-content"></div>
+  </section>
+
+  <!-- ══════════ Page : Détail ══════════ -->
+  <section class="page" id="page-detail"></section>
+</main>
+
+<!-- ══════════ Barre mobile ══════════ -->
+<nav class="mobilebar" id="mobilebar">
+  <a class="mtab" href="#seen"><span>📺</span>Vus</a>
+  <a class="mtab" href="#plan"><span>🔖</span>À voir</a>
+  <button class="mtab add" onclick="UI.openForm()"><span>＋</span>Ajouter</button>
+  <a class="mtab" href="#news"><span>✨</span>Nouveau</a>
+  <a class="mtab" href="#stats"><span>📊</span>Stats</a>
+</nav>
+
+<!-- ══════════ Modale formulaire ══════════ -->
+<div class="modal-back" id="form-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="form-title">
+    <div class="modal-head">
+      <h2 id="form-title">Ajouter un anime</h2>
+      <button class="btn btn-icon" onclick="UI.closeForm()" aria-label="Fermer">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="assist">
+        <div class="assist-title">🔎 Remplissage automatique <span class="muted" style="font-weight:500">(AniList)</span></div>
+        <div class="assist-row">
+          <input class="input" id="assist-q" placeholder="Ex : Frieren, Jujutsu Kaisen…" autocomplete="off" />
+          <button class="btn btn-primary btn-sm" id="assist-btn">Chercher</button>
+        </div>
+        <div class="assist-res" id="assist-res"></div>
+      </div>
+
+      <div class="field">
+        <label for="f-title">Titre *</label>
+        <input id="f-title" placeholder="Sousou no Frieren" />
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="f-jp">Titre original</label>
+          <input id="f-jp" placeholder="葬送のフリーレン" />
+        </div>
+        <div class="field">
+          <label for="f-status">Statut</label>
+          <select id="f-status">
+            <option value="watching">▶️ En cours</option>
+            <option value="completed">✅ Terminé</option>
+            <option value="planned">🔖 À regarder</option>
+            <option value="dropped">⏸️ Abandonné</option>
+            <option value="soon">🗓️ Prochainement</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field" id="f-release-wrap" style="display:none">
+        <label for="f-release">Date de sortie</label>
+        <input id="f-release" type="date" />
+      </div>
+
+      <div class="field">
+        <label for="f-banner">Bannière (URL image)</label>
+        <input id="f-banner" placeholder="https://…jpg" />
+        <div class="preview-banner" id="f-banner-prev">Aperçu de la bannière</div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="f-genres">Genres <span class="muted" style="font-weight:500;text-transform:none">(séparés par des virgules)</span></label>
+          <input id="f-genres" placeholder="Aventure, Fantasy, Drame" />
+        </div>
+        <div class="field">
+          <label for="f-rating">Ma note <span class="muted" style="font-weight:500;text-transform:none">/10</span></label>
+          <input id="f-rating" type="number" min="0" max="10" step="0.5" placeholder="9" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-syn">Synopsis</label>
+        <textarea id="f-syn" placeholder="Résumé de l'anime…"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Saisons &amp; épisodes *</label>
+        <div id="f-seasons"></div>
+        <button class="btn btn-sm" onclick="UI.addSeasonRow()">＋ Ajouter une saison</button>
+        <div class="hint">Durée par épisode en minutes — 22 min par défaut. Le temps de visionnage se calcule à partir de ces valeurs.</div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-danger" id="f-delete" onclick="UI.deleteCurrent()" style="margin-right:auto">🗑️ Supprimer</button>
+      <button class="btn btn-ghost" onclick="UI.closeForm()">Annuler</button>
+      <button class="btn btn-primary" onclick="UI.saveForm()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
