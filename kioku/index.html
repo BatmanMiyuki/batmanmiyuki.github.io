@@ -46,9 +46,9 @@
 
     <div class="topbar-actions">
       <button class="btn btn-primary btn-add" onclick="UI.openForm()">＋ Ajouter</button>
-      <div class="signature-badge" id="signature-badge" onclick="Signature.openModal()" title="Photo de signature (cliquer pour modifier)">
-        <img id="signature-img" src="signature.png" alt="Signature" onerror="Signature.handleImgError(this)" />
-        <div class="signature-placeholder" id="signature-placeholder">
+      <div class="signature-badge" onclick="Signature.openModal()" title="Photo de signature (cliquer pour modifier)">
+        <img class="signature-img-el" src="signature.png" alt="Signature" onerror="Signature.handleImgError(this)" />
+        <div class="signature-placeholder">
           <span>✍️</span>
         </div>
       </div>
@@ -60,9 +60,18 @@
   <!-- ══════════ Page : Vus ══════════ -->
   <section class="page" id="page-seen">
     <div class="page-head">
-      <div class="eyebrow">Ma collection</div>
-      <h1 class="title">Animes <em>vus</em></h1>
-      <p class="subtitle">Tout ce que tu as regardé. Clique sur une carte pour cocher tes épisodes saison par saison.</p>
+      <div class="page-head-text">
+        <div class="eyebrow">Ma collection</div>
+        <h1 class="title">Animes <em>vus</em></h1>
+        <p class="subtitle">Tout ce que tu as regardé. Clique sur une carte pour cocher tes épisodes saison par saison.</p>
+      </div>
+      <div class="hero-signature" onclick="Signature.openModal()" title="Photo de signature (cliquer pour modifier)">
+        <span class="hero-signature-label">🌸 Collection de</span>
+        <div class="hero-signature-box">
+          <img class="signature-img-el" src="signature.png" alt="Signature" onerror="Signature.handleImgError(this)" />
+          <div class="signature-placeholder-el"><span>✍️</span> <i>Ma signature</i></div>
+        </div>
+      </div>
     </div>
     <div class="toolbar">
       <div class="search"><input type="search" id="seen-search" placeholder="Rechercher un titre, un genre…" /></div>
@@ -80,9 +89,18 @@
   <!-- ══════════ Page : À regarder ══════════ -->
   <section class="page" id="page-plan">
     <div class="page-head">
-      <div class="eyebrow">Ma watchlist</div>
-      <h1 class="title">À <em>regarder</em></h1>
-      <p class="subtitle">Ta pile de la honte, joliment rangée. Le temps total estimé t'attend en bas de chaque carte.</p>
+      <div class="page-head-text">
+        <div class="eyebrow">Ma watchlist</div>
+        <h1 class="title">À <em>regarder</em></h1>
+        <p class="subtitle">Ta pile de la honte, joliment rangée. Le temps total estimé t'attend en bas de chaque carte.</p>
+      </div>
+      <div class="hero-signature" onclick="Signature.openModal()" title="Photo de signature (cliquer pour modifier)">
+        <span class="hero-signature-label">🔖 Watchlist de</span>
+        <div class="hero-signature-box">
+          <img class="signature-img-el" src="signature.png" alt="Signature" onerror="Signature.handleImgError(this)" />
+          <div class="signature-placeholder-el"><span>✍️</span> <i>Ma signature</i></div>
+        </div>
+      </div>
     </div>
     <div class="toolbar">
       <div class="search"><input type="search" id="plan-search" placeholder="Rechercher dans la watchlist…" /></div>
@@ -100,9 +118,18 @@
   <!-- ══════════ Page : Nouveautés ══════════ -->
   <section class="page" id="page-news">
     <div class="page-head">
-      <div class="eyebrow">Radar</div>
-      <h1 class="title">Nouveautés &amp; <em>prochainement</em></h1>
-      <p class="subtitle">La saison en cours et les sorties à venir, en direct d'AniList. Plus tes propres sorties surveillées.</p>
+      <div class="page-head-text">
+        <div class="eyebrow">Radar</div>
+        <h1 class="title">Nouveautés &amp; <em>prochainement</em></h1>
+        <p class="subtitle">La saison en cours et les sorties à venir, en direct d'AniList. Plus tes propres sorties surveillées.</p>
+      </div>
+      <div class="hero-signature" onclick="Signature.openModal()" title="Photo de signature (cliquer pour modifier)">
+        <span class="hero-signature-label">✨ Radar de</span>
+        <div class="hero-signature-box">
+          <img class="signature-img-el" src="signature.png" alt="Signature" onerror="Signature.handleImgError(this)" />
+          <div class="signature-placeholder-el"><span>✍️</span> <i>Ma signature</i></div>
+        </div>
+      </div>
     </div>
     <div class="toolbar">
       <div class="chips" id="news-chips">
@@ -119,9 +146,18 @@
   <!-- ══════════ Page : Stats ══════════ -->
   <section class="page" id="page-stats">
     <div class="page-head">
-      <div class="eyebrow">Bilan</div>
-      <h1 class="title">Mes <em>statistiques</em></h1>
-      <p class="subtitle">Chaque épisode coché nourrit ces chiffres. Retrouve ici le résumé de tes visionnages.</p>
+      <div class="page-head-text">
+        <div class="eyebrow">Bilan</div>
+        <h1 class="title">Mes <em>statistiques</em></h1>
+        <p class="subtitle">Chaque épisode coché nourrit ces chiffres. Retrouve ici le résumé de tes visionnages.</p>
+      </div>
+      <div class="hero-signature" onclick="Signature.openModal()" title="Photo de signature (cliquer pour modifier)">
+        <span class="hero-signature-label">📊 Bilan de</span>
+        <div class="hero-signature-box">
+          <img class="signature-img-el" src="signature.png" alt="Signature" onerror="Signature.handleImgError(this)" />
+          <div class="signature-placeholder-el"><span>✍️</span> <i>Ma signature</i></div>
+        </div>
+      </div>
     </div>
     <div id="stats-content"></div>
   </section>
@@ -231,7 +267,7 @@
     </div>
     <div class="modal-body">
       <p class="muted" style="font-size:14px;margin-bottom:16px">
-        Personnalise ta photo de signature affichée dans le header à droite. Tu peux importer une image, renseigner une URL ou placer un fichier <code>signature.png</code> à la racine du projet.
+        Personnalise ta photo de signature affichée sur le site. Tu peux importer une image, renseigner une URL ou placer un fichier <code>signature.png</code> à la racine du projet.
       </p>
       <div class="field">
         <label for="sig-file">Importer une image</label>
