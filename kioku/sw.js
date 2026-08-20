@@ -1,5 +1,5 @@
 // ── KIOKU · Service Worker ───────────────────────────────────────────────────
-const CACHE = 'kioku-v2';
+const CACHE = 'kioku-v3';
 
 const SHELL = [
   './',
@@ -9,6 +9,7 @@ const SHELL = [
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
+  './signature.png',
 ];
 
 self.addEventListener('install', e => {
