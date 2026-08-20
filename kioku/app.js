@@ -168,14 +168,10 @@ function emptyHTML(ico, title, text, btn) {
    5. Page « Vus »
 ------------------------------------------------------------ */
 const Seen = {
-  filter: 'all',
   render() {
     const q = (document.getElementById('seen-search').value || '').toLowerCase().trim();
     const sort = document.getElementById('seen-sort').value;
     let list = Store.all().filter(a => a.status !== 'planned' && a.status !== 'soon');
-
-    if (this.filter === 'fav') list = list.filter(a => a.favorite);
-    else if (this.filter !== 'all') list = list.filter(a => a.status === this.filter);
 
     if (q) list = list.filter(a =>
       a.title.toLowerCase().includes(q) || a.jp.toLowerCase().includes(q) ||
@@ -194,7 +190,7 @@ const Seen = {
     if (!list.length) {
       el.className = '';
       el.innerHTML = Store.all().length
-        ? emptyHTML('🔍', 'Aucun résultat', 'Aucun anime ne correspond à ce filtre ou à cette recherche.')
+        ? emptyHTML('🔍', 'Aucun résultat', 'Aucun anime ne correspond à cette recherche.')
         : emptyHTML('🌸', 'Ta collection est vide', 'Ajoute ton premier anime : titre, bannière, saisons et durée des épisodes.',
             `<button class="btn btn-primary" onclick="UI.openForm()">＋ Ajouter un anime</button>`);
     } else {
@@ -470,16 +466,12 @@ const Stats = {
   render() {
     const all = Store.all();
     const seen      = all.filter(a => a.status !== 'planned' && a.status !== 'soon');
-    const completed = all.filter(a => a.status === 'completed');
-    const watching  = all.filter(a => a.status === 'watching');
     const planned   = all.filter(a => a.status === 'planned');
-    const dropped   = all.filter(a => a.status === 'dropped');
     const soon      = all.filter(a => a.status === 'soon');
 
     const epsWatched = all.reduce((n, a) => n + Calc.watchedEps(a), 0);
     const minWatched = all.reduce((n, a) => n + Calc.watchedMin(a), 0);
     const minPlanned = planned.reduce((n, a) => n + Calc.totalMin(a), 0);
-    const minLeft    = all.filter(a => a.status === 'watching').reduce((n, a) => n + Calc.remainingMin(a), 0);
     const seasons    = all.reduce((n, a) => n + a.seasons.length, 0);
     const rated      = all.filter(a => a.rating != null);
     const avg        = rated.length ? (rated.reduce((n, a) => n + a.rating, 0) / rated.length) : null;
@@ -505,12 +497,9 @@ const Stats = {
 
       <div class="stat-grid">
         ${this.stat('📺', seen.length, 'Animes vus')}
-        ${this.stat('✅', completed.length, 'Terminés')}
-        ${this.stat('▶️', watching.length, 'En cours')}
         ${this.stat('🔖', planned.length, 'À regarder')}
         ${this.stat('🎞️', epsWatched.toLocaleString('fr-FR'), 'Épisodes vus')}
         ${this.stat('🗂️', seasons, 'Saisons suivies')}
-        ${this.stat('⏸️', dropped.length, 'Abandonnés')}
         ${this.stat('🗓️', soon.length, 'Sorties suivies')}
       </div>
 
@@ -518,17 +507,14 @@ const Stats = {
         <h3>Répartition de la collection</h3>
         <div class="donut-wrap">
           ${this.donut([
-            ['Terminés',    completed.length, '#3ddc97'],
-            ['En cours',    watching.length,  '#ff3d8b'],
-            ['À regarder',  planned.length,   '#35e6ff'],
-            ['Abandonnés',  dropped.length,   '#9b5cff'],
+            ['Animes vus',    seen.length,    '#ff3d8b'],
+            ['À regarder',    planned.length, '#35e6ff'],
             ['Prochainement', soon.length,    '#ffce4f'],
           ], all.length)}
         </div>
       </div>
 
       <div class="stat-grid" style="margin-top:18px">
-        ${this.stat('⏳', fmtDuration(minLeft), 'Reste à finir (en cours)')}
         ${this.stat('📚', fmtDuration(minPlanned), 'Watchlist à venir')}
         ${this.stat('⭐', avg != null ? avg.toFixed(1).replace('.', ',') + '/10' : '—', 'Note moyenne')}
         ${this.stat('🎬', epsWatched ? Math.round(minWatched / epsWatched) + ' min' : '—', 'Durée moyenne / ép.')}
@@ -801,7 +787,7 @@ const UI = {
     v('f-title', a?.title); v('f-jp', a?.jp); v('f-banner', a?.banner);
     v('f-syn', a?.synopsis); v('f-genres', (a?.genres || []).join(', '));
     v('f-rating', a?.rating); v('f-release', a?.release);
-    document.getElementById('f-status').value = a?.status || presetStatus || 'watching';
+    document.getElementById('f-status').value = a?.status || presetStatus || 'completed';
     document.getElementById('assist-q').value = '';
     document.getElementById('assist-res').innerHTML = '';
     this._cover = a?.cover || '';
@@ -1022,6 +1008,105 @@ const Data = {
 };
 
 /* ------------------------------------------------------------
+   11b. Signature (photo de signature du header)
+------------------------------------------------------------ */
+const Signature = {
+  KEY: 'kioku.signature',
+
+  init() {
+    const saved = localStorage.getItem(this.KEY);
+    const img = document.getElementById('signature-img');
+    const ph = document.getElementById('signature-placeholder');
+    if (saved) {
+      if (img) {
+        img.src = saved;
+        img.style.display = 'block';
+        if (ph) ph.style.display = 'none';
+      }
+    } else if (img) {
+      img.src = 'signature.png';
+    }
+  },
+
+  handleImgError(img) {
+    img.style.display = 'none';
+    const ph = document.getElementById('signature-placeholder');
+    if (ph) ph.style.display = 'flex';
+  },
+
+  openModal() {
+    document.getElementById('sig-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    const current = localStorage.getItem(this.KEY) || '';
+    const isData = current.startsWith('data:');
+    document.getElementById('sig-url').value = isData ? '' : current;
+    this.previewUrl(current || 'signature.png');
+  },
+
+  closeModal() {
+    document.getElementById('sig-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  },
+
+  previewUrl(url) {
+    const box = document.getElementById('sig-prev');
+    if (!box) return;
+    const clean = (url || '').trim();
+    box.innerHTML = clean
+      ? `<img src="${esc(clean)}" alt="" style="max-height:100%;max-width:100%;object-fit:contain" onerror="this.parentNode.textContent='Image introuvable'" />`
+      : 'Aperçu de la signature';
+  },
+
+  saveUrl() {
+    const url = document.getElementById('sig-url').value.trim();
+    if (url) {
+      localStorage.setItem(this.KEY, url);
+      this.update(url);
+      toast('Photo de signature enregistrée');
+    } else {
+      localStorage.removeItem(this.KEY);
+      this.update('signature.png');
+      toast('Photo de signature réinitialisée');
+    }
+    this.closeModal();
+  },
+
+  uploadFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      try {
+        localStorage.setItem(this.KEY, dataUrl);
+        this.update(dataUrl);
+        toast('Photo de signature importée');
+        this.closeModal();
+      } catch (e) {
+        toast('Image trop volumineuse pour le stockage local', 'err');
+      }
+    };
+    reader.readAsDataURL(file);
+  },
+
+  reset() {
+    localStorage.removeItem(this.KEY);
+    this.update('signature.png');
+    this.closeModal();
+    toast('Signature réinitialisée');
+  },
+
+  update(src) {
+    const img = document.getElementById('signature-img');
+    const ph = document.getElementById('signature-placeholder');
+    if (img) {
+      img.style.display = 'block';
+      img.src = src;
+    }
+    if (ph) ph.style.display = 'none';
+  }
+};
+
+/* ------------------------------------------------------------
    12. Routage
 ------------------------------------------------------------ */
 const Router = {
@@ -1085,17 +1170,21 @@ function spawnPetals(n = 14) {
 ------------------------------------------------------------ */
 function boot() {
   Store.load();
+  Signature.init();
   spawnPetals();
 
   window.addEventListener('hashchange', () => Router.handle());
   Router.handle();
 
   // Filtres & recherches
-  document.getElementById('seen-chips').addEventListener('click', e => {
-    const c = e.target.closest('.chip'); if (!c) return;
-    document.querySelectorAll('#seen-chips .chip').forEach(x => x.classList.toggle('active', x === c));
-    Seen.filter = c.dataset.f; Seen.render();
-  });
+  const seenChips = document.getElementById('seen-chips');
+  if (seenChips) {
+    seenChips.addEventListener('click', e => {
+      const c = e.target.closest('.chip'); if (!c) return;
+      document.querySelectorAll('#seen-chips .chip').forEach(x => x.classList.toggle('active', x === c));
+      Seen.filter = c.dataset.f; Seen.render();
+    });
+  }
   document.getElementById('news-chips').addEventListener('click', e => {
     const c = e.target.closest('.chip'); if (!c) return;
     News.setFilter(c.dataset.f);
@@ -1106,7 +1195,7 @@ function boot() {
   ['plan-search', 'plan-sort'].forEach(id =>
     document.getElementById(id).addEventListener('input', () => Plan.render()));
 
-  // Formulaire
+  // Formulaire & Signature
   document.getElementById('f-status').addEventListener('change', () => UI.syncStatusFields());
   document.getElementById('f-banner').addEventListener('input', () => UI.previewBanner());
   document.getElementById('assist-btn').addEventListener('click', () => UI.assistSearch());
@@ -1116,10 +1205,14 @@ function boot() {
   document.getElementById('form-modal').addEventListener('mousedown', e => {
     if (e.target.id === 'form-modal') UI.closeForm();
   });
+  document.getElementById('sig-modal').addEventListener('mousedown', e => {
+    if (e.target.id === 'sig-modal') Signature.closeModal();
+  });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') UI.closeForm();
-    const modalOpen = document.getElementById('form-modal').classList.contains('open');
-    if (e.key === 'n' && !modalOpen && !/input|textarea|select/i.test(document.activeElement.tagName)) UI.openForm();
+    if (e.key === 'Escape') { UI.closeForm(); Signature.closeModal(); }
+    const formOpen = document.getElementById('form-modal').classList.contains('open');
+    const sigOpen = document.getElementById('sig-modal').classList.contains('open');
+    if (e.key === 'n' && !formOpen && !sigOpen && !/input|textarea|select/i.test(document.activeElement.tagName)) UI.openForm();
   });
 
   // PWA
