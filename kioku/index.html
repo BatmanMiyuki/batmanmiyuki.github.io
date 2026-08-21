@@ -688,33 +688,57 @@ input:checked + .slider::before { transform: translateX(22px); }
 .season-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 
 /* ============================================================
-   Formulaire / Modale
+   Formulaire / Modale (Défilement fluide & Boutons toujours accessibles)
    ============================================================ */
 .modal-back {
-  position: fixed; inset: 0; z-index: 100; display: none;
-  background: rgba(4,2,10,.85);
-  padding: 20px; overflow-y: auto;
+  position: fixed; inset: 0; z-index: 200; display: none;
+  background: rgba(4, 2, 10, .85);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 20px 14px 60px;
 }
-.modal-back.open { display: block; animation: fadeIn .2s ease; }
+.modal-back.open {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  animation: fadeIn .2s ease;
+}
 @keyframes fadeIn { from { opacity: 0; } }
 .modal {
-  max-width: 720px; margin: 22px auto; border-radius: var(--r-xl); overflow: hidden;
+  width: 100%;
+  max-width: 720px;
+  margin: auto auto;
+  border-radius: var(--r-xl);
+  overflow: hidden;
   background: linear-gradient(180deg, #14102a, #0c0918);
-  border: 1px solid var(--stroke-2); box-shadow: var(--shadow);
+  border: 1px solid var(--stroke-2);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
   animation: modalIn .25s var(--ease);
 }
 @keyframes modalIn { from { opacity: 0; transform: translateY(16px); } }
 .modal-head {
-  display: flex; align-items: center; gap: 12px; padding: 20px 22px;
-  border-bottom: 1px solid var(--stroke); position: sticky; top: 0; z-index: 3;
-  background: #14102a;
+  display: flex; align-items: center; gap: 12px; padding: 18px 22px;
+  border-bottom: 1px solid var(--stroke); position: sticky; top: 0; z-index: 10;
+  background: #14102a; flex-shrink: 0;
 }
 .modal-head h2 { font-size: 19px; font-weight: 800; }
 .modal-head .btn-icon { margin-left: auto; }
-.modal-body { padding: 22px; }
+.modal-body {
+  padding: 22px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 auto;
+}
 .modal-foot {
-  display: flex; gap: 10px; justify-content: flex-end; padding: 18px 22px;
-  border-top: 1px solid var(--stroke); background: rgba(0,0,0,.2); flex-wrap: wrap;
+  display: flex; gap: 10px; justify-content: flex-end; padding: 16px 22px;
+  border-top: 1px solid var(--stroke); background: #120d26;
+  position: sticky; bottom: 0; z-index: 10; flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
 .field { margin-bottom: 16px; }
@@ -876,8 +900,10 @@ input:checked + .slider::before { transform: translateX(22px); }
   .season-edit { grid-template-columns: 1fr 1fr; }
   .season-edit .mini-del { grid-column: 2; justify-self: end; }
   .row, .row-3 { grid-template-columns: 1fr; }
-  .modal { margin: 0 auto; }
-  .modal-back { padding: 0; }
+  .modal { max-height: 94vh; margin: auto; border-radius: var(--r); }
+  .modal-back { padding: 10px 10px 40px; }
+  .modal-body { padding: 16px 14px; }
+  .modal-head, .modal-foot { padding: 14px 16px; }
   .ma-photo { margin-left: auto; }
 }
 @media (max-width: 420px) {
@@ -2356,6 +2382,8 @@ const UI = {
     this.previewBanner();
     document.getElementById('form-modal').classList.add('open');
     document.body.style.overflow = 'hidden';
+    const mb = document.querySelector('#form-modal .modal-body');
+    if (mb) mb.scrollTop = 0;
   },
 
   closeForm() {
