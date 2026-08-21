@@ -556,6 +556,19 @@ function App() {
   const [appImages,setAppImages]   = useState(()=>load('app_images',{}));
   const [imgSearch,setImgSearch]   = useState('');
 
+  // ── Heures « bonus » ajoutées manuellement par app ──────────────────────────
+  // Comptent dans le total & le classement, mais PAS dans la moyenne/jour
+  // (elles ne sont rattachées à aucune journée).
+  const [bonus,setBonus]           = useState(()=>load('app_bonus',{}));
+  const [bonusOpen,setBonusOpen]   = useState(false);
+  const [bonusApp,setBonusApp]     = useState('');
+  const [bonusCust,setBonusCust]   = useState('');
+  const [bonusH,setBonusH]         = useState('');
+  const [bonusM,setBonusM]         = useState('');
+
+  // ── Photo de signature du header (uploadée dans l'app, stockée localement)
+  const [signature,setSignature]   = useState(()=>load('app_signature',''));
+
   // ── Settings state
   const [theme,setThemeState]      = useState(()=>load('sp_theme','default'));
   const [accentColor,setAccentColor] = useState(()=>load('sp_accent','default'));
@@ -607,6 +620,8 @@ function App() {
   useEffect(()=>{ save('sp_lastexport',lastExport); },[lastExport]);
   useEffect(()=>{ save('my_apps',myApps); },[myApps]);
   useEffect(()=>{ try{ localStorage.setItem('app_images',JSON.stringify(appImages)); }catch{} },[appImages]);
+  useEffect(()=>{ save('app_bonus',bonus); },[bonus]);
+  useEffect(()=>{ save('app_signature',signature); },[signature]);
 
   const setTheme = (t) => setThemeState(t);
 
@@ -712,6 +727,9 @@ function App() {
       :Object.entries(data);
     const appT={};
     entries.forEach(([,v])=>Object.entries(v.apps||{}).forEach(([app,h])=>{ appT[app]=(appT[app]||0)+h; }));
+    // + heures « bonus » manuelles : gonflent le total & le classement,
+    // mais ne sont pas dans les journées → la moyenne/jour ne bouge pas
+    Object.entries(bonus||{}).forEach(([app,h])=>{ if(typeof h==='number'&&h>0) appT[app]=(appT[app]||0)+h; });
     const sorted=Object.entries(appT).sort((a,b)=>b[1]-a[1]);
     const totalH=sorted.reduce((a,[,h])=>a+h,0);
     const daily=entries
@@ -720,7 +738,7 @@ function App() {
       .sort((a,b)=>a.key.localeCompare(b.key));
     const avgH=daily.length>0?daily.reduce((a,d)=>a+d.total,0)/daily.length:0;
     return {totalH,avgH,sorted,daily,days:daily.length};
-  },[data,range]);
+  },[data,range,bonus]);
 
   const appStats = useMemo(()=>{
     if (!focusedApp) return null;
@@ -728,12 +746,13 @@ function App() {
       .map(([k,v])=>({ key:k, h:(v.apps||{})[focusedApp]||0 }))
       .filter(d=>d.h>0)
       .sort((a,b)=>b.h-a.h);
-    const total = days.reduce((acc,d)=>acc+d.h, 0);
+    const dayTotal = days.reduce((acc,d)=>acc+d.h, 0);
+    const total = dayTotal + (bonus[focusedApp]||0);
     const top10 = days.slice(0,10);
-    const avgH  = days.length ? total/days.length : 0;
+    const avgH  = days.length ? dayTotal/days.length : 0;
     const best  = top10[0] || null;
     return { total, avgH, days: days.length, top10, best };
-  }, [focusedApp, data]);
+  }, [focusedApp, data, bonus]);
 
   const allKnownApps = useMemo(()=>{
     const fromData = new Set();
@@ -790,6 +809,51 @@ function App() {
   };
   const delApp=(dk,app)=>setData(p=>{const o=p[dk]||{total:0,apps:{}}; const apps={...o.apps}; delete apps[app]; return {...p,[dk]:{...o,apps}}; });
 
+  // ── Heures « bonus » (manuelles, hors jours) ───────────────────────────────
+  const addBonus=(sign)=>{
+    const app=(bonusApp==='_c'?bonusCust.trim():bonusApp);
+    if(!app) return;
+    const h=(parseFloat(bonusH)||0)+(parseFloat(bonusM)||0)/60;
+    if(h<=0) return;
+    setBonus(p=>{
+      const next={...p};
+      const cur=(next[app]||0)+sign*h;
+      if(cur<0.01) delete next[app]; else next[app]=Math.round(cur*100)/100;
+      return next;
+    });
+    setBonusH('');setBonusM('');
+  };
+  const delBonus=(app)=>setBonus(p=>{const next={...p};delete next[app];return next;});
+  const bonusOptions=useMemo(()=>{
+    const s=new Set(allKnownApps);
+    myApps.forEach(a=>s.add(a.name));
+    PRESETS.forEach(p=>s.add(p));
+    return [...s].sort((a,b)=>a.localeCompare(b,'fr'));
+  },[allKnownApps,myApps]);
+  const bonusList=useMemo(()=>Object.entries(bonus).filter(([,h])=>h>0).sort((a,b)=>b[1]-a[1]),[bonus]);
+
+  // ── Photo de signature : upload + miniature (≤480px) pour rester léger ─────
+  const handleSignatureFile=(file)=>{
+    if(!file) return;
+    const reader=new FileReader();
+    reader.onload=(e)=>{
+      const img=new Image();
+      img.onload=()=>{
+        try{
+          const maxW=480;
+          const scale=Math.min(1,maxW/img.width);
+          const c=document.createElement('canvas');
+          c.width=Math.max(1,Math.round(img.width*scale));
+          c.height=Math.max(1,Math.round(img.height*scale));
+          c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+          setSignature(c.toDataURL('image/png'));
+        }catch{ setSignature(e.target.result); }
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
   const quickRange=(d,yr)=>{
     const t=today(),toS=toKey(t),frS=yr?`${t.getFullYear()}-01-01`:toKey(addD(t,-d+1));
     setRFrom(frS);setRTo(toS);setRange({from:frS,to:toS});setShowPicker(false);
@@ -808,6 +872,11 @@ function App() {
     lines.push(`TOTAL APPS : ${fmtH(stats.totalH)}`);
     lines.push(`MOYENNE/JOUR : ${fmtH(stats.avgH)}`);
     lines.push(`JOURS TRACKÉS : ${stats.days}`);
+    if(bonusList.length){
+      lines.push('');
+      lines.push('=== HEURES AJOUTÉES MANUELLEMENT (hors journées) ===');
+      bonusList.forEach(([app,h])=>{ lines.push(`  + ${app} : ${fmtH(h)}`); });
+    }
     lines.push('');
     lines.push('=== DÉTAIL PAR JOUR ===');
     Object.entries(data).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([date,v])=>{
@@ -822,11 +891,13 @@ function App() {
 
   const doFullExport = () => {
     const backup = {
-      version: 37,
+      version: 38,
       exportedAt: new Date().toISOString(),
       data,
       myApps,
       appImages,
+      bonus,
+      signature,
       settings: { theme, accentColor, fontSize, dailyGoal, showGoalBar, compactCards, weekStartMon }
     };
     const txt = JSON.stringify(backup);
@@ -858,6 +929,8 @@ function App() {
 
       if (parsed.data)      setData(prev=>({...prev,...parsed.data}));
       if (parsed.myApps)    setMyApps(parsed.myApps);
+      if (parsed.bonus && typeof parsed.bonus==='object') setBonus(prev=>({...prev,...parsed.bonus}));
+      if (typeof parsed.signature==='string' && parsed.signature) setSignature(parsed.signature);
       if (parsed.appImages) {
         setAppImages(prev=>{
           const merged = {...prev,...parsed.appImages};
@@ -898,9 +971,11 @@ function App() {
     setData({});
     setMyApps([]);
     setAppImages({});
+    setBonus({});
+    setSignature('');
     ['st_data','my_apps','app_images','sp_theme','sp_accent','sp_fontsize',
      'sp_goal','sp_showgoal','sp_compact','sp_weekmon','sp_confirmdelete',
-     'sp_lastexport','st_data_snapshot','st_data_snapshot_day'].forEach(k=>{
+     'sp_lastexport','st_data_snapshot','st_data_snapshot_day','app_bonus','app_signature'].forEach(k=>{
       try { localStorage.removeItem(k); } catch {}
     });
     try { window.name = ''; } catch {}
@@ -957,8 +1032,8 @@ function App() {
               </button>
             ))}
           </nav>
-          <img src={SIGNATURE_SRC} alt="signature" style={S.sig} onError={e=>{e.currentTarget.style.display='none';}}/>
-          <span style={S.ver}>v37</span>
+          <img key={signature?'custom':'file'} src={signature||SIGNATURE_SRC} alt="signature" style={S.sig} onError={e=>{e.currentTarget.style.display='none';}} onLoad={e=>{e.currentTarget.style.display='';}}/>
+          <span style={S.ver}>v38</span>
         </div>
       </header>
 
@@ -1273,7 +1348,10 @@ function App() {
                 <Reveal style={S.card}>
                   <div style={{...S.ct,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
                     <span>🏆 Classement</span>
-                    {stats.sorted.length>10&&<button style={S.sab} onClick={()=>setShowAll(true)}>Voir tout ({stats.sorted.length}) →</button>}
+                    <span style={{display:'flex',alignItems:'center',gap:12}}>
+                      <button style={S.sab} onClick={()=>{setBonusOpen(true);setBonusApp('');setBonusCust('');setBonusH('');setBonusM('');}}>⏱ + Temps</button>
+                      {stats.sorted.length>10&&<button style={S.sab} onClick={()=>setShowAll(true)}>Voir tout ({stats.sorted.length}) →</button>}
+                    </span>
                   </div>
                   <div style={{display:'flex',flexDirection:'column',gap:12}}>
                     {stats.sorted.slice(0,10).map(([app,h],i)=><RankRow key={app} app={app} h={h} i={i} total={stats.totalH}/>)}
@@ -1608,6 +1686,28 @@ function App() {
                     ))}
                   </div>
                 </div>
+                <div>
+                  <div style={{fontSize:12,fontWeight:600,color:'var(--text-muted)',marginBottom:12,letterSpacing:'0.04em'}}>Signature du header</div>
+                  <div style={{display:'flex',alignItems:'center',gap:14,flexWrap:'wrap'}}>
+                    <div style={{width:120,height:52,borderRadius:12,border:'1px solid var(--border)',background:'rgba(255,255,255,0.02)',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',flexShrink:0}}>
+                      {signature
+                        ?<img src={signature} alt="signature" style={{maxWidth:'100%',maxHeight:'100%',objectFit:'contain'}}/>
+                        :<span style={{fontSize:10,color:'var(--text-faint)',textAlign:'center',padding:'0 6px',lineHeight:1.4}}>aucune photo<br/>(fichier signature.png)</span>}
+                    </div>
+                    <label style={{padding:'10px 18px',borderRadius:999,border:'1px solid var(--accent)',background:'rgba(77,150,255,0.08)',color:'var(--accent)',fontSize:13,fontWeight:700,cursor:'pointer',display:'inline-flex',alignItems:'center',gap:6,fontFamily:'inherit'}}>
+                      📷 Choisir une photo
+                      <input type="file" accept="image/*" style={{display:'none'}} onChange={e=>{handleSignatureFile(e.target.files&&e.target.files[0]);e.target.value='';}}/>
+                    </label>
+                    {signature&&(
+                      <button onClick={()=>setSignature('')} style={{padding:'10px 14px',borderRadius:999,border:'1px solid rgba(255,69,58,0.3)',background:'rgba(255,69,58,0.06)',color:'var(--accent-red)',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>
+                        ✕ Retirer
+                      </button>
+                    )}
+                  </div>
+                  <div style={{fontSize:11,color:'var(--text-faint)',marginTop:8,lineHeight:1.5}}>
+                    Affichée dans le header, juste avant le numéro de version. Stockée sur cet appareil (et incluse dans les exports).
+                  </div>
+                </div>
               </div>
 
               {/* SUIVI & OBJECTIFS */}
@@ -1699,7 +1799,7 @@ function App() {
                     </summary>
                     <textarea
                       style={{width:'100%',minHeight:80,background:'transparent',border:`1px solid ${importStatus==='err'?'var(--accent-red)':importStatus==='ok'?'var(--accent-green)':'var(--border-modal)'}`,borderRadius:12,color:'var(--text-primary)',fontFamily:'Space Mono,monospace',fontSize:10,padding:'10px 12px',resize:'vertical',outline:'none',lineHeight:1.5,transition:'border 0.2s',marginTop:6}}
-                      placeholder='{"version":37,"data":{…}}'
+                      placeholder='{"version":38,"data":{…}}'
                       value={importText}
                       onChange={e=>{ setImportText(e.target.value); setImportStatus(null); }}
                     />
@@ -1799,7 +1899,7 @@ function App() {
                 <div style={{display:'flex',flexDirection:'column',gap:0}}>
                   {[
                     { label:'Application', value:'ScreenPulse' },
-                    { label:'Version', value:'v37' },
+                    { label:'Version', value:'v38' },
                     { label:'Édition', value:'Cinématique' },
                     { label:'Jours trackés', value:`${daysTracked} jours` },
                     { label:'Premier jour', value: firstDayFmt || '–' },
@@ -1830,7 +1930,7 @@ function App() {
                     ))}
                   </div>
                   <div className="mono" style={{fontSize:10,color:'var(--text-faint)',letterSpacing:'0.1em',padding:'8px 18px',border:'1px solid var(--border)',borderRadius:999,display:'inline-block'}}>
-                    VERSION v37 · ÉDITION CINÉMATIQUE
+                    VERSION v38 · ÉDITION CINÉMATIQUE
                   </div>
                 </div>
               </div>
@@ -1953,6 +2053,60 @@ function App() {
         </div>
       )}
 
+      {/* ─── Bonus modal : heures ajoutées à une app (hors journées) ─── */}
+      {bonusOpen&&(
+        <div style={S.ov} onClick={()=>setBonusOpen(false)}>
+          <div style={{...S.mo,maxWidth:480,maxHeight:'86vh',display:'flex',flexDirection:'column'}} onClick={e=>e.stopPropagation()}>
+            <div style={S.mt}>⏱ Ajouter du temps à une app</div>
+            <div style={S.msub}>
+              Ces heures s'ajoutent au <strong>total de l'app</strong> et la font monter dans le <strong>classement</strong>,
+              mais elles ne sont rattachées à aucune journée : la <strong>moyenne/jour ne change pas</strong>.
+            </div>
+            <div style={{marginBottom:12}}>
+              <select style={S.sel} value={bonusApp} onChange={e=>setBonusApp(e.target.value)}>
+                <option value="">Choisir une application...</option>
+                {bonusOptions.map(a=><option key={a} value={a}>{a}</option>)}
+                <option value="_c">✏️ Autre (nom personnalisé)…</option>
+              </select>
+            </div>
+            {bonusApp==='_c'&&(
+              <input style={{...S.inp,marginBottom:12,fontSize:13}} placeholder="Nom de l'app…" value={bonusCust} onChange={e=>setBonusCust(e.target.value)}/>
+            )}
+            {bonusApp&&bonusApp!=='_c'&&bonus[bonusApp]>0&&(
+              <div style={{fontSize:11,color:'var(--text-muted)',marginBottom:12}}>
+                Bonus actuel de <strong style={{color:'var(--text-primary)'}}>{bonusApp}</strong> : <span className="mono" style={{color:'var(--accent-green)'}}>+{fmtH(bonus[bonusApp])}</span>
+              </div>
+            )}
+            <div style={{display:'flex',gap:10,marginBottom:14}}>
+              <div style={{flex:1,display:'flex',alignItems:'center',gap:8}}><input style={S.inp} type="number" min="0" placeholder="0" value={bonusH} onChange={e=>setBonusH(e.target.value)}/><span style={{fontSize:13,color:'var(--text-muted)',flexShrink:0}}>h</span></div>
+              <div style={{flex:1,display:'flex',alignItems:'center',gap:8}}><input style={S.inp} type="number" min="0" placeholder="0" value={bonusM} onChange={e=>setBonusM(e.target.value)}/><span style={{fontSize:13,color:'var(--text-muted)',flexShrink:0}}>min</span></div>
+            </div>
+            <div style={{display:'flex',gap:8}}>
+              <button style={S.btnGreen} onClick={()=>addBonus(1)}>+ Ajouter</button>
+              <button style={S.btnDanger} onClick={()=>addBonus(-1)}>− Retirer</button>
+              <button style={S.btnGhostSm} onClick={()=>setBonusOpen(false)}>Fermer</button>
+            </div>
+            {bonusList.length>0&&(
+              <div style={{borderTop:'1px solid var(--border-modal)',marginTop:16,paddingTop:14,overflowY:'auto'}}>
+                <div style={{fontSize:11,fontWeight:700,color:'var(--text-muted)',letterSpacing:'0.06em',marginBottom:10}}>
+                  BONUS EN COURS · <span style={{color:'var(--accent-green)'}}>+{fmtH(bonusList.reduce((a,[,h])=>a+h,0))}</span> AU TOTAL
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                  {bonusList.map(([app,h])=>(
+                    <div key={app} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 12px',borderRadius:12,border:'1px solid var(--border)',background:'rgba(48,209,88,0.03)'}}>
+                      <AppIcon name={app} color={COLORS[0]} size={16} appImages={appImages}/>
+                      <span style={{flex:1,fontSize:13,color:'var(--text-primary)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{app}</span>
+                      <span className="mono" style={{fontSize:12,color:'var(--accent-green)',flexShrink:0}}>+{fmtH(h)}</span>
+                      <button onClick={()=>delBonus(app)} style={{background:'none',border:'none',color:'var(--text-muted)',cursor:'pointer',fontSize:14,padding:2}}>✕</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <InstallBanner/>
     </div>
   );
@@ -1969,7 +2123,7 @@ const S={
   tabs: {display:'flex',gap:'clamp(16px,2.2vw,34px)',flex:1,minWidth:0,overflowX:'auto',scrollbarWidth:'none'},
   tab:  {padding:'8px 2px',border:'none',background:'transparent',color:'var(--text-muted)',cursor:'pointer',fontSize:17,fontWeight:500,fontFamily:'inherit',borderBottom:'2px solid transparent',whiteSpace:'nowrap'},
   tabA: {color:'var(--text-primary)',borderBottom:'2px solid var(--accent)'},
-  sig:  {height:'clamp(30px,3.4vw,42px)',maxWidth:'clamp(90px,14vw,200px)',objectFit:'contain',flexShrink:0},
+  sig:  {height:'clamp(48px,5.5vw,72px)',maxWidth:'clamp(150px,24vw,340px)',objectFit:'contain',flexShrink:0},
   ver:  {fontFamily:"'Space Mono',monospace",fontSize:14,fontWeight:700,color:'var(--accent)',letterSpacing:'0.1em',flexShrink:0},
   page: {maxWidth:'100%',margin:'0 auto',padding:'0 clamp(16px,4vw,56px)',position:'relative',zIndex:1},
   hero: {padding:'72px 0 56px',position:'relative',zIndex:1},
@@ -2051,7 +2205,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 // ── PWA : Service Worker ──────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
   const SW = `
-const CACHE = 'screenpulse-cinematic-v37';
+const CACHE = 'screenpulse-cinematic-v38';
 const ASSETS = [
   'https://unpkg.com/react@18.3.1/umd/react.production.min.js',
   'https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js',
