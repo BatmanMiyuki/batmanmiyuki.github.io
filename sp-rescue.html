@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <title>ScreenPulse — Vérificateur de données</title>
+  <title>ScreenPulse — Vérificateur de données v2</title>
   <meta name="theme-color" content="#000000"/>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -21,18 +21,18 @@
     .kt{font-size:12px;font-weight:700;color:#4d96ff;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
     .row{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px}
     .row:last-child{border-bottom:none}
-    .row b{font-family:ui-monospace,'Space Mono',monospace;font-weight:600;text-align:right;word-break:break-all;max-width:60%}
-    .btn{display:block;width:100%;padding:16px;border-radius:999px;border:none;font-size:15px;font-weight:700;cursor:pointer;text-align:center;margin-top:14px;font-family:inherit}
+    .row b{font-family:ui-monospace,monospace;font-weight:600;text-align:right;word-break:break-all;max-width:62%}
+    .btn{display:block;width:100%;padding:16px;border-radius:999px;border:none;font-size:15px;font-weight:700;cursor:pointer;text-align:center;margin-top:14px;font-family:inherit;text-decoration:none}
     .btn-green{background:#30d158;color:#000}
     .btn-blue{background:#4d96ff;color:#000}
     .btn-ghost{background:transparent;color:#86868b;border:1px solid #2a2a2c}
     .note{font-size:12px;color:#86868b;margin-top:16px;line-height:1.7}
-    pre{background:rgba(255,255,255,0.04);border-radius:10px;padding:10px;font-size:11px;overflow-x:auto;color:#9ecbff}
+    pre{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;font-size:11px;overflow-x:auto;color:#9ecbff;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto;margin-top:8px}
   </style>
 </head>
 <body>
   <h1>🛡 ScreenPulse</h1>
-  <div class="sub">Vérificateur de données — v1</div>
+  <div class="sub">Vérificateur de données — <b>v2</b> (diagnostic approfondi)</div>
 
   <div id="status"></div>
   <div id="report"></div>
@@ -40,8 +40,8 @@
 
   <div class="note">
     Cette page lit uniquement le stockage local de ce site (localStorage, backup session, cookies).
-    Elle n'envoie rien nulle part. Si un backup de sauvetage est disponible, télécharge-le et
-    réimporte-le ensuite dans l'app (Réglages → Importer des données).
+    Elle n'envoie rien nulle part. Le « rapport de diagnostic » télécharge un fichier
+    <b>sp-dump.json</b> que tu peux envoyer à ton assistant pour analyse.
   </div>
 
 <script>
@@ -49,11 +49,10 @@
   var $s=document.getElementById('status'), $r=document.getElementById('report'), $a=document.getElementById('actions');
   var WN_KEY='__sp_wn__';
 
-  function fmtKB(n){ return n>1024*1024 ? (n/1048576).toFixed(1)+' Mo' : Math.round(n/1024)+' ko'; }
+  function fmtB(n){ if(n>1024*1024)return (n/1048576).toFixed(2)+' Mo'; if(n>1024)return Math.round(n/1024)+' ko'; return n+' o'; }
   function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
   function tryParse(s){ try{ return JSON.parse(s); }catch(e){ return undefined; } }
 
-  // ── Récupère une clé depuis les 3 couches de stockage ──────────────────────
   function fromLocalStorage(k){ try{ var v=localStorage.getItem(k); return v===null?undefined:v; }catch(e){ return undefined; } }
   function fromWindowName(k){
     try{
@@ -70,118 +69,133 @@
   }
   function getKey(k){
     var v=fromLocalStorage(k); if(v!==undefined) return {src:'localStorage',raw:v};
-    v=fromWindowName(k);       if(v!==undefined) return {src:'session (window.name)',raw:v};
+    v=fromWindowName(k);       if(v!==undefined) return {src:'window.name',raw:v};
     v=fromCookie(k);           if(v!==undefined) return {src:'cookie',raw:v};
     return null;
   }
 
-  // ── Scan des clés connues + inventaire localStorage complet ─────────────────
-  var KEYS=['st_data','my_apps','app_images','st_data_snapshot','st_data_snapshot_day','sp_theme','sp_accent','sp_fontsize','sp_goal','sp_lastexport'];
-  var found={}, layersUsed={};
-  KEYS.forEach(function(k){
-    var r=getKey(k);
-    if(r&&r.raw!==undefined){ found[k]=r; layersUsed[r.src]=(layersUsed[r.src]||0)+1; }
-  });
+  // ── Scan complet ────────────────────────────────────────────────────────────
   var lsKeys=[]; try{ for(var i=0;i<localStorage.length;i++){ lsKeys.push(localStorage.key(i)); } }catch(e){}
-  var totalLsBytes=0; lsKeys.forEach(function(k){ try{ totalLsBytes+=(localStorage.getItem(k)||'').length; }catch(e){} });
+  lsKeys.sort();
+  var totalLsBytes=0, dumpKeys={};
+  lsKeys.forEach(function(k){
+    var v=fromLocalStorage(k); if(v===undefined)return;
+    totalLsBytes+=v.length;
+    dumpKeys[k]=v;
+  });
 
-  // ── Analyse des données ScreenPulse ─────────────────────────────────────────
-  var dataSrc = found['st_data'] || found['st_data_snapshot'] || null;
-  var dataObj = dataSrc ? tryParse(dataSrc.raw) : undefined;
+  var rSt = getKey('st_data');
+  var rSnap = getKey('st_data_snapshot');
+  var rMyApps = getKey('my_apps');
+  var rImgs = getKey('app_images');
+  var wnHas = fromWindowName('st_data')!==undefined;
+  var ckHas = fromCookie('st_data')!==undefined;
+
+  var dataRaw = rSt? rSt.raw : (rSnap? rSnap.raw : undefined);
+  var dataObj = dataRaw!==undefined ? tryParse(dataRaw) : undefined;
   var dataOk = dataObj && typeof dataObj==='object' && !Array.isArray(dataObj);
-  var stats=null;
+  var days=[], stats=null;
   if(dataOk){
-    var days=Object.keys(dataObj).filter(function(d){ return dataObj[d] && dataObj[d].total>0; }).sort();
+    days=Object.keys(dataObj).filter(function(d){ try{return dataObj[d]&&dataObj[d].total>0;}catch(e){return false;} }).sort();
     if(days.length){
       var total=0; days.forEach(function(d){ total+=dataObj[d].total||0; });
-      var first=days[0], last=days[days.length-1];
-      stats={ days:days.length, first:first, last:last, totalHours:Math.round(total*10)/10 };
+      stats={ days:days.length, first:days[0], last:days[days.length-1], totalHours:Math.round(total*10)/10 };
     }
   }
-  var myAppsParsed  = found['my_apps']    ? tryParse(found['my_apps'].raw)    : undefined;
-  var imagesParsed  = found['app_images'] ? tryParse(found['app_images'].raw) : undefined;
-  var appsCount    = Array.isArray(myAppsParsed)? myAppsParsed.length : 0;
-  var imagesCount  = imagesParsed && typeof imagesParsed==='object' ? Object.keys(imagesParsed).length : 0;
+  var myAppsParsed = rMyApps? tryParse(rMyApps.raw):undefined;
+  var imagesParsed = rImgs? tryParse(rImgs.raw):undefined;
+  var appsCount = Array.isArray(myAppsParsed)?myAppsParsed.length:0;
+  var imagesCount = imagesParsed&&typeof imagesParsed==='object'?Object.keys(imagesParsed).length:0;
+  var stBytes = rSt? rSt.raw.length : 0;
+  var snapBytes = rSnap? rSnap.raw.length : 0;
 
-  // ── Rapport ─────────────────────────────────────────────────────────────────
-  var html='', statusHtml='', actionsHtml='';
-
+  // ── Verdict ─────────────────────────────────────────────────────────────────
+  var statusHtml;
   if(stats){
     statusHtml='<div class="status ok"><div class="big">🎉</div><div class="title">DES DONNÉES ONT ÉTÉ RETROUVÉES !</div>'
       +'<div class="detail">'+stats.days+' jour'+(stats.days>1?'s':'')+' tracké'+(stats.days>1?'s':'')
       +' · du '+stats.first+' au '+stats.last+' · '+stats.totalHours+' h au total</div></div>';
-  } else if(Object.keys(found).length>0 || lsKeys.length>0){
-    statusHtml='<div class="status partial"><div class="big">⚠️</div><div class="title">Des réglages ont été retrouvés, mais pas l\'historique</div>'
-      +'<div class="detail">Le stockage local n\'a pas été entièrement vidé, mais le journal des temps d\'écran (st_data) semble absent.</div></div>';
+  } else if(rSt){
+    statusHtml='<div class="status partial"><div class="big">⚠️</div><div class="title">La clé st_data existe mais contient '+fmtB(stBytes)+' et 0 jour lisible</div>'
+      +'<div class="detail">Regarde l\'aperçu du contenu ci-dessous : s\'il affiche juste <code>{}</code>, l\'historique a été écrasé par un état vide.</div></div>';
+  } else if(lsKeys.length>0){
+    statusHtml='<div class="status ko"><div class="big">💔</div><div class="title">Aucun historique ScreenPulse (st_data absent)</div>'
+      +'<div class="detail">Le stockage contient d\'autres clés mais plus le journal de tes temps d\'écran.</div></div>';
   } else {
-    statusHtml='<div class="status ko"><div class="big">💔</div><div class="title">Aucune donnée ScreenPulse trouvée</div>'
-      +'<div class="detail">Le stockage de ce navigateur ne contient plus rien pour ScreenPulse. Les données ont été effacées par le système/le navigateur.</div></div>';
+    statusHtml='<div class="status ko"><div class="big">💔</div><div class="title">Stockage totalement vide</div>'
+      +'<div class="detail">Aucune donnée locale trouvée pour ce site.</div></div>';
   }
 
-  // Tableau de diagnostic
-  html+='<div class="card"><div class="kt">🔬 Diagnostic du stockage</div>';
-  html+='<div class="row"><span>Clés connues retrouvées</span><b>'+Object.keys(found).join(', ')+(!Object.keys(found).length?'aucune':'')+'</b></div>';
-  html+='<div class="row"><span>Couches de stockage actives</span><b>'+Object.keys(layersUsed).join(', ')+(!Object.keys(layersUsed).length?'aucune':'')+'</b></div>';
-  html+='<div class="row"><span>Taille totale localStorage (site)</span><b>'+fmtKB(totalLsBytes)+'</b></div>';
-  html+='<div class="row"><span>Stocke un historique (st_data)</span><b>'+(found['st_data']?'oui ✓':'non ✗')+'</b></div>';
-  html+='<div class="row"><span>Snapshot interne (st_data_snapshot)</span><b>'+(found['st_data_snapshot']?'oui ✓':'non ✗')+'</b></div>';
-  html+='<div class="row"><span>Backup session (window.name)</span><b>'+(fromWindowName('st_data')!==undefined?'avec données ✓':'vide ✗')+'</b></div>';
-  html+='<div class="row"><span>Backup cookie</span><b>'+(fromCookie('st_data')!==undefined?'présent ✓':'absent ✗')+'</b></div>';
-  if(lsKeys.length&&lsKeys.length<25){ html+='<div class="row"><span>Toutes les clés locales</span><b>'+esc(lsKeys.join(', '))+'</b></div>'; }
+  // ── Rapport détaillé ────────────────────────────────────────────────────────
+  var html='<div class="card"><div class="kt">🔬 Diagnostic du stockage</div>';
+  html+='<div class="row"><span>st_data (historique)</span><b>'+(rSt?('présent · '+fmtB(stBytes)+' · '+days.length+' jour(s)'):'absent ✗')+'</b></div>';
+  html+='<div class="row"><span>st_data_snapshot</span><b>'+(rSnap?('présent · '+fmtB(snapBytes)):'absent ✗')+'</b></div>';
+  html+='<div class="row"><span>my_apps</span><b>'+(rMyApps?('présent · '+appsCount+' app(s)'):'absent ✗')+'</b></div>';
+  html+='<div class="row"><span>app_images</span><b>'+(rImgs?('présent · '+imagesCount+' image(s)'):'absent ✗')+'</b></div>';
+  html+='<div class="row"><span>Backup session (window.name)</span><b>'+(wnHas?'avec données ✓':'vide ✗')+'</b></div>';
+  html+='<div class="row"><span>Backup cookie</span><b>'+(ckHas?'présent ✓':'absent ✗')+'</b></div>';
+  html+='<div class="row"><span>Taille totale localStorage (site)</span><b>'+fmtB(totalLsBytes)+'</b></div>';
+  html+='<div class="row"><span>Clés locales ('+lsKeys.length+')</span><b>'+esc(lsKeys.join(', '))+'</b></div>';
   html+='</div>';
 
+  if(rSt){
+    var prev = rSt.raw.length>800 ? rSt.raw.slice(0,800)+' …' : rSt.raw;
+    html+='<div class="card"><div class="kt">👀 Aperçu brut de st_data (début)</div><pre>'+esc(prev)+'</pre></div>';
+  }
   if(stats){
     html+='<div class="card"><div class="kt">📊 Contenu retrouvé</div>'
       +'<div class="row"><span>Jours trackés</span><b>'+stats.days+'</b></div>'
       +'<div class="row"><span>Premier jour</span><b>'+stats.first+'</b></div>'
       +'<div class="row"><span>Dernier jour</span><b>'+stats.last+'</b></div>'
-      +'<div class="row"><span>Total cumulé</span><b>'+stats.totalHours+' h</b></div>'
-      +'<div class="row"><span>Applications perso</span><b>'+appsCount+'</b></div>'
-      +'<div class="row"><span>Images d\'apps</span><b>'+imagesCount+'</b></div></div>';
+      +'<div class="row"><span>Total cumulé</span><b>'+stats.totalHours+' h</b></div></div>';
   }
 
-  // ── Actions : export de sauvetage + restauration ────────────────────────────
-  var rescue=null;
-  if(dataOk){
-    rescue={ version:37, exportedAt:new Date().toISOString(), rescue:true,
+  // ── Actions ─────────────────────────────────────────────────────────────────
+  var actionsHtml='';
+  if(stats){
+    actionsHtml+='<button class="btn btn-green" id="dl">📦 Télécharger le backup de sauvetage (.json)</button>';
+  }
+  if(lsKeys.length>0 || wnHas || ckHas){
+    actionsHtml+='<button class="btn btn-blue" id="dump">📤 Télécharger le rapport de diagnostic (sp-dump.json)</button>';
+  }
+  actionsHtml+='<a class="btn btn-ghost" href="screenpulse/index.html">➡️ Ouvrir ScreenPulse</a>';
+
+  $s.innerHTML=statusHtml; $r.innerHTML=html; $a.innerHTML=actionsHtml;
+
+  function download(name, content){
+    try{
+      var blob=new Blob([content],{type:'application/json'});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=url; a.download=name;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); },4000);
+      return true;
+    }catch(e){ alert('Erreur: '+e); return false; }
+  }
+
+  var dl=document.getElementById('dl');
+  if(dl){ dl.onclick=function(){
+    var rescue={ version:37, exportedAt:new Date().toISOString(), rescue:true,
       data:dataObj,
       myApps: Array.isArray(myAppsParsed)?myAppsParsed:[],
       appImages: (imagesParsed&&typeof imagesParsed==='object')?imagesParsed:{},
       settings:{} };
-    actionsHtml+='<button class="btn btn-green" id="dl">📦 Télécharger le backup de sauvetage (.json)</button>';
-  }
-  var needsRestore = dataOk && !found['st_data'];
-  if(needsRestore){
-    actionsHtml+='<button class="btn btn-blue" id="restore">♻️ Restaurer les données dans l\'app maintenant</button>';
-  }
-  if(stats&&!needsRestore){
-    actionsHtml+='<a class="btn btn-ghost" href="screenpulse/index.html">➡️ Ouvrir ScreenPulse</a>';
-  }
-
-  $s.innerHTML=statusHtml; $r.innerHTML=html; $a.innerHTML=actionsHtml;
-
-  var dl=document.getElementById('dl');
-  if(dl){ dl.onclick=function(){
-    try{
-      var blob=new Blob([JSON.stringify(rescue)],{type:'application/json'});
-      var url=URL.createObjectURL(blob);
-      var a=document.createElement('a');
-      a.href=url; a.download='screenpulse-rescue-'+new Date().toISOString().slice(0,10)+'.json';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      setTimeout(function(){ URL.revokeObjectURL(url); },4000);
+    if(download('screenpulse-rescue-'+new Date().toISOString().slice(0,10)+'.json', JSON.stringify(rescue))){
       dl.textContent='✅ Backup téléchargé — regarde tes Téléchargements !';
-    }catch(e){ alert('Erreur de téléchargement: '+e); }
+    }
   }; }
 
-  var rs=document.getElementById('restore');
-  if(rs){ rs.onclick=function(){
-    try{
-      localStorage.setItem('st_data', JSON.stringify(rescue.data));
-      localStorage.setItem('my_apps', JSON.stringify(rescue.myApps));
-      localStorage.setItem('app_images', JSON.stringify(rescue.appImages));
-      rs.textContent='✅ Restauré ! Ouvre ScreenPulse maintenant →';
-      rs.onclick=function(){ location.href='screenpulse/index.html'; };
-    }catch(e){ alert('Erreur: '+e); }
+  var dp=document.getElementById('dump');
+  if(dp){ dp.onclick=function(){
+    var dump={ generatedAt:new Date().toISOString(), screen:'sp-rescue v2',
+      totalLsBytes:totalLsBytes,
+      windowNameScreenpulse: wnHas? fromWindowName('st_data') : null,
+      cookieScreenpulse: ckHas? fromCookie('st_data') : null,
+      localStorage: dumpKeys };
+    if(download('sp-dump-'+new Date().toISOString().slice(0,10)+'.json', JSON.stringify(dump))){
+      dp.textContent='✅ Rapport téléchargé — envoie-le à ton assistant !';
+    }
   }; }
 })();
 </script>
