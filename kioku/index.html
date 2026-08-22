@@ -1447,6 +1447,7 @@ function normalize(a) {
   a.synopsis  = a.synopsis  || '';
   a.status    = a.status    || 'completed';
   a.isMovie   = !!a.isMovie;
+  a.parentId  = a.parentId  || null;
   a.genres    = Array.isArray(a.genres) ? a.genres : [];
   a.favorite  = !!a.favorite;
   a.rating    = typeof a.rating === 'number' ? a.rating : null;
@@ -1458,23 +1459,20 @@ function normalize(a) {
     s.name     = s.name || (a.isMovie ? 'Film' : `Saison ${i + 1}`);
     s.episodes = Math.max(0, parseInt(s.episodes, 10) || 0);
     s.duration = Math.max(1, parseInt(s.duration, 10) || (a.isMovie ? 100 : DEFAULT_DUR));
-    s.watched  = Array.isArray(s.watched) ? s.watched.filter(n => typeof n === 'number' && n >= 1 && n <= s.episodes) : [];
-  });
-  a.others    = Array.isArray(a.others) ? a.others : [];
-  a.others.forEach((o, i) => {
-    o.id       = o.id || uid();
-    o.name     = o.name || (o.isMovie ? 'Film' : `Saison ${i + 2}`);
-    o.isMovie  = !!o.isMovie;
-    o.episodes = Math.max(0, parseInt(o.episodes, 10) || 0);
-    o.duration = Math.max(1, parseInt(o.duration, 10) || (o.isMovie ? 100 : DEFAULT_DUR));
-    o.watched  = Array.isArray(o.watched) ? o.watched.filter(n => typeof n === 'number' && n >= 1 && n <= o.episodes) : [];
+    s.watched  = Array.isArray(s.watched)
+      ? s.watched.map(n => parseInt(n, 10)).filter(n => !isNaN(n) && n >= 1 && n <= s.episodes)
+      : [];
   });
   return a;
 }
 
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 
-const allItems = a => (a?.seasons || []).concat(a?.others || []);
+function getFamilyMembers(a) {
+  if (!a) return [];
+  const children = Store.all().filter(x => x && x.parentId === a.id);
+  return [a, ...children];
+}
 
 /**
  * Normalise le titre pour regrouper les saisons, arcs, parties et films d'un même anime
@@ -1517,21 +1515,21 @@ function getAnimeBaseKey(title) {
 }
 
 /* ------------------------------------------------------------
-   2. Calculs (Prend en compte toutes les saisons & autres oeuvres)
+   2. Calculs (Prend en compte toute la famille liée)
 ------------------------------------------------------------ */
 const Calc = {
-  totalEps:   a => allItems(a).reduce((n, s) => n + s.episodes, 0),
+  totalEps:   a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + (s.episodes || 0), 0), 0),
   // Total des épisodes vus (chaque re-visionnage d'épisode compte +1)
-  watchedEps: a => allItems(a).reduce((n, s) => n + s.watched.length, 0),
-  totalMin:   a => allItems(a).reduce((n, s) => n + s.episodes * s.duration, 0),
+  watchedEps: a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + (s.watched || []).length, 0), 0),
+  totalMin:   a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + (s.episodes || 0) * (s.duration || DEFAULT_DUR), 0), 0),
   // Temps total regardé (multiplié par le nombre de visionnages de chaque épisode)
-  watchedMin: a => allItems(a).reduce((n, s) => n + s.watched.length * s.duration, 0),
+  watchedMin: a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + (s.watched || []).length * (s.duration || DEFAULT_DUR), 0), 0),
   pct(a) {
     const t = Calc.totalEps(a);
-    const uniqueDone = allItems(a).reduce((n, s) => n + new Set(s.watched).size, 0);
+    const uniqueDone = getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + new Set(s.watched || []).size, 0), 0);
     return t ? Math.min(100, Math.round(uniqueDone / t * 100)) : 0;
   },
-  remainingMin: a => Math.max(0, Calc.totalMin(a) - allItems(a).reduce((n, s) => n + new Set(s.watched).size * s.duration, 0)),
+  remainingMin: a => Math.max(0, Calc.totalMin(a) - getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + new Set(s.watched || []).size * (s.duration || DEFAULT_DUR), 0), 0)),
 };
 
 function fmtDuration(min) {
@@ -1586,12 +1584,13 @@ function cardHTML(a, i, opts = {}) {
   const total = Calc.totalEps(a), done = Calc.watchedEps(a), pct = Calc.pct(a);
   const st = STATUS[a.status] || STATUS.watching;
   const time = opts.plan ? Calc.totalMin(a) : Calc.watchedMin(a);
+  const children = Store.all().filter(x => x.parentId === a.id);
   return `
   <article class="card" onclick="Router.go('anime/${a.id}')">
     <div class="card-media">
       ${mediaHTML(a, opts.cover)}
       <span class="badge ${a.status}">${st.ico} ${st.label}</span>
-      ${a.isMovie ? `<span class="badge movie">🎬 Film</span>` : ''}
+      ${children.length > 0 ? `<span class="badge" style="left:auto;right:48px;background:var(--cyan);color:#041e26;border-color:transparent">📦 +${children.length}</span>` : (a.isMovie ? `<span class="badge movie">🎬 Film</span>` : '')}
       <button class="fav-star ${a.favorite ? 'on' : ''}" title="Favori"
               onclick="event.stopPropagation();UI.toggleFav('${a.id}')">${a.favorite ? '⭐' : '☆'}</button>
     </div>
@@ -1600,6 +1599,7 @@ function cardHTML(a, i, opts = {}) {
       <div class="card-meta">
         <span>${a.isMovie ? '🎬' : '📼'} <b>${done}</b>/${total} ép.</span>
         <span>⏱️ ${fmtDuration(time)}</span>
+        ${children.length > 0 ? `<span>📦 <b>${children.length + 1}</b> œuvres</span>` : ''}
         ${a.rating != null ? `<span>⭐ <b>${a.rating}</b>/10</span>` : ''}
       </div>
       <div class="progress ${pct === 100 ? 'done' : ''}"><i style="width:${pct}%"></i></div>
@@ -1623,11 +1623,15 @@ const Seen = {
   render() {
     const q = (document.getElementById('seen-search').value || '').toLowerCase().trim();
     const sort = document.getElementById('seen-sort').value;
-    let list = Store.all().filter(a => a.status !== 'planned' && a.status !== 'soon');
+    let list = Store.all().filter(a => !a.parentId && a.status !== 'planned' && a.status !== 'soon');
 
-    if (q) list = list.filter(a =>
-      a.title.toLowerCase().includes(q) || a.jp.toLowerCase().includes(q) ||
-      a.genres.join(' ').toLowerCase().includes(q));
+    if (q) list = list.filter(a => {
+      const family = getFamilyMembers(a);
+      return family.some(m =>
+        m.title.toLowerCase().includes(q) || m.jp.toLowerCase().includes(q) ||
+        m.genres.join(' ').toLowerCase().includes(q)
+      );
+    });
 
     const cmp = {
       recent:   (x, y) => y.addedAt - x.addedAt,
@@ -1641,7 +1645,7 @@ const Seen = {
     const el = document.getElementById('seen-grid');
     if (!list.length) {
       el.className = '';
-      el.innerHTML = Store.all().length
+      el.innerHTML = Store.all().filter(a => !a.parentId).length
         ? emptyHTML('🔍', 'Aucun résultat', 'Aucun anime ne correspond à cette recherche.')
         : emptyHTML('🌸', 'Ta collection est vide', 'Ajoute ton premier anime : titre, bannière, saisons et durée des épisodes.',
             `<button class="btn btn-primary" onclick="UI.openForm()">＋ Ajouter un anime</button>`);
@@ -1659,9 +1663,13 @@ const Plan = {
   render() {
     const q = (document.getElementById('plan-search').value || '').toLowerCase().trim();
     const sort = document.getElementById('plan-sort').value;
-    let list = Store.all().filter(a => a.status === 'planned');
-    if (q) list = list.filter(a =>
-      a.title.toLowerCase().includes(q) || a.genres.join(' ').toLowerCase().includes(q));
+    let list = Store.all().filter(a => !a.parentId && a.status === 'planned');
+    if (q) list = list.filter(a => {
+      const family = getFamilyMembers(a);
+      return family.some(m =>
+        m.title.toLowerCase().includes(q) || m.genres.join(' ').toLowerCase().includes(q)
+      );
+    });
 
     list.sort({
       recent: (x, y) => y.addedAt - x.addedAt,
@@ -1935,36 +1943,24 @@ const Stats = {
 
   render() {
     const all = Store.all();
-    const seen      = all.filter(a => a.status !== 'planned' && a.status !== 'soon');
-    const planned   = all.filter(a => a.status === 'planned');
-    const soon      = all.filter(a => a.status === 'soon');
+    const topLevel = all.filter(a => !a.parentId);
+    const seen     = topLevel.filter(a => a.status !== 'planned' && a.status !== 'soon');
+    const planned  = topLevel.filter(a => a.status === 'planned');
+    const soon     = topLevel.filter(a => a.status === 'soon');
 
-    // Déduplication par franchise / série pour éviter de compter chaque saison comme un anime distinct
-    const seenGroups = this.getGroupedTop(seen);
-    const uniqueSeenCount = seenGroups.length || new Set(seen.map(a => getAnimeBaseKey(a.title))).size;
-    const uniquePlannedCount = new Set(planned.map(a => getAnimeBaseKey(a.title))).size;
+    // Nombre d'animes uniques (les animes liés dans une famille comptent pour 1 seul anime)
+    const uniqueSeenCount = seen.length;
+    const uniquePlannedCount = planned.length;
 
-    // Films regardés (comptabilisés sur la fiche principale et dans la section Autre)
-    const moviesWatched = seen.reduce((n, a) => {
-      let count = a.isMovie ? 1 : 0;
-      if (Array.isArray(a.others)) {
-        count += a.others.filter(o => o.isMovie && (o.watched && o.watched.length > 0)).length;
-      }
-      return n + count;
-    }, 0);
+    // Films regardés (comptabilisés parmi tous les animes de la collection ayant au moins 1 visionnage)
+    const moviesWatched = all.filter(a => a.isMovie && (a.seasons || []).some(s => s.watched && s.watched.length > 0)).length;
 
-    // Total d'épisodes et temps total (chaque visionnage est multiplié)
-    const epsWatched = all.reduce((n, a) => n + Calc.watchedEps(a), 0);
-    const minWatched = all.reduce((n, a) => n + Calc.watchedMin(a), 0);
+    // Total d'épisodes et temps total (tous les animes parents et enfants liés sont cumulés)
+    const epsWatched = all.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.watched.length, 0), 0);
+    const minWatched = all.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.watched.length * s.duration, 0), 0);
     const minPlanned = planned.reduce((n, a) => n + Calc.totalMin(a), 0);
     // Saisons suivies (les films ne comptent pas comme saisons)
-    const seasons = all.reduce((n, a) => {
-      let sCount = a.isMovie ? 0 : (a.seasons ? a.seasons.length : 0);
-      if (Array.isArray(a.others)) {
-        sCount += a.others.filter(o => !o.isMovie).length;
-      }
-      return n + sCount;
-    }, 0);
+    const seasons = all.filter(a => !a.isMovie).reduce((n, a) => n + (a.seasons || []).length, 0);
 
     // Calcul des épisodes vus durant le mois sélectionné
     const now = new Date();
@@ -2100,9 +2096,9 @@ const Stats = {
         </div>
         <div style="margin-top:14px">
           ${top.map((a, i) => `
-            <div class="bar-row" style="cursor:pointer" onclick="Router.go('anime/${a.entries[0]?.id}')" title="Voir la fiche de ${esc(a.title)}">
+            <div class="bar-row" style="cursor:pointer" onclick="Router.go('anime/${a.id}')" title="Voir la fiche de ${esc(a.title)}">
               <div class="bar-head">
-                <b><span style="color:var(--cyan-lt);margin-right:6px">#${i + 1}</span> ${esc(a.title)} ${a.entries.length > 1 ? `<small style="color:var(--muted);font-weight:normal">(${a.entries.length} saisons réunies)</small>` : ''}</b>
+                <b><span style="color:var(--cyan-lt);margin-right:6px">#${i + 1}</span> ${esc(a.title)} ${a.entries.length > 1 ? `<small style="color:var(--muted);font-weight:normal">(${a.entries.length} animes réunis)</small>` : ''}</b>
                 <span>${fmtDuration(a.watchedMin)} · ${a.watchedEps} ép.</span>
               </div>
               <div class="bar"><i style="width:${a.watchedMin / max * 100}%"></i></div>
@@ -2112,63 +2108,21 @@ const Stats = {
   },
 
   getGroupedTop(all) {
-    const active = all.filter(a => Calc.watchedMin(a) > 0);
-    const items = active.map(a => ({
-      anime: a,
-      key: getAnimeBaseKey(a.title),
-      min: Calc.watchedMin(a),
-      eps: Calc.watchedEps(a),
-      totalEps: Calc.totalEps(a),
-    }));
-
-    const uniqueKeys = Array.from(new Set(items.map(x => x.key))).sort((a, b) => a.length - b.length);
-    const rootMap = {};
-    uniqueKeys.forEach(k => {
-      if (k === "naruto: shippuden" || k === "naruto shippuden" || k === "dragon ball z" || k === "dragon ball super") {
-        rootMap[k] = k;
-        return;
-      }
-      const parent = uniqueKeys.find(p => p !== k && (k.startsWith(p + ":") || k.startsWith(p + " -") || k.startsWith(p + " ") || k.startsWith(p + "-")));
-      rootMap[k] = parent ? rootMap[parent] || parent : k;
-    });
-
-    const groups = {};
-    items.forEach(({ anime, key, min, eps, totalEps }) => {
-      const rootKey = rootMap[key] || key;
-      if (!groups[rootKey]) {
-        let displayTitle = anime.title
-          .replace(/[:\-–—]?\s*(?:the\s+|la\s+)?(?:final\s+season|saison\s+finale)\b.*$/gi, '')
-          .replace(/[:\-–—]?\s*\b\d+\s*(?:ère|ere|ème|eme)?\s*(?:saisons?|seasons?)\b.*$/gi, '')
-          .replace(/[:\-–—]?\s*(?:la\s+)?(?:saisons?|seasons?)\s*\d*.*$/gi, '')
-          .replace(/[:\-–—]?\s*\b(?:\d+(?:st|nd|rd|th))\s+season\b.*$/gi, '')
-          .replace(/[:\-–—]?\s*\b(?:partie|part|cour)\s*\d*.*$/gi, '')
-          .replace(/[:\-–—]?\s*[^:\-]+?\s+arc\b.*$/gi, '')
-          .replace(/\b(?:the\s+)?movie\b.*$/gi, '')
-          .replace(/\bfilm\b.*$/gi, '')
-          .replace(/!-\s*.*$/g, '')
-          .replace(/[:\-–—\s]+$/g, '').trim();
-
-        groups[rootKey] = {
-          key: rootKey,
-          title: displayTitle || anime.title,
-          cover: anime.cover || anime.banner,
-          banner: anime.banner || anime.cover,
-          watchedMin: 0,
-          watchedEps: 0,
-          totalEps: 0,
-          entries: [],
-        };
-      }
-      groups[rootKey].watchedMin += min;
-      groups[rootKey].watchedEps += eps;
-      groups[rootKey].totalEps += totalEps;
-      groups[rootKey].entries.push(anime);
-      if (!groups[rootKey].banner && (anime.banner || anime.cover)) {
-        groups[rootKey].banner = anime.banner || anime.cover;
-      }
-    });
-
-    return Object.values(groups).sort((x, y) => y.watchedMin - x.watchedMin);
+    const topLevelActive = all.filter(a => !a.parentId && Calc.watchedMin(a) > 0);
+    return topLevelActive.map(a => {
+      const family = getFamilyMembers(a);
+      return {
+        id: a.id,
+        key: a.id,
+        title: a.title,
+        cover: a.cover || a.banner,
+        banner: a.banner || a.cover,
+        watchedMin: Calc.watchedMin(a),
+        watchedEps: Calc.watchedEps(a),
+        totalEps: Calc.totalEps(a),
+        entries: family,
+      };
+    }).sort((x, y) => y.watchedMin - x.watchedMin);
   },
 
   openRankingModal() {
@@ -2218,10 +2172,10 @@ const Stats = {
       const rank = grouped.indexOf(a) + 1;
       const rankBadge = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
       return `
-        <div class="ranking-row" onclick="Stats.closeRankingModal();Router.go('anime/${a.entries[0]?.id}')" title="Voir la fiche de ${esc(a.title)}">
+        <div class="ranking-row" onclick="Stats.closeRankingModal();Router.go('anime/${a.id}')" title="Voir la fiche de ${esc(a.title)}">
           <div class="ranking-num ${rank <= 3 ? 'top' + rank : ''}">${rankBadge}</div>
           <div class="ranking-info">
-            <div class="ranking-title">${esc(a.title)} ${a.entries.length > 1 ? `<small style="color:var(--muted);font-weight:normal">(${a.entries.length} saisons réunies)</small>` : ''}</div>
+            <div class="ranking-title">${esc(a.title)} ${a.entries.length > 1 ? `<small style="color:var(--muted);font-weight:normal">(${a.entries.length} animes réunis)</small>` : ''}</div>
             <div class="ranking-meta">
               <span>⏱️ <b>${fmtDuration(a.watchedMin)}</b></span>
               <span>📼 <b>${a.watchedEps}</b> épisodes vus</span>
@@ -3246,5 +3200,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2f27b298c1af31b',t:'MTc4NzQwODAzNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
