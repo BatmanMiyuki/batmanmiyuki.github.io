@@ -739,7 +739,7 @@ input:checked + .slider::before { transform: translateX(22px); }
 }
 .linked-card-meta {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   font-size: 12px;
   color: var(--muted);
   flex-wrap: wrap;
@@ -1581,10 +1581,16 @@ function mediaHTML(a, useCover) {
 }
 
 function cardHTML(a, i, opts = {}) {
-  const total = Calc.totalEps(a), done = Calc.watchedEps(a), pct = Calc.pct(a);
+  const isPlan = !!opts.plan;
+  // Si on est dans le plan, calculer pour cette entrée spécifique ; sinon calculer pour la famille
+  const total = isPlan ? (a.seasons || []).reduce((n, s) => n + s.episodes, 0) : Calc.totalEps(a);
+  const done = isPlan ? (a.seasons || []).reduce((n, s) => n + s.watched.length, 0) : Calc.watchedEps(a);
+  const pct = isPlan ? (total ? Math.min(100, Math.round((a.seasons || []).reduce((n, s) => n + new Set(s.watched).size, 0) / total * 100)) : 0) : Calc.pct(a);
   const st = STATUS[a.status] || STATUS.watching;
-  const time = opts.plan ? Calc.totalMin(a) : Calc.watchedMin(a);
+  const time = isPlan ? (a.seasons || []).reduce((n, s) => n + s.episodes * s.duration, 0) : Calc.watchedMin(a);
   const children = Store.all().filter(x => x.parentId === a.id);
+  const parent = a.parentId ? Store.get(a.parentId) : null;
+
   return `
   <article class="card" onclick="Router.go('anime/${a.id}')">
     <div class="card-media">
@@ -1600,6 +1606,7 @@ function cardHTML(a, i, opts = {}) {
         <span>${a.isMovie ? '🎬' : '📼'} <b>${done}</b>/${total} ép.</span>
         <span>⏱️ ${fmtDuration(time)}</span>
         ${children.length > 0 ? `<span>📦 <b>${children.length + 1}</b> œuvres</span>` : ''}
+        ${parent ? `<span style="color:var(--cyan-lt)">🔗 Suite de « ${esc(parent.title)} »</span>` : ''}
         ${a.rating != null ? `<span>⭐ <b>${a.rating}</b>/10</span>` : ''}
       </div>
       <div class="progress ${pct === 100 ? 'done' : ''}"><i style="width:${pct}%"></i></div>
@@ -1663,13 +1670,13 @@ const Plan = {
   render() {
     const q = (document.getElementById('plan-search').value || '').toLowerCase().trim();
     const sort = document.getElementById('plan-sort').value;
-    let list = Store.all().filter(a => !a.parentId && a.status === 'planned');
-    if (q) list = list.filter(a => {
-      const family = getFamilyMembers(a);
-      return family.some(m =>
-        m.title.toLowerCase().includes(q) || m.genres.join(' ').toLowerCase().includes(q)
-      );
-    });
+    
+    // Dans la watchlist, afficher toutes les œuvres et saisons prévues (y compris les suites liées en attente)
+    let list = Store.all().filter(a => a.status === 'planned');
+    if (q) list = list.filter(a =>
+      a.title.toLowerCase().includes(q) || a.jp.toLowerCase().includes(q) ||
+      a.genres.join(' ').toLowerCase().includes(q)
+    );
 
     list.sort({
       recent: (x, y) => y.addedAt - x.addedAt,
@@ -1678,12 +1685,12 @@ const Plan = {
       long:   (x, y) => Calc.totalMin(y) - Calc.totalMin(x),
     }[sort]);
 
-    const mins = list.reduce((n, a) => n + Calc.totalMin(a), 0);
-    const eps  = list.reduce((n, a) => n + Calc.totalEps(a), 0);
+    const mins = list.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes * s.duration, 0), 0);
+    const eps  = list.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes, 0), 0);
     document.getElementById('plan-summary').innerHTML = list.length ? `
       <div class="hero-stat" style="padding:24px;margin-bottom:20px">
         <div class="hero-time" style="font-size:clamp(28px,5vw,44px)"><span>${fmtDuration(mins)}</span></div>
-        <div class="hero-sub">${list.length} anime${list.length > 1 ? 's' : ''} · ${eps} épisodes en attente
+        <div class="hero-sub">${list.length} œuvre${list.length > 1 ? 's' : ''} · ${eps} épisodes en attente
           ${mins ? `· soit ${fmtHours(mins)} h de visionnage` : ''}</div>
       </div>` : '';
 
@@ -1945,20 +1952,22 @@ const Stats = {
     const all = Store.all();
     const topLevel = all.filter(a => !a.parentId);
     const seen     = topLevel.filter(a => a.status !== 'planned' && a.status !== 'soon');
-    const planned  = topLevel.filter(a => a.status === 'planned');
+    
+    // Tous les animes et saisons prévus dans la watchlist (y compris les suites/saisons liées en attente)
+    const planned  = all.filter(a => a.status === 'planned');
     const soon     = topLevel.filter(a => a.status === 'soon');
 
-    // Nombre d'animes uniques (les animes liés dans une famille comptent pour 1 seul anime)
+    // Nombre d'animes uniques vus et total d'œuvres prévues
     const uniqueSeenCount = seen.length;
     const uniquePlannedCount = planned.length;
 
     // Films regardés (comptabilisés parmi tous les animes de la collection ayant au moins 1 visionnage)
     const moviesWatched = all.filter(a => a.isMovie && (a.seasons || []).some(s => s.watched && s.watched.length > 0)).length;
 
-    // Total d'épisodes et temps total (tous les animes parents et enfants liés sont cumulés)
+    // Total d'épisodes et temps total (tous les animes de la collection, parents et enfants liés)
     const epsWatched = all.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.watched.length, 0), 0);
     const minWatched = all.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.watched.length * s.duration, 0), 0);
-    const minPlanned = planned.reduce((n, a) => n + Calc.totalMin(a), 0);
+    const minPlanned = planned.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes * s.duration, 0), 0);
     // Saisons suivies (les films ne comptent pas comme saisons)
     const seasons = all.filter(a => !a.isMovie).reduce((n, a) => n + (a.seasons || []).length, 0);
 
@@ -3200,5 +3209,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2f27b298c1af31b',t:'MTc4NzQwODAzNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2f40e309de71d43',t:'MTc4NzQyNDU0NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
