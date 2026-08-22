@@ -569,6 +569,9 @@ function App() {
   // ── Photo de signature du header (uploadée dans l'app, stockée localement)
   const [signature,setSignature]   = useState(()=>load('app_signature',''));
 
+  // ── Semaines « validées » : seules elles comptent pour les records hebdo ───
+  const [validWeeks,setValidWeeks] = useState(()=>load('sp_validweeks',{}));
+
   // ── Settings state
   const [theme,setThemeState]      = useState(()=>load('sp_theme','default'));
   const [accentColor,setAccentColor] = useState(()=>load('sp_accent','default'));
@@ -622,6 +625,7 @@ function App() {
   useEffect(()=>{ try{ localStorage.setItem('app_images',JSON.stringify(appImages)); }catch{} },[appImages]);
   useEffect(()=>{ save('app_bonus',bonus); },[bonus]);
   useEffect(()=>{ save('app_signature',signature); },[signature]);
+  useEffect(()=>{ save('sp_validweeks',validWeeks); },[validWeeks]);
 
   const setTheme = (t) => setThemeState(t);
 
@@ -766,19 +770,21 @@ function App() {
     const sorted=[...allEntries].sort((a,b)=>b[1].total-a[1].total);
     const bestDay=sorted[0];
     const worstDay=sorted[sorted.length-1];
-    const currentWeekKey = toKey(sow(today()));
+    // Seules les semaines VALIDÉES (bouton « Valider la semaine », vue Semaine)
+    // comptent pour les records « semaine la plus / moins active »
     const weekMap={};
     allEntries.forEach(([k,v])=>{
       const d=new Date(k+'T00:00:00');
       const mon=new Date(d); mon.setDate(d.getDate()-((d.getDay()+6)%7));
       const wk=toKey(mon);
-      if(wk===currentWeekKey) return;
       weekMap[wk]=(weekMap[wk]||0)+v.total;
     });
-    const weekEntries=Object.entries(weekMap).sort((a,b)=>b[1]-a[1]);
+    const weekEntries=Object.entries(weekMap)
+      .filter(([wk])=>!!validWeeks[wk])
+      .sort((a,b)=>b[1]-a[1]);
     if(weekEntries.length<1) return {bestDay,worstDay,bestWeek:null,worstWeek:null,topAppEntry:null};
     const bestWeek=weekEntries[0];
-    const worstWeek=weekEntries[weekEntries.length-1];
+    const worstWeek=weekEntries.length>1?weekEntries[weekEntries.length-1]:null;
     let topDayApp=null;
     Object.entries(data).forEach(([k,v])=>{
       Object.entries(v.apps||{}).forEach(([app,h])=>{
@@ -786,7 +792,7 @@ function App() {
       });
     });
     return {bestDay,worstDay,bestWeek,worstWeek,topDayApp};
-  },[data]);
+  },[data,validWeeks]);
 
   const openAdd = d=>{setModal({date:d,mode:'add'});setInputH('');setInputM('');};
   const openApp = d=>{setModal({date:d,mode:'app'});setSelApp('');setCustApp('');setAppH('');setAppM('');};
@@ -898,6 +904,7 @@ function App() {
       appImages,
       bonus,
       signature,
+      validWeeks,
       settings: { theme, accentColor, fontSize, dailyGoal, showGoalBar, compactCards, weekStartMon }
     };
     const txt = JSON.stringify(backup);
@@ -930,6 +937,7 @@ function App() {
       if (parsed.data)      setData(prev=>({...prev,...parsed.data}));
       if (parsed.myApps)    setMyApps(parsed.myApps);
       if (parsed.bonus && typeof parsed.bonus==='object') setBonus(prev=>({...prev,...parsed.bonus}));
+      if (parsed.validWeeks && typeof parsed.validWeeks==='object') setValidWeeks(prev=>({...prev,...parsed.validWeeks}));
       if (typeof parsed.signature==='string' && parsed.signature) setSignature(parsed.signature);
       if (parsed.appImages) {
         setAppImages(prev=>{
@@ -973,9 +981,10 @@ function App() {
     setAppImages({});
     setBonus({});
     setSignature('');
+    setValidWeeks({});
     ['st_data','my_apps','app_images','sp_theme','sp_accent','sp_fontsize',
      'sp_goal','sp_showgoal','sp_compact','sp_weekmon','sp_confirmdelete',
-     'sp_lastexport','st_data_snapshot','st_data_snapshot_day','app_bonus','app_signature'].forEach(k=>{
+     'sp_lastexport','st_data_snapshot','st_data_snapshot_day','app_bonus','app_signature','sp_validweeks'].forEach(k=>{
       try { localStorage.removeItem(k); } catch {}
     });
     try { window.name = ''; } catch {}
@@ -1161,6 +1170,34 @@ function App() {
                   );
                 })}
               </div>
+
+              {/* ─── Validation de la semaine ─────────────────────────────── */}
+              {(()=>{
+                const wk=toKey(week);
+                const curWk=toKey(sow(today()));
+                const isFuture=wk>curWk;
+                const valid=validWeeks[wk];
+                const validDate=typeof valid==='string'?new Date(valid):null;
+                return (
+                  <Reveal style={{marginTop:20,display:'flex',flexDirection:'column',alignItems:'center',gap:10}}>
+                    {isFuture?(
+                      <div style={{fontSize:12,color:'var(--text-faint)',textAlign:'center'}}>🔒 Semaine à venir — impossible à valider pour l'instant.</div>
+                    ):(
+                      <button onClick={()=>setValidWeeks(p=>{const n={...p}; if(n[wk]) delete n[wk]; else n[wk]=new Date().toISOString(); return n;})}
+                        style={valid
+                          ?{padding:'13px 26px',borderRadius:999,border:'1px solid rgba(48,209,88,0.45)',background:'rgba(48,209,88,0.12)',color:'var(--accent-green)',fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}
+                          :{padding:'13px 26px',borderRadius:999,border:'1px solid var(--accent)',background:'rgba(77,150,255,0.07)',color:'var(--accent)',fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>
+                        {valid?`✔ Semaine validée${validDate?` · le ${validDate.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}`:''}`:'✅ Valider la semaine'}
+                      </button>
+                    )}
+                    <div style={{fontSize:11,color:'var(--text-faint)',textAlign:'center',lineHeight:1.6,maxWidth:440}}>
+                      {valid
+                        ?'Cette semaine compte pour les records « semaine la plus / moins active ». Re-clique sur le bouton pour annuler.'
+                        :'Quand ta semaine est complète, valide-la ici : seules les semaines validées comptent pour les records hebdo.'}
+                    </div>
+                  </Reveal>
+                );
+              })()}
             </div>
           </section>
         </main>
@@ -1380,6 +1417,11 @@ function App() {
               {records&&(
                 <Reveal style={S.card}>
                   <div style={S.ct}>🏅 Records</div>
+                  {!records.bestWeek&&(
+                    <div style={{fontSize:11,color:'var(--text-faint)',marginBottom:12,lineHeight:1.6}}>
+                      💡 Seules les semaines <strong style={{color:'var(--text-muted)'}}>validées</strong> (bouton « Valider la semaine » en bas de la vue Semaine) comptent pour les records hebdo.
+                    </div>
+                  )}
                   <div style={{display:'flex',gap:10,overflowX:'auto',paddingBottom:4}}>
                     <div style={{...S.recCard,borderColor:'rgba(48,209,88,0.3)'}}>
                       <div style={{...S.recMedal,background:'rgba(48,209,88,0.12)'}}>🔥</div>
