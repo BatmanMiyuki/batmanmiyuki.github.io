@@ -690,16 +690,16 @@ input:checked + .slider::before { transform: translateX(22px); }
 /* Section Autre & Animes Liés (Famille) */
 .linked-grid {
   display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  margin-top: 12px;
-  margin-bottom: 18px;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  margin-top: 14px;
+  margin-bottom: 20px;
 }
 .linked-anime-card {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 14px;
+  gap: 16px;
+  padding: 14px 16px;
   border-radius: var(--r);
   background: var(--bg-2);
   border: 1px solid var(--stroke);
@@ -712,8 +712,8 @@ input:checked + .slider::before { transform: translateX(22px); }
   border-color: var(--pink);
 }
 .linked-card-media {
-  width: 58px;
-  height: 78px;
+  width: 64px;
+  height: 86px;
   border-radius: var(--r-sm);
   overflow: hidden;
   position: relative;
@@ -731,11 +731,11 @@ input:checked + .slider::before { transform: translateX(22px); }
 }
 .linked-card-title {
   font-weight: 700;
-  font-size: 15px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 4px;
+  font-size: 15.5px;
+  line-height: 1.35;
+  white-space: normal;
+  word-break: break-word;
+  margin-bottom: 6px;
 }
 .linked-card-meta {
   display: flex;
