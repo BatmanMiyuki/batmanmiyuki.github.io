@@ -1667,12 +1667,21 @@ const Seen = {
    6. Page « À regarder »
 ------------------------------------------------------------ */
 const Plan = {
+  shouldShow(a) {
+    if (a.status !== 'planned') return false;
+    if (!a.parentId) return true;
+    const parent = Store.get(a.parentId);
+    if (!parent) return true;
+    // Si l'anime parent est lui-même pas encore vu (planned), cacher la suite jusqu'à ce que la saison 1 soit vue !
+    return parent.status !== 'planned';
+  },
+
   render() {
     const q = (document.getElementById('plan-search').value || '').toLowerCase().trim();
     const sort = document.getElementById('plan-sort').value;
     
-    // Dans la watchlist, afficher toutes les œuvres et saisons prévues (y compris les suites liées en attente)
-    let list = Store.all().filter(a => a.status === 'planned');
+    // Affiche le premier anime à regarder et débloque les suites dès que la saison 1 a été vue
+    let list = Store.all().filter(a => Plan.shouldShow(a));
     if (q) list = list.filter(a =>
       a.title.toLowerCase().includes(q) || a.jp.toLowerCase().includes(q) ||
       a.genres.join(' ').toLowerCase().includes(q)
@@ -1690,7 +1699,7 @@ const Plan = {
     document.getElementById('plan-summary').innerHTML = list.length ? `
       <div class="hero-stat" style="padding:24px;margin-bottom:20px">
         <div class="hero-time" style="font-size:clamp(28px,5vw,44px)"><span>${fmtDuration(mins)}</span></div>
-        <div class="hero-sub">${list.length} œuvre${list.length > 1 ? 's' : ''} · ${eps} épisodes en attente
+        <div class="hero-sub">${list.length} œuvre${list.length > 1 ? 's' : ''} en attente · ${eps} épisodes prévus
           ${mins ? `· soit ${fmtHours(mins)} h de visionnage` : ''}</div>
       </div>` : '';
 
@@ -1953,13 +1962,15 @@ const Stats = {
     const topLevel = all.filter(a => !a.parentId);
     const seen     = topLevel.filter(a => a.status !== 'planned' && a.status !== 'soon');
     
-    // Tous les animes et saisons prévus dans la watchlist (y compris les suites/saisons liées en attente)
-    const planned  = all.filter(a => a.status === 'planned');
+    // Tous les animes et suites prévus dans la watchlist
+    const plannedItems = all.filter(a => a.status === 'planned');
+    // Déduplication des familles liées dans la watchlist pour ne compter qu'1 seul anime par famille
+    const uniquePlannedFamilies = new Set(plannedItems.map(a => a.parentId || a.id));
     const soon     = topLevel.filter(a => a.status === 'soon');
 
-    // Nombre d'animes uniques vus et total d'œuvres prévues
+    // Nombre d'animes uniques vus et prévus
     const uniqueSeenCount = seen.length;
-    const uniquePlannedCount = planned.length;
+    const uniquePlannedCount = uniquePlannedFamilies.size;
 
     // Films regardés (comptabilisés parmi tous les animes de la collection ayant au moins 1 visionnage)
     const moviesWatched = all.filter(a => a.isMovie && (a.seasons || []).some(s => s.watched && s.watched.length > 0)).length;
@@ -1967,7 +1978,7 @@ const Stats = {
     // Total d'épisodes et temps total (tous les animes de la collection, parents et enfants liés)
     const epsWatched = all.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.watched.length, 0), 0);
     const minWatched = all.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.watched.length * s.duration, 0), 0);
-    const minPlanned = planned.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes * s.duration, 0), 0);
+    const minPlanned = plannedItems.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes * s.duration, 0), 0);
     // Saisons suivies (les films ne comptent pas comme saisons)
     const seasons = all.filter(a => !a.isMovie).reduce((n, a) => n + (a.seasons || []).length, 0);
 
@@ -3209,5 +3220,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2f40e309de71d43',t:'MTc4NzQyNDU0NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2f435217aeae1f5',t:'MTc4NzQyNjE0MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
