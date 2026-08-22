@@ -691,53 +691,48 @@ input:checked + .slider::before { transform: translateX(22px); }
    Formulaire / Modale (Défilement fluide & Boutons toujours accessibles)
    ============================================================ */
 .modal-back {
-  position: fixed; inset: 0; z-index: 200; display: none;
-  background: rgba(4, 2, 10, .85);
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: none;
+  background: rgba(4, 2, 10, .88);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  padding: 20px 14px 60px;
+  padding: 24px 14px 80px;
 }
 .modal-back.open {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
+  display: block;
   animation: fadeIn .2s ease;
 }
 @keyframes fadeIn { from { opacity: 0; } }
 .modal {
+  position: relative;
   width: 100%;
   max-width: 720px;
-  margin: auto auto;
+  margin: 16px auto 60px;
   border-radius: var(--r-xl);
   overflow: hidden;
-  background: linear-gradient(180deg, #14102a, #0c0918);
+  background: #14102a;
+  background: linear-gradient(180deg, #16112c, #0c0918);
   border: 1px solid var(--stroke-2);
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  max-height: 90vh;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .7);
   animation: modalIn .25s var(--ease);
 }
 @keyframes modalIn { from { opacity: 0; transform: translateY(16px); } }
 .modal-head {
   display: flex; align-items: center; gap: 12px; padding: 18px 22px;
   border-bottom: 1px solid var(--stroke); position: sticky; top: 0; z-index: 10;
-  background: #14102a; flex-shrink: 0;
+  background: #16112c;
 }
 .modal-head h2 { font-size: 19px; font-weight: 800; }
 .modal-head .btn-icon { margin-left: auto; }
 .modal-body {
   padding: 22px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  flex: 1 1 auto;
 }
 .modal-foot {
   display: flex; gap: 10px; justify-content: flex-end; padding: 16px 22px;
   border-top: 1px solid var(--stroke); background: #120d26;
-  position: sticky; bottom: 0; z-index: 10; flex-shrink: 0;
+  position: sticky; bottom: 0; z-index: 10;
   flex-wrap: wrap;
 }
 
@@ -2358,37 +2353,52 @@ const UI = {
   openForm(id = null, presetStatus = null) {
     this.editing = id;
     const a = id ? Store.get(id) : null;
-    document.getElementById('form-title').textContent = a ? 'Modifier l\'anime' : 'Ajouter un anime';
-    document.getElementById('f-delete').style.display = a ? 'inline-flex' : 'none';
+    const titleEl = document.getElementById('form-title');
+    if (titleEl) titleEl.textContent = a ? 'Modifier l\'anime' : 'Ajouter un anime';
+    const delBtn = document.getElementById('f-delete');
+    if (delBtn) delBtn.style.display = a ? 'inline-flex' : 'none';
 
-    const v = (el, val) => { document.getElementById(el).value = val ?? ''; };
+    const v = (el, val) => {
+      const elem = document.getElementById(el);
+      if (elem) elem.value = val ?? '';
+    };
     v('f-title', a?.title); v('f-jp', a?.jp); v('f-banner', a?.banner);
     v('f-syn', a?.synopsis); v('f-genres', (a?.genres || []).join(', '));
     v('f-rating', a?.rating); v('f-release', a?.release);
-    document.getElementById('f-status').value = a?.status || presetStatus || 'completed';
-    document.getElementById('f-movie').checked = !!a?.isMovie;
-    document.getElementById('assist-q').value = '';
-    document.getElementById('assist-res').innerHTML = '';
+    
+    const statusEl = document.getElementById('f-status');
+    if (statusEl) statusEl.value = a?.status || presetStatus || 'completed';
+    const movieEl = document.getElementById('f-movie');
+    if (movieEl) movieEl.checked = !!a?.isMovie;
+    const assistQ = document.getElementById('assist-q');
+    if (assistQ) assistQ.value = '';
+    const assistRes = document.getElementById('assist-res');
+    if (assistRes) assistRes.innerHTML = '';
+    
     this._cover = a?.cover || '';
     this._anilistId = a?.anilistId || null;
 
     const box = document.getElementById('f-seasons');
-    box.innerHTML = '';
-    if (a && a.seasons.length) a.seasons.forEach(s => this.addSeasonRow(s));
-    else this.addSeasonRow(null, !!a?.isMovie);
+    if (box) {
+      box.innerHTML = '';
+      if (a && a.seasons && a.seasons.length) a.seasons.forEach(s => this.addSeasonRow(s));
+      else this.addSeasonRow(null, !!a?.isMovie);
+    }
 
     this.syncMovieFields();
     this.syncStatusFields();
     this.previewBanner();
-    document.getElementById('form-modal').classList.add('open');
-    document.body.style.overflow = 'hidden';
-    const mb = document.querySelector('#form-modal .modal-body');
-    if (mb) mb.scrollTop = 0;
+    
+    const modal = document.getElementById('form-modal');
+    if (modal) {
+      modal.classList.add('open');
+      modal.scrollTop = 0;
+    }
   },
 
   closeForm() {
-    document.getElementById('form-modal').classList.remove('open');
-    document.body.style.overflow = '';
+    const modal = document.getElementById('form-modal');
+    if (modal) modal.classList.remove('open');
     this.editing = null;
   },
 
@@ -2904,5 +2914,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2edd7c3bf04e1ba',t:'MTc4NzM1OTQwMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
