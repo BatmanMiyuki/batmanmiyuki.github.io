@@ -87,7 +87,6 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
-  transform: translateZ(0);
 }
 
 img { display: block; max-width: 100%; }
@@ -147,7 +146,6 @@ a { color: inherit; text-decoration: none; }
   position: sticky; top: 0; z-index: 60;
   background: rgba(8, 6, 15, .95);
   border-bottom: 1px solid var(--stroke);
-  transform: translateZ(0);
 }
 .topbar-in {
   max-width: 1540px; margin: 0 auto; height: var(--nav-h);
@@ -975,37 +973,42 @@ input:checked + .slider::before { transform: translateX(22px); }
 .modal-back {
   position: fixed;
   inset: 0;
-  z-index: 999;
+  z-index: 9999;
   display: none;
   background: rgba(4, 2, 10, .88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   box-sizing: border-box;
-  padding: 16px;
+  padding: 20px 16px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .modal-back.open {
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fadeIn .2s ease;
 }
-@keyframes fadeIn { from { opacity: 0; } }
 .modal {
   position: relative;
   width: 100%;
   max-width: 720px;
   max-height: 88vh;
   height: auto;
-  margin: 0 auto;
+  margin: auto;
   border-radius: var(--r-xl);
   overflow: hidden;
   background: #14102a;
   background: linear-gradient(180deg, #16112c, #0c0918);
   border: 1px solid var(--stroke-2);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, .8);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .85);
   display: flex;
   flex-direction: column;
-  animation: modalIn .25s var(--ease);
+  animation: modalIn .2s ease-out;
 }
-@keyframes modalIn { from { opacity: 0; transform: scale(.96); } }
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(.97) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
 .modal-head {
   display: flex; align-items: center; gap: 12px; padding: 18px 22px;
   border-bottom: 1px solid var(--stroke);
@@ -1215,7 +1218,7 @@ input:checked + .slider::before { transform: translateX(22px); }
         <span class="brand-icon-fallback" style="display:none">🌸</span>
       </div>
       <div class="brand-txt">
-        <img src="kioku.png" alt="KIOKU" class="brand-logo-img" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';" />
+        <img src="logo.png" alt="KIOKU" class="brand-logo-img" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';" />
         <div class="brand-name" style="display:none">KIOKU</div>
         <div class="brand-sub">記憶 · ANIME</div>
       </div>
@@ -1256,6 +1259,7 @@ input:checked + .slider::before { transform: translateX(22px); }
         <option value="progress">Progression</option>
         <option value="rating">Note</option>
       </select>
+      <button class="btn btn-primary" onclick="Router.go('ranking')" style="white-space:nowrap;font-weight:700">🏆 Voir le Classement</button>
     </div>
     <div class="grid" id="seen-grid"></div>
   </section>
@@ -1696,9 +1700,21 @@ function normalize(a) {
     s.name     = s.name || (a.isMovie ? 'Film' : `Saison ${i + 1}`);
     s.episodes = Math.max(0, parseInt(s.episodes, 10) || 0);
     s.duration = Math.max(1, parseInt(s.duration, 10) || (a.isMovie ? 100 : DEFAULT_DUR));
-    s.watched  = Array.isArray(s.watched)
-      ? s.watched.map(n => parseInt(n, 10)).filter(n => !isNaN(n) && n >= 1 && n <= s.episodes)
-      : [];
+    
+    // Support watched en tant que nombre (ex: 12), booléen ou tableau
+    if (typeof s.watched === 'number' && !isNaN(s.watched)) {
+      const cnt = Math.min(s.episodes, Math.max(0, s.watched));
+      s.watched = Array.from({ length: cnt }, (_, idx) => idx + 1);
+    } else if (!Array.isArray(s.watched)) {
+      s.watched = (a.status === 'completed' && s.episodes > 0)
+        ? Array.from({ length: s.episodes }, (_, idx) => idx + 1)
+        : [];
+    } else {
+      s.watched = s.watched.map(n => parseInt(n, 10)).filter(n => !isNaN(n) && n >= 1 && n <= s.episodes);
+      if (a.status === 'completed' && s.watched.length === 0 && s.episodes > 0) {
+        s.watched = Array.from({ length: s.episodes }, (_, idx) => idx + 1);
+      }
+    }
   });
   return a;
 }
@@ -1756,17 +1772,34 @@ function getAnimeBaseKey(title) {
 ------------------------------------------------------------ */
 const Calc = {
   totalEps:   a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + (s.episodes || 0), 0), 0),
-  // Total des épisodes vus (chaque re-visionnage d'épisode compte +1)
-  watchedEps: a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + (s.watched || []).length, 0), 0),
-  totalMin:   a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + (s.episodes || 0) * (s.duration || DEFAULT_DUR), 0), 0),
+  // Total des épisodes vus (chaque re-visionnage d'épisode compte +1, et statut terminé compte tout)
+  watchedEps: a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => {
+    const w = s.watched || [];
+    if (w.length > 0) return n + w.length;
+    if (item.status === 'completed' && s.episodes > 0) return n + s.episodes;
+    return n;
+  }, 0), 0),
+  totalMin:   a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + (s.episodes || 0) * (s.duration || (item.isMovie ? 100 : DEFAULT_DUR)), 0), 0),
   // Temps total regardé (multiplié par le nombre de visionnages de chaque épisode)
-  watchedMin: a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + (s.watched || []).length * (s.duration || DEFAULT_DUR), 0), 0),
+  watchedMin: a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => {
+    const dur = s.duration || (item.isMovie ? 100 : DEFAULT_DUR);
+    const w = s.watched || [];
+    if (w.length > 0) return n + w.length * dur;
+    if (item.status === 'completed' && s.episodes > 0) return n + s.episodes * dur;
+    return n;
+  }, 0), 0),
   pct(a) {
     const t = Calc.totalEps(a);
-    const uniqueDone = getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + new Set(s.watched || []).size, 0), 0);
-    return t ? Math.min(100, Math.round(uniqueDone / t * 100)) : 0;
+    if (!t) return a.status === 'completed' ? 100 : 0;
+    const uniqueDone = getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => {
+      const w = s.watched || [];
+      if (w.length > 0) return n + new Set(w).size;
+      if (item.status === 'completed' && s.episodes > 0) return n + s.episodes;
+      return n;
+    }, 0), 0);
+    return Math.min(100, Math.round(uniqueDone / t * 100));
   },
-  remainingMin: a => Math.max(0, Calc.totalMin(a) - getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + new Set(s.watched || []).size * (s.duration || DEFAULT_DUR), 0), 0)),
+  remainingMin: a => Math.max(0, Calc.totalMin(a) - Calc.watchedMin(a)),
 };
 
 function fmtDuration(min) {
@@ -2234,6 +2267,7 @@ const Ranking = {
         const watchedMin = Calc.watchedMin(a);
         const watchedEps = Calc.watchedEps(a);
         const totalEps   = Calc.totalEps(a);
+        const totalMin   = Calc.totalMin(a);
         const pct        = Calc.pct(a);
         return {
           id: a.id,
@@ -2250,6 +2284,7 @@ const Ranking = {
           watchedMin,
           watchedEps,
           totalEps,
+          totalMin,
           pct,
           entries: family,
           hasChildren: family.length > 1,
@@ -2257,11 +2292,29 @@ const Ranking = {
       });
     } else {
       items = all.map(a => {
-        const wEps = (a.seasons || []).reduce((sum, s) => sum + (s.watched || []).length, 0);
-        const wMin = (a.seasons || []).reduce((sum, s) => sum + (s.watched || []).length * (s.duration || DEFAULT_DUR), 0);
         const tEps = (a.seasons || []).reduce((sum, s) => sum + (s.episodes || 0), 0);
-        const uEps = (a.seasons || []).reduce((sum, s) => sum + new Set(s.watched || []).size, 0);
-        const pct  = tEps ? Math.min(100, Math.round(uEps / tEps * 100)) : 0;
+        const dur  = a.isMovie ? 100 : DEFAULT_DUR;
+        const tMin = (a.seasons || []).reduce((sum, s) => sum + (s.episodes || 0) * (s.duration || dur), 0);
+        const wEps = (a.seasons || []).reduce((sum, s) => {
+          const w = s.watched || [];
+          if (w.length > 0) return sum + w.length;
+          if (a.status === 'completed' && s.episodes > 0) return sum + s.episodes;
+          return sum;
+        }, 0);
+        const wMin = (a.seasons || []).reduce((sum, s) => {
+          const d = s.duration || dur;
+          const w = s.watched || [];
+          if (w.length > 0) return sum + w.length * d;
+          if (a.status === 'completed' && s.episodes > 0) return sum + s.episodes * d;
+          return sum;
+        }, 0);
+        const uEps = (a.seasons || []).reduce((sum, s) => {
+          const w = s.watched || [];
+          if (w.length > 0) return sum + new Set(w).size;
+          if (a.status === 'completed' && s.episodes > 0) return sum + s.episodes;
+          return sum;
+        }, 0);
+        const pct  = tEps ? Math.min(100, Math.round(uEps / tEps * 100)) : (a.status === 'completed' ? 100 : 0);
         return {
           id: a.id,
           anime: a,
@@ -2277,6 +2330,7 @@ const Ranking = {
           watchedMin: wMin,
           watchedEps: wEps,
           totalEps: tEps,
+          totalMin: tMin,
           pct,
           entries: [a],
           hasChildren: false,
@@ -2284,12 +2338,13 @@ const Ranking = {
       });
     }
 
-    let ranked = items.filter(x => x.watchedMin > 0 || x.watchedEps > 0);
+    // Récupérer les animes avec du temps de visionnage ou tous les animes selon contexte
+    let ranked = items;
 
     if (this.filter === 'series')         ranked = ranked.filter(x => !x.isMovie);
     else if (this.filter === 'movies')    ranked = ranked.filter(x => x.isMovie);
     else if (this.filter === 'fav')       ranked = ranked.filter(x => x.favorite);
-    else if (this.filter === 'completed') ranked = ranked.filter(x => x.pct === 100);
+    else if (this.filter === 'completed') ranked = ranked.filter(x => x.pct === 100 || x.status === 'completed');
 
     if (this.searchQuery) {
       const q = this.searchQuery;
@@ -2302,12 +2357,12 @@ const Ranking = {
     }
 
     const cmp = {
-      time:   (x, y) => (y.watchedMin - x.watchedMin) || (y.watchedEps - x.watchedEps),
-      eps:    (x, y) => (y.watchedEps - x.watchedEps) || (y.watchedMin - x.watchedMin),
+      time:   (x, y) => (y.watchedMin - x.watchedMin) || (y.totalMin - x.totalMin) || (y.watchedEps - x.watchedEps),
+      eps:    (x, y) => (y.watchedEps - x.watchedEps) || (y.totalEps - x.totalEps) || (y.watchedMin - x.watchedMin),
       pct:    (x, y) => (y.pct - x.pct) || (y.watchedMin - x.watchedMin),
       rating: (x, y) => ((y.rating ?? -1) - (x.rating ?? -1)) || (y.watchedMin - x.watchedMin),
       alpha:  (x, y) => x.title.localeCompare(y.title, 'fr'),
-    }[this.sort] || ((x, y) => y.watchedMin - x.watchedMin);
+    }[this.sort] || ((x, y) => (y.watchedMin - x.watchedMin) || (y.totalMin - x.totalMin));
 
     ranked.sort(cmp);
     return ranked;
@@ -2710,8 +2765,8 @@ const Stats = {
   },
 
   getGroupedTop(all) {
-    const topLevelActive = (all || []).filter(a => a && !a.parentId && Calc.watchedMin(a) > 0);
-    return topLevelActive.map(a => {
+    const topLevel = (all || []).filter(a => a && (!a.parentId || !all.some(p => p.id === a.parentId)));
+    return topLevel.map(a => {
       const family = getFamilyMembers(a);
       return {
         id: a.id,
@@ -2724,7 +2779,8 @@ const Stats = {
         totalEps: Calc.totalEps(a),
         entries: family,
       };
-    }).sort((x, y) => y.watchedMin - x.watchedMin);
+    }).filter(x => x.watchedMin > 0 || x.watchedEps > 0 || (all.length > 0 && !all.some(m => Calc.watchedMin(m) > 0)))
+      .sort((x, y) => (y.watchedMin - x.watchedMin) || (y.watchedEps - x.watchedEps));
   },
 
   _lastOpenedRanking: 0,
@@ -2735,6 +2791,8 @@ const Stats = {
     const modal = document.getElementById('ranking-modal');
     if (modal) {
       modal.classList.add('open');
+      modal.scrollTop = 0;
+      document.body.style.overflow = 'hidden';
       const input = document.getElementById('ranking-search-input');
       if (input) {
         input.value = '';
@@ -2745,9 +2803,10 @@ const Stats = {
   },
 
   closeRankingModal() {
-    if (Date.now() - (this._lastOpenedRanking || 0) < 250) return;
+    if (Date.now() - (this._lastOpenedRanking || 0) < 200) return;
     const modal = document.getElementById('ranking-modal');
     if (modal) modal.classList.remove('open');
+    document.body.style.overflow = '';
   },
 
   filterRanking(q) {
@@ -3146,8 +3205,9 @@ const Detail = {
     if (modal) {
       modal.classList.add('open');
       modal.scrollTop = 0;
+      document.body.style.overflow = 'hidden';
       const input = document.getElementById('link-search-input');
-      if (input) input.value = '';
+      if (input) { input.value = ''; setTimeout(() => input.focus(), 60); }
       this.renderLinkPickList();
     }
   },
@@ -3155,6 +3215,7 @@ const Detail = {
   closeLinkModal() {
     const modal = document.getElementById('link-modal');
     if (modal) modal.classList.remove('open');
+    document.body.style.overflow = '';
     this._currentParentId = null;
   },
 
@@ -3283,12 +3344,18 @@ const UI = {
     if (modal) {
       modal.classList.add('open');
       modal.scrollTop = 0;
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => {
+        const titleInp = document.getElementById('f-title');
+        if (titleInp && !id) titleInp.focus();
+      }, 50);
     }
   },
 
   closeForm() {
     const modal = document.getElementById('form-modal');
     if (modal) modal.classList.remove('open');
+    document.body.style.overflow = '';
     this.editing = null;
   },
 
@@ -3815,5 +3882,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2f989fcce69e276',t:'MTc4NzQ4MjA0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
