@@ -472,6 +472,178 @@ h1.title em { font-style: normal; background: var(--grad); -webkit-background-cl
 }
 .panel h3 { font-size: 15.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
 
+/* ============================================================
+   Page Classement & Palmarès
+   ============================================================ */
+.podium-wrap { margin: 10px 0 28px; }
+.podium {
+  display: grid; grid-template-columns: 1fr 1.15fr 1fr;
+  gap: 16px; align-items: flex-end; max-width: 980px; margin: 0 auto;
+}
+.podium-slot { display: flex; flex-direction: column; }
+.podium-card {
+  position: relative; background: var(--surface); border: 1px solid var(--stroke);
+  border-radius: var(--r); overflow: hidden; display: flex; flex-direction: column;
+  cursor: pointer; transition: transform .25s var(--ease), box-shadow .25s var(--ease), border-color .25s;
+}
+.podium-card:hover { transform: translateY(-6px); }
+.podium-card.rank-1 {
+  border-color: rgba(255, 215, 0, .5);
+  box-shadow: 0 0 24px rgba(255, 215, 0, .2), 0 12px 32px rgba(0,0,0,.6);
+  background: linear-gradient(180deg, rgba(255, 215, 0, .09) 0%, rgba(255, 61, 139, .06) 100%), var(--surface);
+}
+.podium-card.rank-1:hover {
+  box-shadow: 0 0 36px rgba(255, 215, 0, .35), 0 16px 40px rgba(0,0,0,.7);
+  border-color: #ffd700;
+}
+.podium-card.rank-2 {
+  border-color: rgba(192, 192, 192, .4);
+  box-shadow: 0 0 18px rgba(192, 192, 192, .15), 0 10px 26px rgba(0,0,0,.5);
+}
+.podium-card.rank-2:hover {
+  box-shadow: 0 0 26px rgba(192, 192, 192, .3), 0 14px 34px rgba(0,0,0,.6);
+  border-color: #e0e0e0;
+}
+.podium-card.rank-3 {
+  border-color: rgba(205, 127, 50, .4);
+  box-shadow: 0 0 18px rgba(205, 127, 50, .15), 0 10px 26px rgba(0,0,0,.5);
+}
+.podium-card.rank-3:hover {
+  box-shadow: 0 0 26px rgba(205, 127, 50, .3), 0 14px 34px rgba(0,0,0,.6);
+  border-color: #cd7f32;
+}
+
+.podium-media {
+  position: relative; aspect-ratio: 16/9; overflow: hidden; background: #110d22;
+}
+.podium-media img {
+  width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s;
+}
+.podium-card:hover .podium-media img { transform: scale(1.05); }
+.podium-crown {
+  position: absolute; top: 10px; right: 10px; font-size: 24px;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.7)); z-index: 2;
+}
+.podium-badge {
+  position: absolute; bottom: 8px; left: 8px; padding: 4px 10px;
+  border-radius: 99px; font-size: 12px; font-weight: 800; letter-spacing: .04em;
+  background: rgba(0,0,0,.75); backdrop-filter: blur(8px); display: flex;
+  align-items: center; gap: 4px; z-index: 2;
+}
+.podium-card.rank-1 .podium-badge { color: #ffd700; border: 1px solid rgba(255,215,0,.4); }
+.podium-card.rank-2 .podium-badge { color: #e0e0e0; border: 1px solid rgba(192,192,192,.4); }
+.podium-card.rank-3 .podium-badge { color: #cd7f32; border: 1px solid rgba(205,127,50,.4); }
+
+.podium-body {
+  padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1;
+}
+.podium-title {
+  font-size: 15.5px; font-weight: 700; line-height: 1.25;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.podium-time {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 14px;
+  font-weight: 800; color: #fff; padding: 5px 12px; border-radius: 8px;
+  background: rgba(255,255,255,.07); width: fit-content;
+}
+.podium-card.rank-1 .podium-time {
+  background: linear-gradient(135deg, rgba(255,215,0,.25), rgba(255,61,139,.2));
+  color: #ffd700; border: 1px solid rgba(255,215,0,.3);
+}
+.podium-meta {
+  font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+
+/* Lignes du classement complet (Leaderboard) */
+.ranking-container { display: flex; flex-direction: column; gap: 10px; }
+.ranking-item {
+  position: relative; background: var(--surface); border: 1px solid var(--stroke);
+  border-radius: var(--r); padding: 14px 18px; display: flex; flex-direction: column;
+  gap: 10px; transition: background .18s, border-color .18s, transform .18s; cursor: pointer;
+}
+.ranking-item:hover {
+  background: rgba(255, 61, 139, .06); border-color: rgba(255, 61, 139, .35);
+  transform: translateX(3px);
+}
+.ranking-item-top { display: flex; align-items: center; gap: 16px; }
+.rank-pos {
+  width: 44px; height: 44px; border-radius: 12px; background: rgba(255, 255, 255, .04);
+  border: 1px solid var(--stroke); display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 800; flex-shrink: 0; color: var(--muted);
+}
+.rank-pos.top-1 {
+  background: linear-gradient(135deg, rgba(255,215,0,.25), rgba(255,61,139,.15));
+  border-color: rgba(255,215,0,.6); color: #ffd700; font-size: 20px;
+  box-shadow: 0 0 14px rgba(255,215,0,.25);
+}
+.rank-pos.top-2 {
+  background: linear-gradient(135deg, rgba(192,192,192,.25), rgba(255,255,255,.1));
+  border-color: rgba(192,192,192,.5); color: #f0f0f0; font-size: 20px;
+}
+.rank-pos.top-3 {
+  background: linear-gradient(135deg, rgba(205,127,50,.25), rgba(255,61,139,.1));
+  border-color: rgba(205,127,50,.5); color: #cd7f32; font-size: 20px;
+}
+
+.ranking-thumb {
+  width: 54px; height: 72px; border-radius: var(--r-sm); object-fit: cover;
+  background: #110d22; flex-shrink: 0; border: 1px solid var(--stroke);
+  box-shadow: 0 4px 10px rgba(0,0,0,.4);
+}
+.ranking-core { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.ranking-headline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ranking-name { font-size: 16px; font-weight: 700; color: var(--text); }
+.ranking-badges { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.rank-chip {
+  font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px;
+  background: rgba(255,255,255,.07); color: var(--muted); border: 1px solid var(--stroke);
+}
+.rank-chip.franchise {
+  background: rgba(53,230,255,.12); color: var(--cyan-lt); border-color: rgba(53,230,255,.3);
+  cursor: pointer;
+}
+.rank-chip.movie {
+  background: rgba(255,206,79,.12); color: var(--gold); border-color: rgba(255,206,79,.3);
+}
+
+.ranking-details {
+  display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
+}
+.ranking-details b { color: var(--text); font-weight: 700; }
+.ranking-time-badge { color: var(--pink-lt); font-weight: 800; font-size: 13.5px; }
+
+.ranking-bar { height: 7px; border-radius: 99px; background: rgba(255,255,255,.06); overflow: hidden; }
+.ranking-bar > i {
+  display: block; height: 100%; border-radius: 99px; background: var(--grad);
+  transition: width .4s var(--ease);
+}
+
+/* Accordéon des œuvres de la franchise */
+.franchise-accordion {
+  border-top: 1px solid rgba(255,255,255,.08); padding-top: 10px; margin-top: 4px;
+}
+.franchise-subitem {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 6px 10px; border-radius: 8px; background: rgba(255,255,255,.025);
+  font-size: 12.5px; margin-bottom: 4px; transition: background .15s; cursor: pointer;
+}
+.franchise-subitem:hover { background: rgba(255,255,255,.06); }
+.franchise-subitem-title {
+  font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;
+}
+
+@media (max-width: 760px) {
+  .podium { grid-template-columns: 1fr; gap: 12px; }
+  .podium-slot:nth-child(1) { order: 2; }
+  .podium-slot:nth-child(2) { order: 1; }
+  .podium-slot:nth-child(3) { order: 3; }
+  .ranking-item-top { gap: 12px; }
+  .rank-pos { width: 36px; height: 36px; font-size: 14px; border-radius: 9px; }
+  .ranking-thumb { width: 44px; height: 60px; }
+  .ranking-name { font-size: 14.5px; }
+  .ranking-details { gap: 10px; font-size: 12px; }
+}
+
 /* En-tête Top Visionnage cliquable */
 .panel-top-header {
   display: flex;
@@ -798,7 +970,7 @@ input:checked + .slider::before { transform: translateX(22px); }
 }
 
 /* ============================================================
-   Formulaire / Modale (Défilement fluide & Boutons toujours accessibles)
+   Modales & Formulaires (Centrées & Défilement Interne Parfait)
    ============================================================ */
 .modal-back {
   position: fixed;
@@ -806,12 +978,13 @@ input:checked + .slider::before { transform: translateX(22px); }
   z-index: 999;
   display: none;
   background: rgba(4, 2, 10, .88);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 24px 14px 80px;
+  box-sizing: border-box;
+  padding: 16px;
 }
 .modal-back.open {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   animation: fadeIn .2s ease;
 }
 @keyframes fadeIn { from { opacity: 0; } }
@@ -819,30 +992,39 @@ input:checked + .slider::before { transform: translateX(22px); }
   position: relative;
   width: 100%;
   max-width: 720px;
-  margin: 16px auto 60px;
+  max-height: 88vh;
+  height: auto;
+  margin: 0 auto;
   border-radius: var(--r-xl);
   overflow: hidden;
   background: #14102a;
   background: linear-gradient(180deg, #16112c, #0c0918);
   border: 1px solid var(--stroke-2);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, .7);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .8);
+  display: flex;
+  flex-direction: column;
   animation: modalIn .25s var(--ease);
 }
-@keyframes modalIn { from { opacity: 0; transform: translateY(16px); } }
+@keyframes modalIn { from { opacity: 0; transform: scale(.96); } }
 .modal-head {
   display: flex; align-items: center; gap: 12px; padding: 18px 22px;
-  border-bottom: 1px solid var(--stroke); position: sticky; top: 0; z-index: 10;
+  border-bottom: 1px solid var(--stroke);
   background: #16112c;
+  flex-shrink: 0;
 }
 .modal-head h2 { font-size: 19px; font-weight: 800; }
 .modal-head .btn-icon { margin-left: auto; }
 .modal-body {
   padding: 22px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 .modal-foot {
   display: flex; gap: 10px; justify-content: flex-end; padding: 16px 22px;
   border-top: 1px solid var(--stroke); background: #120d26;
-  position: sticky; bottom: 0; z-index: 10;
+  flex-shrink: 0;
   flex-wrap: wrap;
 }
 
@@ -1033,7 +1215,7 @@ input:checked + .slider::before { transform: translateX(22px); }
         <span class="brand-icon-fallback" style="display:none">🌸</span>
       </div>
       <div class="brand-txt">
-        <img src="kioku.png" alt="KIOKU" class="brand-logo-img" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';" />
+        <img src="logo.png" alt="KIOKU" class="brand-logo-img" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';" />
         <div class="brand-name" style="display:none">KIOKU</div>
         <div class="brand-sub">記憶 · ANIME</div>
       </div>
@@ -1042,6 +1224,7 @@ input:checked + .slider::before { transform: translateX(22px); }
     <nav class="tabs" id="tabs">
       <a class="tab" href="#seen"><span class="tab-ico">📺</span> Vus</a>
       <a class="tab" href="#plan"><span class="tab-ico">🔖</span> À regarder</a>
+      <a class="tab" href="#ranking"><span class="tab-ico">🏆</span> Classement</a>
       <a class="tab" href="#news"><span class="tab-ico">✨</span> Nouveautés</a>
       <a class="tab" href="#stats"><span class="tab-ico">📊</span> Stats</a>
       <a class="tab" href="#settings"><span class="tab-ico">⚙️</span> Paramètres</a>
@@ -1097,6 +1280,59 @@ input:checked + .slider::before { transform: translateX(22px); }
     </div>
     <div id="plan-summary"></div>
     <div class="grid" id="plan-grid"></div>
+  </section>
+
+  <!-- ══════════ Page : Classement ══════════ -->
+  <section class="page" id="page-ranking">
+    <div class="page-head">
+      <div class="page-head-text">
+        <div class="eyebrow">Palmarès &amp; Records</div>
+        <h1 class="title">Classement des <em>animes</em></h1>
+        <p class="subtitle">Découvre tes animes les plus regardés, tes records d'heures passées et le palmarès complet de ta collection.</p>
+      </div>
+    </div>
+
+    <!-- Résumé & KPI du classement -->
+    <div id="ranking-summary"></div>
+
+    <!-- Podium Top 3 (1er, 2e, 3e) -->
+    <div id="ranking-podium-wrap"></div>
+
+    <!-- Barre d'outils (Recherche, Filtres, Tri & Regroupement) -->
+    <div class="toolbar" style="margin-top:22px">
+      <div class="search">
+        <input type="search" id="ranking-search" placeholder="Rechercher un anime dans le classement…" oninput="Ranking.onSearch(this.value)" />
+      </div>
+      <div class="chips" id="ranking-filter-chips">
+        <button class="chip active" data-f="all" onclick="Ranking.setFilter('all')">🌐 Tous</button>
+        <button class="chip" data-f="series" onclick="Ranking.setFilter('series')">📺 Séries</button>
+        <button class="chip" data-f="movies" onclick="Ranking.setFilter('movies')">🎬 Films</button>
+        <button class="chip" data-f="fav" onclick="Ranking.setFilter('fav')">⭐ Favoris</button>
+        <button class="chip" data-f="completed" onclick="Ranking.setFilter('completed')">✅ Terminés</button>
+      </div>
+      <div class="sort-wrap">
+        <label for="ranking-sort">Trier par</label>
+        <select class="select" id="ranking-sort" onchange="Ranking.setSort(this.value)">
+          <option value="time">⏱️ Temps de visionnage</option>
+          <option value="eps">🎞️ Épisodes vus</option>
+          <option value="pct">📈 Taux de complétion</option>
+          <option value="rating">⭐ Note attribuée</option>
+          <option value="alpha">🔤 Nom (A → Z)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Toggle regroupement par franchise -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0 20px;padding:12px 18px;background:var(--surface);border:1px solid var(--stroke);border-radius:var(--r-sm);font-size:13.5px">
+      <span style="color:var(--text);font-weight:600">📦 Regrouper les suites et films d'une même franchise</span>
+      <label class="switch" style="margin-left:auto">
+        <input type="checkbox" id="ranking-group-toggle" checked onchange="Ranking.toggleGrouping(this.checked)" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <!-- Liste complète du classement -->
+    <div id="ranking-full-list"></div>
   </section>
 
   <!-- ══════════ Page : Nouveautés ══════════ -->
@@ -1240,6 +1476,7 @@ input:checked + .slider::before { transform: translateX(22px); }
 <nav class="mobilebar" id="mobilebar">
   <a class="mtab" href="#seen"><span>📺</span>Vus</a>
   <a class="mtab" href="#plan"><span>🔖</span>À voir</a>
+  <a class="mtab" href="#ranking"><span>🏆</span>Top</a>
   <button class="mtab add" onclick="UI.openForm()"><span>＋</span>Ajouter</button>
   <a class="mtab" href="#stats"><span>📊</span>Stats</a>
   <a class="mtab" href="#settings"><span>⚙️</span>Réglages</a>
@@ -1371,7 +1608,7 @@ input:checked + .slider::before { transform: translateX(22px); }
       <div class="field" style="margin-bottom:14px">
         <input class="input" type="search" id="ranking-search-input" placeholder="Rechercher un anime dans le classement…" oninput="Stats.filterRanking(this.value)" />
       </div>
-      <div id="ranking-list" style="max-height:480px;overflow-y:auto;padding-right:4px"></div>
+      <div id="ranking-list"></div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-primary" onclick="Stats.closeRankingModal()">Fermer</button>
@@ -1946,7 +2183,330 @@ function isoAniDate(d) {
 }
 
 /* ------------------------------------------------------------
-   8. Page « Stats » (Épisodes par mois & Classement complet)
+   8a. Page « Classement » (Podium, Palmarès complet & Filtres)
+------------------------------------------------------------ */
+const Ranking = {
+  filter: 'all',
+  sort: 'time',
+  searchQuery: '',
+  groupByFranchise: true,
+  expandedFamilies: {},
+
+  setFilter(f) {
+    this.filter = f;
+    document.querySelectorAll('#ranking-filter-chips .chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.f === f);
+    });
+    this.render();
+  },
+
+  setSort(s) {
+    this.sort = s;
+    this.render();
+  },
+
+  onSearch(q) {
+    this.searchQuery = (q || '').toLowerCase().trim();
+    this.render();
+  },
+
+  toggleGrouping(val) {
+    this.groupByFranchise = val;
+    this.render();
+  },
+
+  toggleFranchiseDetail(id, ev) {
+    if (ev) ev.stopPropagation();
+    this.expandedFamilies[id] = !this.expandedFamilies[id];
+    this.render();
+  },
+
+  getRankedData() {
+    const all = Store.all();
+    if (!all.length) return [];
+
+    let items = [];
+
+    if (this.groupByFranchise) {
+      const topLevel = all.filter(a => !a.parentId || !all.some(p => p.id === a.parentId));
+      items = topLevel.map(a => {
+        const family = getFamilyMembers(a);
+        const watchedMin = Calc.watchedMin(a);
+        const watchedEps = Calc.watchedEps(a);
+        const totalEps   = Calc.totalEps(a);
+        const pct        = Calc.pct(a);
+        return {
+          id: a.id,
+          anime: a,
+          title: a.title || 'Sans titre',
+          jp: a.jp || '',
+          banner: a.banner || a.cover || '',
+          cover: a.cover || a.banner || '',
+          isMovie: a.isMovie,
+          favorite: a.favorite,
+          rating: a.rating,
+          status: a.status,
+          genres: a.genres || [],
+          watchedMin,
+          watchedEps,
+          totalEps,
+          pct,
+          entries: family,
+          hasChildren: family.length > 1,
+        };
+      });
+    } else {
+      items = all.map(a => {
+        const wEps = (a.seasons || []).reduce((sum, s) => sum + (s.watched || []).length, 0);
+        const wMin = (a.seasons || []).reduce((sum, s) => sum + (s.watched || []).length * (s.duration || DEFAULT_DUR), 0);
+        const tEps = (a.seasons || []).reduce((sum, s) => sum + (s.episodes || 0), 0);
+        const uEps = (a.seasons || []).reduce((sum, s) => sum + new Set(s.watched || []).size, 0);
+        const pct  = tEps ? Math.min(100, Math.round(uEps / tEps * 100)) : 0;
+        return {
+          id: a.id,
+          anime: a,
+          title: a.title || 'Sans titre',
+          jp: a.jp || '',
+          banner: a.banner || a.cover || '',
+          cover: a.cover || a.banner || '',
+          isMovie: a.isMovie,
+          favorite: a.favorite,
+          rating: a.rating,
+          status: a.status,
+          genres: a.genres || [],
+          watchedMin: wMin,
+          watchedEps: wEps,
+          totalEps: tEps,
+          pct,
+          entries: [a],
+          hasChildren: false,
+        };
+      });
+    }
+
+    let ranked = items.filter(x => x.watchedMin > 0 || x.watchedEps > 0);
+
+    if (this.filter === 'series')         ranked = ranked.filter(x => !x.isMovie);
+    else if (this.filter === 'movies')    ranked = ranked.filter(x => x.isMovie);
+    else if (this.filter === 'fav')       ranked = ranked.filter(x => x.favorite);
+    else if (this.filter === 'completed') ranked = ranked.filter(x => x.pct === 100);
+
+    if (this.searchQuery) {
+      const q = this.searchQuery;
+      ranked = ranked.filter(x =>
+        x.title.toLowerCase().includes(q) ||
+        x.jp.toLowerCase().includes(q) ||
+        x.genres.some(g => g.toLowerCase().includes(q)) ||
+        (x.entries || []).some(e => (e.title || '').toLowerCase().includes(q))
+      );
+    }
+
+    const cmp = {
+      time:   (x, y) => (y.watchedMin - x.watchedMin) || (y.watchedEps - x.watchedEps),
+      eps:    (x, y) => (y.watchedEps - x.watchedEps) || (y.watchedMin - x.watchedMin),
+      pct:    (x, y) => (y.pct - x.pct) || (y.watchedMin - x.watchedMin),
+      rating: (x, y) => ((y.rating ?? -1) - (x.rating ?? -1)) || (y.watchedMin - x.watchedMin),
+      alpha:  (x, y) => x.title.localeCompare(y.title, 'fr'),
+    }[this.sort] || ((x, y) => y.watchedMin - x.watchedMin);
+
+    ranked.sort(cmp);
+    return ranked;
+  },
+
+  renderPodium(top3) {
+    if (!top3 || !top3.length) return '';
+    const first  = top3[0];
+    const second = top3.length > 1 ? top3[1] : null;
+    const third  = top3.length > 2 ? top3[2] : null;
+
+    const renderCard = (item, rank) => {
+      if (!item) return '<div class="podium-slot"></div>';
+      const rankClass = 'rank-' + rank;
+      const medal = rank === 1 ? '🥇 1er' : rank === 2 ? '🥈 2e' : '🥉 3e';
+      const imgSrc = item.banner || item.cover;
+      return `
+      <div class="podium-slot">
+        <div class="podium-card ${rankClass}" onclick="Router.go('anime/${item.id}')" title="Voir la fiche de ${esc(item.title)}">
+          <div class="podium-media">
+            ${imgSrc ? `<img src="${esc(imgSrc)}" alt="${esc(item.title)}" loading="lazy" decoding="async" onerror="this.remove()" />` : '<div style="width:100%;height:100%;display:grid;place-items:center;font-size:32px">🌸</div>'}
+            ${rank === 1 ? '<span class="podium-crown">👑</span>' : ''}
+            <div class="podium-badge">${medal}</div>
+          </div>
+          <div class="podium-body">
+            <div class="podium-title">${esc(item.title)}</div>
+            <div class="podium-time">⏱️ ${fmtDuration(item.watchedMin)}</div>
+            <div class="podium-meta">
+              <span>🎞️ <b>${item.watchedEps}</b> ép.</span>
+              ${item.hasChildren ? `<span>📦 <b>${item.entries.length}</b> œuvres</span>` : ''}
+              ${item.rating != null ? `<span>⭐ <b>${item.rating}</b>/10</span>` : ''}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    };
+
+    return `
+      <div class="podium-wrap">
+        <div class="podium">
+          ${renderCard(second, 2)}
+          ${renderCard(first, 1)}
+          ${renderCard(third, 3)}
+        </div>
+      </div>
+    `;
+  },
+
+  renderRow(item, rank, maxMetric, isEpsSort) {
+    const isTop3 = rank <= 3;
+    const rankIco = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+    const topClass = isTop3 ? `top-${rank}` : '';
+    const currentVal = isEpsSort ? item.watchedEps : item.watchedMin;
+    const pctBar = Math.max(3, Math.min(100, (currentVal / maxMetric) * 100));
+    const isExpanded = !!this.expandedFamilies[item.id];
+    const imgSrc = item.cover || item.banner;
+
+    const subEntriesHTML = (item.hasChildren && isExpanded) ? `
+      <div class="franchise-accordion" onclick="event.stopPropagation()">
+        <div style="font-size:12px;font-weight:700;color:var(--cyan-lt);margin-bottom:6px">📦 Détail des ${item.entries.length} œuvres réunies :</div>
+        ${item.entries.map(c => {
+          const cMin = (c.seasons || []).reduce((n, s) => n + (s.watched || []).length * (s.duration || DEFAULT_DUR), 0);
+          const cEps = (c.seasons || []).reduce((n, s) => n + (s.watched || []).length, 0);
+          const cTot = (c.seasons || []).reduce((n, s) => n + (s.episodes || 0), 0);
+          return `
+            <div class="franchise-subitem" onclick="Router.go('anime/${c.id}')" title="Ouvrir « ${esc(c.title)} »">
+              <div class="franchise-subitem-title">
+                ${c.isMovie ? '🎬' : '📼'} <b>${esc(c.title)}</b>
+                ${c.id === item.id ? '<span style="color:var(--muted);font-size:11px"> (Fiche principale)</span>' : ''}
+              </div>
+              <div style="display:flex;gap:12px;flex-shrink:0;color:var(--muted)">
+                <span>🎞️ <b>${cEps}</b>/${cTot} ép.</span>
+                <span>⏱️ <b>${fmtDuration(cMin)}</b></span>
+                <span style="color:var(--cyan-lt)">↗ Ouvrir</span>
+              </div>
+            </div>`;
+        }).join('')}
+      </div>
+    ` : '';
+
+    return `
+    <div class="ranking-item" onclick="Router.go('anime/${item.id}')" title="Voir la fiche de ${esc(item.title)}">
+      <div class="ranking-item-top">
+        <div class="rank-pos ${topClass}">${rankIco}</div>
+        ${imgSrc ? `<img class="ranking-thumb" src="${esc(imgSrc)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'" />` : '<div class="ranking-thumb" style="display:grid;place-items:center;font-size:20px">🌸</div>'}
+        <div class="ranking-core">
+          <div class="ranking-headline">
+            <span class="ranking-name">${esc(item.title)}</span>
+            <div class="ranking-badges">
+              ${item.isMovie ? '<span class="rank-chip movie">🎬 Film</span>' : ''}
+              ${item.favorite ? '<span class="rank-chip" style="color:var(--gold)">⭐ Favori</span>' : ''}
+              ${item.rating != null ? `<span class="rank-chip">⭐ ${item.rating}/10</span>` : ''}
+              ${item.hasChildren ? `
+                <button class="rank-chip franchise" onclick="Ranking.toggleFranchiseDetail('${item.id}', event)" title="Afficher/masquer les œuvres de la franchise">
+                  📦 ${item.entries.length} œuvres ${isExpanded ? '▲' : '▼'}
+                </button>` : ''}
+            </div>
+          </div>
+          <div class="ranking-details">
+            <span class="ranking-time-badge">⏱️ <b>${fmtDuration(item.watchedMin)}</b></span>
+            <span>🎞️ <b>${item.watchedEps}</b>/${item.totalEps} ép.</span>
+            <span>📈 <b>${item.pct}%</b> complété</span>
+          </div>
+          <div class="ranking-bar" style="margin-top:6px"><i style="width:${pctBar}%"></i></div>
+        </div>
+      </div>
+      ${subEntriesHTML}
+    </div>`;
+  },
+
+  render() {
+    const sumEl = document.getElementById('ranking-summary');
+    const podEl = document.getElementById('ranking-podium-wrap');
+    const listEl = document.getElementById('ranking-full-list');
+    if (!listEl) return;
+
+    const all = Store.all();
+    const ranked = this.getRankedData();
+
+    if (!all.length) {
+      if (sumEl) sumEl.innerHTML = '';
+      if (podEl) podEl.innerHTML = '';
+      listEl.innerHTML = emptyHTML('🏆', 'Collection vide',
+        'Ajoute des animes et coche des épisodes pour établir ton classement.',
+        `<button class="btn btn-primary" onclick="UI.openForm()">＋ Ajouter un anime</button>`);
+      return;
+    }
+
+    if (!ranked.length) {
+      if (sumEl) sumEl.innerHTML = '';
+      if (podEl) podEl.innerHTML = '';
+      const hasWatchedAny = all.some(a => Calc.watchedMin(a) > 0);
+      if (!hasWatchedAny) {
+        listEl.innerHTML = emptyHTML('⏳', 'Aucun visionnage enregistré',
+          "Tu n'as pas encore coché d'épisodes vus. Ouvre une fiche d'anime et coche tes épisodes ou clique sur « Vu en entier » pour alimenter le classement.",
+          `<button class="btn btn-primary" onclick="Router.go('seen')">📺 Voir ma collection</button>`);
+      } else {
+        listEl.innerHTML = emptyHTML('🔍', 'Aucun résultat',
+          'Aucun anime ne correspond à ces critères de recherche ou de filtre.',
+          `<button class="btn" onclick="Ranking.setFilter('all');document.getElementById('ranking-search').value='';Ranking.onSearch('');">Réinitialiser les filtres</button>`);
+      }
+      return;
+    }
+
+    const totalTimeMin = ranked.reduce((s, x) => s + x.watchedMin, 0);
+    const totalEpsSeen = ranked.reduce((s, x) => s + x.watchedEps, 0);
+    const top1 = ranked[0];
+
+    if (sumEl) {
+      sumEl.innerHTML = `
+        <div class="stat-grid" style="margin-bottom:22px">
+          <div class="stat" style="background:linear-gradient(135deg,rgba(255,215,0,.12),rgba(255,61,139,.08));border-color:rgba(255,215,0,.35)">
+            <div class="stat-ico">👑</div>
+            <div class="stat-val" style="font-size:18px;color:#ffd700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(top1.title)}">
+              ${esc(top1.title)}
+            </div>
+            <div class="stat-lab">N°1 du classement (${fmtDuration(top1.watchedMin)})</div>
+          </div>
+          <div class="stat">
+            <div class="stat-ico">⏱️</div>
+            <div class="stat-val">${fmtDuration(totalTimeMin)}</div>
+            <div class="stat-lab">Temps total cumulé (${fmtHours(totalTimeMin)} h)</div>
+          </div>
+          <div class="stat">
+            <div class="stat-ico">🎞️</div>
+            <div class="stat-val">${totalEpsSeen.toLocaleString('fr-FR')}</div>
+            <div class="stat-lab">Épisodes vus au total</div>
+          </div>
+          <div class="stat">
+            <div class="stat-ico">📊</div>
+            <div class="stat-val">${ranked.length}</div>
+            <div class="stat-lab">Œuvre${ranked.length > 1 ? 's' : ''} classée${ranked.length > 1 ? 's' : ''}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (podEl) {
+      if (ranked.length >= 1 && !this.searchQuery && this.filter === 'all' && (this.sort === 'time' || this.sort === 'eps')) {
+        podEl.innerHTML = this.renderPodium(ranked);
+      } else {
+        podEl.innerHTML = '';
+      }
+    }
+
+    const maxTime = ranked[0]?.watchedMin || 1;
+    const maxEps = Math.max(...ranked.map(r => r.watchedEps), 1);
+    const isEpsSort = this.sort === 'eps';
+
+    listEl.innerHTML = `
+      <div class="ranking-container">
+        ${ranked.map((item, idx) => this.renderRow(item, idx + 1, isEpsSort ? maxEps : maxTime, isEpsSort)).join('')}
+      </div>
+    `;
+  }
+};
+
+/* ------------------------------------------------------------
+   8b. Page « Stats » (Épisodes par mois & Classement complet)
 ------------------------------------------------------------ */
 const Stats = {
   monthOffset: 0,
@@ -2102,41 +2662,63 @@ const Stats = {
   topPanel(all) {
     const grouped = this.getGroupedTop(all);
     if (!grouped.length) return '';
-    const top = grouped.slice(0, 6);
-    const max = top[0]?.watchedMin || 1;
+    const showAll = !!this.showAllTop;
+    const displayed = showAll ? grouped : grouped.slice(0, 6);
+    const max = grouped[0]?.watchedMin || 1;
 
     return `
       <div class="panel">
-        <div class="panel-top-header" onclick="Stats.openRankingModal()" title="Cliquer pour voir le classement complet">
+        <div class="panel-top-header" onclick="Stats.toggleShowAllTop()" title="Cliquer pour afficher tout le classement">
           <div>
-            <h3>Top temps de visionnage</h3>
-            <div class="panel-sub-hint">Clique pour voir le classement de tous les animes (${grouped.length})</div>
+            <h3>🏆 Top temps de visionnage</h3>
+            <div class="panel-sub-hint">${showAll ? `Affichage de tous les ${grouped.length} animes (clique pour réduire)` : `Affichage des 6 premiers · Total : ${grouped.length} animes`}</div>
           </div>
-          <button class="btn btn-sm" onclick="event.stopPropagation();Stats.openRankingModal()">🏆 Voir tout (1→${grouped.length})</button>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();Router.go('ranking')" title="Ouvrir la page complète du classement">
+              🏆 Classement complet
+            </button>
+            <button class="btn btn-sm" onclick="event.stopPropagation();Stats.toggleShowAllTop()">
+              ${showAll ? '🔼 Réduire' : `🔽 Déplier tout (${grouped.length})`}
+            </button>
+            <button class="btn btn-sm" onclick="event.stopPropagation();Stats.openRankingModal()" title="Ouvrir la fenêtre avec recherche">🔍 Rechercher</button>
+          </div>
         </div>
         <div style="margin-top:14px">
-          ${top.map((a, i) => `
+          ${displayed.map((a, i) => {
+            const rankIco = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`;
+            return `
             <div class="bar-row" style="cursor:pointer" onclick="Router.go('anime/${a.id}')" title="Voir la fiche de ${esc(a.title)}">
               <div class="bar-head">
-                <b><span style="color:var(--cyan-lt);margin-right:6px">#${i + 1}</span> ${esc(a.title)} ${a.entries.length > 1 ? `<small style="color:var(--muted);font-weight:normal">(${a.entries.length} animes réunis)</small>` : ''}</b>
+                <b><span style="color:${i <= 2 ? 'var(--pink-lt)' : 'var(--cyan-lt)'};margin-right:6px">${rankIco}</span> ${esc(a.title)} ${a.entries.length > 1 ? `<small style="color:var(--muted);font-weight:normal">(${a.entries.length} œuvres réunies)</small>` : ''}</b>
                 <span>${fmtDuration(a.watchedMin)} · ${a.watchedEps} ép.</span>
               </div>
-              <div class="bar"><i style="width:${a.watchedMin / max * 100}%"></i></div>
-            </div>`).join('')}
+              <div class="bar"><i style="width:${Math.max(2, a.watchedMin / max * 100)}%"></i></div>
+            </div>`;
+          }).join('')}
         </div>
+        ${!showAll && grouped.length > 6 ? `
+          <div style="text-align:center;margin-top:14px">
+            <button class="btn btn-sm" onclick="Router.go('ranking')" style="width:100%">🏆 Ouvrir la page Classement (${grouped.length} animes classés) →</button>
+          </div>
+        ` : ''}
       </div>`;
   },
 
+  toggleShowAllTop() {
+    this.showAllTop = !this.showAllTop;
+    this.render();
+  },
+
   getGroupedTop(all) {
-    const topLevelActive = all.filter(a => !a.parentId && Calc.watchedMin(a) > 0);
+    const topLevelActive = (all || []).filter(a => a && !a.parentId && Calc.watchedMin(a) > 0);
     return topLevelActive.map(a => {
       const family = getFamilyMembers(a);
       return {
         id: a.id,
         key: a.id,
-        title: a.title,
-        cover: a.cover || a.banner,
-        banner: a.banner || a.cover,
+        title: a.title || 'Sans titre',
+        cover: a.cover || a.banner || '',
+        banner: a.banner || a.cover || '',
         watchedMin: Calc.watchedMin(a),
         watchedEps: Calc.watchedEps(a),
         totalEps: Calc.totalEps(a),
@@ -2145,24 +2727,27 @@ const Stats = {
     }).sort((x, y) => y.watchedMin - x.watchedMin);
   },
 
+  _lastOpenedRanking: 0,
+
   openRankingModal() {
+    this._lastOpenedRanking = Date.now();
     this._rankingSearch = '';
     const modal = document.getElementById('ranking-modal');
     if (modal) {
       modal.classList.add('open');
-      document.body.style.overflow = 'hidden';
       const input = document.getElementById('ranking-search-input');
-      if (input) input.value = '';
+      if (input) {
+        input.value = '';
+        setTimeout(() => input.focus(), 60);
+      }
       this.renderRankingList();
     }
   },
 
   closeRankingModal() {
+    if (Date.now() - (this._lastOpenedRanking || 0) < 250) return;
     const modal = document.getElementById('ranking-modal');
-    if (modal) {
-      modal.classList.remove('open');
-      document.body.style.overflow = '';
-    }
+    if (modal) modal.classList.remove('open');
   },
 
   filterRanking(q) {
@@ -2175,15 +2760,18 @@ const Stats = {
     if (!box) return;
     const all = Store.all();
     const grouped = this.getGroupedTop(all);
-    const q = this._rankingSearch || '';
+    const q = (this._rankingSearch || '').toLowerCase().trim();
     
     let list = grouped;
     if (q) {
-      list = list.filter(g => g.title.toLowerCase().includes(q) || g.entries.some(e => e.title.toLowerCase().includes(q)));
+      list = list.filter(g =>
+        (g.title || '').toLowerCase().includes(q) ||
+        (g.entries || []).some(e => (e?.title || '').toLowerCase().includes(q))
+      );
     }
 
     if (!list.length) {
-      box.innerHTML = `<p class="muted center" style="padding:30px">Aucun anime trouvé.</p>`;
+      box.innerHTML = `<div class="empty" style="padding:28px 14px"><p class="muted" style="margin:0">Aucun anime avec du temps de visionnage.</p></div>`;
       return;
     }
 
@@ -2191,16 +2779,17 @@ const Stats = {
     box.innerHTML = list.map((a, i) => {
       const rank = grouped.indexOf(a) + 1;
       const rankBadge = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+      const entryCount = (a.entries || []).length;
       return `
         <div class="ranking-row" onclick="Stats.closeRankingModal();Router.go('anime/${a.id}')" title="Voir la fiche de ${esc(a.title)}">
           <div class="ranking-num ${rank <= 3 ? 'top' + rank : ''}">${rankBadge}</div>
           <div class="ranking-info">
-            <div class="ranking-title">${esc(a.title)} ${a.entries.length > 1 ? `<small style="color:var(--muted);font-weight:normal">(${a.entries.length} animes réunis)</small>` : ''}</div>
+            <div class="ranking-title">${esc(a.title)} ${entryCount > 1 ? `<small style="color:var(--muted);font-weight:normal">(${entryCount} œuvres réunies)</small>` : ''}</div>
             <div class="ranking-meta">
               <span>⏱️ <b>${fmtDuration(a.watchedMin)}</b></span>
               <span>📼 <b>${a.watchedEps}</b> épisodes vus</span>
             </div>
-            <div class="bar" style="margin-top:6px;height:6px"><i style="width:${a.watchedMin / max * 100}%"></i></div>
+            <div class="bar" style="margin-top:6px;height:6px"><i style="width:${Math.max(2, a.watchedMin / max * 100)}%"></i></div>
           </div>
         </div>`;
     }).join('');
@@ -3098,8 +3687,8 @@ const Router = {
     const [page, param] = raw.split('/');
     if (page === 'add') { location.replace('#seen'); setTimeout(() => UI.openForm(), 60); return; }
 
-    const known = ['seen', 'plan', 'news', 'stats', 'settings', 'anime'];
-    const p = known.includes(page) ? page : 'seen';
+    const known = ['seen', 'plan', 'ranking', 'news', 'stats', 'settings', 'anime'];
+    const p = known.includes(page) ? page : (page === 'top' ? 'ranking' : 'seen');
     this.current = p; this.param = param;
 
     document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
@@ -3119,6 +3708,7 @@ const Router = {
     switch (this.current) {
       case 'seen':     Seen.render(); break;
       case 'plan':     Plan.render(); break;
+      case 'ranking':  Ranking.render(); break;
       case 'news':     News.render(); break;
       case 'stats':    Stats.render(); break;
       case 'settings': Settings.render(); break;
@@ -3175,6 +3765,11 @@ function boot() {
   const planSort = document.getElementById('plan-sort');
   if (planSort) planSort.addEventListener('change', () => Plan.render());
 
+  const rankSearch = document.getElementById('ranking-search');
+  if (rankSearch) rankSearch.addEventListener('input', debounce(e => Ranking.onSearch(e.target.value), 100));
+  const rankSort = document.getElementById('ranking-sort');
+  if (rankSort) rankSort.addEventListener('change', e => Ranking.setSort(e.target.value));
+
   const newsChips = document.getElementById('news-chips');
   if (newsChips) {
     newsChips.addEventListener('click', e => {
@@ -3220,5 +3815,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2f435217aeae1f5',t:'MTc4NzQyNjE0MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2f989fcce69e276',t:'MTc4NzQ4MjA0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
