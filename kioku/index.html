@@ -860,26 +860,53 @@ input:checked + .slider::before { transform: translateX(22px); }
 /* Section Autre & Animes Liés (Famille) */
 .linked-grid {
   display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   margin-top: 14px;
   margin-bottom: 20px;
+  position: relative;
 }
 .linked-anime-card {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 14px 16px;
+  gap: 12px;
+  padding: 12px 16px;
   border-radius: var(--r);
   background: var(--bg-2);
   border: 1px solid var(--stroke);
-  transition: transform .2s var(--ease), border-color .2s;
+  transition: transform .18s var(--ease), border-color .18s, box-shadow .18s, opacity .18s;
   position: relative;
   overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+  cursor: pointer;
 }
 .linked-anime-card:hover {
-  transform: translateY(-2px);
+  border-color: rgba(255, 61, 139, .6);
+}
+.linked-anime-card.is-dragging {
+  opacity: .94;
+  transform: scale(1.03) rotate(0.8deg);
   border-color: var(--pink);
+  box-shadow: 0 14px 34px rgba(255, 61, 139, .4), 0 0 20px rgba(255, 61, 139, .25);
+  z-index: 99;
+  cursor: grabbing;
+}
+.drag-handle {
+  font-size: 19px;
+  color: var(--muted-2);
+  cursor: grab;
+  padding: 6px 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color .15s;
+}
+.linked-anime-card:hover .drag-handle {
+  color: var(--pink-lt);
 }
 .linked-card-media {
   width: 64px;
@@ -1723,7 +1750,17 @@ const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 
 
 function getFamilyMembers(a) {
   if (!a) return [];
-  const children = Store.all().filter(x => x && x.parentId === a.id);
+  let children = Store.all().filter(x => x && x.parentId === a.id);
+  if (Array.isArray(a.linkedOrder) && a.linkedOrder.length) {
+    children.sort((x, y) => {
+      const ix = a.linkedOrder.indexOf(x.id);
+      const iy = a.linkedOrder.indexOf(y.id);
+      if (ix === -1 && iy === -1) return 0;
+      if (ix === -1) return 1;
+      if (iy === -1) return -1;
+      return ix - iy;
+    });
+  }
   return [a, ...children];
 }
 
@@ -1950,6 +1987,11 @@ const Plan = {
     const q = (document.getElementById('plan-search').value || '').toLowerCase().trim();
     const sort = document.getElementById('plan-sort').value;
     
+    // Tous les animes prévus dans la watchlist (y compris suites et films liés)
+    const allPlanned = Store.all().filter(a => a.status === 'planned');
+    const totalPlannedMins = allPlanned.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes * (s.duration || (a.isMovie ? 100 : DEFAULT_DUR)), 0), 0);
+    const totalPlannedEps  = allPlanned.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes, 0), 0);
+
     // Affiche le premier anime à regarder et débloque les suites dès que la saison 1 a été vue
     let list = Store.all().filter(a => Plan.shouldShow(a));
     if (q) list = list.filter(a =>
@@ -1964,14 +2006,26 @@ const Plan = {
       long:   (x, y) => Calc.totalMin(y) - Calc.totalMin(x),
     }[sort]);
 
-    const mins = list.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes * s.duration, 0), 0);
-    const eps  = list.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes, 0), 0);
-    document.getElementById('plan-summary').innerHTML = list.length ? `
-      <div class="hero-stat" style="padding:24px;margin-bottom:20px">
-        <div class="hero-time" style="font-size:clamp(28px,5vw,44px)"><span>${fmtDuration(mins)}</span></div>
-        <div class="hero-sub">${list.length} œuvre${list.length > 1 ? 's' : ''} en attente · ${eps} épisodes prévus
-          ${mins ? `· soit ${fmtHours(mins)} h de visionnage` : ''}</div>
-      </div>` : '';
+    const visibleMins = list.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes * (s.duration || (a.isMovie ? 100 : DEFAULT_DUR)), 0), 0);
+    const visibleEps  = list.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes, 0), 0);
+    const hiddenCount = allPlanned.length - list.length;
+    const hiddenMins  = Math.max(0, totalPlannedMins - visibleMins);
+
+    const summaryEl = document.getElementById('plan-summary');
+    if (summaryEl) {
+      if (!allPlanned.length && !list.length) {
+        summaryEl.innerHTML = '';
+      } else {
+        const displayDuration = q ? visibleMins : totalPlannedMins;
+        const displayEps = q ? visibleEps : totalPlannedEps;
+        const displayCount = q ? list.length : allPlanned.length;
+
+        const uniquePlannedCount = new Set(allPlanned.map(a => a.parentId || a.id)).size;
+        const displayAnimes = q ? list.length : uniquePlannedCount;
+
+        
+      }
+    }
 
     const el = document.getElementById('plan-grid');
     if (!list.length) {
@@ -2873,6 +2927,112 @@ const Detail = {
   open: {},
   _currentParentId: null,
   _linkSearch: '',
+  _drag: {
+    card: null,
+    parentId: null,
+    childId: null,
+    timer: null,
+    active: false,
+    startX: 0,
+    startY: 0,
+    hasMoved: false,
+  },
+
+  onCardPointerDown(e, parentId, childId) {
+    if (e.target.closest('button, select, a, .linked-card-actions')) return;
+
+    const card = e.currentTarget;
+    this._drag.card = card;
+    this._drag.parentId = parentId;
+    this._drag.childId = childId;
+    this._drag.active = false;
+    this._drag.hasMoved = false;
+    this._drag.startX = e.clientX;
+    this._drag.startY = e.clientY;
+
+    this._drag.timer = setTimeout(() => {
+      this._drag.active = true;
+      card.classList.add('is-dragging');
+      if (card.setPointerCapture) {
+        try { card.setPointerCapture(e.pointerId); } catch (err) {}
+      }
+      if (navigator.vibrate) navigator.vibrate(35);
+      toast('Déplace le bloc pour réorganiser l\'ordre ✨');
+    }, 180);
+
+    const onPointerMove = ev => {
+      const dist = Math.hypot(ev.clientX - this._drag.startX, ev.clientY - this._drag.startY);
+      if (!this._drag.active) {
+        if (dist > 8) {
+          clearTimeout(this._drag.timer);
+          this._drag.timer = null;
+        }
+        return;
+      }
+
+      ev.preventDefault();
+      this._drag.hasMoved = true;
+
+      const elemBelow = document.elementFromPoint(ev.clientX, ev.clientY);
+      const targetCard = elemBelow?.closest('.linked-anime-card');
+      const grid = card.parentElement;
+
+      if (grid && targetCard && targetCard !== card && targetCard.parentElement === grid) {
+        const cards = [...grid.querySelectorAll('.linked-anime-card')];
+        const curIdx = cards.indexOf(card);
+        const targetIdx = cards.indexOf(targetCard);
+
+        if (curIdx !== -1 && targetIdx !== -1) {
+          if (curIdx < targetIdx) {
+            grid.insertBefore(card, targetCard.nextSibling);
+          } else {
+            grid.insertBefore(card, targetCard);
+          }
+        }
+      }
+    };
+
+    const onPointerUp = ev => {
+      clearTimeout(this._drag.timer);
+      this._drag.timer = null;
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+
+      if (this._drag.active) {
+        card.classList.remove('is-dragging');
+        if (card.releasePointerCapture) {
+          try { card.releasePointerCapture(ev.pointerId); } catch (err) {}
+        }
+
+        const grid = card.parentElement;
+        if (grid) {
+          const newOrder = [...grid.querySelectorAll('.linked-anime-card')].map(el => el.dataset.id).filter(Boolean);
+          const parent = Store.get(parentId);
+          if (parent && newOrder.length) {
+            parent.linkedOrder = newOrder;
+            Store.save();
+            toast('Ordre des œuvres mis à jour ✨');
+          }
+        }
+
+        setTimeout(() => {
+          this._drag.active = false;
+          this._drag.hasMoved = false;
+        }, 80);
+      }
+    };
+
+    window.addEventListener('pointermove', onPointerMove, { passive: false });
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+  },
+
+  onCardClick(e, childId) {
+    if (this._drag.active || this._drag.hasMoved) return;
+    if (e.target.closest('button, select, a, .linked-card-actions')) return;
+    Router.go('anime/' + childId);
+  },
 
   render(id) {
     this.id = id;
@@ -2958,28 +3118,37 @@ const Detail = {
         ? a.seasons.map((s, i) => this.seasonHTML(a, s, i)).join('')
         : `<p class="muted">Aucune saison enregistrée. <button class="btn btn-sm" onclick="UI.openForm('${a.id}')">Ajouter une saison</button></p>`}
 
-      <!-- Section Autre (Animes / Suites / Films liés de la même famille) -->
+      <!-- Section Autre (Animes / Suites / Films liés de la même famille avec Réorganisation Tactile & Souris) -->
       ${!a.parentId ? `
-        <div class="section-title" style="margin-top:38px;display:flex;align-items:center;justify-content:space-between">
+        <div class="section-title" style="margin-top:38px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
           <span>Autre <span class="count">${children.length}</span></span>
-          <button class="btn btn-sm btn-primary" onclick="Detail.openLinkModal('${a.id}')">＋ Ajouter un autre</button>
+          <div style="display:flex;gap:8px;align-items:center">
+            ${children.length > 1 ? '<span class="muted" style="font-size:12px">✋ Maintiens appuyé pour déplacer</span>' : ''}
+            <button class="btn btn-sm btn-primary" onclick="Detail.openLinkModal('${a.id}')">＋ Ajouter un autre</button>
+          </div>
         </div>
         <p class="muted" style="font-size:13px;margin:-6px 0 16px">
-          Associe ici d'autres animes ou films de ta collection appartenant à cette même famille. Ils n'apparaîtront plus dans la liste principale et compteront pour <b>1 seul anime</b> dans tes statistiques.
+          Associe ici d'autres animes ou films de ta collection. Maintiens appuyé sur un bloc pour le glisser et organiser l'ordre de la franchise comme tu le souhaites.
         </p>
 
         ${children.length > 0 ? `
-          <div class="linked-grid">
-            ${children.map(c => {
+          <div class="linked-grid" id="linked-grid-${a.id}">
+            ${children.map((c, i) => {
               const cTotal = Calc.totalEps(c), cDone = Calc.watchedEps(c), cPct = Calc.pct(c);
               const cImg = c.cover || c.banner || '';
               const cSt = STATUS[c.status] || STATUS.watching;
               return `
-                <div class="linked-anime-card">
-                  <div class="linked-card-media" onclick="Router.go('anime/${c.id}')" style="cursor:pointer">
-                    ${cImg ? `<img src="${esc(cImg)}" alt="" />` : '<div class="card-fallback" style="font-size:22px">🌸</div>'}
+                <div class="linked-anime-card"
+                     data-id="${c.id}"
+                     data-parent="${a.id}"
+                     onpointerdown="Detail.onCardPointerDown(event, '${a.id}', '${c.id}')"
+                     onclick="Detail.onCardClick(event, '${c.id}')"
+                     title="Maintiens appuyé pour déplacer ou clique pour ouvrir">
+                  <div class="drag-handle" title="Maintiens appuyé pour déplacer">⠿</div>
+                  <div class="linked-card-media">
+                    ${cImg ? `<img src="${esc(cImg)}" alt="" loading="lazy" />` : '<div class="card-fallback" style="font-size:22px">🌸</div>'}
                   </div>
-                  <div class="linked-card-body" onclick="Router.go('anime/${c.id}')" style="cursor:pointer">
+                  <div class="linked-card-body">
                     <div class="linked-card-title">${esc(c.title)}</div>
                     <div class="linked-card-meta">
                       <span class="badge ${c.status}" style="position:static;display:inline-block;padding:2px 7px;font-size:10px">${cSt.ico} ${cSt.label}</span>
@@ -2991,7 +3160,7 @@ const Detail = {
                       <i style="width:${cPct}%"></i>
                     </div>
                   </div>
-                  <div class="linked-card-actions">
+                  <div class="linked-card-actions" onclick="event.stopPropagation()">
                     <button class="btn btn-sm btn-primary" onclick="Router.go('anime/${c.id}')">📂 Ouvrir</button>
                     <button class="btn btn-sm btn-danger" onclick="Detail.unlinkAnime('${c.id}')" title="Détacher du groupe">✕</button>
                   </div>
@@ -3882,5 +4051,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a303eaa8fd2bda11',t:'MTc4NzU5MDg2Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
