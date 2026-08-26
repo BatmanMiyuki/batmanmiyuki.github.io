@@ -13,6 +13,9 @@
     <meta name="mobile-web-app-capable" content="yes">
     <!-- Apple Touch Icon (new lock logo) -->
     <link rel="apple-touch-icon" href="icons/icon-180.png">
+    <!-- Favicon + Manifest (fichiers externes) -->
+    <link rel="icon" type="image/png" href="icons/favicon-64.png">
+    <link rel="manifest" href="manifest.json">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -200,6 +203,23 @@
             background-color: #4f46e5;
             color: white;
             font-weight: 600;
+        }
+        
+        .nav-item.static {
+            cursor: default;
+        }
+        
+        .nav-item.static:hover {
+            background-color: transparent;
+        }
+        
+        /* Folder tree collapse/expand */
+        .tree-toggle {
+            border-radius: 8px;
+        }
+        
+        .tree-toggle:hover {
+            background-color: #1a1a1a;
         }
 
         .section-header {
@@ -548,7 +568,7 @@
                     
                     <!-- Version indicator -->
                     <div class="px-2 py-0.5 text-[10px] bg-emerald-900 text-emerald-300 font-bold rounded-full px-2.5" style="font-size:9.5px">
-                        v4.0 • PWA
+                        v4.1 • PWA
                     </div>
 
                     <!-- PWA Install Button -->
@@ -613,17 +633,10 @@
                 
                 <!-- Quick nav -->
                 <div class="px-2 pt-2 pb-1">
-                    <div onclick="navigateToView('all')" 
-                         class="nav-item cursor-pointer flex items-center px-3 py-[9px] gap-x-3 text-sm rounded-2xl mb-0.5 active" id="nav-all">
-                        <i class="fa-solid fa-th-large w-4 text-center"></i>
+                    <div class="nav-item static flex items-center px-3 py-[9px] gap-x-3 text-sm rounded-2xl mb-0.5" id="nav-all" title="Vue d'accueil de Privara">
+                        <i class="fa-solid fa-th-large w-4 text-center text-indigo-400"></i>
                         <span class="font-medium">Tous les médias</span>
                         <span id="count-all" class="ml-auto text-xs font-semibold px-2 py-0.5 bg-slate-700 text-slate-300 rounded-[10px]">0</span>
-                    </div>
-                    
-                    <div onclick="navigateToView('recent')" 
-                         class="nav-item cursor-pointer flex items-center px-3 py-[9px] gap-x-3 text-sm rounded-2xl" id="nav-recent">
-                        <i class="fa-solid fa-clock w-4 text-center"></i>
-                        <span class="font-medium">Récents</span>
                     </div>
                 </div>
                 
@@ -1197,111 +1210,22 @@
             // Already handled in updatePinDots()
         }
         
-        // ===================== PWA INLINE ENHANCEMENTS =====================
+        // ===================== PWA (manifest.json + sw.js externes) =====================
+        // Le manifest est déclaré statiquement dans le <head> : manifest.json
         
-        // Create inline manifest (self-contained PWA) - using new lock logo
-        function registerInlineManifest() {
-            const manifest = {
-                "name": "Privara",
-                "short_name": "Privara",
-                "description": "Coffre-fort Photos & Vidéos sécurisé",
-                "start_url": "./",
-                "display": "standalone",
-                "background_color": "#000000",
-                "theme_color": "#000000",
-                "orientation": "portrait",
-                "icons": [
-                    {
-                        "src": "icons/icon-512.png",
-                        "sizes": "512x512",
-                        "type": "image/png"
-                    },
-                    {
-                        "src": "icons/icon-192.png",
-                        "sizes": "192x192",
-                        "type": "image/png"
-                    },
-                    {
-                        "src": "icons/icon-180.png",
-                        "sizes": "180x180",
-                        "type": "image/png"
-                    }
-                ],
-                "categories": ["productivity", "utilities"],
-                "lang": "fr"
-            };
-            
-            // Inject manifest as data URL
-            const link = document.createElement('link');
-            link.rel = 'manifest';
-            link.href = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(manifest));
-            document.head.appendChild(link);
-        }
-        
-        // Inline Service Worker registration + minimal SW code
         function registerServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                // Create inline service worker via Blob
-                const swCode = `
-                    const CACHE_NAME = 'privara-v4';
-                    const ASSETS = [
-                        './',
-                        './index.html'
-                    ];
-                    
-                    self.addEventListener('install', (event) => {
-                        event.waitUntil(
-                            caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
-                        );
-                        self.skipWaiting();
-                    });
-                    
-                    self.addEventListener('activate', (event) => {
-                        event.waitUntil(
-                            caches.keys().then(keys => 
-                                Promise.all(
-                                    keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-                                )
-                            )
-                        );
-                        self.clients.claim();
-                    });
-                    
-                    self.addEventListener('fetch', (event) => {
-                        if (event.request.method !== 'GET') return;
-                        
-                        event.respondWith(
-                            caches.match(event.request).then(response => {
-                                return response || fetch(event.request).then(fetchRes => {
-                                    return caches.open(CACHE_NAME).then(cache => {
-                                        cache.put(event.request, fetchRes.clone());
-                                        return fetchRes;
-                                    });
-                                });
-                            }).catch(() => {
-                                // Offline fallback
-                                if (event.request.destination === 'document') {
-                                    return caches.match('./');
-                                }
-                            })
-                        );
-                    });
-                `;
-                
-                const swBlob = new Blob([swCode], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(swBlob);
-                
-                navigator.serviceWorker.register(swUrl)
-                    .then(registration => {
-                        console.log('%c[Privara PWA] Service Worker inline registered', 'color:#22c55e');
-                    })
-                    .catch(err => {
-                        console.log('%c[Privara PWA] SW registration failed', 'color:#ef4444', err);
-                    });
-            }
+            if (!('serviceWorker' in navigator)) return;
+            
+            navigator.serviceWorker.register('./sw.js')
+                .then(registration => {
+                    console.log('%c[Privara PWA] Service Worker enregistré', 'color:#22c55e', registration);
+                })
+                .catch(err => {
+                    console.warn('[Privara PWA] Service Worker non enregistré :', err);
+                });
         }
         
-        // ===================== ORIGINAL APP CODE (kept intact) =====================
+// ===================== ORIGINAL APP CODE (kept intact) =====================
         
         function initializeTailwind() {
             document.documentElement.style.setProperty('--accent', '#6366f1');
@@ -1644,6 +1568,35 @@
             showToast(`Dossier "${folderName}" créé !`, false, true);
         }
         
+        // --- Dossiers repliables (état persisté) ---
+        let collapsedFolders = new Set();
+        
+        function loadCollapsedState() {
+            try {
+                const raw = localStorage.getItem('privara_collapsed_folders');
+                collapsedFolders = raw ? new Set(JSON.parse(raw)) : new Set();
+            } catch (e) {
+                collapsedFolders = new Set();
+            }
+        }
+        
+        function saveCollapsedState() {
+            try {
+                localStorage.setItem('privara_collapsed_folders', JSON.stringify(Array.from(collapsedFolders)));
+            } catch (e) {}
+        }
+        
+        function toggleFolderCollapse(folderId, e) {
+            if (e) e.stopImmediatePropagation();
+            if (collapsedFolders.has(folderId)) {
+                collapsedFolders.delete(folderId);
+            } else {
+                collapsedFolders.add(folderId);
+            }
+            saveCollapsedState();
+            renderFoldersTree();
+        }
+        
         async function renderFoldersTree() {
             const container = document.getElementById('folders-tree');
             container.innerHTML = '';
@@ -1653,9 +1606,7 @@
                 .sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
             
             topLevel.forEach(folder => {
-                const folderEl = createFolderTreeItem(folder, 0);
-                container.appendChild(folderEl);
-                renderSubFolders(folder.id, container, 1);
+                container.appendChild(createFolderTreeItem(folder, 0));
             });
             
             if (currentView === 'all') {
@@ -1664,29 +1615,30 @@
             }
         }
         
-        function renderSubFolders(parentId, container, level) {
-            const children = allFolders
-                .filter(f => f.parentId === parentId)
-                .sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
-            
-            children.forEach(child => {
-                const childEl = createFolderTreeItem(child, level);
-                container.appendChild(childEl);
-                renderSubFolders(child.id, container, level + 1);
-            });
-        }
-        
         function createFolderTreeItem(folder, level) {
-            const div = document.createElement('div');
-            div.className = `tree-item cursor-pointer flex items-center px-2 py-[5px] gap-x-2 text-sm rounded-xl mb-0.5`;
-            if (level > 0) div.style.paddingLeft = `${level * 14 + 8}px`;
+            const wrapper = document.createElement('div');
+            wrapper.className = 'tree-wrapper';
+            
+            const hasChildren = allFolders.some(f => f.parentId === folder.id);
+            const isCollapsed = collapsedFolders.has(folder.id);
+            
+            const row = document.createElement('div');
+            row.className = `tree-item cursor-pointer flex items-center px-2 py-[5px] gap-x-2 text-sm rounded-xl mb-0.5`;
+            row.style.paddingLeft = `${level * 14 + 6}px`;
             
             const count = getMediaCountInFolder(folder.id);
             const countHTML = count > 0 
                 ? `<span class="ml-auto text-[10px] px-1.5 py-px bg-slate-700 text-slate-400 font-bold rounded px-1.5">${count}</span>` 
                 : '';
             
-            div.innerHTML = `
+            const chevronHTML = hasChildren
+                ? `<button class="tree-toggle w-5 h-5 flex items-center justify-center text-slate-400 hover:text-white transition-colors" style="flex-shrink:0; width:20px; height:20px;" title="${isCollapsed ? 'Ouvrir ce dossier' : 'Fermer ce dossier'}">
+                     <i class="fa-solid ${isCollapsed ? 'fa-chevron-right' : 'fa-chevron-down'} text-[10px]"></i>
+                   </button>`
+                : `<span class="w-5 h-5 flex items-center justify-center text-slate-600" style="flex-shrink:0; width:20px; height:20px;"><i class="fa-solid fa-minus text-[8px]"></i></span>`;
+            
+            row.innerHTML = `
+                ${chevronHTML}
                 <div class="flex items-center flex-1 min-w-0">
                     <i class="fa-solid fa-folder text-indigo-300 w-3.5"></i>
                     <span class="ml-2 font-medium text-sm truncate">${folder.name}</span>
@@ -1694,17 +1646,37 @@
                 </div>
             `;
             
-            div.onclick = (e) => {
+            const toggleBtn = row.querySelector('.tree-toggle');
+            if (toggleBtn) {
+                toggleBtn.onclick = (e) => toggleFolderCollapse(folder.id, e);
+            }
+            
+            row.onclick = (e) => {
                 e.stopImmediatePropagation();
                 navigateToFolder(folder.id);
             };
             
-            div.oncontextmenu = (e) => {
+            row.oncontextmenu = (e) => {
                 e.preventDefault();
                 showFolderContextMenu(e, folder);
             };
             
-            return div;
+            wrapper.appendChild(row);
+            
+            if (hasChildren && !isCollapsed) {
+                const childrenContainer = document.createElement('div');
+                childrenContainer.className = 'tree-children';
+                const children = allFolders
+                    .filter(f => f.parentId === folder.id)
+                    .sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
+                
+                children.forEach(child => {
+                    childrenContainer.appendChild(createFolderTreeItem(child, level + 1));
+                });
+                wrapper.appendChild(childrenContainer);
+            }
+            
+            return wrapper;
         }
         
         function getMediaCountInFolder(folderId) {
@@ -1741,11 +1713,6 @@
                 currentFolderId = null;
                 document.getElementById('current-folder-name').innerHTML = 'Tous les médias';
                 document.getElementById('current-folder-info').innerHTML = `${allMedia.length} médias • ${allFolders.length} dossiers`;
-            } else if (view === 'recent') {
-                document.getElementById('nav-recent').classList.add('active');
-                currentFolderId = null;
-                document.getElementById('current-folder-name').innerHTML = 'Récents';
-                document.getElementById('current-folder-info').innerHTML = `Derniers médias ajoutés`;
             }
             
             renderFoldersTree();
@@ -1766,16 +1733,6 @@
                 return;
             }
             
-            if (currentView === 'recent') {
-                const el = document.createElement('div');
-                el.className = `flex items-center gap-x-[5px]`;
-                el.innerHTML = `
-                    <span class="px-3 py-[3px] text-xs font-extrabold bg-slate-700 text-white rounded-[2rem] px-3.5 py-1">Récents</span>
-                `;
-                container.appendChild(el);
-                return;
-            }
-            
             let path = [];
             let current = allFolders.find(f => f.id === currentFolderId);
             
@@ -1784,6 +1741,18 @@
                 if (!current.parentId) break;
                 current = allFolders.find(f => f.id === current.parentId);
             }
+            
+            // Racine cliquable : permet de revenir à la vue "Tous les médias"
+            const rootChip = document.createElement('span');
+            rootChip.className = `px-3 cursor-pointer py-[3px] flex items-center text-xs font-medium hover:bg-slate-700 px-3.5 transition-colors bg-slate-700 text-white rounded-[2rem]`;
+            rootChip.innerHTML = `<span>Tous les médias</span>`;
+            rootChip.onclick = () => navigateToView('all');
+            container.appendChild(rootChip);
+            
+            const rootArrow = document.createElement('span');
+            rootArrow.className = `px-[3px] text-slate-500 text-xs flex items-center`;
+            rootArrow.innerHTML = `<i class="fa-solid fa-chevron-right text-xs"></i>`;
+            container.appendChild(rootArrow);
             
             path.forEach((folder, idx) => {
                 const span = document.createElement('span');
@@ -1822,9 +1791,6 @@
             
             if (currentView === 'folder') {
                 filteredMedia = filteredMedia.filter(m => m.folderId === currentFolderId);
-            } else if (currentView === 'recent') {
-                filteredMedia.sort((a, b) => new Date(b.date) - new Date(a.date));
-                filteredMedia = filteredMedia.slice(0, 50);
             }
             
             const typeFilter = document.getElementById('filter-type').value;
@@ -2731,6 +2697,17 @@
             const confirmMsg = `Supprimer le dossier "${folder.name}" ?\n\n${mediaCount} médias et ${subfolders} sous-dossiers seront aussi supprimés.`;
             if (!confirm(confirmMsg)) return;
             
+            // Nettoyage de l'état "replié" pour le dossier supprimé et ses sous-dossiers
+            const removedIds = [];
+            const stackIds = [folderId];
+            while (stackIds.length) {
+                const fid = stackIds.pop();
+                removedIds.push(fid);
+                allFolders.filter(f => f.parentId === fid).forEach(sf => stackIds.push(sf.id));
+            }
+            removedIds.forEach(id => collapsedFolders.delete(id));
+            saveCollapsedState();
+            
             await deleteFolderFromDB(folderId);
             
             if (currentFolderId === folderId) {
@@ -2914,6 +2891,7 @@
                 allMedia = [];
             }
             
+            loadCollapsedState();
             await renderFoldersTree();
             
             document.getElementById('nav-all').classList.add('active');
@@ -3131,8 +3109,7 @@
         
         // Main boot
         window.onload = function() {
-            // Register inline PWA features first
-            registerInlineManifest();
+            // Enregistrement du Service Worker (fichier sw.js)
             registerServiceWorker();
             
             // Check for existing PIN

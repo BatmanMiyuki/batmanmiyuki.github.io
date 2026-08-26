@@ -1,63 +1,71 @@
-// Privara PWA - Service Worker
-const CACHE_NAME = 'privara-v1';
-const urlsToCache = [
+// Privara PWA - Service Worker (fichier externe)
+const CACHE_NAME = 'privara-v2';
+const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './icons/icon-180.png'
+  './icons/icon-180.png',
+  './icons/favicon-64.png'
 ];
 
-// Install
+// Install : met en cache le "shell" de l'application
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('[SW] Caching app shell');
-        return cache.addAll(urlsToCache);
-      })
+      .then((cache) => cache.addAll(ASSETS))
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
-// Activate
+// Activate : supprime les anciens caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('[SW] Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
+    caches.keys()
+      .then((keys) => Promise.all(
+        keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
+      ))
+      .then(() => self.clients.claim())
+  );
+});
+
+// Fetch : stratégie network-first pour la page, stale-while-revalidate pour le reste
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  if (request.method !== 'GET') return;
+
+  const url = new URL(request.url);
+  // Ne pas intercepter les ressources externes (CDN, polices, etc.)
+  if (url.origin !== location.origin) return;
+
+  // Navigation (la page) : toujours essayer le réseau d'abord
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((resp) => {
+          const copy = resp.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          return resp;
         })
-      );
+        .catch(() =>
+          caches.match(request).then((r) => r || caches.match('./index.html'))
+        )
+    );
+    return;
+  }
+
+  // Autres ressources (icônes...) : cache d'abord, mise à jour en arrière-plan
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      const fetchPromise = fetch(request)
+        .then((resp) => {
+          const copy = resp.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          return resp;
+        })
+        .catch(() => cached);
+      return cached || fetchPromise;
     })
   );
-  self.clients.claim();
 });
-
-// Fetch - Network first, fallback to cache (good for local app)
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // Cache successful responses
-        if (response && response.status === 200) {
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-        }
-        return response;
-      })
-      .catch(() => {
-        // Offline fallback
-        return caches.match(event.request);
-      })
-  );
-});
-
-// Optional: background sync or push later
-console.log('[SW] Privara Service Worker loaded');
