@@ -1743,12 +1743,13 @@ function normalize(a) {
       }
     }
   });
+  a.linkedOrder = Array.isArray(a.linkedOrder) ? a.linkedOrder : [];
   return a;
 }
 
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 
-function getFamilyMembers(a) {
+function getFamilyChildren(a) {
   if (!a) return [];
   let children = Store.all().filter(x => x && x.parentId === a.id);
   if (Array.isArray(a.linkedOrder) && a.linkedOrder.length) {
@@ -1761,7 +1762,12 @@ function getFamilyMembers(a) {
       return ix - iy;
     });
   }
-  return [a, ...children];
+  return children;
+}
+
+function getFamilyMembers(a) {
+  if (!a) return [];
+  return [a, ...getFamilyChildren(a)];
 }
 
 /**
@@ -1895,7 +1901,7 @@ function cardHTML(a, i, opts = {}) {
   const pct = isPlan ? (total ? Math.min(100, Math.round((a.seasons || []).reduce((n, s) => n + new Set(s.watched).size, 0) / total * 100)) : 0) : Calc.pct(a);
   const st = STATUS[a.status] || STATUS.watching;
   const time = isPlan ? (a.seasons || []).reduce((n, s) => n + s.episodes * s.duration, 0) : Calc.watchedMin(a);
-  const children = Store.all().filter(x => x.parentId === a.id);
+  const children = getFamilyChildren(a);
   const parent = a.parentId ? Store.get(a.parentId) : null;
 
   return `
@@ -3045,7 +3051,7 @@ const Detail = {
     }
 
     const parent = a.parentId ? Store.get(a.parentId) : null;
-    const children = Store.all().filter(x => x.parentId === a.id);
+    const children = getFamilyChildren(a);
     const family = [a, ...children];
 
     const total = Calc.totalEps(a), done = Calc.watchedEps(a), pct = Calc.pct(a);
@@ -3285,7 +3291,7 @@ const Detail = {
 
   rewatchAll() {
     const a = Store.get(this.id); if (!a) return;
-    const children = Store.all().filter(x => x.parentId === a.id);
+    const children = getFamilyChildren(a);
     const family = [a, ...children];
 
     if (!Store.data.watchLog) Store.data.watchLog = [];
@@ -4051,5 +4057,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a303eaa8fd2bda11',t:'MTc4NzU5MDg2Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3040bab7915a631',t:'MTc4NzU5MjIxNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
