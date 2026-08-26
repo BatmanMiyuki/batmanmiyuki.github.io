@@ -568,7 +568,7 @@
                     
                     <!-- Version indicator -->
                     <div class="px-2 py-0.5 text-[10px] bg-emerald-900 text-emerald-300 font-bold rounded-full px-2.5" style="font-size:9.5px">
-                        v4.2 • PWA
+                        v4.3 • PWA
                     </div>
 
                     <!-- PWA Install Button -->
@@ -1518,7 +1518,7 @@
             });
         }
         
-        async function uploadFiles(files, targetFolderId = null) {
+        async function uploadFiles(files, targetFolderId) {
             if (!files || files.length === 0) return;
             
             const folderId = (targetFolderId === undefined) ? currentFolderId : targetFolderId;
@@ -3284,6 +3284,25 @@
                 resetPin: () => {
                     localStorage.removeItem('privara_pin_hash');
                     location.reload();
+                },
+                // Diagnostic du partage : vérifie que le manifest contient bien share_target
+                checkShare: async () => {
+                    try {
+                        const res = await fetch('./manifest.json', { cache: 'no-store' });
+                        const manifest = await res.json();
+                        const hasShare = !!(manifest.share_target && manifest.share_target.action);
+                        const installed = navigator.standalone || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+                        const swActive = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
+                        console.log('%c[Privara] Diagnostic partage', 'font-weight:bold');
+                        console.log('  share_target dans le manifest :', hasShare ? 'OUI ✓' : 'NON ✗');
+                        console.log('  App installée (standalone)   :', installed ? 'OUI ✓' : 'NON — installez l\'app pour le partage');
+                        console.log('  Service Worker actif          :', swActive ? 'OUI ✓' : 'NON (rechargez la page)');
+                        if (!hasShare) console.warn('  Le manifest servi ne contient pas share_target ! Videz le cache et rechargez.');
+                        return { hasShare, installed, swActive };
+                    } catch (err) {
+                        console.error('[Privara] checkShare impossible :', err);
+                        return null;
+                    }
                 }
             };
             

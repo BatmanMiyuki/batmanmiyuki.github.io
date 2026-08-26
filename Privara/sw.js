@@ -1,10 +1,9 @@
 // Privara PWA - Service Worker (fichier externe)
-const CACHE_NAME = 'privara-v3';
+const CACHE_NAME = 'privara-v4';
 const SHARE_DB_NAME = 'PrivaraShareDB';
 const ASSETS = [
   './',
   './index.html',
-  './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-180.png',
@@ -84,7 +83,8 @@ self.addEventListener('fetch', (event) => {
         console.warn('[SW] Erreur lors du partage :', err);
       }
       // Redirige vers l'application, qui proposera le choix du dossier
-      return Response.redirect('./index.html?shared=1');
+      const dest = new URL('./index.html?shared=1', self.location.href);
+      return Response.redirect(dest.href, 303);
     })());
     return;
   }
@@ -94,6 +94,15 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   // Ne pas intercepter les ressources externes (CDN, polices, etc.)
   if (url.origin !== location.origin) return;
+
+  // Le manifest doit TOUJOURS être frais : le navigateur le relit pour
+  // détecter le share_target. On ne le sert jamais depuis le cache.
+  if (url.pathname.endsWith('/manifest.json')) {
+    event.respondWith(
+      fetch(request).catch(() => caches.match(request))
+    );
+    return;
+  }
 
   // Navigation (la page) : toujours essayer le réseau d'abord
   if (request.mode === 'navigate') {
