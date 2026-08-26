@@ -568,7 +568,7 @@
                     
                     <!-- Version indicator -->
                     <div class="px-2 py-0.5 text-[10px] bg-emerald-900 text-emerald-300 font-bold rounded-full px-2.5" style="font-size:9.5px">
-                        v4.1 • PWA
+                        v4.2 • PWA
                     </div>
 
                     <!-- PWA Install Button -->
@@ -974,6 +974,25 @@
                 <button onclick="closeMoveModal()" class="px-4 py-[7px] text-xs transition-colors px-5 font-semibold bg-slate-700 hover:bg-slate-600 rounded-3xl">Annuler</button>
                 <button onclick="confirmMove()" id="confirm-move-btn"
                         class="px-4 py-[7px] text-xs transition-colors px-5 font-semibold bg-indigo-600 hover:bg-indigo-500 rounded-3xl">Déplacer</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Import par partage : choix du dossier -->
+    <div id="share-folder-modal" onclick="if (event.target.id === 'share-folder-modal') closeShareFolderModal(true)" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[225]">
+        <div onclick="event.stopImmediatePropagation()" class="bg-slate-800 border border-slate-700 w-full max-w-md mx-4 rounded-3xl p-5">
+            <h4 class="font-bold px-1 text-lg">Importer dans un dossier</h4>
+            <p id="share-file-count" class="text-xs text-slate-400 px-1 mt-0.5"></p>
+            
+            <div class="my-4">
+                <div id="share-folder-list" class="max-h-[260px] overflow-auto custom-scroll space-y-[1px]">
+                    <!-- Rempli par JS -->
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-end gap-x-2">
+                <button onclick="closeShareFolderModal(true)" class="px-4 py-[7px] text-xs transition-colors px-5 font-semibold bg-slate-700 hover:bg-slate-600 rounded-3xl">Annuler</button>
+                <button onclick="confirmShareImport()" class="px-4 py-[7px] text-xs transition-colors px-5 font-semibold bg-indigo-600 hover:bg-indigo-500 rounded-3xl">Importer</button>
             </div>
         </div>
     </div>
@@ -1502,7 +1521,7 @@
         async function uploadFiles(files, targetFolderId = null) {
             if (!files || files.length === 0) return;
             
-            const folderId = targetFolderId || currentFolderId;
+            const folderId = (targetFolderId === undefined) ? currentFolderId : targetFolderId;
             const loadingToast = showToast(`Téléversement de ${files.length} fichier(s)...`, true);
             
             let successCount = 0;
@@ -2509,6 +2528,183 @@
             showToast(`${movedCount} élément(s) déplacé(s)`, false, true);
         }
         
+        // ===================== IMPORT PAR PARTAGE (Web Share Target) =====================
+        // Les fichiers partagés via le menu "Partager" du téléphone sont déposés
+        // par le Service Worker dans la base PrivaraShareDB, puis récupérés ici.
+        
+        let pendingSharedFiles = [];
+        let selectedShareFolderId = null;
+        let selectedShareFolderEl = null;
+        
+        function openShareDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open('PrivaraShareDB', 1);
+                req.onupgradeneeded = () => {
+                    const d = req.result;
+                    if (!d.objectStoreNames.contains('shares')) {
+                        d.createObjectStore('shares', { keyPath: 'id', autoIncrement: true });
+                    }
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+        
+        function getPendingShares() {
+            return openShareDB().then((db) => new Promise((resolve) => {
+                const tx = db.transaction('shares', 'readonly');
+                const req = tx.objectStore('shares').getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => resolve([]);
+            })).catch(() => Promise.resolve([]));
+        }
+        
+        function clearPendingShares() {
+            return openShareDB().then((db) => new Promise((resolve) => {
+                const tx = db.transaction('shares', 'readwrite');
+                tx.objectStore('shares').clear();
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => resolve();
+            })).catch(() => Promise.resolve());
+        }
+        
+        async function checkPendingShares() {
+            try {
+                const entries = await getPendingShares();
+                if (!entries || entries.length === 0) return;
+                
+                // On vide la file AVANT le traitement pour éviter tout doublon
+                await clearPendingShares();
+                
+                const files = entries
+                    .map(e => {
+                        let f = e.file;
+                        // Au cas où le nom serait perdu, on le restaure depuis le champ stocké
+                        if (f && e.name && !f.name) {
+                            try {
+                                f = new File([f], e.name, { type: f.type || e.type || '' });
+                            } catch (err) {}
+                        }
+                        return f;
+                    })
+                    .filter(f => f && (f.type.startsWith('image/') || f.type.startsWith('video/')));
+                
+                if (files.length === 0) {
+                    showToast('Aucune photo/vidéo reçue.', false);
+                    return;
+                }
+                
+                showShareFolderModal(files);
+            } catch (err) {
+                console.warn('[Privara] Vérification des partages impossible :', err);
+            }
+        }
+        
+        function showShareFolderModal(files) {
+            pendingSharedFiles = files;
+            selectedShareFolderId = null;
+            selectedShareFolderEl = null;
+            
+            const modal = document.getElementById('share-folder-modal');
+            const list = document.getElementById('share-folder-list');
+            const count = document.getElementById('share-file-count');
+            
+            count.innerHTML = `${files.length} fichier(s) à importer`;
+            list.innerHTML = '';
+            
+            // Option "racine" : Tous les médias
+            const root = document.createElement('div');
+            root.className = 'px-4 py-[8.5px] flex items-center cursor-pointer hover:bg-slate-700 rounded-2xl gap-x-3';
+            root.innerHTML = `
+                <div class="flex items-center gap-x-[9px] flex-1">
+                    <i class="fa-solid fa-th-large text-lg text-indigo-300 w-5"></i>
+                    <div><span class="font-semibold">Tous les médias</span></div>
+                </div>
+            `;
+            root.onclick = () => selectShareFolder(null, root);
+            list.appendChild(root);
+            
+            // Dossiers en arborescence
+            const renderOptions = (parentId, level) => {
+                const children = allFolders
+                    .filter(f => f.parentId === parentId)
+                    .sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
+                
+                children.forEach(folder => {
+                    const item = document.createElement('div');
+                    item.className = 'px-4 py-[8.5px] flex items-center cursor-pointer hover:bg-slate-700 rounded-2xl gap-x-3';
+                    item.style.paddingLeft = `${level * 16 + 16}px`;
+                    item.innerHTML = `
+                        <div class="flex items-center gap-x-[9px] flex-1">
+                            <i class="fa-solid fa-folder text-lg text-indigo-300 w-5"></i>
+                            <div><span class="font-semibold">${folder.name}</span></div>
+                        </div>
+                    `;
+                    item.onclick = () => selectShareFolder(folder.id, item);
+                    list.appendChild(item);
+                    renderOptions(folder.id, level + 1);
+                });
+            };
+            renderOptions(null, 1);
+            
+            // Présélection : le dossier actuellement ouvert (si on est dans un dossier)
+            if (currentFolderId) {
+                const cur = allFolders.find(f => f.id === currentFolderId);
+                if (cur) selectShareFolder(cur.id, null);
+            }
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        
+        function selectShareFolder(folderId, el) {
+            selectedShareFolderId = folderId;
+            
+            if (selectedShareFolderEl) {
+                selectedShareFolderEl.classList.remove('bg-indigo-700', 'bg-opacity-30');
+            }
+            
+            if (el) {
+                el.classList.add('bg-indigo-700', 'bg-opacity-30');
+                selectedShareFolderEl = el;
+            }
+        }
+        
+        function closeShareFolderModal(cancel = false) {
+            const modal = document.getElementById('share-folder-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            
+            if (cancel) {
+                pendingSharedFiles = [];
+                selectedShareFolderId = null;
+                selectedShareFolderEl = null;
+            }
+        }
+        
+        async function confirmShareImport() {
+            if (!pendingSharedFiles || pendingSharedFiles.length === 0) return;
+            
+            const files = pendingSharedFiles;
+            const targetId = selectedShareFolderId; // null = racine
+            const targetName = targetId
+                ? (allFolders.find(f => f.id === targetId)?.name || 'dossier')
+                : 'Tous les médias';
+            
+            closeShareFolderModal();
+            
+            await uploadFiles(files, targetId);
+            
+            // On affiche le dossier de destination pour voir les fichiers importés
+            if (targetId) {
+                navigateToFolder(targetId);
+            } else {
+                navigateToView('all');
+            }
+            
+            showToast(`Importés dans ${targetName}`, false, true);
+        }
+        
         function updateStats() {
             const totalCount = allMedia.length;
             document.getElementById('header-total-count').innerHTML = totalCount;
@@ -2918,6 +3114,9 @@
             setViewMode('grid');
             
             document.getElementById('media-count-display').innerHTML = allMedia.length;
+            
+            // Vérifie les fichiers reçus via le menu "Partager" du téléphone
+            checkPendingShares();
             
             if (allMedia.length === 0 && allFolders.length <= 1) {
                 setTimeout(() => {

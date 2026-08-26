@@ -1,5 +1,6 @@
 // Privara PWA - Service Worker (fichier externe)
-const CACHE_NAME = 'privara-v2';
+const CACHE_NAME = 'privara-v3';
+const SHARE_DB_NAME = 'PrivaraShareDB';
 const ASSETS = [
   './',
   './index.html',
@@ -30,9 +31,64 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// ==================== Partage externe (Web Share Target) ====================
+// Base temporaire qui reçoit les fichiers partagés ; l'application les lira
+function openShareDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(SHARE_DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      const d = req.result;
+      if (!d.objectStoreNames.contains('shares')) {
+        d.createObjectStore('shares', { keyPath: 'id', autoIncrement: true });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function storeSharedFiles(files) {
+  const db = await openShareDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('shares', 'readwrite');
+    const store = tx.objectStore('shares');
+    files.forEach((file) => {
+      // name/type stockés séparément par robustesse (le nom est préservé
+      // par les navigateurs, mais on couvre tous les cas)
+      store.add({ file, name: file.name || '', type: file.type || '', receivedAt: Date.now() });
+    });
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
 // Fetch : stratégie network-first pour la page, stale-while-revalidate pour le reste
 self.addEventListener('fetch', (event) => {
   const { request } = event;
+
+  // Partage reçu depuis le système (POST multipart sur ./share)
+  if (request.method === 'POST') {
+    event.respondWith((async () => {
+      try {
+        const url = new URL(request.url);
+        // Seule notre cible de partage est traitée
+        if (!url.pathname.endsWith('/share')) {
+          return new Response('Non trouvé', { status: 404 });
+        }
+        const formData = await request.formData();
+        const files = (formData.getAll('media') || []).filter((f) => f && f.size > 0);
+        if (files.length > 0) {
+          await storeSharedFiles(files);
+        }
+      } catch (err) {
+        console.warn('[SW] Erreur lors du partage :', err);
+      }
+      // Redirige vers l'application, qui proposera le choix du dossier
+      return Response.redirect('./index.html?shared=1');
+    })());
+    return;
+  }
+
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
