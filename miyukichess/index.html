@@ -96,8 +96,10 @@ body{background:var(--bg);color:var(--paper);font-family:'Syne',sans-serif;min-h
 .elo-edit input{padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--paper);font-family:'Fragment Mono',monospace;font-size:13px;font-weight:700;text-align:center}
 .modal{position:fixed;inset:0;z-index:50;background:rgba(14,14,11,.6);backdrop-filter:blur(16px);display:none;place-items:center;padding:14px}
 .modal.open{display:grid}
-.modal-box{width:min(720px,100%);max-height:90vh;overflow:auto;background:var(--paper);border-radius:20px;border:1px solid var(--line);padding:16px;color:var(--ink);box-shadow:0 30px 80px rgba(0,0,0,.2)}
+.modal-box{width:min(820px,100%);max-height:90vh;overflow:auto;background:var(--paper);border-radius:20px;border:1px solid var(--line);padding:16px;color:var(--ink);box-shadow:0 30px 80px rgba(0,0,0,.2)}
 .modal-box input{padding:8px 10px;border-radius:8px;border:1px solid var(--line);font-family:'Fragment Mono',monospace;font-size:12px}
+.tab{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.tab.active{background:var(--ink);color:#fff}
 .confetti{position:fixed;inset:0;pointer-events:none;z-index:70}
 </style>
 </head>
@@ -107,7 +109,7 @@ body{background:var(--bg);color:var(--paper);font-family:'Syne',sans-serif;min-h
     <img src="logo-title.png" class="top-logo" alt="Miyuki">
     <div class="top-title">MIYUKI <span>STUDIO</span></div>
     <div class="pill"><span id="progressText">0/0</span> <b id="cycleNum">#1</b></div>
-    <div class="pill"><span id="accCount">0</span> comptes</div>
+    <div class="pill"><span id="accCount">0</span> comptes <span id="accPlatLabel" style="color:var(--gold)"></span></div>
   </div>
   <div class="top-right">
     <div class="platforms" id="platformSwitch">
@@ -120,22 +122,22 @@ body{background:var(--bg);color:var(--paper);font-family:'Syne',sans-serif;min-h
 
 <div class="layout">
   <div class="col accounts-col">
-    <div style="display:flex;justify-content:space-between;align-items:center"><h3 class="serif" style="font-size:20px">Comptes</h3><button class="btn" style="padding:6px 10px;font-size:10px;background:#1A1815;color:#fff;border-color:#2A2824" onclick="openManage()">⚙️ Gérer</button></div>
+    <div style="display:flex;justify-content:space-between;align-items:center"><h3 class="serif" style="font-size:20px">Comptes <span id="currentPlatTitle" style="color:var(--gold)"></span></h3><button class="btn" style="padding:6px 10px;font-size:10px;background:#1A1815;color:#fff;border-color:#2A2824" onclick="openManage()">⚙️ Gérer</button></div>
     <div id="accountsList" style="display:grid;gap:8px"></div>
-    <button class="add-btn" onclick="addAccount()">+ Ajouter compte</button>
+    <button class="add-btn" onclick="addAccount()">+ Ajouter compte à <span class="addPlatLabel"></span></button>
     <div class="card">
       <div class="mono" style="font-size:10px;color:#8A867E;letter-spacing:.1em;text-transform:uppercase">Stats — <span id="statsPlat">SocialChess</span></div>
       <div id="quickStats" style="margin-top:8px;display:grid;gap:6px"></div>
     </div>
     <div style="margin-top:auto;display:flex;gap:6px">
-      <button class="btn" style="padding:8px 12px;font-size:10px;background:#1A1815;color:#fff;border-color:#2A2824;flex:1" onclick="resetCycle()">↻ Cycle</button>
-      <button class="btn" style="padding:8px 12px;font-size:10px;background:transparent;color:#8A867E;border-color:#2A2824;flex:1" onclick="resetAll()">Reset</button>
+      <button class="btn" style="padding:8px 12px;font-size:10px;background:#1A1815;color:#fff;border-color:#2A2824;flex:1" onclick="resetCycle()">↻ Cycle <span class="addPlatLabel"></span></button>
+      <button class="btn" style="padding:8px 12px;font-size:10px;background:transparent;color:#8A867E;border-color:#2A2824;flex:1" onclick="resetAll()">Reset total</button>
     </div>
   </div>
 
   <div class="col orders-col">
     <div style="display:flex;justify-content:space-between;align-items:end;gap:10px;flex-wrap:wrap;margin-bottom:10px">
-      <div><h2 class="serif" style="font-size:28px">Ordres <span style="color:var(--gold);font-style:italic">de passage</span></h2><p class="mono" style="font-size:11px;color:#8A867E;margin-top:4px">Auto selon nb comptes • 11 mats en boucle • Gauche = gagnant</p></div>
+      <div><h2 class="serif" style="font-size:28px">Ordres <span style="color:var(--gold);font-style:italic">de passage</span> — <span id="ordersPlat" style="font-size:16px"></span></h2><p class="mono" style="font-size:11px;color:#8A867E;margin-top:4px">Auto selon nb comptes • 11 mats en boucle continue • Gauche = gagnant</p></div>
       <div style="display:flex;gap:6px"><button class="btn" style="padding:7px 12px;font-size:10px;background:#1A1815;color:#fff;border-color:#2A2824" onclick="regenerateOrders()">↻ Ordres</button><button class="btn" style="padding:7px 12px;font-size:10px;background:#1A1815;color:#fff;border-color:#2A2824" onclick="shiftMats()">🎲 Mats +1</button></div>
     </div>
 
@@ -144,8 +146,9 @@ body{background:var(--bg);color:var(--paper);font-family:'Syne',sans-serif;min-h
     <div id="cycleBanner" style="margin-top:12px"></div>
 
     <div class="card" style="margin-top:14px">
-      <div class="mono" style="font-size:10px;color:#8A867E;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">11 mats — boucle actuelle (décalage <span id="matOffset">0</span>)</div>
+      <div class="mono" style="font-size:10px;color:#8A867E;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">11 mats — boucle continue (décalage <span id="matOffset">0</span> — prochain mat <span id="nextMatName"></span>)</div>
       <div id="matsList" style="display:grid;gap:5px"></div>
+      <div class="mono" style="font-size:9px;color:#8A867E;margin-top:8px">Quand un cycle finit, on continue au mat suivant (pas retour à Caro-Kann). Ex: si tu finis sur #10, le prochain cycle commence à #11 Queen's, puis #1.</div>
     </div>
   </div>
 
@@ -177,7 +180,7 @@ body{background:var(--bg);color:var(--paper);font-family:'Syne',sans-serif;min-h
 
 <div id="manageModal" class="modal">
   <div class="modal-box">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 class="serif" style="font-size:22px">Gérer comptes</h3><button class="btn" style="padding:6px 10px;font-size:10px" onclick="closeManage()">✕</button></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap"><h3 class="serif" style="font-size:22px">Gérer comptes séparés</h3><div style="display:flex;gap:6px"><button id="tabSocial" class="tab active" onclick="setManageTab('socialchess')">SocialChess</button><button id="tabSimple" class="tab" onclick="setManageTab('simplechess')">SimpleChess</button><button class="btn" style="padding:6px 10px;font-size:10px" onclick="closeManage()">✕</button></div></div>
     <div id="manageContent" style="display:grid;gap:10px"></div>
     <div style="margin-top:12px;display:flex;gap:8px"><button class="btn" style="background:var(--ink);color:#fff" onclick="saveManage()">💾 Sauver</button><button class="btn" onclick="closeManage()">Fermer</button></div>
   </div>
@@ -189,7 +192,8 @@ body{background:var(--bg);color:var(--paper);font-family:'Syne',sans-serif;min-h
 var Chess=function(r){var u="b",s="w",l=-1,_="p",A="n",S="b",m="r",y="q",p="k",t="pnbrqkPNBRQK",e="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",g=["1-0","0-1","1/2-1/2","*"],C={b:[16,32,17,15],w:[-16,-32,-17,-15]},T={n:[-18,-33,-31,-14,18,33,31,14],b:[-17,-15,17,15],r:[-16,1,16,-1],q:[-17,-16,-15,1,17,16,15,-1],k:[-17,-16,-15,1,17,16,15,-1]},c=[20,0,0,0,0,0,0,24,0,0,0,0,0,0,20,0,0,20,0,0,0,0,0,24,0,0,0,0,0,20,0,0,0,0,20,0,0,0,0,24,0,0,0,0,20,0,0,0,0,0,0,20,0,0,0,24,0,0,0,20,0,0,0,0,0,0,0,0,20,0,0,24,0,0,20,0,0,0,0,0,0,0,0,0,0,20,2,24,2,20,0,0,0,0,0,0,0,0,0,0,0,2,53,56,53,2,0,0,0,0,0,0,24,24,24,24,24,24,56,0,56,24,24,24,24,24,24,0,0,0,0,0,0,2,53,56,53,2,0,0,0,0,0,0,0,0,0,0,0,20,2,24,2,20,0,0,0,0,0,0,0,0,0,0,20,0,0,24,0,0,20,0,0,0,0,0,0,0,0,20,0,0,0,24,0,0,0,20,0,0,0,0,0,0,20,0,0,0,0,24,0,0,0,0,20,0,0,0,0,20,0,0,0,0,0,24,0,0,0,0,0,20,0,0,20,0,0,0,0,0,0,24,0,0,0,0,0,0,20],v=[17,0,0,0,0,0,0,16,0,0,0,0,0,0,15,0,0,17,0,0,0,0,0,16,0,0,0,0,0,15,0,0,0,0,17,0,0,0,0,16,0,0,0,0,15,0,0,0,0,0,0,17,0,0,0,16,0,0,0,15,0,0,0,0,0,0,0,0,17,0,0,16,0,0,15,0,0,0,0,0,0,0,0,0,0,17,0,16,0,15,0,0,0,0,0,0,0,0,0,0,0,0,17,16,15,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,0,-15,-16,-17,0,0,0,0,0,0,0,0,0,0,0,0,-15,0,-16,0,-17,0,0,0,0,0,0,0,0,0,0,-15,0,0,-16,0,0,-17,0,0,0,0,0,0,0,0,-15,0,0,0,-16,0,0,0,-17,0,0,0,0,0,0,-15,0,0,0,0,-16,0,0,0,0,-17,0,0,0,0,-15,0,0,0,0,0,-16,0,0,0,0,0,-17,0,0,-15,0,0,0,0,0,0,-16,0,0,0,0,0,0,-17],h={p:0,n:1,b:2,r:3,q:4,k:5},o={NORMAL:"n",CAPTURE:"c",BIG_PAWN:"b",EP_CAPTURE:"e",PROMOTION:"p",KSIDE_CASTLE:"k",QSIDE_CASTLE:"q"},I={NORMAL:1,CAPTURE:2,BIG_PAWN:4,EP_CAPTURE:8,PROMOTION:16,KSIDE_CASTLE:32,QSIDE_CASTLE:64},P=7,w=6,L=1,R=0,N={a8:0,b8:1,c8:2,d8:3,e8:4,f8:5,g8:6,h8:7,a7:16,b7:17,c7:18,d7:19,e7:20,f7:21,g7:22,h7:23,a6:32,b6:33,c6:34,d6:35,e6:36,f6:37,g6:38,h6:39,a5:48,b5:49,c5:50,d5:51,e5:52,f5:53,g5:54,h5:55,a4:64,b4:65,c4:66,d4:67,e4:68,f4:69,g4:70,h4:71,a3:80,b3:81,c3:82,d3:83,e3:84,f3:85,g3:86,h3:87,a2:96,b2:97,c2:98,d2:99,e2:100,f2:101,g2:102,h2:103,a1:112,b1:113,c1:114,d1:115,e1:116,f1:117,g1:118,h1:119},E={w:[{square:N.a1,flag:I.QSIDE_CASTLE},{square:N.h1,flag:I.KSIDE_CASTLE}],b:[{square:N.a8,flag:I.QSIDE_CASTLE},{square:N.h8,flag:I.KSIDE_CASTLE}]},O=new Array(128),k={w:l,b:l},q=s,D={w:0,b:0},K=l,d=0,b=1,Q=[],U={};function x(r){void 0===r&&(r=!1),O=new Array(128),k={w:l,b:l},q=s,D={w:0,b:0},K=l,d=0,b=1,Q=[],r||(U={}),F(M())}function j(){B(e)}function B(r,e){void 0===e&&(e=!1);var n=r.split(/\s+/),t=n[0],o=0;if(!$(r).valid)return!1;x(e);for(var i=0;i<t.length;i++){var f=t.charAt(i);if("/"===f)o+=8;else if(-1!=="0123456789".indexOf(f))o+=parseInt(f,10);else{var a=f<"a"?s:u;W({type:f.toLowerCase(),color:a},fr(o)),o++}}return q=n[1],-1<n[2].indexOf("K")&&(D.w|=I.KSIDE_CASTLE),-1<n[2].indexOf("Q")&&(D.w|=I.QSIDE_CASTLE),-1<n[2].indexOf("k")&&(D.b|=I.KSIDE_CASTLE),-1<n[2].indexOf("q")&&(D.b|=I.QSIDE_CASTLE),K="-"===n[3]?l:N[n[3]],d=parseInt(n[4],10),b=parseInt(n[5],10),F(M()),!0}function $(r){var e="No errors.",n="FEN string must contain six space-delimited fields.",t="6th field (move number) must be a positive integer.",o="5th field (half move counter) must be a non-negative integer.",i="4th field (en-passant square) is invalid.",f="3rd field (castling availability) is invalid.",a="2nd field (side to move) is invalid.",l="1st field (piece positions) does not contain 8 '/'-delimited rows.",u="1st field (piece positions) is invalid [consecutive numbers].",s="1st field (piece positions) is invalid [invalid piece].",p="1st field (piece positions) is invalid [row too large].",c="Illegal en-passant square",v=r.split(/\s+/);if(6!==v.length)return{valid:!1,error_number:1,error:n};if(isNaN(v[5])||parseInt(v[5],10)<=0)return{valid:!1,error_number:2,error:t};if(isNaN(v[4])||parseInt(v[4],10)<0)return{valid:!1,error_number:3,error:o};if(!/^(-|[abcdefgh][36])$/.test(v[3]))return{valid:!1,error_number:4,error:i};if(!/^(KQ?k?q?|Qk?q?|kq?|q|-)$/.test(v[2]))return{valid:!1,error_number:5,error:f};if(!/^(w|b)$/.test(v[1]))return{valid:!1,error_number:6,error:a};var g=v[0].split("/");if(8!==g.length)return{valid:!1,error_number:7,error:l};for(var h=0;h<g.length;h++){for(var E=0,d=!1,b=0;b<g[h].length;b++)if(isNaN(g[h][b])){if(!/^[prnbqkPRNBQK]$/.test(g[h][b]))return{valid:!1,error_number:9,error:s};E+=1,d=!1}else{if(d)return{valid:!1,error_number:8,error:u};E+=parseInt(g[h][b],10),d=!0}if(8!==E)return{valid:!1,error_number:10,error:p}}return"3"==v[3][1]&&"w"==v[1]||"6"==v[3][1]&&"b"==v[1]?{valid:!1,error_number:11,error:c}:{valid:!0,error_number:0,error:e}}function M(){for(var r=0,e="",n=N.a8;n<=N.h1;n++){if(null==O[n])r++;else{0<r&&(e+=r,r=0);var t=O[n].color,o=O[n].type;e+=t===s?o.toUpperCase():o.toLowerCase()}n+1&136&&(0<r&&(e+=r),n!==N.h1&&(e+="/"),r=0,n+=8)}var i="";D[s]&I.KSIDE_CASTLE&&(i+="K"),D[s]&I.QSIDE_CASTLE&&(i+="Q"),D[u]&I.KSIDE_CASTLE&&(i+="k"),D[u]&I.QSIDE_CASTLE&&(i+="q"),i=i||"-";var f=K===l?"-":fr(K);return[e,q,i,f,d,b].join(" ")}function G(r){for(var e=0;e<r.length;e+=2)"string"==typeof r[e]&&"string"==typeof r[e+1]&&(U[r[e]]=r[e+1]);return U}function F(r){0<Q.length||(r!==e?(U.SetUp="1",U.FEN=r):(delete U.SetUp,delete U.FEN))}function i(r){var e=O[N[r]];return e?{type:e.type,color:e.color}:null}function W(r,e){if(!("type"in r&&"color"in r))return!1;if(-1===t.indexOf(r.type.toLowerCase()))return!1;if(!(e in N))return!1;var n=N[e];return(r.type!=p||k[r.color]==l||k[r.color]==n)&&(O[n]={type:r.type,color:r.color},r.type===p&&(k[r.color]=n),F(M()),!0)}function H(r,e,n,t,o){var i={color:q,from:e,to:n,flags:t,piece:r[e].type};return o&&(i.flags|=I.PROMOTION,i.promotion=o),r[n]?i.captured=r[n].type:t&I.EP_CAPTURE&&(i.captured=_),i}function Z(r){function e(r,e,n,t,o){if(r[n].type!==_||or(t)!==R&&or(t)!==P)e.push(H(r,n,t,o));else for(var i=[y,m,S,A],f=0,a=i.length;f<a;f++)e.push(H(r,n,t,o,i[f]))}var n=[],t=q,o=ar(t),i={b:L,w:w},f=N.a8,a=N.h1,l=!1,u=!(void 0!==r&&"legal"in r)||r.legal;if(void 0!==r&&"square"in r){if(!(r.square in N))return[];f=a=N[r.square],l=!0}for(var s=f;s<=a;s++)if(136&s)s+=7;else{var p=O[s];if(null!=p&&p.color===t)if(p.type===_){var c=s+C[t][0];if(null==O[c]){e(O,n,s,c,I.NORMAL);c=s+C[t][1];i[t]===or(s)&&null==O[c]&&e(O,n,s,c,I.BIG_PAWN)}for(v=2;v<4;v++){136&(c=s+C[t][v])||(null!=O[c]&&O[c].color===o?e(O,n,s,c,I.CAPTURE):c===K&&e(O,n,s,K,I.EP_CAPTURE))}}else for(var v=0,g=T[p.type].length;v<g;v++){var h=T[p.type][v];for(c=s;!(136&(c+=h));){if(null!=O[c]){if(O[c].color===t)break;e(O,n,s,c,I.CAPTURE);break}if(e(O,n,s,c,I.NORMAL),"n"===p.type||"k"===p.type)break}}}if(!l||a===k[t]){if(D[t]&I.KSIDE_CASTLE){var E=(d=k[t])+2;null!=O[d+1]||null!=O[E]||V(o,k[t])||V(o,d+1)||V(o,E)||e(O,n,k[t],E,I.KSIDE_CASTLE)}if(D[t]&I.QSIDE_CASTLE){var d;E=(d=k[t])-2;null!=O[d-1]||null!=O[d-2]||null!=O[d-3]||V(o,k[t])||V(o,d-1)||V(o,E)||e(O,n,k[t],E,I.QSIDE_CASTLE)}}if(!u)return n;var b=[];for(s=0,g=n.length;s<g;s++)er(n[s]),X(t)||b.push(n[s]),nr();return b}function z(r,e){var n="";if(r.flags&I.KSIDE_CASTLE)n="O-O";else if(r.flags&I.QSIDE_CASTLE)n="O-O-O";else{var t=function(r,e){for(var n=Z({legal:!e}),t=r.from,o=r.to,i=r.piece,f=0,a=0,l=0,u=0,s=n.length;u<s;u++){var p=n[u].from,c=n[u].to,v=n[u].piece;i===v&&t!==p&&o===c&&(f++,or(t)===or(p)&&a++,ir(t)===ir(p)&&l++)}if(0<f)return 0<a&&0<l?fr(t):0<l?fr(t).charAt(1):fr(t).charAt(0);return""}(r,e);r.piece!==_&&(n+=r.piece.toUpperCase()+t),r.flags&(I.CAPTURE|I.EP_CAPTURE)&&(r.piece===_&&(n+=fr(r.from)[0]),n+="x"),n+=fr(r.to),r.flags&I.PROMOTION&&(n+="="+r.promotion.toUpperCase())}return er(r),f()&&(a()?n+="#":n+="+"),nr(),n}function J(r){return r.replace(/=/,"").replace(/[+#]?[?!]*$/,"")}function V(r,e){for(var n=N.a8;n<=N.h1;n++)if(136&n)n+=7;else if(null!=O[n]&&O[n].color===r){var t=O[n],o=n-e,i=119+o;if(c[i]&1<<h[t.type]){if(t.type===_){if(0<o){if(t.color===s)return!0}else if(t.color===u)return!0;continue}if("n"===t.type||"k"===t.type)return!0;for(var f=v[i],a=n+f,l=!1;a!==e;){if(null!=O[a]){l=!0;break}a+=f}if(!l)return!0}}return!1}function X(r){return V(ar(r),k[r])}function f(){return X(q)}function a(){return f()&&0===Z().length}function n(){return!f()&&0===Z().length}function Y(){for(var r={},e=[],n=0,t=0,o=N.a8;o<=N.h1;o++)if(t=(t+1)%2,136&o)o+=7;else{var i=O[o];i&&(r[i.type]=i.type in r?r[i.type]+1:1,i.type===S&&e.push(t),n++)}if(2===n)return!0;if(3===n&&(1===r[S]||1===r[A]))return!0;if(n===r[S]+2){var f=0,a=e.length;for(o=0;o<a;o++)f+=e[o];if(0===f||f===a)return!0}return!1}function rr(){for(var r=[],e={},n=!1;;){var t=nr();if(!t)break;r.push(t)}for(;;){var o=M().split(" ").slice(0,4).join(" ");if(e[o]=o in e?e[o]+1:1,3<=e[o]&&(n=!0),!r.length)break;er(r.pop())}return n}function er(r){var e,n=q,t=ar(n);if(e=r,Q.push({move:e,kings:{b:k.b,w:k.w},turn:q,castling:{b:D.b,w:D.w},ep_square:K,half_moves:d,move_number:b}),O[r.to]=O[r.from],O[r.from]=null,r.flags&I.EP_CAPTURE&&(q===u?O[r.to-16]=null:O[r.to+16]=null),r.flags&I.PROMOTION&&(O[r.to]={type:r.promotion,color:n}),O[r.to].type===p){if(k[O[r.to].color]=r.to,r.flags&I.KSIDE_CASTLE){var o=r.to-1,i=r.to+1;O[o]=O[i],O[i]=null}else if(r.flags&I.QSIDE_CASTLE){o=r.to+1,i=r.to-2;O[o]=O[i],O[i]=null}D[n]=""}if(D[n])for(var f=0,a=E[n].length;f<a;f++)if(r.from===E[n][f].square&&D[n]&E[n][f].flag){D[n]^=E[n][f].flag;break}if(D[t])for(f=0,a=E[t].length;f<a;f++)if(r.to===E[t][f].square&&D[t]&E[t][f].flag){D[t]^=E[t][f].flag;break}K=r.flags&I.BIG_PAWN?"b"===q?r.to-16:r.to+16:l,r.piece===_||r.flags&(I.CAPTURE|I.EP_CAPTURE)?d=0:d++,q===u&&b++,q=ar(q)}function nr(){var r=Q.pop();if(null==r)return null;var e=r.move;k=r.kings,q=r.turn,D=r.castling,K=r.ep_square,d=r.half_moves,b=r.move_number;var n,t,o=q,i=ar(q);if(O[e.from]=O[e.to],O[e.from].type=e.piece,O[e.to]=null,e.flags&I.CAPTURE)O[e.to]={type:e.captured,color:i};else if(e.flags&I.EP_CAPTURE){var f;f=o===u?e.to-16:e.to+16,O[f]={type:_,color:i}}e.flags&(I.KSIDE_CASTLE|I.QSIDE_CASTLE)&&(e.flags&I.KSIDE_CASTLE?(n=e.to+1,t=e.to-1):e.flags&I.QSIDE_CASTLE&&(n=e.to-2,t=e.to+1),O[n]=O[t],O[t]=null);return e}function tr(r,e){var n=J(r);if(e){var t=n.match(/([pnbrqkPNBRQK])?([a-h][1-8])x?-?([a-h][1-8])([qrbnQRBN])?/);if(t)var o=t[1],i=t[2],f=t[3],a=t[4]}for(var l=Z(),u=0,s=l.length;u<s;u++){if(n===J(z(l[u]))||e&&n===J(z(l[u],!0)))return l[u];if(t&&(!o||o.toLowerCase()==l[u].piece)&&N[i]==l[u].from&&N[f]==l[u].to&&(!a||a.toLowerCase()==l[u].promotion))return l[u]}return null}function or(r){return r>>4}function ir(r){return 15&r}function fr(r){var e=ir(r),n=or(r);return"abcdefgh".substring(e,e+1)+"87654321".substring(n,n+1)}function ar(r){return r===s?u:s}function lr(r){var e=function r(e){var n=e instanceof Array?[]:{};for(var t in e)n[t]="object"==typeof t?r(e[t]):e[t];return n}(r);e.san=z(e,!1),e.to=fr(e.to),e.from=fr(e.from);var n="";for(var t in I)I[t]&e.flags&&(n+=o[t]);return e.flags=n,e}function ur(r){return r.replace(/^\s+|\s+$/g,"")}return B(void 0===r?e:r),{WHITE:s,BLACK:u,PAWN:_,KNIGHT:A,BISHOP:S,ROOK:m,QUEEN:y,KING:p,SQUARES:function(){for(var r=[],e=N.a8;e<=N.h1;e++)136&e?e+=7:r.push(fr(e));return r}(),FLAGS:o,load:function(r){return B(r)},reset:function(){return j()},moves:function(r){for(var e=Z(r),n=[],t=0,o=e.length;t<o;t++)void 0!==r&&"verbose"in r&&r.verbose?n.push(lr(e[t])):n.push(z(e[t],!1));return n},in_check:function(){return f()},in_checkmate:function(){return a()},in_stalemate:function(){return n()},in_draw:function(){return 100<=d||n()||Y()||rr()},insufficient_material:function(){return Y()},in_threefold_repetition:function(){return rr()},game_over:function(){return 100<=d||a()||n()||Y()||rr()},validate_fen:function(r){return $(r)},fen:function(){return M()},board:function(){for(var r=[],e=[],n=N.a8;n<=N.h1;n++)null==O[n]?e.push(null):e.push({type:O[n].type,color:O[n].color}),n+1&136&&(r.push(e),e=[],n+=8);return r},pgn:function(r){var e="object"==typeof r&&"string"==typeof r.newline_char?r.newline_char:"\n",n="object"==typeof r&&"number"==typeof r.max_width?r.max_width:0,t=[],o=!1;for(var i in U)t.push("["+i+' "'+U[i]+'"]'+e),o=!0;o&&Q.length&&t.push(e);for(var f=[];0<Q.length;)f.push(nr());for(var a=[],l="";0<f.length;){var u=f.pop();Q.length||"b"!==u.color?"w"===u.color&&(l.length&&a.push(l),l=b+"."):l=b+". ...",l=l+" "+z(u,!1),er(u)}if(l.length&&a.push(l),void 0!==U.Result&&a.push(U.Result),0===n)return t.join("")+a.join(" ");var s=0;for(i=0;i<a.length;i++)s+a[i].length>n&&0!==i?(" "===t[t.length-1]&&t.pop(),t.push(e),s=0):0!==i&&(t.push(" "),s++),t.push(a[i]),s+=a[i].length;return t.join("")},load_pgn:function(r,e){var n=void 0!==e&&"sloppy"in e&&e.sloppy;function l(r){return r.replace(/\\/g,"\\")}var t="object"==typeof e&&"string"==typeof e.newline_char?e.newline_char:"\r?\n",o=new RegExp("^(\\[((?:"+l(t)+")|.)*\\])(?:"+l(t)+"){2}"),i=o.test(r)?o.exec(r)[1]:"";j();var f=function(r,e){for(var n="object"==typeof e&&"string"==typeof e.newline_char?e.newline_char:"\r?\n",t={},o=r.split(new RegExp(l(n))),i="",f="",a=0;a<o.length;a++)i=o[a].replace(/^\[([A-Z][A-Za-z]*)\s.*\]$/,"$1"),f=o[a].replace(/^\[[A-Za-z]+\s"(.*)"\]$/,"$1"),0<ur(i).length&&(t[i]=f);return t}(i,e);for(var a in f)G([a,f[a]]);if("1"===f.SetUp&&!("FEN"in f&&B(f.FEN,!0)))return!1;var u=r.replace(i,"").replace(new RegExp(l(t),"g")," ");u=u.replace(/(\{[^}]+\})+?/g,"");for(var s=/(\([^\(\)]+\))+?/g;s.test(u);)u=u.replace(s,"");var p=ur(u=(u=(u=u.replace(/\d+\.(\.\.)?/g,"")).replace(/\.\.\./g,"")).replace(/\$\d+/g,"")).split(new RegExp(/\s+/));p=p.join(",").replace(/,,+/g,",").split(",");for(var c="",v=0;v<p.length-1;v++){if(null==(c=tr(p[v],n)))return!1;er(c)}if(c=p[p.length-1],-1<g.indexOf(c))!function(r){for(var e in r)return 1}(U)||void 0!==U.Result||G(["Result",c]);else{if(null==(c=tr(c,n)))return!1;er(c)}return!0},header:function(){return G(arguments)},ascii:function(){return function(){for(var r="   +------------------------+\n",e=N.a8;e<=N.h1;e++){if(0===ir(e)&&(r+=" "+"87654321"[or(e)]+" |"),null==O[e])r+=" . ";else{var n=O[e].type;r+=" "+(O[e].color===s?n.toUpperCase():n.toLowerCase())+" "}e+1&136&&(r+="|\n",e+=8)}return r+="   +------------------------+\n",r+="     a  b  c  d  e  f  g  h\n"}()},turn:function(){return q},move:function(r,e){var n=void 0!==e&&"sloppy"in e&&e.sloppy,t=null;if("string"==typeof r)t=tr(r,n);else if("object"==typeof r)for(var o=Z(),i=0,f=o.length;i<f;i++)if(!(r.from!==fr(o[i].from)||r.to!==fr(o[i].to)||"promotion"in o[i]&&r.promotion!==o[i].promotion)){t=o[i];break}if(!t)return null;var a=lr(t);return er(t),a},undo:function(){var r=nr();return r?lr(r):null},clear:function(){return x()},put:function(r,e){return W(r,e)},get:function(r){return i(r)},remove:function(r){return n=i(e=r),O[N[e]]=null,n&&n.type===p&&(k[n.color]=l),F(M()),n;var e,n},perft:function(r){return function r(e){for(var n=Z({legal:!1}),t=0,o=q,i=0,f=n.length;i<f;i++)er(n[i]),X(o)||(0<e-1?t+=r(e-1):t++),nr();return t}(r)},square_color:function(r){if(r in N){var e=N[r];return(or(e)+ir(e))%2==0?"light":"dark"}return null},history:function(r){for(var e=[],n=[],t=(void 0!==r&&"verbose"in r&&r.verbose);0<Q.length;)e.push(nr());for(;0<e.length;){var o=e.pop();t?n.push(lr(o)):n.push(z(o)),er(o)}return n}}};"undefined"!=typeof exports&&(exports.Chess=Chess),"undefined"!=typeof define&&define(function(){return Chess});
 </script>
 <script>
-const DEFAULT_NAMES=["Miyuki","Miyuki.EXE","MiyukiPrime","Miyuki404","MiyukiOnTop","MiyukiGhost","MiyukiZero","MiyukiNova","MiyukiX","MiyukiY"];
+const DEFAULT_NAMES_SOCIAL=["Miyuki","Miyuki.EXE","MiyukiPrime","Miyuki404","MiyukiOnTop"];
+const DEFAULT_NAMES_SIMPLE=["SimpleMiyu","SimpleX","SimpleY","SimpleZ","SimpleNova"];
 const COLORS=["#C9A86A","#6B8A9E","#12100E","#A68A5B","#8A9A9A","#2E7D5B","#B85450","#D9B18E","#5A7D8F","#C2B8A3"];
 const MODES=["bullet","blitz","rapide","classique","960"];
 const MODE_LABEL={bullet:"BULLET",blitz:"BLITZ",rapide:"RAPIDE",classique:"CLASSIQUE","960":"960"};
@@ -210,24 +214,24 @@ const MATS=[
 ];
 
 let state={
-  cycle:1,
-  accounts:[],
-  completed:new Set(),
-  assignments:{},
-  modes:{},
-  platforms:{},
+  cycle:{socialchess:1,simplechess:1},
+  accounts:{socialchess:[],simplechess:[]},
+  completed:{socialchess:new Set(),simplechess:new Set()},
+  assignments:{socialchess:{},simplechess:{}},
+  modes:{socialchess:{},simplechess:{}},
+  matOffset:{socialchess:0,simplechess:0},
   globalMode:"blitz",
   globalPlatform:"socialchess",
-  baseElo:{},
-  elo:{},
-  eloHistory:{},
-  matOffset:0,
+  baseElo:{socialchess:{},simplechess:{}},
+  elo:{socialchess:{},simplechess:{}},
+  eloHistory:{socialchess:{},simplechess:{}},
   currentId:null,
+  currentPlat:null,
   currentFens:[],
   currentMoves:[],
   currentIdx:0,
-  selectedFrom:null,
-  flipped:false
+  flipped:false,
+  manageTab:"socialchess"
 };
 
 function getAllIds(order1,order2){
@@ -236,39 +240,43 @@ function getAllIds(order1,order2){
   order2.forEach((_,i)=>ids.push(`2-${i}`));
   return ids;
 }
-
-function genOrders(){
-  const ids=state.accounts.map(a=>a.id);
+function genOrders(plat){
+  const ids=state.accounts[plat].map(a=>a.id);
   const pairs=[];
   for(let i=0;i<ids.length;i++) for(let j=i+1;j<ids.length;j++) pairs.push([ids[i],ids[j]]);
   return {order1:pairs, order2:pairs.map(p=>[p[1],p[0]])};
 }
-let ORDERS={order1:[],order2:[]};
+let ORDERS={socialchess:{order1:[],order2:[]},simplechess:{order1:[],order2:[]}};
 
-function ensureOrders(){
-  ORDERS=genOrders();
-  const all=getAllIds(ORDERS.order1,ORDERS.order2);
+function ensureOrders(plat){
+  ORDERS[plat]=genOrders(plat);
+  const all=getAllIds(ORDERS[plat].order1,ORDERS[plat].order2);
+  // keep existing assignments if still valid, else assign with offset
   all.forEach((id,idx)=>{
-    if(state.assignments[id]===undefined) state.assignments[id]=(idx+state.matOffset)%MATS.length;
-    if(!state.modes[id]) state.modes[id]=state.globalMode;
-    if(!state.platforms[id]) state.platforms[id]=state.globalPlatform;
+    if(state.assignments[plat][id]===undefined){
+      state.assignments[plat][id]=(idx+state.matOffset[plat])%MATS.length;
+    }
+    if(!state.modes[plat][id]) state.modes[plat][id]=state.globalMode;
   });
-  // clean old
-  Object.keys(state.assignments).forEach(k=>{if(!all.includes(k)) delete state.assignments[k];});
+  Object.keys(state.assignments[plat]).forEach(k=>{if(!all.includes(k)) delete state.assignments[plat][k];});
+}
+function ensureAllOrders(){
+  PLATS.forEach(p=>ensureOrders(p));
 }
 
 function initAccounts(){
-  if(state.accounts.length===0){
-    ["A","B","C","D","E"].forEach((id,i)=>{
-      state.accounts.push({id,name:DEFAULT_NAMES[i],color:COLORS[i],top:{socialchess:0,simplechess:0}});
-    });
-  }
+  PLATS.forEach(plat=>{
+    if(!state.accounts[plat] || state.accounts[plat].length===0){
+      const names=plat==='socialchess'?DEFAULT_NAMES_SOCIAL:DEFAULT_NAMES_SIMPLE;
+      state.accounts[plat]=names.slice(0,5).map((n,i)=>({id:String.fromCharCode(65+i),name:n,color:COLORS[i%COLORS.length],top:0}));
+    }
+  });
 }
 function initElo(){
   PLATS.forEach(plat=>{
     if(!state.baseElo[plat]) state.baseElo[plat]={};
     if(!state.elo[plat]) state.elo[plat]={};
-    state.accounts.forEach(acc=>{
+    state.accounts[plat].forEach(acc=>{
       if(!state.baseElo[plat][acc.id]) state.baseElo[plat][acc.id]={};
       if(!state.elo[plat][acc.id]) state.elo[plat][acc.id]={};
       MODES.forEach(m=>{
@@ -280,219 +288,310 @@ function initElo(){
 }
 function recalc(){
   PLATS.forEach(plat=>{
-    state.accounts.forEach(acc=>{
+    state.accounts[plat].forEach(acc=>{
       MODES.forEach(m=>{
         if(state.baseElo[plat]?.[acc.id]?.[m]!==undefined) state.elo[plat][acc.id][m]=state.baseElo[plat][acc.id][m];
       });
     });
-  });
-  [...state.completed].forEach(id=>{
-    const h=state.eloHistory[id];
-    if(!h) return;
-    const plat=h.platform;
-    if(!state.elo[plat]?.[h.winner]) return;
-    state.elo[plat][h.winner][h.mode]=h.wNew;
-    state.elo[plat][h.loser][h.mode]=h.lNew;
+    [...state.completed[plat]].forEach(id=>{
+      const h=state.eloHistory[plat][id];
+      if(!h) return;
+      if(!state.elo[plat]?.[h.winner]) return;
+      state.elo[plat][h.winner][h.mode]=h.wNew;
+      state.elo[plat][h.loser][h.mode]=h.lNew;
+    });
   });
 }
 function load(){
   try{
-    const raw=localStorage.getItem('miyuki_studio_v10');
+    const raw=localStorage.getItem('miyuki_studio_v11');
     if(raw){
       const s=JSON.parse(raw);
-      state.cycle=s.cycle||1;
-      state.accounts=s.accounts||[];
-      state.completed=new Set(s.completed||[]);
-      state.assignments=s.assignments||{};
-      state.modes=s.modes||{};
-      state.platforms=s.platforms||{};
+      if(s.accounts){
+        // check if old format (array) -> migrate to both plats
+        if(Array.isArray(s.accounts)){
+          const arr=s.accounts;
+          state.accounts.socialchess=arr.map(a=>({id:a.id,name:a.name,color:a.color,top:a.top?.socialchess||0}));
+          state.accounts.simplechess=arr.map(a=>({id:a.id,name:a.name+' S',color:a.color,top:a.top?.simplechess||0}));
+        }else{
+          state.accounts.socialchess=s.accounts.socialchess||[];
+          state.accounts.simplechess=s.accounts.simplechess||[];
+        }
+      }
+      if(s.cycle){
+        if(typeof s.cycle==='number'){
+          state.cycle.socialchess=s.cycle;
+          state.cycle.simplechess=s.cycle;
+        }else{
+          state.cycle.socialchess=s.cycle.socialchess||1;
+          state.cycle.simplechess=s.cycle.simplechess||1;
+        }
+      }
+      if(s.completed){
+        // could be array old or object
+        if(Array.isArray(s.completed)){
+          state.completed.socialchess=new Set(s.completed);
+          state.completed.simplechess=new Set();
+        }else{
+          state.completed.socialchess=new Set(s.completed.socialchess||[]);
+          state.completed.simplechess=new Set(s.completed.simplechess||[]);
+        }
+      }
+      if(s.assignments){
+        if(s.assignments['1-0']!==undefined){ // old flat
+          state.assignments.socialchess=s.assignments;
+          state.assignments.simplechess={};
+        }else{
+          state.assignments.socialchess=s.assignments.socialchess||{};
+          state.assignments.simplechess=s.assignments.simplechess||{};
+        }
+      }
+      if(s.modes){
+        if(s.modes['1-0']!==undefined){
+          state.modes.socialchess=s.modes;
+          state.modes.simplechess={};
+        }else{
+          state.modes.socialchess=s.modes.socialchess||{};
+          state.modes.simplechess=s.modes.simplechess||{};
+        }
+      }
+      if(s.matOffset!==undefined){
+        if(typeof s.matOffset==='number'){
+          state.matOffset.socialchess=s.matOffset;
+          state.matOffset.simplechess=s.matOffset;
+        }else{
+          state.matOffset.socialchess=s.matOffset.socialchess||0;
+          state.matOffset.simplechess=s.matOffset.simplechess||0;
+        }
+      }
       state.globalMode=s.globalMode||"blitz";
       state.globalPlatform=s.globalPlatform||"socialchess";
-      state.baseElo=s.baseElo||{};
-      state.elo=s.elo||{};
-      state.eloHistory=s.eloHistory||{};
-      state.matOffset=s.matOffset||0;
+      state.baseElo=s.baseElo||{socialchess:{},simplechess:{}};
+      state.elo=s.elo||{socialchess:{},simplechess:{}};
+      state.eloHistory=s.eloHistory||{socialchess:{},simplechess:{}};
+      // migrate eloHistory old flat
+      if(state.eloHistory['1-0']!==undefined){
+        state.eloHistory={socialchess:state.eloHistory,simplechess:{}};
+      }
+      // ensure eloHistory per plat is object not array
+      PLATS.forEach(p=>{
+        if(!state.eloHistory[p]) state.eloHistory[p]={};
+        if(!state.baseElo[p]) state.baseElo[p]={};
+        if(!state.elo[p]) state.elo[p]={};
+      });
     }
-  }catch(e){}
+  }catch(e){console.log('load err',e);}
   initAccounts();
-  ensureOrders();
+  ensureAllOrders();
   initElo();
   recalc();
 }
 function save(){
-  localStorage.setItem('miyuki_studio_v10',JSON.stringify({
+  localStorage.setItem('miyuki_studio_v11',JSON.stringify({
     cycle:state.cycle,
     accounts:state.accounts,
-    completed:[...state.completed],
+    completed:{socialchess:[...state.completed.socialchess],simplechess:[...state.completed.simplechess]},
     assignments:state.assignments,
     modes:state.modes,
-    platforms:state.platforms,
+    matOffset:state.matOffset,
     globalMode:state.globalMode,
     globalPlatform:state.globalPlatform,
     baseElo:state.baseElo,
     elo:state.elo,
-    eloHistory:state.eloHistory,
-    matOffset:state.matOffset
+    eloHistory:state.eloHistory
   }));
 }
 function avg(accId,plat){try{const v=MODES.map(m=>state.elo[plat][accId][m]||1200);return Math.round(v.reduce((a,b)=>a+b,0)/v.length);}catch{return 1200;}}
 
 function setPlatform(p){
   state.globalPlatform=p;
-  document.querySelectorAll('[data-plat]').forEach(b=>b.classList.toggle('active',b.dataset.plat===p));
-  const all=getAllIds(ORDERS.order1,ORDERS.order2);
-  all.forEach(id=>{if(!state.completed.has(id)) state.platforms[id]=p;});
   save();render();
 }
 function setMode(m){
   state.globalMode=m;
-  const all=getAllIds(ORDERS.order1,ORDERS.order2);
-  all.forEach(id=>{if(!state.completed.has(id)) state.modes[id]=m;});
+  const plat=state.globalPlatform;
+  const all=getAllIds(ORDERS[plat].order1,ORDERS[plat].order2);
+  all.forEach(id=>{if(!state.completed[plat].has(id)) state.modes[plat][id]=m;});
   save();render();
 }
 function addAccount(){
-  const name=prompt('Nom du compte ?','Nouveau');
+  const plat=state.globalPlatform;
+  const name=prompt(`Nom du compte pour ${PLAT_LABEL[plat]} ?`,'Nouveau');
   if(!name) return;
   const letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  let nid='';for(let ch of letters){if(!state.accounts.find(a=>a.id===ch)){nid=ch;break;}}
-  if(!nid) nid='X'+(state.accounts.length+1);
-  state.accounts.push({id:nid,name,color:COLORS[state.accounts.length%COLORS.length],top:{socialchess:0,simplechess:0}});
-  ensureOrders();initElo();recalc();save();render();
+  let nid='';for(let ch of letters){if(!state.accounts[plat].find(a=>a.id===ch)){nid=ch;break;}}
+  if(!nid) nid='X'+(state.accounts[plat].length+1);
+  state.accounts[plat].push({id:nid,name,color:COLORS[state.accounts[plat].length%COLORS.length],top:0});
+  ensureOrders(plat);initElo();recalc();save();render();
 }
-function removeAccount(id){
-  if(!confirm(`Supprimer ${id} ?`)) return;
-  state.accounts=state.accounts.filter(a=>a.id!==id);
-  PLATS.forEach(p=>{if(state.baseElo[p]) delete state.baseElo[p][id]; if(state.elo[p]) delete state.elo[p][id];});
-  // remove related matches
-  const all=getAllIds(ORDERS.order1,ORDERS.order2);
-  // need to regenerate after removal, so first collect to delete
-  const toDel=[...state.completed].filter(mid=>{
-    const [o,i]=mid.split('-');const order=o==='1'?ORDERS.order1:ORDERS.order2;const pr=order[parseInt(i)];return pr && (pr[0]===id||pr[1]===id);
+function removeAccount(plat,id){
+  if(!confirm(`Supprimer ${id} sur ${PLAT_LABEL[plat]} ?`)) return;
+  state.accounts[plat]=state.accounts[plat].filter(a=>a.id!==id);
+  if(state.baseElo[plat]) delete state.baseElo[plat][id];
+  if(state.elo[plat]) delete state.elo[plat][id];
+  const toDel=[...state.completed[plat]].filter(mid=>{
+    const [o,i]=mid.split('-');const order=o==='1'?ORDERS[plat].order1:ORDERS[plat].order2;const pr=order[parseInt(i)];return pr && (pr[0]===id||pr[1]===id);
   });
-  toDel.forEach(mid=>{state.completed.delete(mid);delete state.eloHistory[mid];});
-  ensureOrders();save();render();
+  toDel.forEach(mid=>{state.completed[plat].delete(mid);delete state.eloHistory[plat][mid];});
+  ensureOrders(plat);save();render();openManage();
 }
-function openManage(){
+function openManage(){renderManage();document.getElementById('manageModal').classList.add('open');}
+function closeManage(){document.getElementById('manageModal').classList.remove('open');}
+function setManageTab(p){state.manageTab=p;renderManage();}
+function renderManage(){
+  const plat=state.manageTab;
+  document.getElementById('tabSocial').classList.toggle('active',plat==='socialchess');
+  document.getElementById('tabSimple').classList.toggle('active',plat==='simplechess');
   const el=document.getElementById('manageContent');
-  let html=`<div style="display:grid;gap:10px">`;
-  state.accounts.forEach(acc=>{
+  let html=`<div class="mono" style="font-size:10px;color:#8A867E">Comptes ${PLAT_LABEL[plat]} — ${state.accounts[plat].length} comptes • Mats décalage ${state.matOffset[plat]} (prochain ${MATS[state.matOffset[plat]].name})</div>`;
+  html+=`<div style="display:grid;gap:10px">`;
+  state.accounts[plat].forEach(acc=>{
     html+=`<div style="border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff">
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <div style="width:28px;height:28px;border-radius:8px;background:${acc.color};color:#fff;display:grid;place-items:center;font-weight:800">${acc.id}</div>
         <input data-acc="${acc.id}" data-k="name" value="${acc.name}" style="flex:1;min-width:120px">
-        <input data-acc="${acc.id}" data-k="topSocial" type="number" value="${acc.top.socialchess||0}" placeholder="Top Social" style="width:110px">
-        <input data-acc="${acc.id}" data-k="topSimple" type="number" value="${acc.top.simplechess||0}" placeholder="Top Simple" style="width:110px">
-        <button onclick="removeAccount('${acc.id}')" style="padding:5px 8px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer">🗑️</button>
+        <input data-acc="${acc.id}" data-k="top" type="number" value="${acc.top||0}" placeholder="Top" style="width:100px">
+        <button onclick="removeAccount('${plat}','${acc.id}')" style="padding:5px 8px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer">🗑️</button>
       </div>
       <div style="margin-top:8px;display:grid;gap:6px">
-        ${PLATS.map(plat=>`<div><div class="mono" style="font-size:9px;color:#8A867E">${PLAT_LABEL[plat]}</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px">${MODES.map(m=>`<div><div class="mono" style="font-size:8px;text-align:center">${m}</div><input type="number" data-acc="${acc.id}" data-plat="${plat}" data-mode="${m}" value="${state.baseElo[plat]?.[acc.id]?.[m]||1200}" style="width:100%"></div>`).join('')}</div></div>`).join('')}
+        <div><div class="mono" style="font-size:9px;color:#8A867E">${PLAT_LABEL[plat]} Elo</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px">${MODES.map(m=>`<div><div class="mono" style="font-size:8px;text-align:center">${m}</div><input type="number" data-acc="${acc.id}" data-plat="${plat}" data-mode="${m}" value="${state.baseElo[plat]?.[acc.id]?.[m]||1200}" style="width:100%"></div>`).join('')}</div></div>
       </div>
     </div>`;
   });
-  html+=`</div>`;
+  html+=`</div><button class="add-btn" style="margin-top:10px" onclick="addAccountInManage()">+ Ajouter compte à ${PLAT_LABEL[plat]}</button>`;
   el.innerHTML=html;
-  document.getElementById('manageModal').classList.add('open');
 }
-function closeManage(){document.getElementById('manageModal').classList.remove('open');}
+function addAccountInManage(){
+  const plat=state.manageTab;
+  const name=prompt(`Nom du compte pour ${PLAT_LABEL[plat]} ?`,'Nouveau');
+  if(!name) return;
+  const letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let nid='';for(let ch of letters){if(!state.accounts[plat].find(a=>a.id===ch)){nid=ch;break;}}
+  if(!nid) nid='X'+(state.accounts[plat].length+1);
+  state.accounts[plat].push({id:nid,name,color:COLORS[state.accounts[plat].length%COLORS.length],top:0});
+  ensureOrders(plat);initElo();recalc();save();renderManage();render();
+}
 function saveManage(){
+  const plat=state.manageTab;
   document.querySelectorAll('#manageContent input').forEach(inp=>{
     const accId=inp.dataset.acc;
-    const acc=state.accounts.find(a=>a.id===accId);
+    const acc=state.accounts[plat].find(a=>a.id===accId);
     if(!acc) return;
     const k=inp.dataset.k;
-    const plat=inp.dataset.plat;
+    const p=inp.dataset.plat;
     const mode=inp.dataset.mode;
     if(k==='name') acc.name=inp.value||acc.name;
-    else if(k==='topSocial') acc.top.socialchess=parseInt(inp.value)||0;
-    else if(k==='topSimple') acc.top.simplechess=parseInt(inp.value)||0;
-    else if(plat&&mode){
-      if(!state.baseElo[plat]) state.baseElo[plat]={};
-      if(!state.baseElo[plat][accId]) state.baseElo[plat][accId]={};
-      state.baseElo[plat][accId][mode]=parseInt(inp.value)||1200;
+    else if(k==='top') acc.top=parseInt(inp.value)||0;
+    else if(p&&mode){
+      if(!state.baseElo[p]) state.baseElo[p]={};
+      if(!state.baseElo[p][accId]) state.baseElo[p][accId]={};
+      state.baseElo[p][accId][mode]=parseInt(inp.value)||1200;
     }
   });
-  recalc();save();render();closeManage();
+  recalc();save();render();renderManage();
 }
-function regenerateOrders(){state.accounts.sort(()=>Math.random()-0.5);state.assignments={};state.matOffset=0;ensureOrders();save();render();}
-function shiftMats(){state.matOffset=(state.matOffset+1)%MATS.length;const all=getAllIds(ORDERS.order1,ORDERS.order2);all.forEach((id,idx)=>{state.assignments[id]=(idx+state.matOffset)%MATS.length;});save();render();if(state.currentId) openMatch(state.currentId);document.getElementById('matOffset').textContent=state.matOffset;}
+function regenerateOrders(){
+  const plat=state.globalPlatform;
+  // continue mats: keep matOffset, but reassign
+  state.assignments[plat]={};
+  state.accounts[plat].sort(()=>Math.random()-0.5);
+  ensureOrders(plat);
+  save();render();
+}
+function shiftMats(){
+  const plat=state.globalPlatform;
+  state.matOffset[plat]=(state.matOffset[plat]+1)%MATS.length;
+  const all=getAllIds(ORDERS[plat].order1,ORDERS[plat].order2);
+  all.forEach((id,idx)=>{state.assignments[plat][id]=(idx+state.matOffset[plat])%MATS.length;});
+  save();render();if(state.currentPlat===plat && state.currentId) openMatch(state.currentPlat,state.currentId);
+}
 
 function render(){
   try{
     const plat=state.globalPlatform;
-    document.getElementById('progressText').textContent=`${state.completed.size}/${ORDERS.order1.length+ORDERS.order2.length}`;
-    document.getElementById('cycleNum').textContent=`#${state.cycle}`;
-    const accCountEl=document.getElementById('accCount'); if(accCountEl) accCountEl.textContent=state.accounts.length;
-    const topPlatEl=document.getElementById('topPlatforms'); if(topPlatEl) topPlatEl.innerHTML=PLATS.map(p=>`<button data-plat="${p}" class="${state.globalPlatform===p?'active':''}" onclick="setPlatform('${p}')">${PLAT_LABEL[p]}</button>`).join('');
-    const modeEl=document.getElementById('modeSwitch'); if(modeEl) modeEl.innerHTML=MODES.map(m=>`<button class="${state.globalMode===m?'active':''}" onclick="setMode('${m}')">${MODE_LABEL[m]}</button>`).join('');
-    const platSw=document.getElementById('platformSwitch'); if(platSw) platSw.innerHTML=PLATS.map(p=>`<button data-plat="${p}" class="${state.globalPlatform===p?'active':''}" onclick="setPlatform('${p}')">${PLAT_LABEL[p]}</button>`).join('');
-    document.querySelectorAll('[data-plat]').forEach(b=>b.classList.toggle('active',b.dataset.plat===plat));
+    const ord=ORDERS[plat];
+    const total=ord.order1.length+ord.order2.length;
+    document.getElementById('progressText').textContent=`${state.completed[plat].size}/${total}`;
+    document.getElementById('cycleNum').textContent=`#${state.cycle[plat]}`;
+    document.getElementById('accCount').textContent=state.accounts[plat].length;
+    document.getElementById('accPlatLabel').textContent=PLAT_LABEL[plat];
+    document.getElementById('currentPlatTitle').textContent=PLAT_LABEL[plat];
+    document.getElementById('ordersPlat').textContent=PLAT_LABEL[plat];
+    document.querySelectorAll('.addPlatLabel').forEach(el=>el.textContent=PLAT_LABEL[plat]);
+    document.getElementById('statsPlat').textContent=PLAT_LABEL[plat];
+    document.getElementById('platformSwitch').innerHTML=PLATS.map(p=>`<button data-plat="${p}" class="${state.globalPlatform===p?'active':''}" onclick="setPlatform('${p}')">${PLAT_LABEL[p]}</button>`).join('');
+    document.getElementById('modeSwitch').innerHTML=MODES.map(m=>`<button class="${state.globalMode===m?'active':''}" onclick="setMode('${m}')">${MODE_LABEL[m]}</button>`).join('');
 
-    // accounts
     const accList=document.getElementById('accountsList');
     if(accList){
-      accList.innerHTML=state.accounts.map(acc=>{
+      accList.innerHTML=state.accounts[plat].map(acc=>{
         const av=avg(acc.id,plat);
-        return `<div class="account"><div class="acc-head"><div class="acc-letter" style="background:${acc.color}">${acc.id}</div><div><div class="acc-name">${acc.name} ${acc.top[plat]?'<span style="color:var(--gold);font-size:10px">Top '+acc.top[plat]+'</span>':''}</div><div class="acc-sub">${acc.id} • ${av} • ${PLAT_LABEL[plat]}</div></div></div><div class="acc-stats">${MODES.map(m=>`<div class="acc-stat"><b>${state.elo[plat]?.[acc.id]?.[m]||1200}</b><span>${m}</span></div>`).join('')}</div><div class="acc-actions"><button onclick="openManage()">✏️</button><button onclick="removeAccount('${acc.id}')">🗑️</button></div></div>`;
+        return `<div class="account"><div class="acc-head"><div class="acc-letter" style="background:${acc.color}">${acc.id}</div><div><div class="acc-name">${acc.name} ${acc.top?'<span style="color:var(--gold);font-size:10px">Top '+acc.top+'</span>':''}</div><div class="acc-sub">${acc.id} • ${av} • ${PLAT_LABEL[plat]}</div></div></div><div class="acc-stats">${MODES.map(m=>`<div class="acc-stat"><b>${state.elo[plat]?.[acc.id]?.[m]||1200}</b><span>${m}</span></div>`).join('')}</div><div class="acc-actions"><button onclick="openManage()">✏️</button><button onclick="removeAccount('${plat}','${acc.id}')">🗑️</button></div></div>`;
       }).join('');
     }
-
     const quick=document.getElementById('quickStats');
     if(quick){
-      const list=state.accounts.map(a=>({id:a.id,name:a.name,avg:avg(a.id,plat),top:a.top[plat]||0})).sort((a,b)=>b.avg-a.avg);
-      quick.innerHTML=list.slice(0,4).map((a,i)=>`<div style="display:flex;justify-content:space-between;font-size:11px" class="mono"><span>#${i+1} ${a.id} ${a.name}</span><span>${a.avg} ${a.top?'Top '+a.top:''}</span></div>`).join('')||'<div class="mono" style="font-size:11px;color:#8A867E">Aucun</div>';
+      const list=state.accounts[plat].map(a=>({id:a.id,name:a.name,avg:avg(a.id,plat),top:a.top||0})).sort((a,b)=>b.avg-a.avg);
+      quick.innerHTML=list.slice(0,5).map((a,i)=>`<div style="display:flex;justify-content:space-between;font-size:11px" class="mono"><span>#${i+1} ${a.id} ${a.name}</span><span>${a.avg} ${a.top?'Top '+a.top:''}</span></div>`).join('')||'<div class="mono" style="font-size:11px;color:#8A867E">Aucun compte sur '+PLAT_LABEL[plat]+'</div>';
     }
 
     const renderList=(order,num)=>{
       return order.map((pair,idx)=>{
         const id=`${num}-${idx}`;
         const [L,R]=pair;
-        const done=state.completed.has(id);
-        const matIdx=state.assignments[id]!==undefined?state.assignments[id]:(idx+state.matOffset)%MATS.length;
+        const done=state.completed[plat].has(id);
+        const matIdx=state.assignments[plat][id]!==undefined?state.assignments[plat][id]:(idx+state.matOffset[plat])%MATS.length;
         const mat=MATS[matIdx];
-        const mode=state.modes[id]||state.globalMode;
-        const pMatch=state.platforms[id]||state.globalPlatform;
+        const mode=state.modes[plat][id]||state.globalMode;
         let eL=1200,eR=1200;
-        try{eL=state.elo[pMatch][L][mode]||1200;eR=state.elo[pMatch][R][mode]||1200;}catch{}
-        const h=state.eloHistory[id];
-        const active=state.currentId===id?'active':'';
-        return `<div class="match ${done?'done':''} ${active}" onclick="openMatch('${id}')" onmouseenter="preview('${id}')">
+        try{eL=state.elo[plat][L][mode]||1200;eR=state.elo[plat][R][mode]||1200;}catch{}
+        const h=state.eloHistory[plat][id];
+        const active=state.currentPlat===plat && state.currentId===id?'active':'';
+        return `<div class="match ${done?'done':''} ${active}" onclick="openMatch('${plat}','${id}')" onmouseenter="previewMatch('${plat}','${id}')">
           <div class="match-num">${num}.${idx+1}</div>
-          <div class="match-player winner"><div class="n">${state.accounts.find(a=>a.id===L)?.name||L}</div><div class="meta">${L} • ${eL} ${h?`+${h.deltaW}`:''} • ${PLAT_LABEL[pMatch]}</div></div>
+          <div class="match-player winner"><div class="n">${state.accounts[plat].find(a=>a.id===L)?.name||L}</div><div class="meta">${L} • ${eL} ${h?`+${h.deltaW}`:''} • ${mode}</div></div>
           <div class="match-vs">VS</div>
-          <div class="match-player"><div class="n">${state.accounts.find(a=>a.id===R)?.name||R}</div><div class="meta">${R} • ${eR} ${h?`${h.deltaL}`:''}</div></div>
+          <div class="match-player"><div class="n">${state.accounts[plat].find(a=>a.id===R)?.name||R}</div><div class="meta">${R} • ${eR} ${h?`${h.deltaL}`:''}</div></div>
           <div class="hide" style="display:flex;flex-direction:column;gap:3px;align-items:end"><span class="match-mat">#${matIdx+1} ${mat.name}</span><span class="mono" style="font-size:8px;color:#8A867E">${mat.coups}c • ${mat.winner} • ${mode}</span></div>
           <div class="match-check">${done?'✓':'○'}</div>
         </div>`;
       }).join('');
     };
 
-    const o1=document.getElementById('order1List'); if(o1) o1.innerHTML=renderList(ORDERS.order1,1);
-    const o2=document.getElementById('order2List'); if(o2) o2.innerHTML=renderList(ORDERS.order2,2);
-    const c1=document.getElementById('count1'); if(c1) c1.textContent=`${ORDERS.order1.filter((_,i)=>state.completed.has(`1-${i}`)).length}/${ORDERS.order1.length}`;
-    const c2=document.getElementById('count2'); if(c2) c2.textContent=`${ORDERS.order2.filter((_,i)=>state.completed.has(`2-${i}`)).length}/${ORDERS.order2.length}`;
+    document.getElementById('order1List').innerHTML=renderList(ord.order1,1);
+    document.getElementById('order2List').innerHTML=renderList(ord.order2,2);
+    document.getElementById('count1').textContent=`${ord.order1.filter((_,i)=>state.completed[plat].has(`1-${i}`)).length}/${ord.order1.length}`;
+    document.getElementById('count2').textContent=`${ord.order2.filter((_,i)=>state.completed[plat].has(`2-${i}`)).length}/${ord.order2.length}`;
 
-    const total=ORDERS.order1.length+ORDERS.order2.length;
     const banner=document.getElementById('cycleBanner');
-    if(banner){
-      if(total>0 && state.completed.size===total) banner.innerHTML=`<div style="background:#1A1815;border:1px solid #2A2824;border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center"><b style="font-family:'Instrument Serif',serif">Cycle #${state.cycle} terminé</b><button class="btn" style="background:#fff;color:#000;padding:8px 12px;font-size:10px" onclick="resetCycle()">Nouveau cycle</button></div>`;
-      else banner.innerHTML=`<div class="mono" style="font-size:11px;color:#8A867E">${state.completed.size===0?'Survole un duel':'Encore '+(total-state.completed.size)+' duels'} • Mats boucle #${state.matOffset+1} • ${PLAT_LABEL[plat]}</div>`;
+    if(total>0 && state.completed[plat].size===total){
+      banner.innerHTML=`<div style="background:#1A1815;border:1px solid #2A2824;border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center"><b style="font-family:'Instrument Serif',serif">Cycle #${state.cycle[plat]} terminé sur ${PLAT_LABEL[plat]} — prochain mat ${MATS[(state.matOffset[plat]+total)%MATS.length].name}</b><button class="btn" style="background:#fff;color:#000;padding:8px 12px;font-size:10px" onclick="resetCycle()">Nouveau cycle continue boucle</button></div>`;
+    }else{
+      banner.innerHTML=`<div class="mono" style="font-size:11px;color:#8A867E">${state.completed[plat].size===0?'Survole un duel':'Encore '+(total-state.completed[plat].size)+' duels'} • Boucle mats continue #${state.matOffset[plat]+1}→${MATS[state.matOffset[plat]].name} • ${PLAT_LABEL[plat]}</div>`;
     }
 
     const matsEl=document.getElementById('matsList');
-    if(matsEl) matsEl.innerHTML=MATS.map((m,i)=>`<div style="display:flex;justify-content:space-between;gap:8px;padding:7px 10px;border-radius:10px;background:${i===state.matOffset?'var(--gold)':'#1A1815'};border:1px solid ${i===state.matOffset?'var(--gold)':'#1E1C19'};color:${i===state.matOffset?'#000':'var(--paper)'}" class="mono"><span>#${i+1} ${m.name} • ${m.coups}c • ${m.winner}</span><span style="font-size:8px;opacity:.7">${m.fr.slice(0,32)}</span></div>`).join('');
+    if(matsEl){
+      const nextIdx=(state.matOffset[plat]+total)%MATS.length;
+      matsEl.innerHTML=MATS.map((m,i)=>{
+        const isCurrent=i===state.matOffset[plat];
+        const isNext=i===nextIdx && total>0;
+        return `<div style="display:flex;justify-content:space-between;gap:8px;padding:7px 10px;border-radius:10px;background:${isCurrent?'var(--gold)':isNext?'#1E2A1E':'#1A1815'};border:1px solid ${isCurrent?'var(--gold)':isNext?'var(--green)':'#1E1C19'};color:${isCurrent?'#000':isNext?'#A8D5A8':'var(--paper)'}" class="mono"><span>#${i+1} ${m.name} • ${m.coups}c • ${m.winner} ${isCurrent?'◀ ACTUEL':''} ${isNext?'◀ PROCHAIN CYCLE':''}</span><span style="font-size:8px;opacity:.7">${m.fr.slice(0,32)}</span></div>`;
+      }).join('');
+    }
+    document.getElementById('matOffset').textContent=state.matOffset[plat];
+    document.getElementById('nextMatName').textContent=MATS[(state.matOffset[plat]+total)%MATS.length].name+` (#${(state.matOffset[plat]+total)%MATS.length+1})`;
 
-    const off=document.getElementById('matOffset'); if(off) off.textContent=state.matOffset;
-
-    if(state.accounts.length>0 && !state.currentId){
+    if(state.accounts[plat].length>0 && !state.currentId){
       const fid=`1-0`;
-      if(state.assignments[fid]!==undefined) preview(fid);
+      if(state.assignments[plat][fid]!==undefined) previewMatch(plat,fid);
     }
   }catch(e){console.error('render err',e);}
 }
 
-function preview(id){
+function previewMatch(plat,id){
   try{
-    const matIdx=state.assignments[id];
+    const matIdx=state.assignments[plat][id];
     const mat=MATS[matIdx];
     if(!mat) return;
     const chess=new Chess();
@@ -501,7 +600,7 @@ function preview(id){
     const last=fens[fens.length-1];
     renderBoard(last.fen,last.from,last.to,document.getElementById('chessboard'));
     const title=document.getElementById('boardTitle');
-    if(title) title.textContent=`${mat.name} • ${mat.coups}c • ${mat.winner} gagne • #${matIdx+1}`;
+    if(title) title.textContent=`${PLAT_LABEL[plat]} • ${mat.name} • ${mat.coups}c • ${mat.winner} gagne • #${matIdx+1}`;
     document.getElementById('boardFen').textContent=last.fen;
   }catch(e){console.log('preview err',e);}
 }
@@ -570,28 +669,30 @@ function onSquare(sq){
   }
 }
 
-function openMatch(id){
+function openMatch(plat,id){
+  state.currentPlat=plat;
   state.currentId=id;
-  const [o,i]=id.split('-');const idx=parseInt(i);const order=o==='1'?ORDERS.order1:ORDERS.order2;const pair=order[idx];if(!pair) return;
-  const [L,R]=pair;const matIdx=state.assignments[id];const mat=MATS[matIdx];const mode=state.modes[id];const plat=state.platforms[id];
-  document.getElementById('boardTitle').textContent=`${state.accounts.find(a=>a.id===L)?.name||L} vs ${state.accounts.find(a=>a.id===R)?.name||R} — ${mat.name}`;
+  const idx=parseInt(id.split('-')[1]);const order=id.startsWith('1-')?ORDERS[plat].order1:ORDERS[plat].order2;const pair=order[idx];if(!pair) return;
+  const [L,R]=pair;const matIdx=state.assignments[plat][id];const mat=MATS[matIdx];const mode=state.modes[plat][id];
+  document.getElementById('boardTitle').textContent=`${PLAT_LABEL[plat]} • ${state.accounts[plat].find(a=>a.id===L)?.name||L} vs ${state.accounts[plat].find(a=>a.id===R)?.name||R} — ${mat.name}`;
   const det=document.getElementById('matDetail');
-  if(det) det.innerHTML=`<h4 style="font-family:'Instrument Serif',serif;font-size:18px">♞ ${mat.name} — ${mat.coups}c — ${mat.winner} gagne</h4><p class="mono" style="font-size:11px;color:#6B6760;margin-top:4px">${mat.fr}<br>${mat.moves.join(' ')}</p><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><span style="font-size:10px;padding:3px 7px;border-radius:999px;background:#fff;border:1px solid var(--line)">${mat.winner}</span><span style="font-size:10px;padding:3px 7px;border-radius:999px;background:#fff;border:1px solid var(--line)">Boucle #${matIdx+1}/11</span><span style="font-size:10px;padding:3px 7px;border-radius:999px;background:var(--ink);color:#fff">${PLAT_LABEL[plat]} • ${MODE_LABEL[mode]}</span></div>`;
-  const h=state.eloHistory[id];
+  if(det) det.innerHTML=`<h4 style="font-family:'Instrument Serif',serif;font-size:18px">♞ ${mat.name} — ${mat.coups}c — ${mat.winner} gagne</h4><p class="mono" style="font-size:11px;color:#6B6760;margin-top:4px">${mat.fr}<br>${mat.moves.join(' ')}</p><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><span style="font-size:10px;padding:3px 7px;border-radius:999px;background:#fff;border:1px solid var(--line)">${mat.winner}</span><span style="font-size:10px;padding:3px 7px;border-radius:999px;background:#fff;border:1px solid var(--line)">Boucle #${matIdx+1}/11 • offset ${state.matOffset[plat]}</span><span style="font-size:10px;padding:3px 7px;border-radius:999px;background:var(--ink);color:#fff">${PLAT_LABEL[plat]} • ${MODE_LABEL[mode]}</span></div>`;
+  const h=state.eloHistory[plat][id];
   document.getElementById('deltaW').value=h?h.deltaW:15;
   document.getElementById('deltaL').value=h?h.deltaL:-15;
   updatePreview();
   initBoard(mat);
   const btn=document.getElementById('btnDone');
-  if(btn) btn.textContent=state.completed.has(id)?'↩ Annuler':'✓ Valider avec gains';
+  if(btn) btn.textContent=state.completed[plat].has(id)?'↩ Annuler':'✓ Valider avec gains';
   render();
   if(window.innerWidth<=1150) document.querySelector('.board-col').scrollIntoView({behavior:'smooth'});
 }
 function updatePreview(){
-  if(!state.currentId) return;
-  const [o,i]=state.currentId.split('-');const idx=parseInt(i);const order=o==='1'?ORDERS.order1:ORDERS.order2;const pair=order[idx];if(!pair) return;
-  const [L,R]=pair;const mode=state.modes[state.currentId];const plat=state.platforms[state.currentId];
-  const h=state.eloHistory[state.currentId];
+  if(!state.currentId||!state.currentPlat) return;
+  const plat=state.currentPlat;const id=state.currentId;
+  const idx=parseInt(id.split('-')[1]);const order=id.startsWith('1-')?ORDERS[plat].order1:ORDERS[plat].order2;const pair=order[idx];if(!pair) return;
+  const [L,R]=pair;const mode=state.modes[plat][id];
+  const h=state.eloHistory[plat][id];
   let baseL=1200,baseR=1200;
   try{baseL=h?h.wOld:state.elo[plat][L][mode];baseR=h?h.lOld:state.elo[plat][R][mode];}catch{}
   const dW=parseInt(document.getElementById('deltaW').value)||0;
@@ -621,31 +722,43 @@ function autoPlay(){
 function flipBoard(){state.flipped=!state.flipped;if(state.currentFens.length){const f=state.currentFens[state.currentIdx];renderBoard(f.fen,f.from,f.to,document.getElementById('chessboard'));}}
 function resetBoard(){if(state.currentFens.length) goTo(0);}
 function toggleDone(){
-  if(!state.currentId) return;
-  const id=state.currentId;const [o,i]=id.split('-');const idx=parseInt(i);const order=o==='1'?ORDERS.order1:ORDERS.order2;const pair=order[idx];if(!pair) return;
-  const [W,L]=pair;const mode=state.modes[id];const plat=state.platforms[id];
-  if(state.completed.has(id)){
-    const h=state.eloHistory[id];
-    if(h){try{state.elo[h.platform][W][h.mode]=h.wOld;state.elo[h.platform][L][h.mode]=h.lOld;}catch{}delete state.eloHistory[id];}
-    state.completed.delete(id);
+  if(!state.currentId||!state.currentPlat) return;
+  const plat=state.currentPlat;const id=state.currentId;const idx=parseInt(id.split('-')[1]);const order=id.startsWith('1-')?ORDERS[plat].order1:ORDERS[plat].order2;const pair=order[idx];if(!pair) return;
+  const [W,L]=pair;const mode=state.modes[plat][id];
+  if(state.completed[plat].has(id)){
+    const h=state.eloHistory[plat][id];
+    if(h){try{state.elo[plat][W][h.mode]=h.wOld;state.elo[plat][L][h.mode]=h.lOld;}catch{}delete state.eloHistory[plat][id];}
+    state.completed[plat].delete(id);
   }else{
     const dW=parseInt(document.getElementById('deltaW').value)||0;
     const dL=parseInt(document.getElementById('deltaL').value)||0;
     let rW=1200,rL=1200;
     try{rW=state.elo[plat][W][mode];rL=state.elo[plat][L][mode];}catch{}
     const newW=rW+dW;const newL=rL+dL;
-    state.eloHistory[id]={winner:W,loser:L,mode,platform:plat,wOld:rW,lOld:rL,wNew:newW,lNew:newL,deltaW:dW,deltaL:dL};
+    state.eloHistory[plat][id]={winner:W,loser:L,mode,platform:plat,wOld:rW,lOld:rL,wNew:newW,lNew:newL,deltaW:dW,deltaL:dL};
     if(!state.elo[plat]) state.elo[plat]={};
     if(!state.elo[plat][W]) state.elo[plat][W]={};
     if(!state.elo[plat][L]) state.elo[plat][L]={};
-    state.elo[plat][W][mode]=newW;state.elo[plat][L][mode]=newL;
-    state.completed.add(id);
+    state.elo[plat][W][mode]=newW;
+    state.elo[plat][L][mode]=newL;
+    state.completed[plat].add(id);
   }
   save();render();
 }
-function copyMoves(){if(!state.currentId)return;const mat=MATS[state.assignments[state.currentId]];navigator.clipboard.writeText(mat.moves.join(' ')).then(()=>alert('Copié: '+mat.moves.join(' ')));}
-function resetCycle(){state.cycle++;state.completed.clear();state.eloHistory={};state.matOffset=0;const all=getAllIds(ORDERS.order1,ORDERS.order2);all.forEach((id,idx)=>{state.assignments[id]=(idx+state.matOffset)%MATS.length;});recalc();save();render();}
-function resetAll(){if(!confirm('Reset total ?'))return;localStorage.removeItem('miyuki_studio_v10');state={cycle:1,accounts:[],completed:new Set(),assignments:{},modes:{},platforms:{},globalMode:"blitz",globalPlatform:"socialchess",baseElo:{},elo:{},eloHistory:{},matOffset:0,currentId:null,currentFens:[],currentMoves:[],currentIdx:0,selectedFrom:null,flipped:false};load();save();render();}
+function copyMoves(){if(!state.currentId)return;const mat=MATS[state.assignments[state.currentPlat][state.currentId]];navigator.clipboard.writeText(mat.moves.join(' ')).then(()=>alert('Copié: '+mat.moves.join(' ')));}
+function resetCycle(){
+  const plat=state.globalPlatform;
+  const total=ORDERS[plat].order1.length+ORDERS[plat].order2.length;
+  // Continue boucle : offset = (offset + total) % 11
+  state.matOffset[plat]=(state.matOffset[plat]+total)%MATS.length;
+  state.cycle[plat]++;
+  state.completed[plat].clear();
+  state.eloHistory[plat]={};
+  state.assignments[plat]={};
+  ensureOrders(plat);
+  recalc();save();render();
+}
+function resetAll(){if(!confirm('Reset total (les deux plateformes) ?'))return;localStorage.removeItem('miyuki_studio_v11');localStorage.removeItem('miyuki_studio_v10');state={cycle:{socialchess:1,simplechess:1},accounts:{socialchess:[],simplechess:[]},completed:{socialchess:new Set(),simplechess:new Set()},assignments:{socialchess:{},simplechess:{}},modes:{socialchess:{},simplechess:{}},matOffset:{socialchess:0,simplechess:0},globalMode:"blitz",globalPlatform:"socialchess",baseElo:{socialchess:{},simplechess:{}},elo:{socialchess:{},simplechess:{}},eloHistory:{socialchess:{},simplechess:{}},currentId:null,currentPlat:null,currentFens:[],currentMoves:[],currentIdx:0,flipped:false,manageTab:"socialchess"};load();save();render();}
 
 load();render();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}
