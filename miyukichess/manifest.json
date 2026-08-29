@@ -1,5 +1,5 @@
 {
-  "name": "Miyuki Chess \u2014 Corporation",
+  "name": "Miyuki Chess — Corporation",
   "short_name": "Miyuki Chess",
   "description": "Tracker d'ordres de passage, Elo par mode et mats rapides pour Miyuki Corporation",
   "start_url": "./index.html",
@@ -27,10 +27,6 @@
       "purpose": "any"
     }
   ],
-  "categories": [
-    "games",
-    "sports"
-  ],
-  "lang": "fr",
-  "scope": "./"
+  "categories": ["games", "sports"],
+  "lang": "fr"
 }
