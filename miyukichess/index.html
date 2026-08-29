@@ -3,259 +3,251 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Miyuki Chess — SocialChess x SimpleChess</title>
-<meta name="theme-color" content="#FBF8F3">
+<title>Miyuki Chess — Studio</title>
+<meta name="theme-color" content="#0E0E0B">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fragment+Mono:ital@0;1&family=Instrument+Serif:ital@0;1&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--paper:#FBF8F3;--paper2:#F5EFE4;--ink:#12100E;--ink2:#5A5752;--gold:#C9A86A;--gold2:#A68A5B;--blue:#6B8A9E;--line:#EADFC6;--green:#2E7D5B;--red:#B85450}
+:root{
+  --paper:#F7F2E8;
+  --ink:#12100E;
+  --ink2:#6B6760;
+  --line:#E8DCC2;
+  --gold:#C9A86A;
+  --gold2:#A68A5B;
+  --blue:#6B8A9E;
+  --blue2:#4E6B7E;
+  --green:#2E7D5B;
+  --red:#B85450;
+  --bg:#0E0E0B;
+  --bg2:#171410;
+  --card:#1A1815;
+  --card2:#232019;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;overflow-x:hidden}
-.mono{font-family:'JetBrains Mono',monospace}.serif{font-family:'Instrument Serif',serif}
-.nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:8px;background:rgba(251,248,243,.88);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:999px;padding:6px 8px 6px 12px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
-.nav-logo{font-weight:800;font-size:11px;letter-spacing:.18em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
-.nav-logo i{width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,var(--gold),var(--gold2));display:grid;place-items:center;color:#fff;font-size:12px}
-.nav-tabs{display:flex;gap:4px;background:var(--paper2);border-radius:999px;padding:3px;border:1px solid var(--line)}
-.nav-tabs button{padding:7px 14px;border-radius:999px;border:0;background:transparent;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:.2s;color:var(--ink2)}
-.nav-tabs button.active{background:var(--ink);color:#fff}
-.nav-meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2);padding:0 6px;display:flex;gap:8px}
-.page{display:none;min-height:100vh}.page.active{display:block;animation:fade .45s ease}
-@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.hero{min-height:88vh;display:grid;place-items:center;text-align:center;padding:88px 20px 36px;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(800px 500px at 50% -10%, rgba(201,168,106,.18), transparent 60%),radial-gradient(600px 400px at 20% 80%, rgba(107,138,158,.12), transparent 60%);pointer-events:none}
-.hero-bg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Instrument Serif',serif;font-size:22vw;color:rgba(18,16,14,.03);pointer-events:none;white-space:nowrap}
-.hero-logo{width:min(420px,84vw);position:relative;z-index:1;filter:drop-shadow(0 20px 40px rgba(201,168,106,.18));margin-bottom:16px}
-.hero-title{font-family:'Instrument Serif',serif;font-size:clamp(40px,7vw,84px);line-height:.9;letter-spacing:-.03em;max-width:900px;position:relative;z-index:1}
-.hero-title span{font-style:italic;color:var(--gold2)}
-.hero-sub{max-width:580px;margin:16px auto 0;font-size:14px;line-height:1.6;color:var(--ink2);position:relative;z-index:1}
-.hero-actions{margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
-.btn{padding:12px 20px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;cursor:pointer;transition:.22s;display:inline-flex;align-items:center;gap:8px}
-.btn:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(0,0,0,.08)}
-.btn-gold{background:var(--ink);color:#fff;border-color:var(--ink)}
-.btn-line{background:transparent}
-.platform-switch{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px;box-shadow:0 4px 12px rgba(0,0,0,.04)}
-.platform-switch button{padding:8px 16px;border-radius:999px;border:1px solid transparent;background:transparent;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:.2s;font-family:'JetBrains Mono',monospace}
-.platform-switch button.active{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;box-shadow:0 6px 16px rgba(201,168,106,.3)}
-.platform-switch button.active.blue{background:linear-gradient(135deg,var(--blue),#4E6B7E)}
-.arena{background:var(--ink);color:var(--paper);border-top:1px solid #1E1C19}
-.arena-inner{max-width:1440px;margin:0 auto;display:grid;grid-template-columns:400px 1fr;min-height:80vh}
-@media(max-width:1000px){.arena-inner{grid-template-columns:1fr}}
-.arena-left{border-right:1px solid #1E1C19;padding:24px 20px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:16px;background:linear-gradient(180deg,#12100E,#0E0C0A)}
-@media(max-width:1000px){.arena-left{position:relative;height:auto;border-right:0;border-bottom:1px solid #1E1C19}}
-.clock-bar{display:flex;gap:5px;flex-wrap:wrap}
-.clock-btn{padding:6px 11px;border-radius:999px;border:1px solid #2A2824;background:#1A1816;color:#8A867E;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:'JetBrains Mono',monospace}
-.clock-btn.active{background:var(--paper);color:var(--ink);border-color:var(--paper)}
-.board-preview{aspect-ratio:1;background:linear-gradient(180deg,#FFFEFB,#F5EFE4);border-radius:20px;padding:14px;box-shadow:0 24px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.9);border:1px solid #2A2824;position:relative}
-.miyuki-board{width:100%;aspect-ratio:1;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);border-radius:12px;overflow:hidden;border:3px solid #12100E;box-shadow:0 8px 24px rgba(0,0,0,.35), inset 0 0 0 1px rgba(201,168,106,.3);background:#12100E}
-.miyuki-square{position:relative;display:grid;place-items:center;transition:.12s}
+body{background:var(--bg);color:var(--paper);font-family:'Syne',sans-serif;overflow-x:hidden;min-height:100vh}
+.mono{font-family:'Fragment Mono',monospace}
+.serif{font-family:'Instrument Serif',serif}
+button{font-family:inherit}
+
+/* Top */
+.top{
+  position:sticky;top:0;z-index:30;
+  background:rgba(14,14,11,.92);backdrop-filter:blur(20px);
+  border-bottom:1px solid #1E1C19;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 16px;
+}
+.top-left{display:flex;align-items:center;gap:14px}
+.top-logo{height:32px;width:auto;filter:brightness(1.2)}
+.top-title{font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:800}
+.top-title span{color:var(--gold)}
+.top-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pill{padding:6px 12px;border-radius:999px;border:1px solid #2A2824;background:#1A1815;font-size:11px;font-family:'Fragment Mono',monospace;display:flex;align-items:center;gap:6px}
+.pill b{color:var(--paper)}
+.platforms{display:flex;gap:4px;background:#1A1815;border:1px solid #2A2824;border-radius:999px;padding:3px}
+.platforms button{padding:7px 14px;border-radius:999px;border:0;background:transparent;color:#8A867E;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:.2s}
+.platforms button.active{background:var(--paper);color:var(--ink)}
+.modes{display:flex;gap:4px;flex-wrap:wrap}
+.modes button{padding:6px 10px;border-radius:999px;border:1px solid #2A2824;background:#1A1815;color:#8A867E;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:'Fragment Mono',monospace}
+.modes button.active{background:var(--gold);color:#000;border-color:var(--gold)}
+
+/* Layout */
+.layout{max-width:1600px;margin:0 auto;display:grid;grid-template-columns:300px 1fr 420px;min-height:calc(100vh - 56px)}
+@media(max-width:1200px){.layout{grid-template-columns:260px 1fr} .board-col{grid-column:1 / -1;position:relative !important;top:auto !important;height:auto !important}}
+@media(max-width:760px){.layout{grid-template-columns:1fr} .accounts-col{order:2} .orders-col{order:1} .board-col{order:3}}
+
+/* Accounts */
+.accounts-col{border-right:1px solid #1E1C19;background:linear-gradient(180deg,#12100E,#0E0C0A);padding:16px;display:flex;flex-direction:column;gap:14px;overflow:auto}
+.accounts-head{display:flex;justify-content:space-between;align-items:center}
+.accounts-head h3{font-family:'Instrument Serif',serif;font-size:22px;font-weight:400}
+.accounts-head h3 em{color:var(--gold);font-style:italic}
+.account-card{background:var(--card);border:1px solid #2A2824;border-radius:16px;padding:12px;position:relative;transition:.2s}
+.account-card:hover{border-color:#3A3832}
+.acc-top{display:flex;gap:10px;align-items:center}
+.acc-letter{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0}
+.acc-name{font-weight:700;font-size:13px;line-height:1.1}
+.acc-sub{font-size:10px;color:#8A867E;font-family:'Fragment Mono',monospace}
+.acc-actions{display:flex;gap:6px;margin-top:10px}
+.acc-actions button{padding:5px 8px;border-radius:999px;border:1px solid #2A2824;background:#1A1815;color:#8A867E;font-size:10px;cursor:pointer}
+.acc-actions button:hover{color:var(--paper);border-color:#3A3832}
+.acc-stats{margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.acc-stat{background:#12100E;border:1px solid #1E1C19;border-radius:8px;padding:6px;text-align:center}
+.acc-stat b{display:block;font-size:11px;font-family:'Fragment Mono',monospace}
+.acc-stat span{font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:#8A867E}
+.add-btn{width:100%;padding:12px;border-radius:14px;border:1px dashed #3A3832;background:transparent;color:#8A867E;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:.2s}
+.add-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Orders */
+.orders-col{padding:16px 14px 30px;background:var(--bg);overflow:auto}
+.orders-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.orders-head h2{font-family:'Instrument Serif',serif;font-size:30px;font-weight:400;line-height:.9}
+.orders-head h2 span{color:var(--gold);font-style:italic}
+.orders-head p{font-size:11px;color:#8A867E;max-width:360px;line-height:1.5;font-family:'Fragment Mono',monospace}
+.round{margin-bottom:18px}
+.round-title{display:flex;align-items:center;justify-content:space-between;padding:10px 4px 8px;border-bottom:1px solid #1E1C19;margin-bottom:8px}
+.round-title h4{font-family:'Instrument Serif',serif;font-size:18px}
+.round-title h4 i{color:var(--gold);font-style:italic}
+.round-title .count{font-family:'Fragment Mono',monospace;font-size:11px;color:#8A867E}
+.match{
+  display:grid;grid-template-columns:48px 1fr auto 1fr auto 28px;
+  gap:8px;align-items:center;
+  padding:12px 10px;
+  border:1px solid #1E1C19;
+  border-radius:14px;
+  margin-bottom:8px;
+  background:linear-gradient(180deg,#1A1815,#15130F);
+  cursor:pointer;transition:.2s;position:relative;
+}
+@media(max-width:600px){.match{grid-template-columns:36px 1fr 1fr 28px}.match .hide{display:none}}
+.match:hover{border-color:var(--gold);transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.3)}
+.match.done{opacity:.45}
+.match.done::before{content:'';position:absolute;left:0;top:12px;bottom:12px;width:2px;background:var(--green);border-radius:999px}
+.match.active{border-color:var(--gold);background:linear-gradient(180deg,#232019,#1A1815);box-shadow:0 0 0 1px rgba(201,168,106,.15) inset}
+.match-num{font-family:'Fragment Mono',monospace;font-size:10px;color:#5A5752}
+.match-player .n{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.match-player.winner .n{color:var(--paper)}
+.match-player.winner .n::after{content:' ★';color:var(--gold);font-size:10px}
+.match-player .meta{font-family:'Fragment Mono',monospace;font-size:9px;color:#8A867E}
+.match-vs{width:24px;height:24px;border-radius:999px;background:#12100E;border:1px solid #2A2824;display:grid;place-items:center;font-size:8px;color:#8A867E}
+.match-mat{font-size:9px;font-family:'Fragment Mono',monospace;padding:3px 7px;border-radius:999px;background:#12100E;border:1px solid #2A2824;color:var(--gold);white-space:nowrap}
+.match-mat.loop{color:var(--blue);border-color:#2A3240;background:#131A22}
+.match-check{width:24px;height:24px;border-radius:999px;border:1px solid #2A2824;display:grid;place-items:center;font-size:10px;color:#5A5752}
+.match.done .match-check{background:var(--green);color:#000;border-color:var(--green)}
+
+/* Board */
+.board-col{border-left:1px solid #1E1C19;background:linear-gradient(180deg,#171410,#12100E);padding:16px;position:sticky;top:56px;height:calc(100vh - 56px);overflow:auto;display:flex;flex-direction:column;gap:14px}
+.board-card{background:linear-gradient(180deg,#FFFEFB,#F5EFE4);border-radius:20px;padding:14px;box-shadow:0 20px 50px rgba(0,0,0,.5);border:1px solid #2A2824;position:relative}
+.miyuki-board{width:100%;aspect-ratio:1;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);border-radius:12px;overflow:hidden;border:3px solid #12100E;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.miyuki-square{position:relative;display:grid;place-items:center}
 .miyuki-square.light{background:radial-gradient(120% 120% at 30% 20%, #FFFEFB 0%, #F5EFE4 60%, #EDE3CF 100%)}
 .miyuki-square.dark{background:radial-gradient(120% 120% at 30% 20%, #D8C19A 0%, #C9A86A 55%, #B9975B 100%)}
 .miyuki-square.last-move.light{background:radial-gradient(120% 120% at 30% 20%, #FFF6B5 0%, #F9E9A6 100%) !important}
 .miyuki-square.last-move.dark{background:radial-gradient(120% 120% at 30% 20%, #E8C86A 0%, #D4B56A 100%) !important}
-.miyuki-square .coord{position:absolute;bottom:2px;right:3px;font-size:7px;font-family:'JetBrains Mono',monospace;font-weight:700;color:rgba(18,16,14,.5)}
-.miyuki-piece{width:84%;height:84%;border-radius:50% 50% 38% 38% / 58% 58% 42% 42%;display:grid;place-items:center;position:relative;box-shadow:0 4px 10px rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.8) inset,inset 0 -2px 4px rgba(0,0,0,.15)}
-.miyuki-piece.white{background:radial-gradient(130% 130% at 32% 18%, #FFFFFF 0%, #FFFEFB 25%, #F5EFE4 60%, #EADFC6 100%);border:1.8px solid var(--gold)}
-.miyuki-piece.black{background:radial-gradient(130% 130% at 32% 18%, #2E2C28 0%, #1E1C19 30%, #12100E 100%);border:1.8px solid var(--blue)}
-.miyuki-piece .glyph{font-size:23px;line-height:1;font-weight:700;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
+.miyuki-square.selected{outline:3px solid var(--blue);outline-offset:-3px;z-index:2}
+.miyuki-square .coord{position:absolute;bottom:1px;right:2px;font-size:7px;font-family:'Fragment Mono',monospace;font-weight:700;color:rgba(18,16,14,.5)}
+.miyuki-piece{width:82%;height:82%;border-radius:50% 50% 38% 38% / 58% 58% 42% 42%;display:grid;place-items:center;box-shadow:0 4px 10px rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.8) inset;transition:transform .12s;cursor:pointer}
+.miyuki-piece.white{background:radial-gradient(130% 130% at 32% 18%, #FFFFFF 0%, #FFFEFB 25%, #F5EFE4 60%, #EADFC6 100%);border:1.6px solid var(--gold)}
+.miyuki-piece.black{background:radial-gradient(130% 130% at 32% 18%, #2E2C28 0%, #1E1C19 30%, #12100E 100%);border:1.6px solid var(--blue)}
+.miyuki-piece .glyph{font-size:22px;line-height:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
 .miyuki-piece.white .glyph{color:#12100E}.miyuki-piece.black .glyph{color:#FFFEFB}
-.arena-right{padding:16px 12px 28px 0}
-@media(max-width:1000px){.arena-right{padding:12px}}
-.round-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 10px 22px;border-bottom:1px solid #1E1C19}
-.round-head h4{font-family:'Instrument Serif',serif;font-size:21px;font-weight:400}
-.round-head h4 span{color:var(--gold)}
-.round-head .count{font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A867E}
-.match-row{display:grid;grid-template-columns:56px 1fr auto 1fr 120px 32px;gap:10px;align-items:center;padding:14px 16px 14px 20px;border-bottom:1px solid #1E1C19;cursor:pointer;transition:.2s;position:relative}
-@media(max-width:700px){.match-row{grid-template-columns:44px 1fr 1fr 32px;gap:8px}.hide-m{display:none}}
-.match-row:hover{background:#1A1816}
-.match-row.done{opacity:.45}
-.match-row.done::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--green)}
-.match-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752}
-.match-player .name{font-weight:700;font-size:13px}
-.match-player.winner .name{color:var(--paper)}
-.match-player.winner .name::after{content:' ●';color:var(--gold);font-size:10px}
-.match-player .elo{font-family:'JetBrains Mono',monospace;font-size:10px;color:#8A867E}
-.match-vs{width:26px;height:26px;border-radius:999px;background:#1A1816;border:1px solid #2A2824;display:grid;place-items:center;font-size:9px;color:#8A867E;font-family:'JetBrains Mono',monospace}
-.match-mat{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--gold);border:1px solid #2A2824;background:#1A1816;padding:3px 7px;border-radius:999px;white-space:nowrap}
-.match-check{width:24px;height:24px;border-radius:999px;border:1px solid #2A2824;display:grid;place-items:center;font-size:11px;color:#5A5752}
-.match-row.done .match-check{background:var(--green);color:#000;border-color:var(--green)}
-.stats-hero{padding:86px 22px 24px;max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:end}
-@media(max-width:900px){.stats-hero{grid-template-columns:1fr}}
-.stats-hero h2{font-family:'Instrument Serif',serif;font-size:clamp(36px,6vw,68px);line-height:.9;letter-spacing:-.03em}
-.stats-hero h2 em{font-style:italic;color:var(--gold2)}
-.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;max-width:1400px;margin:0 auto;padding:0 22px 40px}
-@media(max-width:900px){.bento{grid-template-columns:1fr}}
-.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.04);position:relative;overflow:hidden}
-.card.dark{background:var(--ink);color:var(--paper);border-color:#1E1C19}
-.card.gold{background:linear-gradient(135deg,#FFFEFB,#FFF2D6);border-color:var(--line)}
-.bento-4{grid-column:span 4}.bento-6{grid-column:span 6}.bento-8{grid-column:span 8}.bento-12{grid-column:span 12}
-@media(max-width:900px){.bento-4,.bento-6,.bento-8,.bento-12{grid-column:span 1}}
-.podium-stats{display:flex;gap:10px;align-items:end;margin-top:12px}
-.podium-bar{flex:1;text-align:center}
-.podium-bar i{display:block;background:var(--line);border-radius:12px 12px 0 0;margin:0 auto 8px}
-.podium-bar.first i{background:linear-gradient(180deg,var(--gold),var(--gold2));height:88px}
-.podium-bar.second i{background:#E8E8E8;height:62px}
-.podium-bar.third i{background:#D9B18E;height:44px}
-.podium-bar b{font-family:'Instrument Serif',serif;font-size:20px;display:block}
-.podium-bar span{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink2)}
-.leader-row{display:grid;grid-template-columns:32px 1fr auto auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
-.leader-row:last-child{border:0}
-.leader-ava{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:12px;background:var(--paper2);border:1px solid var(--line)}
-.base-elo-table{width:100%;border-collapse:collapse;margin-top:10px}
-.base-elo-table th{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);font-family:'JetBrains Mono',monospace;padding:7px;text-align:center;border-bottom:1px solid var(--line)}
-.base-elo-table td{padding:5px;text-align:center;border-bottom:1px solid #F0E8D5}
-.base-elo-table input{width:64px;padding:5px 6px;border-radius:8px;border:1px solid var(--line);background:var(--paper);font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center}
-.base-elo-table input.text{width:110px;text-align:left}
-.base-elo-table input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,106,.15)}
-.acc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.acc-card{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}
-.acc-ava{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-weight:800;color:#fff}
-.acc-elo{font-family:'Instrument Serif',serif;font-size:24px;line-height:1}
-.modes-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:10px}
-.modes-bar div{background:var(--paper2);border-radius:8px;padding:5px 3px;text-align:center;border:1px solid var(--line)}
-.modes-bar b{font-size:11px;font-family:'JetBrains Mono',monospace;display:block}
-.modes-bar span{font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
-.modal-overlay{position:fixed;inset:0;z-index:60;background:rgba(18,16,14,.55);backdrop-filter:blur(16px);display:none;place-items:center;padding:16px}
-.modal-overlay.open{display:grid}
-.modal{width:min(1100px,100%);max-height:94vh;overflow:auto;background:var(--paper);border-radius:24px;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.2);display:grid;grid-template-columns:1.1fr .9fr}
-@media(max-width:800px){.modal{grid-template-columns:1fr}}
-.modal-board{padding:16px;background:var(--paper2);border-right:1px solid var(--line)}
-.modal-info{padding:18px;display:grid;gap:14px;align-content:start}
-.board-wrap{background:linear-gradient(180deg,#FFFEFB,#F5EFE4);border-radius:20px;padding:14px;border:1px solid var(--line);box-shadow:0 12px 32px rgba(0,0,0,.08)}
-.moves{display:flex;flex-wrap:wrap;gap:6px;max-height:180px;overflow:auto;padding:8px;background:var(--paper);border:1px solid var(--line);border-radius:12px}
-.move{padding:5px 9px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer}
+.miyuki-piece.selected{transform:scale(1.12);box-shadow:0 8px 18px rgba(0,0,0,.5),0 0 0 2px var(--blue)}
+.board-controls{display:flex;gap:6px;flex-wrap:wrap}
+.board-controls button{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.board-controls button:hover{background:var(--ink);color:#fff}
+.mat-detail{padding:12px;border-radius:14px;background:#fff;border:1px solid var(--line);color:var(--ink)}
+.mat-detail h4{font-family:'Instrument Serif',serif;font-size:18px;margin-bottom:4px}
+.mat-detail p{font-size:11px;color:#6B6760;line-height:1.5;font-family:'Fragment Mono',monospace}
+.moves{display:flex;flex-wrap:wrap;gap:6px;max-height:160px;overflow:auto;padding:8px;background:var(--paper);border:1px solid var(--line);border-radius:12px}
+.move{padding:5px 9px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:11px;font-family:'Fragment Mono',monospace;cursor:pointer;color:var(--ink)}
 .move.active{background:var(--ink);color:#fff}
-.elo-manual{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
-.elo-manual label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);font-family:'JetBrains Mono',monospace;display:grid;gap:6px}
-.elo-manual input{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--paper);font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;text-align:center}
-.elo-manual input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,106,.15)}
+.move.done{background:var(--green);color:#000;border-color:var(--green)}
+.elo-edit{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}
+.elo-edit label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);font-family:'Fragment Mono',monospace;display:grid;gap:4px}
+.elo-edit input{padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);font-family:'Fragment Mono',monospace;font-size:13px;font-weight:700;text-align:center}
 .confetti{position:fixed;inset:0;pointer-events:none;z-index:70}
 </style>
 </head>
 <body>
-<nav class="nav">
-  <div class="nav-logo"><i>M</i> MIYUKI CHESS</div>
-  <div class="nav-tabs">
-    <button data-page="arena" class="active" onclick="switchPage('arena')">Arène</button>
-    <button data-page="stats" onclick="switchPage('stats')">Classement</button>
+<div class="top">
+  <div class="top-left">
+    <img src="logo-title.png" class="top-logo" alt="Miyuki">
+    <div class="top-title">MIYUKI <span>CHESS</span> STUDIO</div>
+    <div class="pill"><span id="progressText">0/20</span> <b id="cycleNum">#1</b></div>
   </div>
-  <div class="nav-meta"><span id="progressText">0/20</span> <b id="cycleNum">#1</b></div>
-</nav>
-
-<div id="page-arena" class="page active">
-  <section class="hero">
-    <div class="hero-bg">MIYUKI</div>
-    <img src="logo-title.png" class="hero-logo" alt="Miyuki Chess">
-    <h1 class="hero-title">SocialChess <span>x</span> SimpleChess<br><span>Deux jeux, un ordre.</span></h1>
-    <p class="hero-sub">Ordres #1 et #2 identiques. 11 mats exacts. Gauche = gagnant. Choisis plateforme et mode, entre les Elo de base et gains manuels.</p>
-    <div class="hero-actions">
-      <div class="platform-switch" id="heroPlatform">
-        <button data-plat="socialchess" class="active" onclick="setPlatform('socialchess')">♟ SocialChess</button>
-        <button data-plat="simplechess" class="active blue" onclick="setPlatform('simplechess')">♞ SimpleChess</button>
-      </div>
-      <button class="btn btn-gold" onclick="document.querySelector('.arena').scrollIntoView({behavior:'smooth'})">Entrer dans l'arène ↓</button>
+  <div class="top-right">
+    <div class="platforms" id="topPlatforms">
+      <button data-plat="socialchess" class="active" onclick="setPlatform('socialchess')">SocialChess</button>
+      <button data-plat="simplechess" onclick="setPlatform('simplechess')">SimpleChess</button>
     </div>
-  </section>
-
-  <section class="arena">
-    <div class="arena-inner">
-      <div class="arena-left">
-        <h3>Arène <i>Miyuki</i></h3>
-        <div class="mono" style="font-size:10px;color:#8A867E">PLATEFORME ACTIVE</div>
-        <div class="platform-switch" id="platformSwitch">
-          <button data-plat="socialchess" class="active" onclick="setPlatform('socialchess')">SocialChess</button>
-          <button data-plat="simplechess" onclick="setPlatform('simplechess')">SimpleChess</button>
-        </div>
-        <div class="mono" style="font-size:10px;color:#8A867E;margin-top:6px">MODE</div>
-        <div class="clock-bar" id="globalModes"></div>
-        <div class="board-preview"><div class="miyuki-board" id="previewBoard"></div></div>
-        <div id="previewInfo" class="mono" style="font-size:11px;color:#8A867E;line-height:1.4"></div>
-        <div style="margin-top:auto;display:flex;gap:8px">
-          <button class="btn" style="background:#1A1816;color:#fff;border-color:#2A2824" onclick="resetCycle()">↻ Nouveau cycle</button>
-          <button class="btn" style="background:transparent;color:#8A867E;border-color:#2A2824" onclick="resetAll()">Reset</button>
-        </div>
-      </div>
-      <div class="arena-right">
-        <div class="round-head"><h4>Ronde <span>#1</span></h4><span class="count" id="count1">0/10</span><button class="btn" style="padding:6px 10px;font-size:10px;margin-left:auto" onclick="shuffleMats(1)">🎲 Mats</button></div>
-        <div id="order1List"></div>
-        <div class="round-head" style="margin-top:12px"><h4>Ronde <span>#2</span></h4><span class="count" id="count2">0/10</span><button class="btn" style="padding:6px 10px;font-size:10px;margin-left:auto" onclick="shuffleMats(2)">🎲 Mats</button></div>
-        <div id="order2List"></div>
-        <div id="cycleBanner" style="padding:18px"></div>
-      </div>
-    </div>
-  </section>
+    <div class="modes" id="topModes"></div>
+  </div>
 </div>
 
-<div id="page-stats" class="page">
-  <div class="stats-hero">
-    <div>
-      <h2>Classement<br><em id="statsPlatformName">SocialChess</em></h2>
-      <p style="margin-top:12px;color:var(--ink2);font-size:13px;line-height:1.6;max-width:520px">Édite les noms, les tops et les Elo de base. Deux jeux = deux stats séparées.</p>
-      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
-        <div class="platform-switch" id="statsPlatformSwitch">
-          <button data-plat="socialchess" class="active" onclick="setPlatform('socialchess')">SocialChess</button>
-          <button data-plat="simplechess" onclick="setPlatform('simplechess')">SimpleChess</button>
-        </div>
-        <button class="btn btn-gold" onclick="switchPage('arena')">Arène</button>
-      </div>
+<div class="layout">
+  <div class="accounts-col">
+    <div class="accounts-head"><h3>Comptes <em id="accCount">5</em></h3><button class="btn" style="padding:6px 10px;font-size:10px" onclick="openAccountModal()">⚙️ Gérer</button></div>
+    <div id="accountsList" style="display:grid;gap:10px"></div>
+    <button class="add-btn" onclick="addAccount()">+ Ajouter un compte</button>
+    <div style="margin-top:12px;padding:12px;border-radius:12px;background:var(--card);border:1px solid #1E1C19">
+      <div class="mono" style="font-size:10px;color:#8A867E;letter-spacing:.1em;text-transform:uppercase">Stats rapides — <span id="statsPlat">SocialChess</span></div>
+      <div id="quickStats" style="margin-top:8px;display:grid;gap:6px"></div>
     </div>
-    <div class="card gold">
-      <div class="mono" style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)">Top 3 — <span id="top3Plat">SocialChess</span></div>
-      <div class="podium-stats" id="podiumStats"></div>
+    <div style="margin-top:auto;display:flex;gap:6px">
+      <button class="btn" style="padding:8px 12px;font-size:10px;background:#1A1815;color:#fff;border-color:#2A2824" onclick="resetCycle()">↻ Cycle</button>
+      <button class="btn" style="padding:8px 12px;font-size:10px;background:transparent;color:#8A867E;border-color:#2A2824" onclick="resetAll()">Reset</button>
     </div>
   </div>
 
-  <div class="bento">
-    <div class="card bento-12">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-        <h3 class="serif" style="font-size:20px">Comptes — Noms & Top (par jeu)</h3>
-        <button class="btn" style="padding:8px 14px;font-size:10px" onclick="saveAccounts()">💾 Sauver noms & tops</button>
+  <div class="orders-col">
+    <div class="orders-head">
+      <div>
+        <h2>Ordres <span>de passage</span></h2>
+        <p>Auto-générés selon le nombre de comptes. 11 mats en boucle (pas aléatoire). Gauche = gagnant.</p>
       </div>
-      <p class="mono" style="font-size:11px;color:var(--ink2);margin-top:6px">Change le nom affiché et le top (ex: Top 50, Top 120) pour chaque compte dans le jeu actif.</p>
-      <div style="overflow:auto"><table class="base-elo-table" id="accountsEditTable"></table></div>
-    </div>
-
-    <div class="card bento-12">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-        <h3 class="serif" style="font-size:20px">Elo de base — <span id="basePlatName">SocialChess</span> (éditable)</h3>
-        <div style="display:flex;gap:8px"><button class="btn" style="padding:8px 14px;font-size:10px" onclick="saveBaseElo()">💾 Sauver Elo</button><button class="btn" style="padding:8px 14px;font-size:10px" onclick="resetBaseElo()">Reset 1200</button></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn" style="padding:8px 12px;font-size:10px" onclick="regenerateOrders()">↻ Régénérer ordres</button>
+        <button class="btn" style="padding:8px 12px;font-size:10px" onclick="shuffleMats()">🎲 Décaler mats</button>
       </div>
-      <div style="overflow:auto"><table class="base-elo-table" id="baseEloTable"></table></div>
     </div>
 
-    <div class="card bento-8">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 class="serif" style="font-size:20px">Leaderboard — <span id="lbPlat">SocialChess</span></h3></div>
-      <div id="ratingTable"></div>
+    <div class="round">
+      <div class="round-title"><h4>Ordre <i>#1</i></h4><span class="count" id="count1">0/10</span></div>
+      <div id="order1List"></div>
     </div>
-    <div class="card dark bento-4">
-      <div class="mono" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#8A867E">Cycle <span id="statPlat">SocialChess</span></div>
-      <div style="margin-top:12px"><div style="font-size:42px;font-family:'Instrument Serif',serif;line-height:1" id="statCycle">#1</div><div class="mono" style="font-size:11px;color:#8A867E;margin-top:6px" id="statProgress">0/20</div><div style="height:4px;background:#1E1C19;border-radius:999px;margin-top:12px;overflow:hidden"><i id="statBar" style="display:block;height:100%;background:var(--gold);width:0%"></i></div><div style="margin-top:18px;display:grid;gap:8px" id="modeDist"></div></div>
+    <div class="round">
+      <div class="round-title"><h4>Ordre <i>#2</i> — Revanches</h4><span class="count" id="count2">0/10</span></div>
+      <div id="order2List"></div>
     </div>
 
-    <div class="card bento-12">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 class="serif" style="font-size:20px">Profils — <span id="profPlat">SocialChess</span></h3></div>
-      <div class="acc-grid" id="accountsGrid"></div>
+    <div id="cycleBanner" style="margin-top:16px"></div>
+
+    <div style="margin-top:20px;padding:14px;border-radius:14px;background:#1A1815;border:1px solid #1E1C19">
+      <div class="mono" style="font-size:10px;color:#8A867E;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Les 11 mats — boucle</div>
+      <div id="matsList" style="display:grid;gap:6px"></div>
+    </div>
+  </div>
+
+  <div class="board-col">
+    <div class="board-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="mono" style="font-size:10px;color:var(--ink2)" id="boardTitle">Sélectionne un duel</div>
+        <div style="display:flex;gap:6px"><button class="btn" style="padding:6px 10px;font-size:10px" onclick="flipBoard()">↕ Flip</button><button class="btn" style="padding:6px 10px;font-size:10px" onclick="resetBoard()">⟲ Reset</button></div>
+      </div>
+      <div class="miyuki-board" id="chessboard"></div>
+      <div class="board-controls" style="margin-top:10px">
+        <button onclick="stepMove(-1)">◀ Reculer</button>
+        <button onclick="stepMove(1)">Avancer ▶</button>
+        <button onclick="stepMove(999)">Fin ⏭</button>
+        <button onclick="autoPlay()" id="autoBtn">▶ Auto</button>
+      </div>
+      <div class="mono" id="boardFen" style="font-size:8px;color:#8A867E;margin-top:8px;word-break:break-all"></div>
+    </div>
+
+    <div class="mat-detail" id="matDetail"><div class="mono" style="font-size:11px;color:var(--ink2)">Clique un match à gauche pour charger son mat. Le plateau est jouable : clique une pièce puis une case pour jouer le coup du mat.</div></div>
+
+    <div class="moves" id="movesList"></div>
+
+    <div class="elo-edit">
+      <label>GAGNANT +gain<input id="deltaWInput" type="number" value="15" step="1" oninput="updateEloPreview()"></label>
+      <label>PERDANT perte<input id="deltaLInput" type="number" value="-15" step="1" oninput="updateEloPreview()"></label>
+    </div>
+    <div id="eloPreview" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px"></div>
+
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-gold" id="btnToggleDone" onclick="toggleDoneCurrent()" style="flex:1">✓ Valider duel</button>
+      <button class="btn" onclick="copyMoves()">📋 Coups</button>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <div class="modal-board">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="mono" style="font-size:10px;color:var(--ink2)" id="modalMatchId">MATCH</div><div style="display:flex;gap:6px"><button class="btn" style="padding:6px 10px;font-size:10px" onclick="rerollCurrentMat()">🎲 Mat</button><button class="btn" style="padding:6px 10px;font-size:10px" onclick="closeModal()">✕</button></div></div>
-      <div class="board-wrap"><div class="miyuki-board" id="chessboard"></div></div>
-      <div style="display:flex;gap:6px;margin-top:10px"><button class="btn" style="padding:7px 12px;font-size:10px" onclick="stepMove(-1)">◀</button><button class="btn" style="padding:7px 12px;font-size:10px" onclick="stepMove(1)">▶</button><button class="btn" style="padding:7px 12px;font-size:10px" onclick="stepMove(999)">⏭</button><button class="btn" style="padding:7px 12px;font-size:10px;margin-left:auto" onclick="copyMoves()">📋</button></div>
-      <div class="mono" id="boardFen" style="font-size:9px;color:var(--ink2);margin-top:8px;word-break:break-all"></div>
-    </div>
-    <div class="modal-info">
-      <div><h2 class="serif" style="font-size:22px;line-height:1.1" id="modalTitle"></h2><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap" id="modalBadges"></div></div>
-      <div><div class="mono" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px">Plateforme + Mode</div><div style="display:flex;gap:8px;flex-wrap:wrap"><div id="modalPlatform" style="display:flex;gap:6px"></div><div id="modalModes" style="display:flex;gap:5px;flex-wrap:wrap"></div></div></div>
-      <div class="elo-manual"><label>GAGNANT +gain<input id="deltaWInput" type="number" value="15" step="1" oninput="updateEloPreview()"></label><label>PERDANT perte<input id="deltaLInput" type="number" value="-15" step="1" oninput="updateEloPreview()"></label></div>
-      <div id="eloPreview" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px"></div>
-      <div style="padding:12px;border-radius:12px;background:linear-gradient(135deg,rgba(201,168,106,.14),rgba(107,138,158,.12));border:1px solid var(--line)" id="matDetail"></div>
-      <div><div class="mono" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px">Coups</div><div class="moves" id="movesList"></div></div>
-      <div style="display:flex;gap:8px"><button class="btn btn-gold" id="btnToggleDone" onclick="toggleDoneCurrent()">✓ Valider</button><button class="btn" onclick="closeModal()">Fermer</button></div>
-    </div>
+<!-- Account manage modal -->
+<div id="accountModal" style="position:fixed;inset:0;z-index:60;background:rgba(14,14,11,.6);backdrop-filter:blur(16px);display:none;place-items:center;padding:16px">
+  <div style="width:min(760px,100%);max-height:90vh;overflow:auto;background:var(--paper);border-radius:20px;border:1px solid var(--line);padding:18px;box-shadow:0 30px 80px rgba(0,0,0,.2)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 class="serif" style="font-size:22px">Gérer comptes & stats</h3><button class="btn" style="padding:6px 10px;font-size:10px" onclick="closeAccountModal()">✕</button></div>
+    <div id="accountModalContent"></div>
+    <div style="margin-top:12px;display:flex;gap:8px"><button class="btn btn-gold" onclick="saveAccountsModal()">💾 Sauver tout</button><button class="btn" onclick="closeAccountModal()">Fermer</button></div>
   </div>
 </div>
 
@@ -265,11 +257,8 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;ove
 var Chess=function(r){var u="b",s="w",l=-1,_="p",A="n",S="b",m="r",y="q",p="k",t="pnbrqkPNBRQK",e="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",g=["1-0","0-1","1/2-1/2","*"],C={b:[16,32,17,15],w:[-16,-32,-17,-15]},T={n:[-18,-33,-31,-14,18,33,31,14],b:[-17,-15,17,15],r:[-16,1,16,-1],q:[-17,-16,-15,1,17,16,15,-1],k:[-17,-16,-15,1,17,16,15,-1]},c=[20,0,0,0,0,0,0,24,0,0,0,0,0,0,20,0,0,20,0,0,0,0,0,24,0,0,0,0,0,20,0,0,0,0,20,0,0,0,0,24,0,0,0,0,20,0,0,0,0,0,0,20,0,0,0,24,0,0,0,20,0,0,0,0,0,0,0,0,20,0,0,24,0,0,20,0,0,0,0,0,0,0,0,0,0,20,2,24,2,20,0,0,0,0,0,0,0,0,0,0,0,2,53,56,53,2,0,0,0,0,0,0,24,24,24,24,24,24,56,0,56,24,24,24,24,24,24,0,0,0,0,0,0,2,53,56,53,2,0,0,0,0,0,0,0,0,0,0,0,20,2,24,2,20,0,0,0,0,0,0,0,0,0,0,20,0,0,24,0,0,20,0,0,0,0,0,0,0,0,20,0,0,0,24,0,0,0,20,0,0,0,0,0,0,20,0,0,0,0,24,0,0,0,0,20,0,0,0,0,20,0,0,0,0,0,24,0,0,0,0,0,20,0,0,20,0,0,0,0,0,0,24,0,0,0,0,0,0,20],v=[17,0,0,0,0,0,0,16,0,0,0,0,0,0,15,0,0,17,0,0,0,0,0,16,0,0,0,0,0,15,0,0,0,0,17,0,0,0,0,16,0,0,0,0,15,0,0,0,0,0,0,17,0,0,0,16,0,0,0,15,0,0,0,0,0,0,0,0,17,0,0,16,0,0,15,0,0,0,0,0,0,0,0,0,0,17,0,16,0,15,0,0,0,0,0,0,0,0,0,0,0,0,17,16,15,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,0,-15,-16,-17,0,0,0,0,0,0,0,0,0,0,0,0,-15,0,-16,0,-17,0,0,0,0,0,0,0,0,0,0,-15,0,0,-16,0,0,-17,0,0,0,0,0,0,0,0,-15,0,0,0,-16,0,0,0,-17,0,0,0,0,0,0,-15,0,0,0,0,-16,0,0,0,0,-17,0,0,0,0,-15,0,0,0,0,0,-16,0,0,0,0,0,-17,0,0,-15,0,0,0,0,0,0,-16,0,0,0,0,0,0,-17],h={p:0,n:1,b:2,r:3,q:4,k:5},o={NORMAL:"n",CAPTURE:"c",BIG_PAWN:"b",EP_CAPTURE:"e",PROMOTION:"p",KSIDE_CASTLE:"k",QSIDE_CASTLE:"q"},I={NORMAL:1,CAPTURE:2,BIG_PAWN:4,EP_CAPTURE:8,PROMOTION:16,KSIDE_CASTLE:32,QSIDE_CASTLE:64},P=7,w=6,L=1,R=0,N={a8:0,b8:1,c8:2,d8:3,e8:4,f8:5,g8:6,h8:7,a7:16,b7:17,c7:18,d7:19,e7:20,f7:21,g7:22,h7:23,a6:32,b6:33,c6:34,d6:35,e6:36,f6:37,g6:38,h6:39,a5:48,b5:49,c5:50,d5:51,e5:52,f5:53,g5:54,h5:55,a4:64,b4:65,c4:66,d4:67,e4:68,f4:69,g4:70,h4:71,a3:80,b3:81,c3:82,d3:83,e3:84,f3:85,g3:86,h3:87,a2:96,b2:97,c2:98,d2:99,e2:100,f2:101,g2:102,h2:103,a1:112,b1:113,c1:114,d1:115,e1:116,f1:117,g1:118,h1:119},E={w:[{square:N.a1,flag:I.QSIDE_CASTLE},{square:N.h1,flag:I.KSIDE_CASTLE}],b:[{square:N.a8,flag:I.QSIDE_CASTLE},{square:N.h8,flag:I.KSIDE_CASTLE}]},O=new Array(128),k={w:l,b:l},q=s,D={w:0,b:0},K=l,d=0,b=1,Q=[],U={};function x(r){void 0===r&&(r=!1),O=new Array(128),k={w:l,b:l},q=s,D={w:0,b:0},K=l,d=0,b=1,Q=[],r||(U={}),F(M())}function j(){B(e)}function B(r,e){void 0===e&&(e=!1);var n=r.split(/\s+/),t=n[0],o=0;if(!$(r).valid)return!1;x(e);for(var i=0;i<t.length;i++){var f=t.charAt(i);if("/"===f)o+=8;else if(-1!=="0123456789".indexOf(f))o+=parseInt(f,10);else{var a=f<"a"?s:u;W({type:f.toLowerCase(),color:a},fr(o)),o++}}return q=n[1],-1<n[2].indexOf("K")&&(D.w|=I.KSIDE_CASTLE),-1<n[2].indexOf("Q")&&(D.w|=I.QSIDE_CASTLE),-1<n[2].indexOf("k")&&(D.b|=I.KSIDE_CASTLE),-1<n[2].indexOf("q")&&(D.b|=I.QSIDE_CASTLE),K="-"===n[3]?l:N[n[3]],d=parseInt(n[4],10),b=parseInt(n[5],10),F(M()),!0}function $(r){var e="No errors.",n="FEN string must contain six space-delimited fields.",t="6th field (move number) must be a positive integer.",o="5th field (half move counter) must be a non-negative integer.",i="4th field (en-passant square) is invalid.",f="3rd field (castling availability) is invalid.",a="2nd field (side to move) is invalid.",l="1st field (piece positions) does not contain 8 '/'-delimited rows.",u="1st field (piece positions) is invalid [consecutive numbers].",s="1st field (piece positions) is invalid [invalid piece].",p="1st field (piece positions) is invalid [row too large].",c="Illegal en-passant square",v=r.split(/\s+/);if(6!==v.length)return{valid:!1,error_number:1,error:n};if(isNaN(v[5])||parseInt(v[5],10)<=0)return{valid:!1,error_number:2,error:t};if(isNaN(v[4])||parseInt(v[4],10)<0)return{valid:!1,error_number:3,error:o};if(!/^(-|[abcdefgh][36])$/.test(v[3]))return{valid:!1,error_number:4,error:i};if(!/^(KQ?k?q?|Qk?q?|kq?|q|-)$/.test(v[2]))return{valid:!1,error_number:5,error:f};if(!/^(w|b)$/.test(v[1]))return{valid:!1,error_number:6,error:a};var g=v[0].split("/");if(8!==g.length)return{valid:!1,error_number:7,error:l};for(var h=0;h<g.length;h++){for(var E=0,d=!1,b=0;b<g[h].length;b++)if(isNaN(g[h][b])){if(!/^[prnbqkPRNBQK]$/.test(g[h][b]))return{valid:!1,error_number:9,error:s};E+=1,d=!1}else{if(d)return{valid:!1,error_number:8,error:u};E+=parseInt(g[h][b],10),d=!0}if(8!==E)return{valid:!1,error_number:10,error:p}}return"3"==v[3][1]&&"w"==v[1]||"6"==v[3][1]&&"b"==v[1]?{valid:!1,error_number:11,error:c}:{valid:!0,error_number:0,error:e}}function M(){for(var r=0,e="",n=N.a8;n<=N.h1;n++){if(null==O[n])r++;else{0<r&&(e+=r,r=0);var t=O[n].color,o=O[n].type;e+=t===s?o.toUpperCase():o.toLowerCase()}n+1&136&&(0<r&&(e+=r),n!==N.h1&&(e+="/"),r=0,n+=8)}var i="";D[s]&I.KSIDE_CASTLE&&(i+="K"),D[s]&I.QSIDE_CASTLE&&(i+="Q"),D[u]&I.KSIDE_CASTLE&&(i+="k"),D[u]&I.QSIDE_CASTLE&&(i+="q"),i=i||"-";var f=K===l?"-":fr(K);return[e,q,i,f,d,b].join(" ")}function G(r){for(var e=0;e<r.length;e+=2)"string"==typeof r[e]&&"string"==typeof r[e+1]&&(U[r[e]]=r[e+1]);return U}function F(r){0<Q.length||(r!==e?(U.SetUp="1",U.FEN=r):(delete U.SetUp,delete U.FEN))}function i(r){var e=O[N[r]];return e?{type:e.type,color:e.color}:null}function W(r,e){if(!("type"in r&&"color"in r))return!1;if(-1===t.indexOf(r.type.toLowerCase()))return!1;if(!(e in N))return!1;var n=N[e];return(r.type!=p||k[r.color]==l||k[r.color]==n)&&(O[n]={type:r.type,color:r.color},r.type===p&&(k[r.color]=n),F(M()),!0)}function H(r,e,n,t,o){var i={color:q,from:e,to:n,flags:t,piece:r[e].type};return o&&(i.flags|=I.PROMOTION,i.promotion=o),r[n]?i.captured=r[n].type:t&I.EP_CAPTURE&&(i.captured=_),i}function Z(r){function e(r,e,n,t,o){if(r[n].type!==_||or(t)!==R&&or(t)!==P)e.push(H(r,n,t,o));else for(var i=[y,m,S,A],f=0,a=i.length;f<a;f++)e.push(H(r,n,t,o,i[f]))}var n=[],t=q,o=ar(t),i={b:L,w:w},f=N.a8,a=N.h1,l=!1,u=!(void 0!==r&&"legal"in r)||r.legal;if(void 0!==r&&"square"in r){if(!(r.square in N))return[];f=a=N[r.square],l=!0}for(var s=f;s<=a;s++)if(136&s)s+=7;else{var p=O[s];if(null!=p&&p.color===t)if(p.type===_){var c=s+C[t][0];if(null==O[c]){e(O,n,s,c,I.NORMAL);c=s+C[t][1];i[t]===or(s)&&null==O[c]&&e(O,n,s,c,I.BIG_PAWN)}for(v=2;v<4;v++){136&(c=s+C[t][v])||(null!=O[c]&&O[c].color===o?e(O,n,s,c,I.CAPTURE):c===K&&e(O,n,s,K,I.EP_CAPTURE))}}else for(var v=0,g=T[p.type].length;v<g;v++){var h=T[p.type][v];for(c=s;!(136&(c+=h));){if(null!=O[c]){if(O[c].color===t)break;e(O,n,s,c,I.CAPTURE);break}if(e(O,n,s,c,I.NORMAL),"n"===p.type||"k"===p.type)break}}}if(!l||a===k[t]){if(D[t]&I.KSIDE_CASTLE){var E=(d=k[t])+2;null!=O[d+1]||null!=O[E]||V(o,k[t])||V(o,d+1)||V(o,E)||e(O,n,k[t],E,I.KSIDE_CASTLE)}if(D[t]&I.QSIDE_CASTLE){var d;E=(d=k[t])-2;null!=O[d-1]||null!=O[d-2]||null!=O[d-3]||V(o,k[t])||V(o,d-1)||V(o,E)||e(O,n,k[t],E,I.QSIDE_CASTLE)}}if(!u)return n;var b=[];for(s=0,g=n.length;s<g;s++)er(n[s]),X(t)||b.push(n[s]),nr();return b}function z(r,e){var n="";if(r.flags&I.KSIDE_CASTLE)n="O-O";else if(r.flags&I.QSIDE_CASTLE)n="O-O-O";else{var t=function(r,e){for(var n=Z({legal:!e}),t=r.from,o=r.to,i=r.piece,f=0,a=0,l=0,u=0,s=n.length;u<s;u++){var p=n[u].from,c=n[u].to,v=n[u].piece;i===v&&t!==p&&o===c&&(f++,or(t)===or(p)&&a++,ir(t)===ir(p)&&l++)}if(0<f)return 0<a&&0<l?fr(t):0<l?fr(t).charAt(1):fr(t).charAt(0);return""}(r,e);r.piece!==_&&(n+=r.piece.toUpperCase()+t),r.flags&(I.CAPTURE|I.EP_CAPTURE)&&(r.piece===_&&(n+=fr(r.from)[0]),n+="x"),n+=fr(r.to),r.flags&I.PROMOTION&&(n+="="+r.promotion.toUpperCase())}return er(r),f()&&(a()?n+="#":n+="+"),nr(),n}function J(r){return r.replace(/=/,"").replace(/[+#]?[?!]*$/,"")}function V(r,e){for(var n=N.a8;n<=N.h1;n++)if(136&n)n+=7;else if(null!=O[n]&&O[n].color===r){var t=O[n],o=n-e,i=119+o;if(c[i]&1<<h[t.type]){if(t.type===_){if(0<o){if(t.color===s)return!0}else if(t.color===u)return!0;continue}if("n"===t.type||"k"===t.type)return!0;for(var f=v[i],a=n+f,l=!1;a!==e;){if(null!=O[a]){l=!0;break}a+=f}if(!l)return!0}}return!1}function X(r){return V(ar(r),k[r])}function f(){return X(q)}function a(){return f()&&0===Z().length}function n(){return!f()&&0===Z().length}function Y(){for(var r={},e=[],n=0,t=0,o=N.a8;o<=N.h1;o++)if(t=(t+1)%2,136&o)o+=7;else{var i=O[o];i&&(r[i.type]=i.type in r?r[i.type]+1:1,i.type===S&&e.push(t),n++)}if(2===n)return!0;if(3===n&&(1===r[S]||1===r[A]))return!0;if(n===r[S]+2){var f=0,a=e.length;for(o=0;o<a;o++)f+=e[o];if(0===f||f===a)return!0}return!1}function rr(){for(var r=[],e={},n=!1;;){var t=nr();if(!t)break;r.push(t)}for(;;){var o=M().split(" ").slice(0,4).join(" ");if(e[o]=o in e?e[o]+1:1,3<=e[o]&&(n=!0),!r.length)break;er(r.pop())}return n}function er(r){var e,n=q,t=ar(n);if(e=r,Q.push({move:e,kings:{b:k.b,w:k.w},turn:q,castling:{b:D.b,w:D.w},ep_square:K,half_moves:d,move_number:b}),O[r.to]=O[r.from],O[r.from]=null,r.flags&I.EP_CAPTURE&&(q===u?O[r.to-16]=null:O[r.to+16]=null),r.flags&I.PROMOTION&&(O[r.to]={type:r.promotion,color:n}),O[r.to].type===p){if(k[O[r.to].color]=r.to,r.flags&I.KSIDE_CASTLE){var o=r.to-1,i=r.to+1;O[o]=O[i],O[i]=null}else if(r.flags&I.QSIDE_CASTLE){o=r.to+1,i=r.to-2;O[o]=O[i],O[i]=null}D[n]=""}if(D[n])for(var f=0,a=E[n].length;f<a;f++)if(r.from===E[n][f].square&&D[n]&E[n][f].flag){D[n]^=E[n][f].flag;break}if(D[t])for(f=0,a=E[t].length;f<a;f++)if(r.to===E[t][f].square&&D[t]&E[t][f].flag){D[t]^=E[t][f].flag;break}K=r.flags&I.BIG_PAWN?"b"===q?r.to-16:r.to+16:l,r.piece===_||r.flags&(I.CAPTURE|I.EP_CAPTURE)?d=0:d++,q===u&&b++,q=ar(q)}function nr(){var r=Q.pop();if(null==r)return null;var e=r.move;k=r.kings,q=r.turn,D=r.castling,K=r.ep_square,d=r.half_moves,b=r.move_number;var n,t,o=q,i=ar(q);if(O[e.from]=O[e.to],O[e.from].type=e.piece,O[e.to]=null,e.flags&I.CAPTURE)O[e.to]={type:e.captured,color:i};else if(e.flags&I.EP_CAPTURE){var f;f=o===u?e.to-16:e.to+16,O[f]={type:_,color:i}}e.flags&(I.KSIDE_CASTLE|I.QSIDE_CASTLE)&&(e.flags&I.KSIDE_CASTLE?(n=e.to+1,t=e.to-1):e.flags&I.QSIDE_CASTLE&&(n=e.to-2,t=e.to+1),O[n]=O[t],O[t]=null);return e}function tr(r,e){var n=J(r);if(e){var t=n.match(/([pnbrqkPNBRQK])?([a-h][1-8])x?-?([a-h][1-8])([qrbnQRBN])?/);if(t)var o=t[1],i=t[2],f=t[3],a=t[4]}for(var l=Z(),u=0,s=l.length;u<s;u++){if(n===J(z(l[u]))||e&&n===J(z(l[u],!0)))return l[u];if(t&&(!o||o.toLowerCase()==l[u].piece)&&N[i]==l[u].from&&N[f]==l[u].to&&(!a||a.toLowerCase()==l[u].promotion))return l[u]}return null}function or(r){return r>>4}function ir(r){return 15&r}function fr(r){var e=ir(r),n=or(r);return"abcdefgh".substring(e,e+1)+"87654321".substring(n,n+1)}function ar(r){return r===s?u:s}function lr(r){var e=function r(e){var n=e instanceof Array?[]:{};for(var t in e)n[t]="object"==typeof t?r(e[t]):e[t];return n}(r);e.san=z(e,!1),e.to=fr(e.to),e.from=fr(e.from);var n="";for(var t in I)I[t]&e.flags&&(n+=o[t]);return e.flags=n,e}function ur(r){return r.replace(/^\s+|\s+$/g,"")}return B(void 0===r?e:r),{WHITE:s,BLACK:u,PAWN:_,KNIGHT:A,BISHOP:S,ROOK:m,QUEEN:y,KING:p,SQUARES:function(){for(var r=[],e=N.a8;e<=N.h1;e++)136&e?e+=7:r.push(fr(e));return r}(),FLAGS:o,load:function(r){return B(r)},reset:function(){return j()},moves:function(r){for(var e=Z(r),n=[],t=0,o=e.length;t<o;t++)void 0!==r&&"verbose"in r&&r.verbose?n.push(lr(e[t])):n.push(z(e[t],!1));return n},in_check:function(){return f()},in_checkmate:function(){return a()},in_stalemate:function(){return n()},in_draw:function(){return 100<=d||n()||Y()||rr()},insufficient_material:function(){return Y()},in_threefold_repetition:function(){return rr()},game_over:function(){return 100<=d||a()||n()||Y()||rr()},validate_fen:function(r){return $(r)},fen:function(){return M()},board:function(){for(var r=[],e=[],n=N.a8;n<=N.h1;n++)null==O[n]?e.push(null):e.push({type:O[n].type,color:O[n].color}),n+1&136&&(r.push(e),e=[],n+=8);return r},pgn:function(r){var e="object"==typeof r&&"string"==typeof r.newline_char?r.newline_char:"\n",n="object"==typeof r&&"number"==typeof r.max_width?r.max_width:0,t=[],o=!1;for(var i in U)t.push("["+i+' "'+U[i]+'"]'+e),o=!0;o&&Q.length&&t.push(e);for(var f=[];0<Q.length;)f.push(nr());for(var a=[],l="";0<f.length;){var u=f.pop();Q.length||"b"!==u.color?"w"===u.color&&(l.length&&a.push(l),l=b+"."):l=b+". ...",l=l+" "+z(u,!1),er(u)}if(l.length&&a.push(l),void 0!==U.Result&&a.push(U.Result),0===n)return t.join("")+a.join(" ");var s=0;for(i=0;i<a.length;i++)s+a[i].length>n&&0!==i?(" "===t[t.length-1]&&t.pop(),t.push(e),s=0):0!==i&&(t.push(" "),s++),t.push(a[i]),s+=a[i].length;return t.join("")},load_pgn:function(r,e){var n=void 0!==e&&"sloppy"in e&&e.sloppy;function l(r){return r.replace(/\\/g,"\\")}var t="object"==typeof e&&"string"==typeof e.newline_char?e.newline_char:"\r?\n",o=new RegExp("^(\\[((?:"+l(t)+")|.)*\\])(?:"+l(t)+"){2}"),i=o.test(r)?o.exec(r)[1]:"";j();var f=function(r,e){for(var n="object"==typeof e&&"string"==typeof e.newline_char?e.newline_char:"\r?\n",t={},o=r.split(new RegExp(l(n))),i="",f="",a=0;a<o.length;a++)i=o[a].replace(/^\[([A-Z][A-Za-z]*)\s.*\]$/,"$1"),f=o[a].replace(/^\[[A-Za-z]+\s"(.*)"\]$/,"$1"),0<ur(i).length&&(t[i]=f);return t}(i,e);for(var a in f)G([a,f[a]]);if("1"===f.SetUp&&!("FEN"in f&&B(f.FEN,!0)))return!1;var u=r.replace(i,"").replace(new RegExp(l(t),"g")," ");u=u.replace(/(\{[^}]+\})+?/g,"");for(var s=/(\([^\(\)]+\))+?/g;s.test(u);)u=u.replace(s,"");var p=ur(u=(u=(u=u.replace(/\d+\.(\.\.)?/g,"")).replace(/\.\.\./g,"")).replace(/\$\d+/g,"")).split(new RegExp(/\s+/));p=p.join(",").replace(/,,+/g,",").split(",");for(var c="",v=0;v<p.length-1;v++){if(null==(c=tr(p[v],n)))return!1;er(c)}if(c=p[p.length-1],-1<g.indexOf(c))!function(r){for(var e in r)return 1}(U)||void 0!==U.Result||G(["Result",c]);else{if(null==(c=tr(c,n)))return!1;er(c)}return!0},header:function(){return G(arguments)},ascii:function(){return function(){for(var r="   +------------------------+\n",e=N.a8;e<=N.h1;e++){if(0===ir(e)&&(r+=" "+"87654321"[or(e)]+" |"),null==O[e])r+=" . ";else{var n=O[e].type;r+=" "+(O[e].color===s?n.toUpperCase():n.toLowerCase())+" "}e+1&136&&(r+="|\n",e+=8)}return r+="   +------------------------+\n",r+="     a  b  c  d  e  f  g  h\n"}()},turn:function(){return q},move:function(r,e){var n=void 0!==e&&"sloppy"in e&&e.sloppy,t=null;if("string"==typeof r)t=tr(r,n);else if("object"==typeof r)for(var o=Z(),i=0,f=o.length;i<f;i++)if(!(r.from!==fr(o[i].from)||r.to!==fr(o[i].to)||"promotion"in o[i]&&r.promotion!==o[i].promotion)){t=o[i];break}if(!t)return null;var a=lr(t);return er(t),a},undo:function(){var r=nr();return r?lr(r):null},clear:function(){return x()},put:function(r,e){return W(r,e)},get:function(r){return i(r)},remove:function(r){return n=i(e=r),O[N[e]]=null,n&&n.type===p&&(k[n.color]=l),F(M()),n;var e,n},perft:function(r){return function r(e){for(var n=Z({legal:!1}),t=0,o=q,i=0,f=n.length;i<f;i++)er(n[i]),X(o)||(0<e-1?t+=r(e-1):t++),nr();return t}(r)},square_color:function(r){if(r in N){var e=N[r];return(or(e)+ir(e))%2==0?"light":"dark"}return null},history:function(r){for(var e=[],n=[],t=(void 0!==r&&"verbose"in r&&r.verbose);0<Q.length;)e.push(nr());for(;0<e.length;){var o=e.pop();t?n.push(lr(o)):n.push(z(o)),er(o)}return n}}};"undefined"!=typeof exports&&(exports.Chess=Chess),"undefined"!=typeof define&&define(function(){return Chess});
 </script>
 <script>
-const DEFAULT_ACCOUNTS={A:"Miyuki",B:"Miyuki.EXE",C:"MiyukiPrime",D:"Miyuki404",E:"MiyukiOnTop"};
-const AVATAR={A:"♔",B:"♕",C:"♖",D:"♗",E:"♘"};
-const AVA_COLOR={A:"#C9A86A",B:"#6B8A9E",C:"#12100E",D:"#A68A5B",E:"#8A9A9A"};
-const ORDER1=[["A","B"],["C","D"],["A","C"],["B","E"],["D","A"],["E","C"],["B","D"],["E","A"],["C","B"],["D","E"]];
-const ORDER2=[["B","A"],["D","C"],["C","A"],["E","B"],["A","D"],["C","E"],["D","B"],["A","E"],["B","C"],["E","D"]];
+const DEFAULT_NAMES=["Miyuki","Miyuki.EXE","MiyukiPrime","Miyuki404","MiyukiOnTop","MiyukiGhost","MiyukiZero","MiyukiNova"];
+const AVA_COLORS=["#C9A86A","#6B8A9E","#12100E","#A68A5B","#8A9A9A","#2E7D5B","#B85450","#D9B18E"];
 const GAME_MODES=["bullet","blitz","rapide","classique","960"];
 const MODE_LABEL={bullet:"BULLET",blitz:"BLITZ",rapide:"RAPIDE",classique:"CLASSIQUE","960":"960"};
 const PLATFORMS=["socialchess","simplechess"];
@@ -289,37 +278,50 @@ const MATS=[
 ];
 
 let state={
-  cycle:1,completed:new Set(),assignments:{},modes:{},platforms:{},
-  globalMode:"blitz",globalPlatform:"socialchess",
-  accountNames:{},accountTops:{},
-  baseElo:{},elo:{},eloHistory:{},
-  currentMatchId:null,currentMoveIdx:0,currentFens:[]
+  cycle:1,
+  accounts:[], // {id, name, color, top:{socialchess:0, simplechess:0}}
+  completed:new Set(),
+  assignments:{}, // matchId -> matIndex (loop)
+  modes:{},
+  platforms:{},
+  globalMode:"blitz",
+  globalPlatform:"socialchess",
+  baseElo:{}, // plat -> accId -> mode -> elo
+  elo:{},
+  eloHistory:{},
+  currentMatchId:null,
+  currentMoveIdx:0,
+  currentFens:[],
+  boardFlipped:false,
+  selectedSquare:null,
+  matOffset:0 // décalage boucle mats
 };
 
-function getAllIds(){const ids=[];ORDER1.forEach((_,i)=>ids.push(`1-${i}`));ORDER2.forEach((_,i)=>ids.push(`2-${i}`));return ids;}
+function uid(){return Math.random().toString(36).slice(2,7);}
 
-function initDefaults(){
-  // account names
-  Object.keys(DEFAULT_ACCOUNTS).forEach(k=>{
-    if(!state.accountNames[k]) state.accountNames[k]=DEFAULT_ACCOUNTS[k];
-  });
-  // tops per platform
-  PLATFORMS.forEach(plat=>{
-    if(!state.accountTops[plat]) state.accountTops[plat]={};
-    Object.keys(DEFAULT_ACCOUNTS).forEach(k=>{
-      if(state.accountTops[plat][k]===undefined) state.accountTops[plat][k]=0;
+function initAccounts(){
+  if(state.accounts.length===0){
+    ["A","B","C","D","E"].forEach((id,i)=>{
+      state.accounts.push({
+        id,
+        name:DEFAULT_NAMES[i]||`Compte ${id}`,
+        color:AVA_COLORS[i%AVA_COLORS.length],
+        top:{socialchess:0,simplechess:0}
+      });
     });
-  });
-  // elo
+  }
+}
+
+function initElo(){
   PLATFORMS.forEach(plat=>{
     if(!state.baseElo[plat]) state.baseElo[plat]={};
     if(!state.elo[plat]) state.elo[plat]={};
-    Object.keys(DEFAULT_ACCOUNTS).forEach(k=>{
-      if(!state.baseElo[plat][k]) state.baseElo[plat][k]={};
-      if(!state.elo[plat][k]) state.elo[plat][k]={};
+    state.accounts.forEach(acc=>{
+      if(!state.baseElo[plat][acc.id]) state.baseElo[plat][acc.id]={};
+      if(!state.elo[plat][acc.id]) state.elo[plat][acc.id]={};
       GAME_MODES.forEach(m=>{
-        if(state.baseElo[plat][k][m]===undefined) state.baseElo[plat][k][m]=1200;
-        if(state.elo[plat][k][m]===undefined) state.elo[plat][k][m]=state.baseElo[plat][k][m];
+        if(state.baseElo[plat][acc.id][m]===undefined) state.baseElo[plat][acc.id][m]=1200;
+        if(state.elo[plat][acc.id][m]===undefined) state.elo[plat][acc.id][m]=state.baseElo[plat][acc.id][m];
       });
     });
   });
@@ -327,10 +329,10 @@ function initDefaults(){
 
 function recalcAllElo(){
   PLATFORMS.forEach(plat=>{
-    Object.keys(DEFAULT_ACCOUNTS).forEach(k=>{
+    state.accounts.forEach(acc=>{
       GAME_MODES.forEach(m=>{
-        if(!state.baseElo[plat]||!state.baseElo[plat][k]) return;
-        state.elo[plat][k][m]=state.baseElo[plat][k][m];
+        if(state.baseElo[plat]&&state.baseElo[plat][acc.id])
+          state.elo[plat][acc.id][m]=state.baseElo[plat][acc.id][m];
       });
     });
   });
@@ -346,234 +348,326 @@ function recalcAllElo(){
 
 function loadState(){
   try{
-    const raw=localStorage.getItem('miyuki_v8');
+    const raw=localStorage.getItem('miyuki_v9');
     if(raw){
       const s=JSON.parse(raw);
       state.cycle=s.cycle||1;
+      state.accounts=s.accounts||[];
       state.completed=new Set(s.completed||[]);
       state.assignments=s.assignments||{};
       state.modes=s.modes||{};
       state.platforms=s.platforms||{};
       state.globalMode=s.globalMode||"blitz";
       state.globalPlatform=s.globalPlatform||"socialchess";
-      state.accountNames=s.accountNames||{};
-      state.accountTops=s.accountTops||{};
       state.baseElo=s.baseElo||{};
       state.elo=s.elo||{};
       state.eloHistory=s.eloHistory||{};
+      state.matOffset=s.matOffset||0;
     }
   }catch(e){}
-  const ids=getAllIds();
-  ids.forEach(id=>{
-    if(state.assignments[id]===undefined) state.assignments[id]=Math.floor(Math.random()*MATS.length);
-    if(!state.modes[id]) state.modes[id]=state.globalMode;
-    if(!state.platforms[id]) state.platforms[id]=state.globalPlatform;
-  });
-  initDefaults();
+  initAccounts();
+  // migrate old v8 accountNames
+  try{
+    const old=localStorage.getItem('miyuki_v8');
+    if(old && state.accounts.length===5){
+      const o=JSON.parse(old);
+      if(o.accountNames){
+        Object.keys(o.accountNames).forEach(k=>{
+          const acc=state.accounts.find(a=>a.id===k);
+          if(acc) acc.name=o.accountNames[k];
+        });
+      }
+    }
+  }catch(e){}
+  generateOrdersIfNeeded();
+  initElo();
   recalcAllElo();
 }
 
 function saveState(){
-  localStorage.setItem('miyuki_v8',JSON.stringify({
+  localStorage.setItem('miyuki_v9',JSON.stringify({
     cycle:state.cycle,
+    accounts:state.accounts,
     completed:[...state.completed],
     assignments:state.assignments,
     modes:state.modes,
     platforms:state.platforms,
     globalMode:state.globalMode,
     globalPlatform:state.globalPlatform,
-    accountNames:state.accountNames,
-    accountTops:state.accountTops,
     baseElo:state.baseElo,
     elo:state.elo,
-    eloHistory:state.eloHistory
+    eloHistory:state.eloHistory,
+    matOffset:state.matOffset
   }));
 }
 
-function avgElo(k,plat){try{const v=GAME_MODES.map(m=>state.elo[plat][k][m]||1200);return Math.round(v.reduce((a,b)=>a+b,0)/v.length);}catch(e){return 1200;}}
+function generateOrders(){
+  // generate all pairs
+  const ids=state.accounts.map(a=>a.id);
+  const pairs=[];
+  for(let i=0;i<ids.length;i++){
+    for(let j=i+1;j<ids.length;j++){
+      pairs.push([ids[i],ids[j]]);
+    }
+  }
+  // Order1 = pairs in order, Order2 = reversed pairs
+  const order1=pairs;
+  const order2=pairs.map(p=>[p[1],p[0]]);
+  return {order1,order2};
+}
 
-function switchPage(p){document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');document.querySelectorAll('.nav-tabs button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));window.scrollTo({top:0,behavior:'smooth'});}
+let CURRENT_ORDERS={order1:[],order2:[]};
+
+function generateOrdersIfNeeded(){
+  CURRENT_ORDERS=generateOrders();
+  const allIds=[];
+  CURRENT_ORDERS.order1.forEach((_,i)=>allIds.push(`1-${i}`));
+  CURRENT_ORDERS.order2.forEach((_,i)=>allIds.push(`2-${i}`));
+  // assign mats in loop, not random
+  allIds.forEach((id,idx)=>{
+    const matIdx=(idx+state.matOffset)%MATS.length;
+    if(state.assignments[id]===undefined) state.assignments[id]=matIdx;
+    if(!state.modes[id]) state.modes[id]=state.globalMode;
+    if(!state.platforms[id]) state.platforms[id]=state.globalPlatform;
+  });
+  // clean old assignments that no longer exist
+  Object.keys(state.assignments).forEach(k=>{
+    if(!allIds.includes(k)) delete state.assignments[k];
+  });
+}
+
+function regenerateOrders(){
+  // shuffle accounts order then regenerate
+  state.accounts.sort(()=>Math.random()-0.5);
+  // reset assignments to loop from 0
+  state.assignments={};
+  state.matOffset=0;
+  generateOrdersIfNeeded();
+  saveState();renderAll();
+}
+
+function shuffleMats(){
+  state.matOffset=(state.matOffset+1)%MATS.length;
+  // reassign loop
+  const allIds=[];
+  CURRENT_ORDERS.order1.forEach((_,i)=>allIds.push(`1-${i}`));
+  CURRENT_ORDERS.order2.forEach((_,i)=>allIds.push(`2-${i}`));
+  allIds.forEach((id,idx)=>{
+    state.assignments[id]=(idx+state.matOffset)%MATS.length;
+  });
+  saveState();renderAll();
+  if(state.currentMatchId) openMatch(state.currentMatchId);
+}
+
+function avgElo(accId,plat){
+  try{
+    const v=GAME_MODES.map(m=>state.elo[plat][accId][m]||1200);
+    return Math.round(v.reduce((a,b)=>a+b,0)/v.length);
+  }catch(e){return 1200;}
+}
+
+function switchPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p)?.classList.add('active');
+  document.querySelectorAll('.nav-tabs button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));
+}
+
 function setPlatform(plat){
   state.globalPlatform=plat;
   document.querySelectorAll('[data-plat]').forEach(b=>b.classList.toggle('active',b.dataset.plat===plat));
-  getAllIds().forEach(id=>{if(!state.completed.has(id)) state.platforms[id]=plat;});
+  const allIds=[];CURRENT_ORDERS.order1.forEach((_,i)=>allIds.push(`1-${i}`));CURRENT_ORDERS.order2.forEach((_,i)=>allIds.push(`2-${i}`));
+  allIds.forEach(id=>{if(!state.completed.has(id)) state.platforms[id]=plat;});
   saveState();renderAll();
 }
-function renderModes(){document.getElementById('globalModes').innerHTML=GAME_MODES.map(m=>`<button class="clock-btn ${state.globalMode===m?'active':''}" onclick="setGlobalMode('${m}')">${MODE_LABEL[m]}</button>`).join('');}
-function setGlobalMode(m){state.globalMode=m;getAllIds().forEach(id=>{if(!state.completed.has(id)) state.modes[id]=m;});saveState();renderModes();renderAll();}
+function setGlobalMode(m){state.globalMode=m;const allIds=[];CURRENT_ORDERS.order1.forEach((_,i)=>allIds.push(`1-${i}`));CURRENT_ORDERS.order2.forEach((_,i)=>allIds.push(`2-${i}`));allIds.forEach(id=>{if(!state.completed.has(id)) state.modes[id]=m;});saveState();renderAll();}
 
-function renderAccountsEdit(){
-  const plat=state.globalPlatform;
-  const table=document.getElementById('accountsEditTable');
-  let html=`<tr><th>Lettre</th><th>Nom du compte (éditable)</th><th>Top ${PLAT_LABEL[plat]} (ex: 42 = Top 42)</th><th>Top SimpleChess / SocialChess autre</th></tr>`;
-  Object.keys(DEFAULT_ACCOUNTS).forEach(k=>{
-    const name=state.accountNames[k]||DEFAULT_ACCOUNTS[k];
-    const topCurr=state.accountTops[plat][k]||0;
-    const otherPlat=plat==='socialchess'?'simplechess':'socialchess';
-    const topOther=state.accountTops[otherPlat][k]||0;
-    html+=`<tr>
-      <td><span style="width:24px;height:24px;border-radius:7px;background:${AVA_COLOR[k]};color:#fff;display:grid;place-items:center;font-weight:800">${k}</span></td>
-      <td><input class="text" data-type="name" data-acc="${k}" value="${name}" placeholder="${DEFAULT_ACCOUNTS[k]}"></td>
-      <td><input type="number" data-type="top" data-acc="${k}" data-plat="${plat}" value="${topCurr}" placeholder="0"></td>
-      <td><input type="number" data-type="top" data-acc="${k}" data-plat="${otherPlat}" value="${topOther}" placeholder="0"></td>
-    </tr>`;
-  });
-  table.innerHTML=html;
+function addAccount(){
+  const name=prompt('Nom du nouveau compte ?','NouveauCompte');
+  if(!name) return;
+  const letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let nextId='';
+  for(let ch of letters){if(!state.accounts.find(a=>a.id===ch)){nextId=ch;break;}}
+  if(!nextId) nextId='X'+(state.accounts.length+1);
+  state.accounts.push({id:nextId,name,color:AVA_COLORS[state.accounts.length%AVA_COLORS.length],top:{socialchess:0,simplechess:0}});
+  generateOrdersIfNeeded();
+  initElo();
+  recalcAllElo();
+  saveState();renderAll();
 }
-
-function saveAccounts(){
-  document.querySelectorAll('#accountsEditTable input').forEach(el=>{
-    const type=el.dataset.type;
-    const acc=el.dataset.acc;
-    if(type==='name'){
-      state.accountNames[acc]=el.value||DEFAULT_ACCOUNTS[acc];
-    }else if(type==='top'){
-      const plat=el.dataset.plat;
-      if(!state.accountTops[plat]) state.accountTops[plat]={};
-      state.accountTops[plat][acc]=parseInt(el.value)||0;
+function removeAccount(id){
+  if(!confirm(`Supprimer le compte ${id} ?`)) return;
+  state.accounts=state.accounts.filter(a=>a.id!==id);
+  // clean elo and history involving this account
+  PLATFORMS.forEach(plat=>{
+    if(state.baseElo[plat]) delete state.baseElo[plat][id];
+    if(state.elo[plat]) delete state.elo[plat][id];
+  });
+  // remove matches involving this id
+  const toRemove=[...state.completed].filter(mid=>{
+    const [o,i]=mid.split('-');const order=o==='1'?CURRENT_ORDERS.order1:CURRENT_ORDERS.order2;const pair=order[parseInt(i)];return pair&& (pair[0]===id||pair[1]===id);
+  });
+  toRemove.forEach(mid=>{state.completed.delete(mid);delete state.eloHistory[mid];});
+  generateOrdersIfNeeded();
+  saveState();renderAll();
+}
+function openAccountModal(){
+  const modal=document.getElementById('accountModal');
+  let html=`<div style="display:grid;gap:12px">`;
+  state.accounts.forEach(acc=>{
+    html+=`<div style="border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff;color:var(--ink)">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div style="width:32px;height:32px;border-radius:8px;background:${acc.color};color:#fff;display:grid;place-items:center;font-weight:800">${acc.id}</div>
+        <input data-acc="${acc.id}" data-field="name" value="${acc.name}" style="flex:1;min-width:140px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);font-weight:700">
+        <input data-acc="${acc.id}" data-field="topSocial" type="number" placeholder="Top SocialChess" value="${acc.top.socialchess||0}" style="width:130px;padding:8px;border-radius:8px;border:1px solid var(--line)">
+        <input data-acc="${acc.id}" data-field="topSimple" type="number" placeholder="Top SimpleChess" value="${acc.top.simplechess||0}" style="width:130px;padding:8px;border-radius:8px;border:1px solid var(--line)">
+        <button onclick="removeAccount('${acc.id}')" style="padding:6px 10px;border-radius:999px;border:1px solid #E8DCC2;background:#fff;cursor:pointer">🗑️</button>
+      </div>
+      <div style="margin-top:10px;display:grid;gap:8px">
+        ${PLATFORMS.map(plat=>`
+          <div style="border-top:1px dashed var(--line);padding-top:8px">
+            <div class="mono" style="font-size:10px;color:var(--ink2);margin-bottom:6px">${PLAT_LABEL[plat]} — Elo de base</div>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+              ${GAME_MODES.map(m=>`<div><div class="mono" style="font-size:8px;text-align:center">${m}</div><input type="number" data-acc="${acc.id}" data-plat="${plat}" data-mode="${m}" value="${state.baseElo[plat]?.[acc.id]?.[m]||1200}" style="width:100%;padding:6px;border-radius:8px;border:1px solid var(--line);font-family:'Fragment Mono',monospace;font-size:11px;text-align:center"></div>`).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  });
+  html+=`</div>`;
+  document.getElementById('accountModalContent').innerHTML=html;
+  modal.style.display='grid';
+}
+function closeAccountModal(){document.getElementById('accountModal').style.display='none';}
+function saveAccountsModal(){
+  document.querySelectorAll('#accountModalContent input').forEach(el=>{
+    const accId=el.dataset.acc;
+    const field=el.dataset.field;
+    const plat=el.dataset.plat;
+    const mode=el.dataset.mode;
+    const acc=state.accounts.find(a=>a.id===accId);
+    if(!acc) return;
+    if(field==='name'){acc.name=el.value||acc.name;}
+    else if(field==='topSocial'){acc.top.socialchess=parseInt(el.value)||0;}
+    else if(field==='topSimple'){acc.top.simplechess=parseInt(el.value)||0;}
+    else if(plat&&mode){
+      if(!state.baseElo[plat]) state.baseElo[plat]={};
+      if(!state.baseElo[plat][accId]) state.baseElo[plat][accId]={};
+      state.baseElo[plat][accId][mode]=parseInt(el.value)||1200;
     }
   });
-  saveState();renderAll();
-  alert('Noms et tops sauvegardés !');
-}
-
-function renderBaseEloTable(){
-  const plat=state.globalPlatform;
-  const table=document.getElementById('baseEloTable');
-  let html=`<tr><th>Compte</th>${GAME_MODES.map(m=>`<th>${m}</th>`).join('')}<th>Moy base</th></tr>`;
-  Object.keys(DEFAULT_ACCOUNTS).forEach(k=>{
-    const name=state.accountNames[k]||DEFAULT_ACCOUNTS[k];
-    const avg=GAME_MODES.reduce((a,m)=>a+(state.baseElo[plat][k][m]||1200),0)/GAME_MODES.length;
-    html+=`<tr><td style="text-align:left;font-weight:700"><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:20px;height:20px;border-radius:6px;background:${AVA_COLOR[k]};color:#fff;display:grid;place-items:center;font-size:10px">${k}</span>${name}</span></td>`;
-    GAME_MODES.forEach(m=>{
-      const val=state.baseElo[plat][k][m]||1200;
-      html+=`<td><input type="number" data-acc="${k}" data-mode="${m}" data-plat="${plat}" value="${val}" oninput="onBaseEloInput(this)"></td>`;
-    });
-    html+=`<td class="mono" style="font-size:11px">${Math.round(avg)}</td></tr>`;
-  });
-  table.innerHTML=html;
-  document.getElementById('basePlatName').textContent=PLAT_LABEL[plat];
-}
-
-function onBaseEloInput(el){
-  const acc=el.dataset.acc;const mode=el.dataset.mode;const plat=el.dataset.plat;
-  const val=parseInt(el.value)||0;
-  if(!state.baseElo[plat]) state.baseElo[plat]={};
-  if(!state.baseElo[plat][acc]) state.baseElo[plat][acc]={};
-  state.baseElo[plat][acc][mode]=val;
   recalcAllElo();
-  renderAllWithoutTables();
-}
-function saveBaseElo(){
-  document.querySelectorAll('#baseEloTable input').forEach(el=>{
-    const acc=el.dataset.acc;const mode=el.dataset.mode;const plat=el.dataset.plat;
-    if(!state.baseElo[plat]) state.baseElo[plat]={};
-    if(!state.baseElo[plat][acc]) state.baseElo[plat][acc]={};
-    state.baseElo[plat][acc][mode]=parseInt(el.value)||1200;
-  });
-  recalcAllElo();saveState();renderAll();
-  alert('Elo de base sauvegardé pour '+PLAT_LABEL[state.globalPlatform]);
-}
-function resetBaseElo(){
-  if(!confirm('Reset base Elo à 1200 pour '+PLAT_LABEL[state.globalPlatform]+' ?')) return;
-  const plat=state.globalPlatform;
-  Object.keys(DEFAULT_ACCOUNTS).forEach(k=>{GAME_MODES.forEach(m=>{state.baseElo[plat][k][m]=1200;});});
-  recalcAllElo();saveState();renderAll();
+  saveState();renderAll();
+  closeAccountModal();
 }
 
-function renderAllWithoutTables(){
+function renderAll(){
   const plat=state.globalPlatform;
-  const list=Object.keys(DEFAULT_ACCOUNTS).map(k=>({k,name:state.accountNames[k]||DEFAULT_ACCOUNTS[k],avg:avgElo(k,plat),elos:state.elo[plat][k],top:state.accountTops[plat][k]||0})).sort((a,b)=>b.avg-a.avg);
-  document.getElementById('progressText').textContent=`${state.completed.size}/20`;
+  const list=state.accounts.map(a=>({id:a.id,name:a.name,avg:avgElo(a.id,plat),color:a.color,top:a.top[plat]||0})).sort((a,b)=>b.avg-a.avg);
+  document.getElementById('progressText').textContent=`${state.completed.size}/${CURRENT_ORDERS.order1.length+CURRENT_ORDERS.order2.length}`;
   document.getElementById('cycleNum').textContent=`#${state.cycle}`;
-  document.getElementById('heroTopElo').textContent=list[0]?list[0].avg:'1200';
-  document.getElementById('heroProgress').textContent=`${state.completed.size}/20`;
-  document.getElementById('statCycle').textContent=`#${state.cycle}`;
-  document.getElementById('statProgress').textContent=`${state.completed.size}/20 duels • ${PLAT_LABEL[plat]}`;
-  document.getElementById('statBar').style.width=`${state.completed.size/20*100}%`;
-  document.getElementById('statsPlatformName').textContent=PLAT_LABEL[plat];
-  document.getElementById('top3Plat').textContent=PLAT_LABEL[plat];
-  document.getElementById('lbPlat').textContent=PLAT_LABEL[plat];
-  document.getElementById('statPlat').textContent=PLAT_LABEL[plat];
-  document.getElementById('profPlat').textContent=PLAT_LABEL[plat];
+  document.getElementById('accCount').textContent=state.accounts.length;
+  document.getElementById('topPlatforms').innerHTML=PLATFORMS.map(p=>`<button data-plat="${p}" class="${state.globalPlatform===p?'active':''}" onclick="setPlatform('${p}')">${PLAT_LABEL[p]}</button>`).join('');
+  document.getElementById('topModes').innerHTML=GAME_MODES.map(m=>`<button class="${state.globalMode===m?'active':''}" onclick="setGlobalMode('${m}')">${MODE_LABEL[m]}</button>`).join('');
+  document.getElementById('globalModes').innerHTML=GAME_MODES.map(m=>`<button class="clock-btn ${state.globalMode===m?'active':''}" onclick="setGlobalMode('${m}')">${MODE_LABEL[m]}</button>`).join('');
+  document.querySelectorAll('[data-plat]').forEach(b=>b.classList.toggle('active',b.dataset.plat===plat));
 
-  const podiumEl=document.getElementById('podiumStats');
-  if(list.length>=3){
-    podiumEl.innerHTML=`<div style="display:flex;gap:10px;align-items:end"><div class="podium-bar second"><i></i><b>${list[1].avg}</b><span>${list[1].k} ${list[1].top?'(Top '+list[1].top+')':''}</span></div><div class="podium-bar first"><i></i><b>${list[0].avg}</b><span>${list[0].k} ${list[0].top?'(Top '+list[0].top+')':''}</span></div><div class="podium-bar third"><i></i><b>${list[2].avg}</b><span>${list[2].k} ${list[2].top?'(Top '+list[2].top+')':''}</span></div></div>`;
-  }
-
-  document.getElementById('ratingTable').innerHTML=list.map((p,idx)=>{
-    const wins=[...state.completed].filter(id=>{const h=state.eloHistory[id];if(!h||h.platform!==plat) return false;return h.winner===p.k;}).length;
-    const losses=[...state.completed].filter(id=>{const h=state.eloHistory[id];if(!h||h.platform!==plat) return false;return h.loser===p.k;}).length;
-    return `<div class="leader-row"><div class="mono" style="font-size:11px;color:var(--ink2)">#${idx+1}</div><div style="display:flex;align-items:center;gap:8px"><div class="leader-ava" style="background:${AVA_COLOR[p.k]};color:#fff">${AVATAR[p.k]}</div><div><div style="font-weight:700;font-size:13px">${p.name} ${p.top?'<span style="font-size:10px;color:var(--gold)">Top '+p.top+'</span>':''}</div><div class="mono" style="font-size:10px;color:var(--ink2)">${p.k} • ${p.avg} • Top ${p.top||'-'}</div></div></div><div style="font-family:'Instrument Serif',serif;font-size:18px">${p.avg}</div><div class="mono" style="font-size:11px">${wins}W-${losses}L</div></div>`;
+  // accounts list
+  document.getElementById('accountsList').innerHTML=state.accounts.map(acc=>{
+    const avg=avgElo(acc.id,plat);
+    const top=acc.top[plat]||0;
+    return `<div class="account-card"><div class="acc-top"><div class="acc-letter" style="background:${acc.color}">${acc.id}</div><div><div class="acc-name">${acc.name} ${top?'<span style="color:var(--gold);font-size:10px">Top '+top+'</span>':''}</div><div class="acc-sub">${acc.id} • ${avg} Elo • ${PLAT_LABEL[plat]}</div></div></div><div class="acc-stats">${GAME_MODES.map(m=>`<div class="acc-stat"><b>${state.elo[plat]?.[acc.id]?.[m]||1200}</b><span>${m}</span></div>`).join('')}</div><div class="acc-actions"><button onclick="openAccountModal()">✏️ Editer</button><button onclick="removeAccount('${acc.id}')">🗑️ Suppr</button></div></div>`;
   }).join('');
 
-  const modeCnt={};[...state.completed].forEach(id=>{const h=state.eloHistory[id];if(h&&h.platform===plat){modeCnt[h.mode]=(modeCnt[h.mode]||0)+1;}});
-  document.getElementById('modeDist').innerHTML=GAME_MODES.map(m=>`<div style="display:flex;justify-content:space-between;font-size:11px" class="mono"><span>${MODE_LABEL[m]}</span><span>${modeCnt[m]||0}x</span></div>`).join('');
+  document.getElementById('quickStats').innerHTML=list.slice(0,3).map((a,i)=>`<div style="display:flex;justify-content:space-between;font-size:11px" class="mono"><span>#${i+1} ${a.id} ${a.name}</span><span>${a.avg} ${a.top?'(Top '+a.top+')':''}</span></div>`).join('')||'<div class="mono" style="font-size:11px;color:#8A867E">Aucun compte</div>';
 
-  document.getElementById('accountsGrid').innerHTML=Object.keys(DEFAULT_ACCOUNTS).map(k=>{
-    const elos=state.elo[plat][k]||{};const avg=avgElo(k,plat);const baseAvg=Math.round(GAME_MODES.reduce((a,m)=>a+(state.baseElo[plat][k][m]||1200),0)/GAME_MODES.length);const name=state.accountNames[k]||DEFAULT_ACCOUNTS[k];const top=state.accountTops[plat][k]||0;
-    return `<div class="acc-card"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px"><div style="display:flex;gap:8px;align-items:center"><div class="acc-ava" style="background:${AVA_COLOR[k]}">${AVATAR[k]}</div><div><div style="font-weight:700;font-size:13px">${name} ${top?'<span style="color:var(--gold);font-size:11px">Top '+top+'</span>':''}</div><div class="mono" style="font-size:10px;color:var(--ink2)">${k} • base ${baseAvg} • ${PLAT_LABEL[plat]}</div></div></div><div class="acc-elo">${avg}</div></div><div class="modes-bar">${GAME_MODES.map(m=>`<div><b>${elos[m]||1200}</b><span>${m}</span></div>`).join('')}</div></div>`;
-  }).join('');
-
+  // orders
   const renderList=(order,num)=>{
     return order.map((pair,idx)=>{
-      const id=`${num}-${idx}`;const [L,R]=pair;const done=state.completed.has(id);const mat=MATS[state.assignments[id]];const mode=state.modes[id];const platMatch=state.platforms[id]||'socialchess';
+      const id=`${num}-${idx}`;
+      const [L,R]=pair;
+      const done=state.completed.has(id);
+      const matIdx=state.assignments[id]!==undefined?state.assignments[id]: (idx+state.matOffset)%MATS.length;
+      const mat=MATS[matIdx];
+      const mode=state.modes[id]||state.globalMode;
+      const platMatch=state.platforms[id]||state.globalPlatform;
       let eloL=1200,eloR=1200;
       try{eloL=state.elo[platMatch][L][mode]||1200;eloR=state.elo[platMatch][R][mode]||1200;}catch(e){}
       const h=state.eloHistory[id];
-      const isActivePlat=platMatch===plat;
-      return `<div class="match-row ${done?'done':''}" onclick="openMatch('${id}')" onmouseenter="previewMat('${id}')" style="${isActivePlat?'':'opacity:.5'}">
+      const active = state.currentMatchId===id ? 'active' : '';
+      return `<div class="match ${done?'done':''} ${active}" onclick="openMatch('${id}')" onmouseenter="previewMat('${id}')">
         <div class="match-num">${num}.${idx+1}</div>
-        <div class="match-player winner"><div class="name">${state.accountNames[L]||DEFAULT_ACCOUNTS[L]}</div><div class="elo">${L} • ${eloL} ${h?`+${h.deltaW}`:''} • ${PLAT_LABEL[platMatch]}</div></div>
+        <div class="match-player winner"><div class="n">${state.accounts.find(a=>a.id===L)?.name||L}</div><div class="meta">${L} • ${eloL} ${h?`+${h.deltaW}`:''} • ${PLAT_LABEL[platMatch]}</div></div>
         <div class="match-vs">VS</div>
-        <div class="match-player"><div class="name">${state.accountNames[R]||DEFAULT_ACCOUNTS[R]}</div><div class="elo">${R} • ${eloR} ${h?`${h.deltaL}`:''}</div></div>
-        <div class="hide-m" style="display:flex;flex-direction:column;gap:4px;align-items:end"><span class="match-mat">${mat.name} • ${mat.coups}c • ${mat.winner}</span><span class="mono" style="font-size:9px;color:#8A867E">${mode}</span></div>
+        <div class="match-player"><div class="n">${state.accounts.find(a=>a.id===R)?.name||R}</div><div class="meta">${R} • ${eloR} ${h?`${h.deltaL}`:''}</div></div>
+        <div class="hide" style="display:flex;flex-direction:column;gap:4px;align-items:end"><span class="match-mat loop">#${(matIdx+1)} ${mat.name}</span><span class="mono" style="font-size:9px;color:#8A867E">${mat.coups}c • ${mat.winner} • ${mode}</span></div>
         <div class="match-check">${done?'✓':'○'}</div>
       </div>`;
     }).join('');
   };
-  document.getElementById('order1List').innerHTML=renderList(ORDER1,1);
-  document.getElementById('order2List').innerHTML=renderList(ORDER2,2);
-  document.getElementById('count1').textContent=`${ORDER1.filter((_,i)=>state.completed.has(`1-${i}`)).length}/10`;
-  document.getElementById('count2').textContent=`${ORDER2.filter((_,i)=>state.completed.has(`2-${i}`)).length}/10`;
-  const total=state.completed.size;
+  document.getElementById('order1List').innerHTML=renderList(CURRENT_ORDERS.order1,1);
+  document.getElementById('order2List').innerHTML=renderList(CURRENT_ORDERS.order2,2);
+  document.getElementById('count1').textContent=`${CURRENT_ORDERS.order1.filter((_,i)=>state.completed.has(`1-${i}`)).length}/${CURRENT_ORDERS.order1.length}`;
+  document.getElementById('count2').textContent=`${CURRENT_ORDERS.order2.filter((_,i)=>state.completed.has(`2-${i}`)).length}/${CURRENT_ORDERS.order2.length}`;
+
+  const total=CURRENT_ORDERS.order1.length+CURRENT_ORDERS.order2.length;
+  const doneCount=state.completed.size;
   const banner=document.getElementById('cycleBanner');
-  if(total===20){banner.innerHTML=`<div style="background:#1A1816;border:1px solid #2A2824;border-radius:14px;padding:14px;display:flex;justify-content:space-between;align-items:center"><div><b style="color:var(--paper);font-family:'Instrument Serif',serif;font-size:16px">Cycle #${state.cycle} terminé — ${PLAT_LABEL[plat]}</b><br><span class="mono" style="font-size:11px;color:#8A867E">20/20 joués</span></div><button class="btn" style="background:var(--paper);color:var(--ink)" onclick="resetCycle()">Nouveau cycle</button></div>`;launchConfetti();}else{banner.innerHTML=`<div class="mono" style="font-size:11px;color:#8A867E">${total===0?'Survole un duel pour prévisualiser':'Encore '+(20-total)+' duels'} • ${PLAT_LABEL[plat]}</div>`;}
-  if(getAllIds().length) previewMat(getAllIds()[0]);
-}
+  if(total>0 && doneCount===total){
+    banner.innerHTML=`<div style="background:#1A1816;border:1px solid #2A2824;border-radius:14px;padding:14px;display:flex;justify-content:space-between;align-items:center"><div><b style="color:var(--paper);font-family:'Instrument Serif',serif;font-size:16px">Cycle #${state.cycle} terminé</b><br><span class="mono" style="font-size:11px;color:#8A867E">${total}/${total} • Boucle mats recommence</span></div><button class="btn" style="background:var(--paper);color:var(--ink)" onclick="resetCycle()">Nouveau cycle</button></div>`;
+  }else{
+    banner.innerHTML=`<div class="mono" style="font-size:11px;color:#8A867E">${doneCount===0?'Survole un duel pour voir le plateau Miyuki':'Encore '+(total-doneCount)+' duels'} • Mats en boucle #${state.matOffset+1}→ • ${PLAT_LABEL[plat]}</div>`;
+  }
 
-function renderAll(){renderAccountsEdit();renderBaseEloTable();renderAllWithoutTables();renderModes();}
+  // mats list
+  document.getElementById('matsList').innerHTML=MATS.map((m,i)=>`<div style="display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:10px;background:${i===state.matOffset?'var(--gold)':'#1A1815'};border:1px solid ${i===state.matOffset?'var(--gold)':'#1E1C19'};color:${i===state.matOffset?'#000':'var(--paper)'}" class="mono"><span>#${i+1} ${m.name} • ${m.coups}c • ${m.winner}</span><span style="font-size:9px;opacity:.7">${m.fr.slice(0,40)}...</span></div>`).join('');
 
-function setPlatform(plat){
-  state.globalPlatform=plat;
-  document.querySelectorAll('[data-plat]').forEach(b=>b.classList.toggle('active',b.dataset.plat===plat));
-  getAllIds().forEach(id=>{if(!state.completed.has(id)) state.platforms[id]=plat;});
-  saveState();renderAll();
+  // stats page
+  const statsPlat=plat;
+  const statsList=state.accounts.map(a=>({id:a.id,name:a.name,avg:avgElo(a.id,statsPlat),top:a.top[statsPlat]||0})).sort((a,b)=>b.avg-a.avg);
+  document.getElementById('podiumStats').innerHTML=statsList.length>=3?`<div style="display:flex;gap:10px;align-items:end"><div class="podium-bar second"><i></i><b>${statsList[1].avg}</b><span>${statsList[1].id} ${statsList[1].top?'Top '+statsList[1].top:''}</span></div><div class="podium-bar first"><i></i><b>${statsList[0].avg}</b><span>${statsList[0].id} ${statsList[0].top?'Top '+statsList[0].top:''}</span></div><div class="podium-bar third"><i></i><b>${statsList[2].avg}</b><span>${statsList[2].id} ${statsList[2].top?'Top '+statsList[2].top:''}</span></div></div>`:'';
+  document.getElementById('ratingTable').innerHTML=statsList.map((p,idx)=>{
+    const wins=[...state.completed].filter(id=>{const h=state.eloHistory[id];return h&&h.platform===statsPlat&&h.winner===p.id;}).length;
+    return `<div class="leader-row"><div class="mono" style="font-size:11px;color:var(--ink2)">#${idx+1}</div><div style="display:flex;align-items:center;gap:8px"><div class="leader-ava" style="background:${state.accounts.find(a=>a.id===p.id)?.color||'#ccc'};color:#fff">${p.id}</div><div><div style="font-weight:700;font-size:13px">${p.name} ${p.top?'<span style="color:var(--gold);font-size:10px">Top '+p.top+'</span>':''}</div><div class="mono" style="font-size:10px;color:var(--ink2)">${p.id} • ${p.avg}</div></div></div><div style="font-family:'Instrument Serif',serif;font-size:18px">${p.avg}</div><div class="mono" style="font-size:11px">${wins}W</div></div>`;
+  }).join('');
+  document.getElementById('accountsGrid').innerHTML=state.accounts.map(acc=>{
+    const avg=avgElo(acc.id,statsPlat);const top=acc.top[statsPlat]||0;
+    return `<div class="acc-card"><div style="display:flex;justify-content:space-between"><div style="display:flex;gap:8px;align-items:center"><div class="acc-ava" style="background:${acc.color}">${acc.id}</div><div><div style="font-weight:700;font-size:13px">${acc.name} ${top?'<span style="color:var(--gold)">Top '+top+'</span>':''}</div><div class="mono" style="font-size:10px;color:var(--ink2)">${acc.id}</div></div></div><div class="acc-elo">${avg}</div></div><div class="modes-bar">${GAME_MODES.map(m=>`<div><b>${state.elo[statsPlat]?.[acc.id]?.[m]||1200}</b><span>${m}</span></div>`).join('')}</div></div>`;
+  }).join('');
+
+  if(state.accounts.length>0 && !state.currentMatchId){
+    const firstId=`1-0`;
+    if(state.assignments[firstId]!==undefined) previewMat(firstId);
+  }
 }
 
 function previewMat(id){
   try{
-    const mat=MATS[state.assignments[id]];
+    const matIdx=state.assignments[id];
+    const mat=MATS[matIdx];
     const chess=new Chess();const fens=[];fens.push({fen:chess.fen(),from:null,to:null});
     for(let mv of mat.moves){const r=chess.move(mv,{sloppy:true});if(!r)break;fens.push({fen:chess.fen(),from:r.from,to:r.to});}
     const last=fens[fens.length-1];
     renderMiyukiBoard(last.fen,last.from,last.to,document.getElementById('previewBoard'));
-    document.getElementById('previewInfo').innerHTML=`<b style="color:var(--paper)">${mat.name}</b> • ${mat.coups} coups • ${mat.winner} gagne<br><span style="font-size:10px;color:#8A867E">${mat.fr}</span>`;
-  }catch(e){console.log('preview err',e);}
+    const boardTitle=document.getElementById('boardTitle');
+    if(boardTitle) boardTitle.textContent=`${mat.name} • ${mat.coups}c • ${mat.winner}`;
+  }catch(e){}
 }
 
 function renderMiyukiBoard(fen,from,to,el){
   try{
+    if(!el) return;
     const chess=new Chess(fen);const board=chess.board();el.innerHTML='';el.className='miyuki-board';
     for(let r=0;r<8;r++){
       for(let c=0;c<8;c++){
         const piece=board[r][c];
-        const light=(r+c)%2===0;
         const sqName=['a','b','c','d','e','f','g','h'][c]+(8-r);
         const isLast=sqName===from||sqName===to;
+        const light=(r+c)%2===0;
         const sq=document.createElement('div');
         sq.className=`miyuki-square ${light?'light':'dark'} ${isLast?'last-move':''}`;
+        sq.dataset.sq=sqName;
+        sq.onclick=()=>onSquareClick(sqName);
         if(piece){
           const pd=document.createElement('div');pd.className=`miyuki-piece ${piece.color==='w'?'white':'black'}`;
           const g=document.createElement('div');g.className='glyph';
@@ -589,54 +683,107 @@ function renderMiyukiBoard(fen,from,to,el){
   }catch(e){console.log('board err',e);}
 }
 
+let selectedFrom=null;
+function onSquareClick(sq){
+  const boardEl=document.getElementById('chessboard');
+  if(!state.currentMatchId) return;
+  // playable board logic: try to play mat move
+  const chess=new Chess(state.currentFens[state.currentMoveIdx].fen);
+  if(!selectedFrom){
+    const piece=chess.get(sq);
+    if(!piece) return;
+    if(piece.color!==chess.turn()) return;
+    selectedFrom=sq;
+    document.querySelectorAll('.miyuki-square').forEach(el=>{if(el.dataset.sq===sq) el.classList.add('selected');});
+  }else{
+    const from=selectedFrom;
+    const to=sq;
+    const move=chess.move({from,to,promotion:'q'});
+    if(move){
+      // check if this move matches expected next mat move
+      const nextIdx=state.currentMoveIdx+1;
+      if(nextIdx < state.currentFens.length){
+        const expectedMove=state.currentMoves[nextIdx-1];
+        if(expectedMove && (move.san===expectedMove.san || (move.from===expectedMove.from && move.to===expectedMove.to))){
+          // correct
+          state.currentMoveIdx=nextIdx;
+          const f=state.currentFens[nextIdx];
+          renderMiyukiBoard(f.fen,f.from,f.to,document.getElementById('chessboard'));
+          document.getElementById('boardFen').textContent=f.fen;
+          document.querySelectorAll('#movesList .move').forEach((el,i)=>el.classList.toggle('active',i===nextIdx-1));
+          if(nextIdx===state.currentFens.length-1){
+            // mat finished
+            document.getElementById('matDetail').innerHTML+=`<div style="margin-top:8px;padding:8px;border-radius:8px;background:var(--green);color:#000;font-weight:700" class="mono">✓ Mat réussi !</div>`;
+          }
+        }else{
+          // wrong move, show hint
+          alert(`Coup attendu : ${expectedMove?expectedMove.san:'-'} — tu as joué ${move.san}`);
+          renderMiyukiBoard(state.currentFens[state.currentMoveIdx].fen,state.currentFens[state.currentMoveIdx].from,state.currentFens[state.currentMoveIdx].to,document.getElementById('chessboard'));
+        }
+      }
+    }
+    selectedFrom=null;
+    document.querySelectorAll('.miyuki-square').forEach(el=>el.classList.remove('selected'));
+  }
+}
+
 function openMatch(id){
   state.currentMatchId=id;
-  const [o,i]=id.split('-');const idx=parseInt(i);const pair=(o==='1'?ORDER1:ORDER2)[idx];const [L,R]=pair;const mat=MATS[state.assignments[id]];const mode=state.modes[id];const plat=state.platforms[id];
-  document.getElementById('modalMatchId').textContent=`MATCH ${id} • ${PLAT_LABEL[plat]} • ${mode.toUpperCase()} • ${mat.winner} gagne`;
-  document.getElementById('modalTitle').textContent=`${state.accountNames[L]||DEFAULT_ACCOUNTS[L]} vs ${state.accountNames[R]||DEFAULT_ACCOUNTS[R]}`;
-  document.getElementById('modalBadges').innerHTML=`<span class="mono" style="font-size:10px;padding:4px 8px;border-radius:999px;background:var(--paper2);border:1px solid var(--line)">👑 ${state.accountNames[L]||DEFAULT_ACCOUNTS[L]} gagne</span><span class="mono" style="font-size:10px;padding:4px 8px;border-radius:999px;background:var(--ink);color:#fff">${PLAT_LABEL[plat]} • ${MODE_LABEL[mode]}</span><span class="mono" style="font-size:10px;padding:4px 8px;border-radius:999px;border:1px solid var(--line)">${mat.name} • ${mat.coups}c • ${mat.winner}</span>`;
-  document.getElementById('modalPlatform').innerHTML=PLATFORMS.map(p=>`<button data-plat="${p}" style="padding:6px 10px;border-radius:999px;border:1px solid ${state.platforms[id]===p?'var(--gold)':'var(--line)'};background:${state.platforms[id]===p?'var(--ink)':'#fff'};color:${state.platforms[id]===p?'#fff':'var(--ink2)'};font-size:10px;font-weight:700;cursor:pointer" onclick="setMatchPlatform('${p}')">${PLAT_LABEL[p]}</button>`).join('');
-  document.getElementById('modalModes').innerHTML=GAME_MODES.map(m=>`<button class="clock-btn ${mode===m?'active':''}" onclick="setMatchMode('${m}')">${MODE_LABEL[m]}</button>`).join('');
-  document.getElementById('matDetail').innerHTML=`<div class="serif" style="font-weight:700;font-size:15px;margin-bottom:4px">♞ ${mat.name} — ${mat.coups} coups — ${mat.winner} gagne</div><div class="mono" style="font-size:11px;color:var(--ink2);line-height:1.5">${mat.fr}</div><div style="margin-top:8px;display:flex;gap:6px"><span class="mono" style="font-size:10px;padding:3px 7px;border-radius:999px;background:#fff;border:1px solid var(--line)">${mat.winner}</span><span class="mono" style="font-size:10px;padding:3px 7px;border-radius:999px;background:#fff;border:1px solid var(--line)">${mat.moves.join(' ')}</span></div>`;
+  const [o,i]=id.split('-');const idx=parseInt(i);const order=o==='1'?CURRENT_ORDERS.order1:CURRENT_ORDERS.order2;const pair=order[idx];if(!pair) return;
+  const [L,R]=pair;const matIdx=state.assignments[id];const mat=MATS[matIdx];const mode=state.modes[id];const plat=state.platforms[id];
+  document.getElementById('boardTitle').textContent=`${state.accounts.find(a=>a.id===L)?.name||L} vs ${state.accounts.find(a=>a.id===R)?.name||R} — ${mat.name}`;
+  document.getElementById('matDetail').innerHTML=`<h4>♞ ${mat.name} — ${mat.coups} coups — ${mat.winner} gagne</h4><p class="mono">${mat.fr}<br>${mat.moves.join(' ')}</p><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><span style="font-size:10px;padding:3px 7px;border-radius:999px;background:var(--paper);border:1px solid var(--line)">${mat.winner} gagne</span><span style="font-size:10px;padding:3px 7px;border-radius:999px;background:var(--paper);border:1px solid var(--line)">Boucle #${matIdx+1}/11</span></div>`;
   const h=state.eloHistory[id];
   document.getElementById('deltaWInput').value=h?h.deltaW:15;
   document.getElementById('deltaLInput').value=h?h.deltaL:-15;
   updateEloPreview();
   initBoard(mat);
-  document.getElementById('btnToggleDone').textContent=state.completed.has(id)?'↩ Annuler':'✓ Valider avec gains manuels';
-  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('btnToggleDone').textContent=state.completed.has(id)?'↩ Annuler':'✓ Valider avec gains';
+  renderAll();
+  // scroll board into view on mobile
+  if(window.innerWidth<=1000) document.querySelector('.board-col').scrollIntoView({behavior:'smooth'});
 }
-function setMatchPlatform(p){if(!state.currentMatchId)return;if(state.completed.has(state.currentMatchId)){alert('Annule d’abord');return;}state.platforms[state.currentMatchId]=p;saveState();renderAll();openMatch(state.currentMatchId);}
+
 function updateEloPreview(){
   if(!state.currentMatchId) return;
-  const [o,i]=state.currentMatchId.split('-');const idx=parseInt(i);const pair=(o==='1'?ORDER1:ORDER2)[idx];const [L,R]=pair;const mode=state.modes[state.currentMatchId];const plat=state.platforms[state.currentMatchId];
+  const [o,i]=state.currentMatchId.split('-');const idx=parseInt(i);const order=o==='1'?CURRENT_ORDERS.order1:CURRENT_ORDERS.order2;const pair=order[idx];if(!pair) return;
+  const [L,R]=pair;const mode=state.modes[state.currentMatchId];const plat=state.platforms[state.currentMatchId];
   const h=state.eloHistory[state.currentMatchId];
   let baseL,baseR;
   try{baseL=h?h.wOld:state.elo[plat][L][mode];baseR=h?h.lOld:state.elo[plat][R][mode];}catch(e){baseL=1200;baseR=1200;}
   const dW=parseInt(document.getElementById('deltaWInput').value)||0;
   const dL=parseInt(document.getElementById('deltaLInput').value)||0;
-  const newL=baseL+dW;const newR=baseR+dL;
-  document.getElementById('eloPreview').innerHTML=`<div><div class="mono" style="font-size:10px;color:var(--ink2)">GAGNANT ${L} ${state.accountNames[L]||DEFAULT_ACCOUNTS[L]} [${PLAT_LABEL[plat]} ${mode}]</div><div style="font-weight:800;font-size:14px">${baseL} → <span style="color:var(--green)">${newL} (${dW>=0?'+':''}${dW})</span></div></div><div><div class="mono" style="font-size:10px;color:var(--ink2)">PERDANT ${R} ${state.accountNames[R]||DEFAULT_ACCOUNTS[R]}</div><div style="font-weight:800;font-size:14px">${baseR} → <span style="color:var(--red)">${newR} (${dL>=0?'+':''}${dL})</span></div></div>`;
+  document.getElementById('eloPreview').innerHTML=`<div><div class="mono" style="font-size:10px;color:var(--ink2)">GAGNANT ${L}</div><div style="font-weight:800;font-size:14px">${baseL} → <span style="color:var(--green)">${baseL+dW} (${dW>=0?'+':''}${dW})</span></div></div><div><div class="mono" style="font-size:10px;color:var(--ink2)">PERDANT ${R}</div><div style="font-weight:800;font-size:14px">${baseR} → <span style="color:var(--red)">${baseR+dL} (${dL>=0?'+':''}${dL})</span></div></div>`;
 }
-function closeModal(){document.getElementById('modalOverlay').classList.remove('open');state.currentMatchId=null;}
-function setMatchMode(m){if(!state.currentMatchId)return;if(state.completed.has(state.currentMatchId)){alert('Annule d’abord');return;}state.modes[state.currentMatchId]=m;saveState();renderAll();openMatch(state.currentMatchId);}
+
 function initBoard(mat){
   const chess=new Chess();const fens=[];const moves=[];
   fens.push({fen:chess.fen(),from:null,to:null});
-  for(let mv of mat.moves){const r=chess.move(mv,{sloppy:true});if(!r){console.log('fail',mv);break;}fens.push({fen:chess.fen(),from:r.from,to:r.to});moves.push(r);}
-  state.currentFens=fens;state.currentMoves=moves;state.currentMoveIdx=fens.length-1;
+  for(let mv of mat.moves){const r=chess.move(mv,{sloppy:true});if(!r)break;fens.push({fen:chess.fen(),from:r.from,to:r.to});moves.push(r);}
+  state.currentFens=fens;state.currentMoves=moves;state.currentMoveIdx=0;
   const movesEl=document.getElementById('movesList');let html='';let num=1;
-  for(let i=0;i<moves.length;i++){if(i%2===0)html+=`<span class="mono" style="font-size:9px;color:var(--ink2);padding:5px 2px">${num}.</span>`;html+=`<div class="move ${i===state.currentMoveIdx-1?'active':''}" onclick="goToMove(${i+1})">${moves[i].san}</div>`;if(i%2===1)num++;}
+  for(let i=0;i<moves.length;i++){if(i%2===0)html+=`<span class="mono" style="font-size:9px;color:var(--ink2);padding:5px 2px">${num}.</span>`;html+=`<div class="move ${i===0?'active':''}" onclick="goToMove(${i+1})">${moves[i].san}</div>`;if(i%2===1)num++;}
   movesEl.innerHTML=html;
-  const last=fens[state.currentMoveIdx];
-  renderMiyukiBoard(last.fen,last.from,last.to,document.getElementById('chessboard'));
-  document.getElementById('boardFen').textContent=last.fen;
+  renderMiyukiBoard(fens[0].fen,null,null,document.getElementById('chessboard'));
+  document.getElementById('boardFen').textContent=fens[0].fen;
 }
 function goToMove(idx){state.currentMoveIdx=idx;const f=state.currentFens[idx];renderMiyukiBoard(f.fen,f.from,f.to,document.getElementById('chessboard'));document.getElementById('boardFen').textContent=f.fen;document.querySelectorAll('#movesList .move').forEach((el,i)=>el.classList.toggle('active',i===idx-1));}
 function stepMove(d){let n=state.currentMoveIdx+d;if(d===999)n=state.currentFens.length-1;if(n<0)n=0;if(n>=state.currentFens.length)n=state.currentFens.length-1;goToMove(n);}
+function autoPlay(){
+  let i=state.currentMoveIdx;
+  const btn=document.getElementById('autoBtn');
+  btn.textContent='⏸';
+  const interval=setInterval(()=>{
+    i++;
+    if(i>=state.currentFens.length){clearInterval(interval);btn.textContent='▶ Auto';return;}
+    goToMove(i);
+  },700);
+}
+function flipBoard(){state.boardFlipped=!state.boardFlipped;if(state.currentMatchId){const f=state.currentFens[state.currentMoveIdx];renderMiyukiBoard(f.fen,f.from,f.to,document.getElementById('chessboard'));}}
+function resetBoard(){if(state.currentFens.length) goToMove(0);}
 function toggleDoneCurrent(){
   if(!state.currentMatchId)return;
-  const id=state.currentMatchId;const [o,i]=id.split('-');const idx=parseInt(i);const pair=(o==='1'?ORDER1:ORDER2)[idx];const [W,L]=pair;const mode=state.modes[id];const plat=state.platforms[id];
+  const id=state.currentMatchId;const [o,i]=id.split('-');const idx=parseInt(i);const order=o==='1'?CURRENT_ORDERS.order1:CURRENT_ORDERS.order2;const pair=order[idx];if(!pair)return;const [W,L]=pair;const mode=state.modes[id];const plat=state.platforms[id];
   if(state.completed.has(id)){
     const h=state.eloHistory[id];
     if(h){try{state.elo[h.platform][W][h.mode]=h.wOld;state.elo[h.platform][L][h.mode]=h.lOld;}catch(e){}delete state.eloHistory[id];}
@@ -654,15 +801,16 @@ function toggleDoneCurrent(){
     state.elo[plat][W][mode]=newW;state.elo[plat][L][mode]=newL;
     state.completed.add(id);
   }
-  saveState();renderAll();openMatch(id);
+  saveState();renderAll();
 }
 function copyMoves(){if(!state.currentMatchId)return;const mat=MATS[state.assignments[state.currentMatchId]];navigator.clipboard.writeText(mat.moves.join(' ')).then(()=>alert('Copié: '+mat.moves.join(' ')));}
-function rerollCurrentMat(){if(!state.currentMatchId)return;if(state.completed.has(state.currentMatchId)){alert('Annule d’abord');return;}state.assignments[state.currentMatchId]=Math.floor(Math.random()*MATS.length);saveState();renderAll();openMatch(state.currentMatchId);}
-function shuffleMats(num){const order=num===1?ORDER1:ORDER2;order.forEach((_,i)=>{const id=`${num}-${i}`;if(!state.completed.has(id))state.assignments[id]=Math.floor(Math.random()*MATS.length);});saveState();renderAll();}
-function resetCycle(){state.cycle++;state.completed.clear();state.eloHistory={};getAllIds().forEach(id=>state.assignments[id]=Math.floor(Math.random()*MATS.length));recalcAllElo();saveState();renderModes();renderAll();}
-function resetAll(){if(!confirm('Reset total ?'))return;localStorage.removeItem('miyuki_v8');state={cycle:1,completed:new Set(),assignments:{},modes:{},platforms:{},globalMode:"blitz",globalPlatform:"socialchess",accountNames:{},accountTops:{},baseElo:{},elo:{},eloHistory:{},currentMatchId:null,currentMoveIdx:0,currentFens:[]};loadState();saveState();renderModes();renderAll();}
+function rerollCurrentMat(){/* plus en boucle, mais on garde décalage */ shuffleMats();}
+function resetCycle(){state.cycle++;state.completed.clear();state.eloHistory={};state.matOffset=0;const allIds=[];CURRENT_ORDERS.order1.forEach((_,i)=>allIds.push(`1-${i}`));CURRENT_ORDERS.order2.forEach((_,i)=>allIds.push(`2-${i}`));allIds.forEach((id,idx)=>{state.assignments[id]=(idx+state.matOffset)%MATS.length;});recalcAllElo();saveState();renderAll();}
+function resetAll(){if(!confirm('Reset total ?'))return;localStorage.removeItem('miyuki_v9');state={cycle:1,accounts:[],completed:new Set(),assignments:{},modes:{},platforms:{},globalMode:"blitz",globalPlatform:"socialchess",baseElo:{},elo:{},eloHistory:{},currentMatchId:null,currentMoveIdx:0,currentFens:[],boardFlipped:false,selectedSquare:null,matOffset:0};loadState();saveState();renderAll();}
+
 function launchConfetti(){const c=document.getElementById('confetti');c.style.display='block';const ctx=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;const pcs=[];for(let i=0;i<100;i++)pcs.push({x:Math.random()*c.width,y:Math.random()*c.height-200,vx:(Math.random()-.5)*6,vy:Math.random()*4+2,color:`hsl(${Math.random()*20+35},70%,60%)`,s:Math.random()*6+4});let f=0;(function anim(){ctx.clearRect(0,0,c.width,c.height);pcs.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.06;ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,p.s,p.s);});if(f++<280)requestAnimationFrame(anim);else c.style.display='none';})();}
-loadState();renderModes();renderAll();
+
+loadState();renderAll();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}
 </script>
 </body>
