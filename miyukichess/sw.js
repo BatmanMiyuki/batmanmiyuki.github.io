@@ -1,13 +1,5 @@
-const CACHE_NAME = 'miyuki-chess-v5-vitrine';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png',
-  './icon-180.png',
-  './logo-title.png'
-];
+const CACHE_NAME = 'miyuki-v28-pwa-linear';
+const ASSETS = ['./','./index.html','./manifest.json','./icon-192.png','./icon-512.png','./icon-180.png','./logo-title.png','./chess.min.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
   self.skipWaiting();

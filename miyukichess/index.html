@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MIYUKI V27 — Grandmaster OS • Graphs + Modes</title>
-  <meta name="description" content="OS d'entraînement aux échecs multi-plateformes - Graphs + Modes editables">
+  <title>MIYUKI V28 — Grandmaster OS • PWA + Delete Games + Linear Graph</title>
+  <meta name="description" content="OS d'entraînement aux échecs multi-plateformes - Graphs + Modes editables - PWA">
+  <meta name="theme-color" content="#C9A86A">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-180.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -50,6 +54,16 @@
     .game-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--game-color, var(--accent-1))}
     .game-item:hover{background:var(--surface-2);transform:translateX(4px)}
     .game-item.active{border-color:var(--border-accent);background:linear-gradient(90deg, color-mix(in oklch, var(--accent-1) 10%, transparent), transparent);box-shadow:var(--shadow-glow)}
+    .game-item__del{margin-left:auto;width:26px;height:26px;border-radius:6px;background:rgba(255,0,0,0.08);border:1px solid transparent;color:var(--text-3);display:grid;place-items:center;cursor:pointer;transition:var(--t-fast);flex-shrink:0;opacity:0}
+    .game-item:hover .game-item__del{opacity:1}
+    .game-item__del:hover{background:var(--danger);color:white;border-color:var(--danger);transform:scale(1.05)}
+    /* PWA install banner */
+    .pwa-banner{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface-2);border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-2);z-index:999;opacity:0;pointer-events:none;transition:var(--t-base)}
+    .pwa-banner.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+    /* Linear graph specific */
+    .linear-legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;padding:12px;background:var(--surface-0);border:1px solid var(--border-1);border-radius:var(--radius-md)}
+    .linear-legend-item{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;padding:6px 10px;background:var(--surface-1);border:1px solid var(--border-1);border-radius:999px}
+    .linear-legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 0 3px color-mix(in oklch, currentColor 20%, transparent)}
     .main-wrap{padding:32px}
     .tabs-nav{display:flex;gap:8px;border-bottom:1px solid var(--border-1);margin-bottom:32px;flex-wrap:wrap}
     .tab-btn{padding:12px 24px;background:transparent;border:none;color:var(--text-3);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;transition:var(--t-fast);position:relative}
@@ -113,7 +127,7 @@
   <div class="chess-bg"></div>
   <div class="app-container">
     <header class="topbar">
-      <div class="topbar-brand">♛ MIYUKI <span style="color:var(--text-2);font-weight:400;">V27 GRAPHS+MODES</span></div>
+      <div class="topbar-brand">♛ MIYUKI <span style="color:var(--text-2);font-weight:400;">V28 PWA • DELETE • LINEAR GRAPH</span></div>
       <div class="topbar-actions">
         <button class="btn btn-secondary btn-sm" onclick="MIYUKIOS.exportData()">💾 Exporter</button>
         <button class="btn btn-secondary btn-sm" onclick="document.getElementById('fileImporter').click()">📂 Importer</button>
@@ -309,11 +323,32 @@ const MIYUKIOS = {
     container.innerHTML = this.state.platforms.map(p=>{
       const act = (this.state.accounts[p.id]||[]).length;
       const modes = (p.modes||[]).length;
-      return `<div class="game-item ${p.id===this.state.globalPlatform?'active':''}" style="--game-color:${p.color}" onclick="MIYUKIOS.selectPlatform('${p.id}')">
-        <span style="font-size:24px">${p.icon}</span>
-        <div style="flex:1;min-width:0"><div style="font-weight:700;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div><div style="font-size:11px;color:var(--text-3);">${act} joueurs • ${modes} modes</div></div>
+      return `<div class="game-item ${p.id===this.state.globalPlatform?'active':''}" style="--game-color:${p.color}">
+        <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer" onclick="MIYUKIOS.selectPlatform('${p.id}')">
+          <span style="font-size:24px">${p.icon}</span>
+          <div style="flex:1;min-width:0"><div style="font-weight:700;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div><div style="font-size:11px;color:var(--text-3);">${act} joueurs • ${modes} modes</div></div>
+        </div>
+        <button class="game-item__del" onclick="event.stopPropagation(); MIYUKIOS.deletePlatform('${p.id}')" title="Supprimer ce jeu">🗑️</button>
       </div>`;
     }).join('');
+  },
+
+  deletePlatform(id){
+    if(this.state.platforms.length<=1) return alert('Il faut garder au moins 1 plateforme');
+    const plat = this.state.platforms.find(p=>p.id===id);
+    if(!plat) return;
+    if(!confirm(`Supprimer définitivement le jeu "${plat.name}" ?\n\n- ${ (this.state.accounts[id]||[]).length } comptes\n- ${ (this.state.banned[id]||[]).length } bannis\n- ${ (this.state.completed[id]?.size||0) } combats\n\nCette action est irréversible.`)) return;
+    this.state.platforms = this.state.platforms.filter(p=>p.id!==id);
+    delete this.state.accounts[id];
+    delete this.state.banned[id];
+    delete this.state.completed[id];
+    delete this.state.assignments[id];
+    delete this.state.matOffset[id];
+    if(this.state.globalPlatform===id){
+      this.state.globalPlatform = this.state.platforms[0]?.id || '';
+    }
+    this.saveState();
+    this.renderAll();
   },
 
   selectPlatform(id){ this.state.globalPlatform=id; this.renderAll(); },
@@ -358,6 +393,16 @@ const MIYUKIOS = {
         <div class="stat-mini-card"><div class="lbl">Modes Actifs</div><div class="val">${modes.length}</div><div class="sub">${modes.map(m=>m.label).join(', ')}</div></div>
       </div>
 
+      <!-- GRAPHIQUE LINÉAIRE DEMANDÉ : modes en bas, elo sur côté, couleur compte en haut -->
+      <div class="glass-card graph-card" style="margin-bottom:20px;grid-column:1/-1">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px">
+          <h4>📈 Évolution Linéaire — ELO par Mode / par Compte (ton idée)</h4>
+          <span class="mono" style="font-size:10px;color:var(--text-3)">En bas = modes • Sur côté = ELO • En haut = couleur compte • Ligne = un compte</span>
+        </div>
+        <div class="linear-legend" id="linearLegend"></div>
+        <canvas id="chartLinear" style="height:320px!important"></canvas>
+      </div>
+
       <div class="graphs-grid">
         <div class="glass-card graph-card"><h4>📊 ELO Moyen par Mode</h4><canvas id="chartAvgMode"></canvas></div>
         <div class="glass-card graph-card"><h4>📈 Distribution ELO par Joueur</h4><canvas id="chartDistrib"></canvas></div>
@@ -393,6 +438,10 @@ const MIYUKIOS = {
     if(!plat || acts.length===0) return;
     const modes = plat.modes||[];
 
+    // 0. NOUVEAU GRAPHIQUE LINÉAIRE demandé : modes en bas, elo sur côté, couleur compte en haut, ligne = compte
+    this.renderLinearLegend(p);
+    this.drawLinearEloChart('chartLinear', p);
+
     // 1. Avg per mode bar chart
     const avgPerMode = modes.map(m=>{
       const vals = acts.map(a=>a.elo[m.id]||0);
@@ -421,6 +470,84 @@ const MIYUKIOS = {
     const total = acts.length>=2 ? acts.length*(acts.length-1) : 0;
     const done = this.state.completed[p]?.size||0;
     this.drawDonut('chartProgress', ['Terminés','Restants'], [done, Math.max(0,total-done)], ['oklch(0.70 0.15 150)','oklch(0.24 0.012 280)']);
+  },
+
+  renderLinearLegend(p){
+    const acts = this.state.accounts[p]||[];
+    const legend = document.getElementById('linearLegend');
+    if(!legend) return;
+    if(acts.length===0){ legend.innerHTML='<span class="mono" style="font-size:11px;color:var(--text-3)">Aucun compte</span>'; return; }
+    legend.innerHTML = acts.map(a=>{
+      const avg = (this.state.platforms.find(x=>x.id===p).modes||[]).reduce((s,m)=>s+(a.elo[m.id]||0),0) / Math.max(1,(this.state.platforms.find(x=>x.id===p).modes||[]).length);
+      return `<div class="linear-legend-item"><span class="linear-legend-dot" style="background:${a.color};color:${a.color}"></span><span>${a.name}</span><span class="mono" style="font-size:10px;color:var(--text-3)">AVG ${Math.round(avg)}</span></div>`;
+    }).join('');
+  },
+
+  drawLinearEloChart(canvasId, platId){
+    const canvas = document.getElementById(canvasId); if(!canvas) return;
+    const acts = this.state.accounts[platId]||[];
+    const plat = this.state.platforms.find(x=>x.id===platId);
+    const modes = plat?.modes||[];
+    if(modes.length===0 || acts.length===0) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width = canvas.offsetWidth*2;
+    const H = canvas.height = 320*2;
+    ctx.scale(2,2);
+    const w = W/2, h = H/2;
+    ctx.clearRect(0,0,w,h);
+    const pad = {l:55, r:20, t:20, b:45};
+    const chartW = w - pad.l - pad.r;
+    const chartH = h - pad.t - pad.b;
+    const allVals = acts.flatMap(a=> modes.map(m=>a.elo[m.id]||0));
+    const max = Math.max(...allVals, 1000) + 50;
+    const min = Math.max(0, Math.min(...allVals, 1000) - 100);
+    const range = max - min || 1;
+
+    // grid horizontal
+    ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1;
+    for(let i=0;i<=5;i++){
+      const y = pad.t + (i/5)*chartH;
+      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w-pad.r, y); ctx.stroke();
+      const eloVal = Math.round(max - (i/5)*range);
+      ctx.fillStyle='oklch(0.55 0.02 280)'; ctx.font='11px Geist Mono'; ctx.textAlign='right'; ctx.fillText(eloVal, pad.l-8, y+3);
+    }
+    // vertical grid + mode labels en bas
+    modes.forEach((m,i)=>{
+      const x = pad.l + (i/(Math.max(1,modes.length-1)))*chartW;
+      if(modes.length>1){
+        ctx.strokeStyle='rgba(255,255,255,0.04)'; ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t+chartH); ctx.stroke();
+      }
+      ctx.fillStyle='oklch(0.75 0.02 280)'; ctx.font='600 11px Inter'; ctx.textAlign='center'; ctx.fillText(m.label, x, h-12);
+      ctx.fillStyle='oklch(0.55 0.02 280)'; ctx.font='10px Geist Mono'; ctx.fillText(m.id, x, h-2);
+    });
+
+    // lines per account
+    acts.forEach(acc=>{
+      const points = modes.map((m,i)=>{
+        const v = acc.elo[m.id]||0;
+        const x = pad.l + (i/(Math.max(1,modes.length-1)))*chartW;
+        const y = pad.t + chartH - ((v-min)/range)*chartH;
+        return {x,y,v,mode:m};
+      });
+      // line
+      ctx.beginPath(); ctx.strokeStyle=acc.color; ctx.lineWidth=2.5; ctx.lineJoin='round'; ctx.lineCap='round';
+      points.forEach((pt,i)=>{ if(i===0) ctx.moveTo(pt.x, pt.y); else ctx.lineTo(pt.x, pt.y); });
+      ctx.stroke();
+      // glow
+      ctx.shadowColor=acc.color; ctx.shadowBlur=12; ctx.stroke(); ctx.shadowBlur=0;
+      // points
+      points.forEach(pt=>{
+        // outer white
+        ctx.beginPath(); ctx.fillStyle='var(--surface-0)'; ctx.arc(pt.x, pt.y, 6, 0, Math.PI*2); ctx.fill();
+        // inner color
+        ctx.beginPath(); ctx.fillStyle=acc.color; ctx.arc(pt.x, pt.y, 4, 0, Math.PI*2); ctx.fill();
+        // value label
+        ctx.fillStyle='oklch(0.95 0.01 80)'; ctx.font='bold 10px Geist Mono'; ctx.textAlign='center'; ctx.fillText(pt.v, pt.x, pt.y-10);
+      });
+    });
+
+    // Y axis label
+    ctx.save(); ctx.translate(12, h/2); ctx.rotate(-Math.PI/2); ctx.fillStyle='oklch(0.55 0.02 280)'; ctx.font='10px Geist Mono'; ctx.textAlign='center'; ctx.fillText('ELO',0,0); ctx.restore();
   },
 
   // Canvas helpers vanilla
@@ -538,7 +665,10 @@ const MIYUKIOS = {
       <div class="glass-card" style="margin-bottom:20px">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
           <h3 style="color:var(--text-1);">🎮 Modes de Jeu — ${plat?.name||p}</h3>
-          <span class="mono" style="font-size:11px;color:var(--text-3)">${modes.length} modes actifs</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="mono" style="font-size:11px;color:var(--text-3)">${modes.length} modes actifs</span>
+            <button class="btn btn-danger btn-xs" onclick="MIYUKIOS.deletePlatform('${p}')">🗑️ Supprimer ce jeu</button>
+          </div>
         </div>
         <div class="modes-grid">
           ${modes.map(m=>`
@@ -794,7 +924,45 @@ const MIYUKIOS = {
   }
 };
 
-document.addEventListener('DOMContentLoaded',()=>MIYUKIOS.init());
+document.addEventListener('DOMContentLoaded',()=>{
+  MIYUKIOS.init();
+  // PWA - enregistre le service worker
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./sw.js').then(reg=>{
+      console.log('SW registered', reg.scope);
+    }).catch(err=>console.log('SW fail', err));
+  }
+  // PWA install prompt
+  let deferredPrompt = null;
+  const banner = document.getElementById('pwaBanner');
+  const btnInstall = document.getElementById('pwaInstallBtn');
+  const btnClose = document.getElementById('pwaCloseBtn');
+  window.addEventListener('beforeinstallprompt', (e)=>{
+    e.preventDefault();
+    deferredPrompt = e;
+    if(banner) banner.classList.add('show');
+  });
+  btnInstall?.addEventListener('click', async ()=>{
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const {outcome} = await deferredPrompt.userChoice;
+    console.log('PWA install', outcome);
+    deferredPrompt = null;
+    banner?.classList.remove('show');
+  });
+  btnClose?.addEventListener('click', ()=> banner?.classList.remove('show'));
+  window.addEventListener('appinstalled', ()=>{
+    console.log('PWA installed');
+    banner?.classList.remove('show');
+  });
+});
 </script>
+  <!-- PWA Install Banner -->
+  <div class="pwa-banner" id="pwaBanner">
+    <span style="font-size:20px">♛</span>
+    <div style="flex:1"><div style="font-weight:700;font-size:13px">Installer Miyuki OS</div><div style="font-size:11px;color:var(--text-3)">App PWA • Offline • Plein écran</div></div>
+    <button class="btn btn-primary btn-sm" id="pwaInstallBtn">Installer</button>
+    <button class="btn btn-secondary btn-sm" id="pwaCloseBtn">✕</button>
+  </div>
 </body>
 </html>
