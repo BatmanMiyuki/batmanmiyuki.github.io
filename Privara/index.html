@@ -568,7 +568,7 @@
                     
                     <!-- Version indicator -->
                     <div class="px-2 py-0.5 text-[10px] bg-emerald-900 text-emerald-300 font-bold rounded-full px-2.5" style="font-size:9.5px">
-                        v4.3 • PWA
+                        v4.4 • PWA
                     </div>
 
                     <!-- PWA Install Button -->
@@ -993,6 +993,28 @@
             <div class="flex items-center justify-end gap-x-2">
                 <button onclick="closeShareFolderModal(true)" class="px-4 py-[7px] text-xs transition-colors px-5 font-semibold bg-slate-700 hover:bg-slate-600 rounded-3xl">Annuler</button>
                 <button onclick="confirmShareImport()" class="px-4 py-[7px] text-xs transition-colors px-5 font-semibold bg-indigo-600 hover:bg-indigo-500 rounded-3xl">Importer</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Fusion de photos : choix de la photo de gauche -->
+    <div id="merge-modal" onclick="if (event.target.id === 'merge-modal') closeMergeModal()" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[226]">
+        <div onclick="event.stopImmediatePropagation()" class="bg-slate-800 border border-slate-700 w-full max-w-lg mx-4 rounded-3xl p-5">
+            <h4 class="font-bold px-1 text-lg">Fusionner des photos</h4>
+            <p class="text-xs text-slate-400 px-1 mt-0.5">Choisissez la photo à placer à <b class="text-slate-200">gauche</b>. Votre photo s'ajoutera à droite, puis les 2 sources seront supprimées.</p>
+            
+            <div class="mt-2 flex items-center justify-between text-xs bg-slate-900 rounded-2xl border border-slate-700 px-3 py-2">
+                <div class="text-slate-400 font-semibold">À droite (photo cliquée) :</div>
+                <div id="merge-right-name" class="text-indigo-300 font-semibold truncate max-w-[55%]"></div>
+            </div>
+            
+            <p id="merge-file-count" class="text-[11px] text-slate-400 px-1 mt-3 mb-1"></p>
+            
+            <div id="merge-candidates" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-[300px] overflow-auto custom-scroll pr-1"></div>
+            
+            <div class="flex items-center justify-end gap-x-2 mt-4">
+                <button onclick="closeMergeModal()" class="px-4 py-[7px] text-xs transition-colors px-5 font-semibold bg-slate-700 hover:bg-slate-600 rounded-3xl">Annuler</button>
+                <button onclick="confirmMerge()" id="confirm-merge-btn" class="px-4 py-[7px] text-xs transition-colors px-5 font-semibold bg-indigo-600 hover:bg-indigo-500 rounded-3xl">Fusionner</button>
             </div>
         </div>
     </div>
@@ -2315,6 +2337,12 @@
                         <span>Télécharger</span>
                     </div>
                     
+                    ${media.type === 'image' ? `
+                    <div onclick="openMergePicker('${mediaId}'); removeContextMenus();" class="flex items-center gap-2 px-3 py-[6.5px] hover:bg-slate-700 cursor-pointer rounded-xl mx-1">
+                        <i class="fa-solid fa-object-group w-4"></i>
+                        <span>Fusionner</span>
+                    </div>` : ''}
+                    
                     <div class="my-1 border-t border-slate-700 mx-1"></div>
                     
                     <div onclick="showMoveModal(['${mediaId}']); removeContextMenus();" class="flex items-center gap-2 px-3 py-[6.5px] hover:bg-slate-700 cursor-pointer rounded-xl mx-1">
@@ -2376,6 +2404,218 @@
             document.body.removeChild(a);
             
             setTimeout(() => URL.revokeObjectURL(url), 1200);
+        }
+        
+        // ===================== FUSION DE PHOTOS =====================
+        // Deux photos placées côte à côte : celle cliquée (⋯) va à droite,
+        // l'autre photo choisie va à gauche. Les 2 sources sont ensuite
+        // supprimées et remplacées par la nouvelle image fusionnée.
+        
+        let mergeState = null; // { rightMediaId, leftMediaId, urls: [], lastEl }
+        
+        function openMergePicker(rightMediaId) {
+            const right = allMedia.find(m => m.id === rightMediaId);
+            if (!right || right.type !== 'image') return;
+            
+            const candidates = allMedia
+                .filter(m => m.type === 'image' && m.id !== rightMediaId && m.folderId === right.folderId)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (candidates.length === 0) {
+                showToast('Il faut au moins 2 photos dans ce dossier pour fusionner.', false);
+                return;
+            }
+            
+            mergeState = { rightMediaId, leftMediaId: null, urls: [], lastEl: null };
+            
+            const list = document.getElementById('merge-candidates');
+            list.innerHTML = '';
+            
+            const nameEl = document.getElementById('merge-right-name');
+            nameEl.innerHTML = `<i class="fa-solid fa-arrow-right-long text-indigo-400 mr-1.5"></i>${right.name}`;
+            
+            candidates.forEach(media => {
+                let thumbHTML = '<div class="w-full h-full flex items-center justify-center bg-slate-800"><i class="fa-solid fa-image text-3xl text-slate-500"></i></div>';
+                if (media.thumbnailBlob || media.originalBlob) {
+                    const src = media.thumbnailBlob || media.originalBlob;
+                    const thumbUrl = URL.createObjectURL(src);
+                    mergeState.urls.push(thumbUrl);
+                    thumbHTML = `<img src="${thumbUrl}" class="w-full h-full object-cover" alt="">`;
+                }
+                
+                const cell = document.createElement('div');
+                cell.className = 'merge-cell cursor-pointer group relative';
+                cell.dataset.id = media.id;
+                cell.innerHTML = `
+                    <div class="merge-thumb relative rounded-2xl overflow-hidden border-2 border-transparent bg-slate-700 aspect-square transition-all">
+                        ${thumbHTML}
+                        <div class="merge-check absolute inset-0 items-center justify-center bg-black bg-opacity-40 hidden">
+                            <div class="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center">
+                                <i class="fa-solid fa-check text-white text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-1 px-0.5 text-[10px] truncate text-slate-400">${media.name}</div>
+                `;
+                cell.onclick = () => selectMergeCandidate(cell, media.id);
+                list.appendChild(cell);
+            });
+            
+            document.getElementById('merge-file-count').innerHTML = `${candidates.length} autre(s) photo(s) dans ce dossier`;
+            
+            setMergeConfirmState();
+            
+            const modal = document.getElementById('merge-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        
+        function selectMergeCandidate(cell, mediaId) {
+            if (!mergeState) return;
+            mergeState.leftMediaId = mediaId;
+            
+            if (mergeState.lastEl && mergeState.lastEl !== cell) {
+                const prevThumb = mergeState.lastEl.querySelector('.merge-thumb');
+                if (prevThumb) prevThumb.classList.remove('border-indigo-500');
+                const prevCheck = mergeState.lastEl.querySelector('.merge-check');
+                if (prevCheck) { prevCheck.classList.add('hidden'); prevCheck.classList.remove('flex'); }
+            }
+            
+            const thumb = cell.querySelector('.merge-thumb');
+            if (thumb) thumb.classList.add('border-indigo-500');
+            const check = cell.querySelector('.merge-check');
+            if (check) { check.classList.remove('hidden'); check.classList.add('flex'); }
+            
+            mergeState.lastEl = cell;
+            setMergeConfirmState();
+        }
+        
+        function setMergeConfirmState() {
+            const btn = document.getElementById('confirm-merge-btn');
+            if (!btn) return;
+            const active = !!(mergeState && mergeState.leftMediaId);
+            if (active) {
+                btn.classList.remove('opacity-40', 'pointer-events-none');
+            } else {
+                btn.classList.add('opacity-40', 'pointer-events-none');
+            }
+        }
+        
+        function closeMergeModal() {
+            const modal = document.getElementById('merge-modal');
+            if (modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+            if (mergeState) {
+                mergeState.urls.forEach(u => { try { URL.revokeObjectURL(u); } catch (e) {} });
+                mergeState = null;
+            }
+        }
+        
+        async function confirmMerge() {
+            if (!mergeState || !mergeState.leftMediaId) return;
+            
+            const right = allMedia.find(m => m.id === mergeState.rightMediaId);
+            const left  = allMedia.find(m => m.id === mergeState.leftMediaId);
+            
+            if (!right || !left || !right.originalBlob || !left.originalBlob) {
+                showToast('Photos indisponibles.', false);
+                closeMergeModal();
+                return;
+            }
+            
+            const loading = showToast('Fusion en cours…', true);
+            closeMergeModal();
+            
+            try {
+                const mergedBlob = await mergeTwoImages(left.originalBlob, right.originalBlob);
+                if (!mergedBlob) {
+                    if (loading && loading.remove) loading.remove();
+                    showToast('Fusion impossible.', false);
+                    return;
+                }
+                
+                const now = new Date();
+                const pad = n => String(n).padStart(2, '0');
+                const ts = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+                
+                const id = 'media-' + Date.now() + '-' + Math.random().toString(16).slice(2, 9);
+                const fileName = `Fusion-${ts}.jpg`;
+                
+                const fileForThumb = new File([mergedBlob], fileName, { type: 'image/jpeg' });
+                const thumbnailBlob = await generateThumbnail(fileForThumb);
+                
+                const newMedia = {
+                    id: id,
+                    name: fileName,
+                    type: 'image',
+                    size: mergedBlob.size,
+                    date: now.toISOString(),
+                    folderId: right.folderId,
+                    originalBlob: mergedBlob,
+                    thumbnailBlob: thumbnailBlob
+                };
+                
+                await saveMediaToDB(newMedia);
+                allMedia.push(newMedia);
+                
+                await deleteMediaFromDB(left.id);
+                await deleteMediaFromDB(right.id);
+                
+                if (loading && loading.remove) loading.remove();
+                showToast('Photos fusionnées ✓', false, true);
+                
+                await refreshUI();
+                
+                // Affiche le résultat de la fusion
+                try { showPreview(id); } catch (err) {}
+            } catch (err) {
+                console.error('Erreur de fusion :', err);
+                if (loading && loading.remove) loading.remove();
+                showToast('Erreur pendant la fusion.', false);
+            }
+        }
+        
+        function blobToImage(blob) {
+            return new Promise((resolve, reject) => {
+                const url = URL.createObjectURL(blob);
+                const img = new Image();
+                img.onload = () => resolve({ img, url });
+                img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image invalide')); };
+                img.src = url;
+            });
+        }
+        
+        async function mergeTwoImages(leftBlob, rightBlob) {
+            const L = await blobToImage(leftBlob);
+            let R = null;
+            try {
+                R = await blobToImage(rightBlob);
+                
+                const targetH = 1400; // hauteur commune du résultat
+                const lw = Math.max(1, Math.round(targetH * L.img.naturalWidth / L.img.naturalHeight));
+                const rw = Math.max(1, Math.round(targetH * R.img.naturalWidth / R.img.naturalHeight));
+                const totalW = lw + rw;
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = totalW;
+                canvas.height = targetH;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return null;
+                
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(0, 0, totalW, targetH);
+                ctx.drawImage(L.img, 0, 0, lw, targetH);      // gauche
+                ctx.drawImage(R.img, lw, 0, rw, targetH);     // droite
+                
+                return await new Promise((resolve) => {
+                    canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.92);
+                });
+            } finally {
+                URL.revokeObjectURL(L.url);
+                if (R && R.url) URL.revokeObjectURL(R.url);
+            }
         }
         
         function toggleSelectItem(mediaId, element = null) {
