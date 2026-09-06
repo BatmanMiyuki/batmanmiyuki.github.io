@@ -23,6 +23,10 @@
         <span class="badge">mode auto SimpleChess</span>
         <span class="badge">Stockfish local</span>
       </div>
+      <div class="hero-actions">
+        <button id="installBtn" type="button">Installer l’app</button>
+        <span id="installHint" class="helper-inline">Tu peux l’installer comme une vraie app depuis Chrome, Edge ou Safari.</span>
+      </div>
     </header>
 
     <main class="layout">
@@ -30,7 +34,7 @@
         <div class="section-title-row">
           <h2>1. Charger l'image</h2>
           <label class="upload-btn">
-            <input id="imageInput" type="file" accept="image/*" />
+            <input id="imageInput" type="file" accept="image/*" capture="environment" />
             Choisir une image
           </label>
         </div>
@@ -146,9 +150,10 @@
         <details class="notes">
           <summary>Notes importantes</summary>
           <ul>
-            <li>Le mode auto est maintenant enrichi avec tes nouveaux screenshots et couvre les <strong>12 types de pièces</strong> du thème SimpleChess actuel.</li>
+            <li>Le mode auto V3 couvre maintenant les <strong>12 types de pièces</strong> du thème SimpleChess actuel.</li>
+            <li>Le prototype essaie aussi de <strong>déduire automatiquement le trait</strong> depuis la case "Trait aux Blancs/Noirs" du screenshot.</li>
             <li>Quand une case est estimée moins sûre, elle est surlignée en <strong>orange</strong> pour te dire quoi vérifier en priorité.</li>
-            <li>Si SimpleChess change un jour de thème, de taille de plateau ou de style de pièces, il faudra peut-être réentraîner les templates avec de nouvelles captures.</li>
+            <li>Après analyse, le meilleur coup est aussi mis en évidence directement sur l’échiquier.</li>
             <li>Si un problème dépend des droits de roque ou d'une prise en passant, pense à corriger ces paramètres avant l'analyse.</li>
           </ul>
         </details>

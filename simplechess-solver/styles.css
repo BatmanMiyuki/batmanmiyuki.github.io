@@ -84,6 +84,19 @@ button.danger {
   margin-top: 14px;
 }
 
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.helper-inline {
+  color: var(--muted);
+  font-size: .94rem;
+}
+
 .badge {
   font-size: .88rem;
   color: #dbeafe;
@@ -247,6 +260,28 @@ button.danger {
   box-shadow:
     inset 0 0 0 3px rgba(245, 158, 11, .92),
     inset 0 0 22px rgba(245, 158, 11, .18);
+}
+
+.square.best-from {
+  z-index: 3;
+  box-shadow:
+    inset 0 0 0 3px rgba(56, 189, 248, .95),
+    inset 0 0 24px rgba(56, 189, 248, .16);
+}
+
+.square.best-to {
+  z-index: 3;
+  box-shadow:
+    inset 0 0 0 4px rgba(34, 197, 94, .95),
+    inset 0 0 24px rgba(34, 197, 94, .18);
+}
+
+.square.best-from.review,
+.square.best-to.review {
+  box-shadow:
+    inset 0 0 0 4px rgba(245, 158, 11, .95),
+    inset 0 0 0 8px rgba(56, 189, 248, .55),
+    inset 0 0 26px rgba(245, 158, 11, .18);
 }
 
 .square::after {

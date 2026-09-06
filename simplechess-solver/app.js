@@ -37,6 +37,7 @@ const zoomRange = document.getElementById('zoomRange');
 
 const boardState = Array.from({ length: 8 }, () => Array(8).fill(null));
 const reviewSquares = new Set();
+const bestMoveSquares = { from: null, to: null };
 let orientation = 'white';
 let selectedTool = 'wP';
 let imageRotation = 0;
@@ -47,6 +48,7 @@ let engineReadyResolver = null;
 let currentSearch = null;
 let uploadedImage = null;
 let uploadedImageUrl = '';
+let deferredInstallPrompt = null;
 
 function setStatus(message, kind = 'info') {
   statusBox.textContent = message;
@@ -56,6 +58,16 @@ function setStatus(message, kind = 'info') {
 function setDetection(message, kind = 'subtle') {
   detectionBox.textContent = message;
   detectionBox.className = `status ${kind}`;
+}
+
+function clearBestMoveHighlights() {
+  bestMoveSquares.from = null;
+  bestMoveSquares.to = null;
+}
+
+function setBestMoveHighlights(from, to) {
+  bestMoveSquares.from = from;
+  bestMoveSquares.to = to;
 }
 
 function squareName(row, col) {
@@ -114,13 +126,18 @@ function renderBoard() {
       const piece = boardState[row][col];
       const square = document.createElement('button');
       square.type = 'button';
-      square.className = `square ${(vRow + vCol) % 2 === 0 ? 'light' : 'dark'}${reviewSquares.has(coord) ? ' review' : ''}`;
+      const classes = ['square', (vRow + vCol) % 2 === 0 ? 'light' : 'dark'];
+      if (reviewSquares.has(coord)) classes.push('review');
+      if (bestMoveSquares.from === coord) classes.push('best-from');
+      if (bestMoveSquares.to === coord) classes.push('best-to');
+      square.className = classes.join(' ');
       square.dataset.coord = coord;
       square.title = piece ? `${coord} · ${pieceNames[piece]}` : coord;
       square.innerHTML = renderPieceMarkup(piece);
       square.addEventListener('click', () => {
         boardState[row][col] = selectedTool === 'erase' ? null : selectedTool;
         reviewSquares.delete(coord);
+        clearBestMoveHighlights();
         renderBoard();
         syncFen();
       });
@@ -128,6 +145,7 @@ function renderBoard() {
         event.preventDefault();
         boardState[row][col] = null;
         reviewSquares.delete(coord);
+        clearBestMoveHighlights();
         renderBoard();
         syncFen();
       });
@@ -146,6 +164,7 @@ function clearBoard(clearReviews = true) {
       boardState[row][col] = null;
     }
   }
+  clearBestMoveHighlights();
   if (clearReviews) clearReviewSquares();
 }
 
@@ -370,6 +389,8 @@ async function analyzePosition() {
   }
 
   try {
+    clearBestMoveHighlights();
+    renderBoard();
     setStatus('Chargement du moteur…', 'info');
     await ensureEngine();
     setStatus('Analyse en cours…', 'info');
@@ -394,6 +415,8 @@ async function analyzePosition() {
       return;
     }
 
+    setBestMoveHighlights(played.from, played.to);
+    renderBoard();
     bestMoveText.textContent = result.bestmove;
     sanMoveText.textContent = played.san;
     evalText.textContent = formatScore(result.infoLine);
@@ -478,39 +501,163 @@ function isGreenArrow(r, g, b) {
   return g > 80 && g > r + 20 && g > b + 20;
 }
 
-function detectBoardBounds(imageData, width, height) {
-  const startX = Math.floor(width * 0.04);
-  const endX = Math.floor(width * 0.62);
-  const startY = Math.floor(height * 0.12);
-  const endY = Math.floor(height * 0.93);
+function longestRun(values, threshold) {
+  let bestStart = -1;
+  let bestEnd = -1;
+  let currentStart = -1;
 
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -1;
-  let maxY = -1;
+  for (let index = 0; index < values.length; index += 1) {
+    if (values[index] >= threshold) {
+      if (currentStart === -1) currentStart = index;
+      continue;
+    }
+    if (currentStart !== -1 && (bestStart === -1 || (index - currentStart) > (bestEnd - bestStart + 1))) {
+      bestStart = currentStart;
+      bestEnd = index - 1;
+    }
+    currentStart = -1;
+  }
+
+  if (currentStart !== -1 && (bestStart === -1 || (values.length - currentStart) > (bestEnd - bestStart + 1))) {
+    bestStart = currentStart;
+    bestEnd = values.length - 1;
+  }
+
+  return bestStart === -1 ? null : { start: bestStart, end: bestEnd };
+}
+
+function detectBoardBounds(imageData, width, height) {
+  const startX = Math.floor(width * 0.02);
+  const endX = Math.floor(width * 0.72);
+  const startY = Math.floor(height * 0.10);
+  const endY = Math.floor(height * 0.93);
+  const colCounts = new Uint32Array(endX - startX);
 
   for (let y = startY; y < endY; y += 1) {
     for (let x = startX; x < endX; x += 1) {
       const index = (y * width + x) * 4;
-      const r = imageData[index];
-      const g = imageData[index + 1];
-      const b = imageData[index + 2];
-      if (!isSimpleChessRed(r, g, b)) continue;
-      if (x < minX) minX = x;
+      if (!isSimpleChessRed(imageData[index], imageData[index + 1], imageData[index + 2])) continue;
+      colCounts[x - startX] += 1;
+    }
+  }
+
+  const maxCol = Math.max(...colCounts);
+  if (!maxCol) return null;
+
+  const colRun = longestRun(colCounts, Math.max(35, Math.round(maxCol * 0.32)));
+  if (!colRun) return null;
+
+  const minX = startX + colRun.start;
+  const maxX = startX + colRun.end;
+  let minY = Infinity;
+  let maxY = -1;
+
+  for (let y = startY; y < endY; y += 1) {
+    for (let x = minX; x <= maxX; x += 1) {
+      const index = (y * width + x) * 4;
+      if (!isSimpleChessRed(imageData[index], imageData[index + 1], imageData[index + 2])) continue;
       if (y < minY) minY = y;
-      if (x > maxX) maxX = x;
       if (y > maxY) maxY = y;
     }
   }
 
-  if (!Number.isFinite(minX)) return null;
+  if (!Number.isFinite(minY) || maxY < minY) return null;
 
   const rawWidth = maxX - minX + 1;
   const rawHeight = maxY - minY + 1;
   const side = Math.round((rawWidth + rawHeight) / 2);
-  if (side < 300) return null;
+  if (side < 280) return null;
 
-  return { x: minX, y: minY, w: side, h: side };
+  return {
+    x: minX,
+    y: minY,
+    w: side,
+    h: side,
+  };
+}
+
+function findLargestSquareComponent(mask, regionWidth, regionHeight) {
+  const visited = new Uint8Array(mask.length);
+  let best = null;
+
+  for (let start = 0; start < mask.length; start += 1) {
+    if (!mask[start] || visited[start]) continue;
+    const queue = [start];
+    visited[start] = 1;
+    let pointer = 0;
+    let area = 0;
+    let minX = regionWidth;
+    let minY = regionHeight;
+    let maxX = -1;
+    let maxY = -1;
+
+    while (pointer < queue.length) {
+      const current = queue[pointer];
+      pointer += 1;
+      const x = current % regionWidth;
+      const y = Math.floor(current / regionWidth);
+      area += 1;
+      if (x < minX) minX = x;
+      if (y < minY) minY = y;
+      if (x > maxX) maxX = x;
+      if (y > maxY) maxY = y;
+
+      const neighbors = [current - 1, current + 1, current - regionWidth, current + regionWidth];
+      for (const neighbor of neighbors) {
+        if (neighbor < 0 || neighbor >= mask.length || visited[neighbor] || !mask[neighbor]) continue;
+        if (Math.abs((neighbor % regionWidth) - x) + Math.abs(Math.floor(neighbor / regionWidth) - y) !== 1) continue;
+        visited[neighbor] = 1;
+        queue.push(neighbor);
+      }
+    }
+
+    const width = maxX - minX + 1;
+    const height = maxY - minY + 1;
+    const aspect = width / Math.max(1, height);
+    const isCandidate = width >= 22 && width <= 44 && height >= 22 && height <= 44 && aspect > 0.8 && aspect < 1.25;
+    if (!isCandidate) continue;
+    if (!best || area > best.area) {
+      best = { area, width, height, x: minX, y: minY };
+    }
+  }
+
+  return best;
+}
+
+function inferSideToMoveFromScreenshot(imageData, width, height) {
+  const startX = Math.floor(width * 0.52);
+  const endX = Math.floor(width * 0.90);
+  const startY = Math.floor(height * 0.12);
+  const endY = Math.floor(height * 0.23);
+  const regionWidth = endX - startX;
+  const regionHeight = endY - startY;
+  const blackMask = new Uint8Array(regionWidth * regionHeight);
+  const whiteMask = new Uint8Array(regionWidth * regionHeight);
+
+  for (let y = startY; y < endY; y += 1) {
+    for (let x = startX; x < endX; x += 1) {
+      const src = (y * width + x) * 4;
+      const r = imageData[src];
+      const g = imageData[src + 1];
+      const b = imageData[src + 2];
+      const target = (y - startY) * regionWidth + (x - startX);
+      if (r < 60 && g < 60 && b < 60) blackMask[target] = 1;
+      if (r > 235 && g > 235 && b > 235) whiteMask[target] = 1;
+    }
+  }
+
+  const blackBox = findLargestSquareComponent(blackMask, regionWidth, regionHeight);
+  const whiteBox = findLargestSquareComponent(whiteMask, regionWidth, regionHeight);
+  const blackScore = blackBox?.area ?? 0;
+  const whiteScore = whiteBox?.area ?? 0;
+
+  if (blackScore > 700 && blackScore > whiteScore * 2) {
+    return { side: 'b', confidence: Math.min(99, Math.round((blackScore / 1024) * 100)) };
+  }
+  if (whiteScore > 700 && whiteScore > blackScore * 2) {
+    return { side: 'w', confidence: Math.min(99, Math.round((whiteScore / 1024) * 100)) };
+  }
+  return null;
 }
 
 function getSquareBounds(bounds, vRow, vCol) {
@@ -721,8 +868,26 @@ async function loadSelectedImage(file) {
   previewImage.src = uploadedImageUrl;
   previewImage.hidden = false;
   imagePlaceholder.hidden = true;
+
+  const rendered = buildProcessingCanvas();
+  const guessedSide = rendered
+    ? inferSideToMoveFromScreenshot(rendered.context.getImageData(0, 0, rendered.width, rendered.height).data, rendered.width, rendered.height)
+    : null;
+
+  if (guessedSide) {
+    sideToMoveEl.value = guessedSide.side;
+    orientation = guessedSide.side === 'b' ? 'black' : 'white';
+    renderBoard();
+    syncFen();
+  }
+
   setStatus(`Image chargée : ${file.name}`, 'success');
-  setDetection('Image prête. Tu peux lancer l’auto-remplissage SimpleChess.', 'info');
+  setDetection(
+    guessedSide
+      ? `Image prête. Trait détecté automatiquement : ${guessedSide.side === 'w' ? 'blancs' : 'noirs'} (${guessedSide.confidence}%). Tu peux le corriger si besoin.`
+      : 'Image prête. Tu peux lancer l’auto-remplissage SimpleChess.',
+    'info'
+  );
 }
 
 function registerServiceWorker() {
@@ -732,6 +897,50 @@ function registerServiceWorker() {
       console.error('Service worker non enregistré', error);
     });
   });
+}
+
+function updateInstallButton() {
+  const installBtn = document.getElementById('installBtn');
+  const installHint = document.getElementById('installHint');
+  if (!installBtn || !installHint) return;
+
+  if (deferredInstallPrompt) {
+    installBtn.disabled = false;
+    installBtn.textContent = 'Installer l’app';
+    installHint.textContent = 'Installation disponible : tu peux l’ajouter à l’écran d’accueil.';
+    return;
+  }
+
+  installBtn.disabled = false;
+  installBtn.textContent = 'Installer l’app';
+  installHint.textContent = 'Si le bouton ne lance rien, utilise le menu du navigateur puis “Installer” ou “Ajouter à l’écran d’accueil”.';
+}
+
+function setupInstallPrompt() {
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    updateInstallButton();
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    const installHint = document.getElementById('installHint');
+    if (installHint) installHint.textContent = 'App installée. Tu peux l’ouvrir depuis ton écran d’accueil.';
+    updateInstallButton();
+  });
+}
+
+async function triggerInstall() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice.catch(() => null);
+    deferredInstallPrompt = null;
+    updateInstallButton();
+    return;
+  }
+
+  setStatus('Si rien ne s’ouvre, installe l’app depuis le menu du navigateur.', 'info');
 }
 
 function attachEvents() {
@@ -774,6 +983,7 @@ function attachEvents() {
 
   document.getElementById('analyzeBtn').addEventListener('click', analyzePosition);
   document.getElementById('autoDetectBtn').addEventListener('click', autoDetectSimpleChessPosition);
+  document.getElementById('installBtn').addEventListener('click', triggerInstall);
 
   [
     sideToMoveEl,
@@ -782,7 +992,11 @@ function attachEvents() {
     document.getElementById('castleQ'),
     document.getElementById('castlek'),
     document.getElementById('castleq'),
-  ].forEach((element) => element.addEventListener('input', syncFen));
+  ].forEach((element) => element.addEventListener('input', () => {
+    clearBestMoveHighlights();
+    renderBoard();
+    syncFen();
+  }));
 
   document.getElementById('imageInput').addEventListener('change', async (event) => {
     const file = event.target.files?.[0];
@@ -825,5 +1039,7 @@ attachEvents();
 applyImageTransform();
 syncFen();
 registerServiceWorker();
+setupInstallPrompt();
+updateInstallButton();
 setStatus('Prêt. Charge une capture puis teste “Auto-remplir depuis screenshot SimpleChess”.', 'info');
 setDetection(`Pack de templates chargé : ${Object.keys(templateMasks).length} types de pièces SimpleChess.`, 'subtle');

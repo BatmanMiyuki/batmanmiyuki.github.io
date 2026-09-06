@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chess-photo-solver-v1';
+const CACHE_NAME = 'chess-photo-solver-v3';
 const ASSETS = [
   './',
   './index.html',
