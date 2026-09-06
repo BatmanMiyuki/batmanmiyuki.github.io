@@ -67,7 +67,7 @@
             <div class="board-wrap">
               <div id="board" class="board" aria-label="Éditeur d'échiquier"></div>
             </div>
-            <div class="board-help">Clic = poser la pièce sélectionnée · Clic droit = vider la case</div>
+            <div class="board-help">Clic = poser la pièce sélectionnée · Clic droit = vider la case · <span class="review-dot"></span> orange = case à vérifier après auto-détection</div>
           </div>
 
           <div class="palette-panel">
@@ -146,9 +146,9 @@
         <details class="notes">
           <summary>Notes importantes</summary>
           <ul>
-            <li>Le mode auto actuel est entraîné sur tes captures <strong>SimpleChess</strong> et sait déjà reconnaître plusieurs pièces dans ce thème.</li>
-            <li>Pour l'instant, les exemples fournis couvrent bien : <strong>roi, tour, fou, pion blancs</strong> et <strong>roi, tour, cavalier, pion noirs</strong>.</li>
-            <li>Pour fiabiliser aussi les <strong>dames</strong>, le <strong>cavalier blanc</strong> et le <strong>fou / dame noirs</strong>, il me faudra encore d'autres screenshots où ces pièces apparaissent.</li>
+            <li>Le mode auto est maintenant enrichi avec tes nouveaux screenshots et couvre les <strong>12 types de pièces</strong> du thème SimpleChess actuel.</li>
+            <li>Quand une case est estimée moins sûre, elle est surlignée en <strong>orange</strong> pour te dire quoi vérifier en priorité.</li>
+            <li>Si SimpleChess change un jour de thème, de taille de plateau ou de style de pièces, il faudra peut-être réentraîner les templates avec de nouvelles captures.</li>
             <li>Si un problème dépend des droits de roque ou d'une prise en passant, pense à corriger ces paramètres avant l'analyse.</li>
           </ul>
         </details>

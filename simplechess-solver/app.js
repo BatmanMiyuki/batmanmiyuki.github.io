@@ -6,6 +6,10 @@ const pieceSymbols = {
   wK: '♔', wQ: '♕', wR: '♖', wB: '♗', wN: '♘', wP: '♙',
   bK: '♚', bQ: '♛', bR: '♜', bB: '♝', bN: '♞', bP: '♟︎',
 };
+const pieceNames = {
+  wK: 'roi blanc', wQ: 'dame blanche', wR: 'tour blanche', wB: 'fou blanc', wN: 'cavalier blanc', wP: 'pion blanc',
+  bK: 'roi noir', bQ: 'dame noire', bR: 'tour noire', bB: 'fou noir', bN: 'cavalier noir', bP: 'pion noir',
+};
 const pieceOrder = ['wK', 'wQ', 'wR', 'wB', 'wN', 'wP', 'bK', 'bQ', 'bR', 'bB', 'bN', 'bP'];
 const pieceToFen = {
   wK: 'K', wQ: 'Q', wR: 'R', wB: 'B', wN: 'N', wP: 'P',
@@ -32,6 +36,7 @@ const imagePlaceholder = document.getElementById('imagePlaceholder');
 const zoomRange = document.getElementById('zoomRange');
 
 const boardState = Array.from({ length: 8 }, () => Array(8).fill(null));
+const reviewSquares = new Set();
 let orientation = 'white';
 let selectedTool = 'wP';
 let imageRotation = 0;
@@ -69,6 +74,12 @@ function screenshotVisualToActual(vRow, vCol) {
     : [7 - vRow, 7 - vCol];
 }
 
+function renderPieceMarkup(piece) {
+  if (!piece) return '';
+  const colorClass = piece.startsWith('w') ? 'piece-white' : 'piece-black';
+  return `<span class="piece ${colorClass}" aria-hidden="true">${pieceSymbols[piece]}</span>`;
+}
+
 function createPalette() {
   piecePaletteEl.innerHTML = '';
   for (const piece of pieceOrder) {
@@ -76,8 +87,9 @@ function createPalette() {
     button.type = 'button';
     button.className = 'piece-btn';
     button.dataset.piece = piece;
-    button.textContent = pieceSymbols[piece];
-    button.title = piece;
+    button.innerHTML = renderPieceMarkup(piece);
+    button.title = pieceNames[piece];
+    button.setAttribute('aria-label', pieceNames[piece]);
     button.addEventListener('click', () => {
       selectedTool = piece;
       renderPalette();
@@ -98,20 +110,24 @@ function renderBoard() {
   for (let vRow = 0; vRow < 8; vRow += 1) {
     for (let vCol = 0; vCol < 8; vCol += 1) {
       const [row, col] = visualToActual(vRow, vCol);
+      const coord = squareName(row, col);
       const piece = boardState[row][col];
       const square = document.createElement('button');
       square.type = 'button';
-      square.className = `square ${(vRow + vCol) % 2 === 0 ? 'light' : 'dark'}`;
-      square.textContent = piece ? pieceSymbols[piece] : '';
-      square.dataset.coord = squareName(row, col);
+      square.className = `square ${(vRow + vCol) % 2 === 0 ? 'light' : 'dark'}${reviewSquares.has(coord) ? ' review' : ''}`;
+      square.dataset.coord = coord;
+      square.title = piece ? `${coord} · ${pieceNames[piece]}` : coord;
+      square.innerHTML = renderPieceMarkup(piece);
       square.addEventListener('click', () => {
         boardState[row][col] = selectedTool === 'erase' ? null : selectedTool;
+        reviewSquares.delete(coord);
         renderBoard();
         syncFen();
       });
       square.addEventListener('contextmenu', (event) => {
         event.preventDefault();
         boardState[row][col] = null;
+        reviewSquares.delete(coord);
         renderBoard();
         syncFen();
       });
@@ -120,12 +136,17 @@ function renderBoard() {
   }
 }
 
-function clearBoard() {
+function clearReviewSquares() {
+  reviewSquares.clear();
+}
+
+function clearBoard(clearReviews = true) {
   for (let row = 0; row < 8; row += 1) {
     for (let col = 0; col < 8; col += 1) {
       boardState[row][col] = null;
     }
   }
+  if (clearReviews) clearReviewSquares();
 }
 
 function clearCastlingAndEp() {
@@ -446,7 +467,7 @@ function buildProcessingCanvas() {
   context.drawImage(uploadedImage, 0, 0);
   context.restore();
 
-  return { canvas, context, width: canvas.width, height: canvas.height };
+  return { context, width: canvas.width, height: canvas.height };
 }
 
 function isSimpleChessRed(r, g, b) {
@@ -512,6 +533,7 @@ function sampleSquare(imageData, boardWidth, bounds, vRow, vCol) {
   const { x0, x1, y0, y1, width, height } = getSquareBounds(bounds, vRow, vCol);
   const pixels = new Uint8ClampedArray(width * height * 4);
   let pointer = 0;
+
   for (let y = y0; y < y1; y += 1) {
     for (let x = x0; x < x1; x += 1) {
       const src = (y * boardWidth + x) * 4;
@@ -522,6 +544,7 @@ function sampleSquare(imageData, boardWidth, bounds, vRow, vCol) {
       pointer += 4;
     }
   }
+
   return { pixels, width, height };
 }
 
@@ -610,12 +633,19 @@ function classifySquare(sample, vRow, vCol) {
   const second = ranked[1];
   if (!best) return null;
 
-  const needsReview = best.score < 0.88 || (second && (best.score - second.score) < 0.06);
+  const needsReview = best.score < 0.88 || (second && (best.score - second.score) < 0.045);
   return {
     label: best.label,
     confidence: best.score,
     needsReview,
   };
+}
+
+function summarizeDetectedPieces(counts) {
+  return Object.entries(counts)
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([label, count]) => `${label}×${count}`)
+    .join(' · ');
 }
 
 async function autoDetectSimpleChessPosition() {
@@ -637,31 +667,43 @@ async function autoDetectSimpleChessPosition() {
 
     clearBoard();
     clearCastlingAndEp();
+    clearReviewSquares();
     orientation = sideToMoveEl.value === 'b' ? 'black' : 'white';
 
     let detectedPieces = 0;
-    const reviewSquares = [];
+    let confidenceSum = 0;
+    const reviewList = [];
+    const pieceCounts = {};
 
     for (let vRow = 0; vRow < 8; vRow += 1) {
       for (let vCol = 0; vCol < 8; vCol += 1) {
         const sample = sampleSquare(imageData, rendered.width, bounds, vRow, vCol);
         const result = classifySquare(sample, vRow, vCol);
         if (!result) continue;
+
         const [row, col] = screenshotVisualToActual(vRow, vCol);
+        const coord = squareName(row, col);
         boardState[row][col] = result.label;
         detectedPieces += 1;
-        if (result.needsReview) reviewSquares.push(squareName(row, col));
+        confidenceSum += result.confidence;
+        pieceCounts[result.label] = (pieceCounts[result.label] || 0) + 1;
+
+        if (result.needsReview) {
+          reviewSquares.add(coord);
+          reviewList.push(coord);
+        }
       }
     }
 
     renderBoard();
     syncFen();
 
-    const reviewText = reviewSquares.length
-      ? ` Vérifie surtout : ${reviewSquares.join(', ')}.`
-      : '';
-    setStatus(`Détection terminée : ${detectedPieces} pièces placées.`, 'success');
-    setDetection(`Mode auto SimpleChess : ${detectedPieces} pièces détectées.${reviewText}`, reviewSquares.length ? 'info' : 'success');
+    const averageConfidence = detectedPieces ? Math.round((confidenceSum / detectedPieces) * 100) : 0;
+    const reviewText = reviewList.length ? ` Vérifie surtout : ${reviewList.join(', ')}.` : '';
+    const breakdown = summarizeDetectedPieces(pieceCounts);
+
+    setStatus(`Détection terminée : ${detectedPieces} pièces placées · confiance moyenne ${averageConfidence}%.`, 'success');
+    setDetection(`Templates SimpleChess : ${Object.keys(templateMasks).length} types de pièces couverts. ${breakdown || 'Aucune pièce détectée.'}.${reviewText}`, reviewList.length ? 'info' : 'success');
   } catch (error) {
     console.error(error);
     setStatus(error.message || 'Erreur pendant la détection automatique.', 'error');
@@ -709,11 +751,13 @@ function attachEvents() {
     renderBoard();
     syncFen();
     setStatus('Échiquier vidé.', 'info');
+    setDetection('Plateau vidé. Les cases à vérifier ont été effacées.', 'subtle');
   });
 
   document.getElementById('startPosBtn').addEventListener('click', () => {
     loadStartPosition();
     setStatus('Position de départ chargée.', 'success');
+    setDetection('Mode manuel actif.', 'subtle');
   });
 
   document.getElementById('copyFenBtn').addEventListener('click', copyFen);
@@ -722,6 +766,7 @@ function attachEvents() {
     try {
       loadFenToBoard(fenOutput.value.trim(), true, true);
       setStatus('FEN chargée.', 'success');
+      setDetection('FEN importée. Vérification automatique réinitialisée.', 'subtle');
     } catch (error) {
       setStatus(error.message, 'error');
     }
@@ -781,4 +826,4 @@ applyImageTransform();
 syncFen();
 registerServiceWorker();
 setStatus('Prêt. Charge une capture puis teste “Auto-remplir depuis screenshot SimpleChess”.', 'info');
-setDetection('Aucune détection automatique lancée.', 'subtle');
+setDetection(`Pack de templates chargé : ${Object.keys(templateMasks).length} types de pièces SimpleChess.`, 'subtle');
