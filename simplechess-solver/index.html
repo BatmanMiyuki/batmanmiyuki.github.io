@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chess Photo Solver</title>
+  <meta name="description" content="PWA d'entraînement pour analyser des problèmes SimpleChess à partir d'un screenshot, reconstruire la position et trouver le meilleur coup." />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/png" href="./icons/favicon.png" />
+  <link rel="apple-touch-icon" href="./icons/icon-180.png" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <h1>Chess Photo Solver</h1>
+      <p class="subtitle">Version entraînement pour problèmes d'échecs : charge une capture, laisse l'app pré-remplir la position SimpleChess, corrige si besoin, puis demande le meilleur coup.</p>
+      <div class="badge-row">
+        <span class="badge">mobile-friendly</span>
+        <span class="badge">mode auto SimpleChess</span>
+        <span class="badge">Stockfish local</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="card image-card">
+        <div class="section-title-row">
+          <h2>1. Charger l'image</h2>
+          <label class="upload-btn">
+            <input id="imageInput" type="file" accept="image/*" />
+            Choisir une image
+          </label>
+        </div>
+
+        <div class="image-tools">
+          <button id="rotateLeftBtn" type="button">↺ Tourner</button>
+          <button id="rotateRightBtn" type="button">↻ Tourner</button>
+          <label>
+            Zoom
+            <input id="zoomRange" type="range" min="0.5" max="2.5" step="0.1" value="1" />
+          </label>
+          <button id="autoDetectBtn" type="button" class="primary">Auto-remplir depuis screenshot SimpleChess</button>
+        </div>
+
+        <div class="helper-text">Le mode auto est optimisé pour les <strong>captures d'écran SimpleChess</strong> comme tes exemples. Pour une vraie photo téléphone, il faudra encore une V2 plus costaude.</div>
+
+        <div class="image-preview" id="imagePreviewBox">
+          <div id="imagePlaceholder" class="placeholder">
+            Ajoute une capture d'écran ou une photo du problème.
+            <small>Conseil : les captures d'écran sont beaucoup plus fiables qu'une photo.</small>
+          </div>
+          <img id="previewImage" alt="Aperçu du problème d'échecs" hidden />
+        </div>
+      </section>
+
+      <section class="card board-card">
+        <div class="section-title-row">
+          <h2>2. Position détectée / corrige si besoin</h2>
+          <button id="flipBoardBtn" type="button">Retourner l'échiquier</button>
+        </div>
+
+        <div class="board-and-palette">
+          <div>
+            <div class="board-wrap">
+              <div id="board" class="board" aria-label="Éditeur d'échiquier"></div>
+            </div>
+            <div class="board-help">Clic = poser la pièce sélectionnée · Clic droit = vider la case</div>
+          </div>
+
+          <div class="palette-panel">
+            <h3>Pièce sélectionnée</h3>
+            <div id="piecePalette" class="piece-palette"></div>
+            <div class="palette-actions">
+              <button id="eraserBtn" type="button">Gomme</button>
+              <button id="clearBoardBtn" type="button" class="danger">Vider l'échiquier</button>
+              <button id="startPosBtn" type="button">Position de départ</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-grid">
+          <div class="field">
+            <label for="sideToMove">Trait</label>
+            <select id="sideToMove">
+              <option value="w">Trait aux blancs</option>
+              <option value="b">Trait aux noirs</option>
+            </select>
+          </div>
+          <div class="field castling-field">
+            <label>Roques autorisés</label>
+            <div class="castling-options">
+              <label><input id="castleK" type="checkbox" /> Blanc O-O</label>
+              <label><input id="castleQ" type="checkbox" /> Blanc O-O-O</label>
+              <label><input id="castlek" type="checkbox" /> Noir O-O</label>
+              <label><input id="castleq" type="checkbox" /> Noir O-O-O</label>
+            </div>
+          </div>
+          <div class="field">
+            <label for="epSquare">Case en passant</label>
+            <input id="epSquare" type="text" placeholder="-" maxlength="2" />
+          </div>
+        </div>
+
+        <div class="fen-box">
+          <label for="fenOutput">FEN généré</label>
+          <textarea id="fenOutput" rows="3" spellcheck="false"></textarea>
+          <div class="fen-actions">
+            <button id="copyFenBtn" type="button">Copier la FEN</button>
+            <button id="loadFenBtn" type="button">Charger cette FEN</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card analysis-card">
+        <div class="section-title-row">
+          <h2>3. Analyser</h2>
+          <button id="analyzeBtn" type="button" class="primary">Trouver le meilleur coup</button>
+        </div>
+
+        <div id="statusBox" class="status info">Prêt.</div>
+        <div id="detectionBox" class="status subtle">Aucune détection automatique lancée.</div>
+
+        <div class="result-grid">
+          <div class="result-item">
+            <span class="label">Meilleur coup</span>
+            <strong id="bestMoveText">—</strong>
+          </div>
+          <div class="result-item">
+            <span class="label">Notation SAN</span>
+            <strong id="sanMoveText">—</strong>
+          </div>
+          <div class="result-item">
+            <span class="label">Évaluation</span>
+            <strong id="evalText">—</strong>
+          </div>
+        </div>
+
+        <div class="pv-box">
+          <span class="label">Suite principale</span>
+          <div id="pvText" class="pv-text">—</div>
+        </div>
+
+        <details class="notes">
+          <summary>Notes importantes</summary>
+          <ul>
+            <li>Le mode auto actuel est entraîné sur tes captures <strong>SimpleChess</strong> et sait déjà reconnaître plusieurs pièces dans ce thème.</li>
+            <li>Pour l'instant, les exemples fournis couvrent bien : <strong>roi, tour, fou, pion blancs</strong> et <strong>roi, tour, cavalier, pion noirs</strong>.</li>
+            <li>Pour fiabiliser aussi les <strong>dames</strong>, le <strong>cavalier blanc</strong> et le <strong>fou / dame noirs</strong>, il me faudra encore d'autres screenshots où ces pièces apparaissent.</li>
+            <li>Si un problème dépend des droits de roque ou d'une prise en passant, pense à corriger ces paramètres avant l'analyse.</li>
+          </ul>
+        </details>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
