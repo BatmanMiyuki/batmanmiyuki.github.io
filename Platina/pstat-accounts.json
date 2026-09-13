@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-08T08:57:55.944Z",
+  "generatedAt": "2026-09-13T10:17:38.410Z",
   "accounts": [
     {
       "key": "batman",
       "label": "BATMAN_Miyukii",
       "version": 1,
       "locale": "fr-FR",
-      "generatedAt": "2026-09-08T08:57:55.943Z",
+      "generatedAt": "2026-09-13T10:17:38.409Z",
       "profile": {
         "onlineId": "BATMAN_Miyukii",
         "avatarUrl": "",
@@ -143,7 +143,7 @@
             "conceptId": 10012768,
             "name": "GOALS",
             "originalName": "GOALS",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202607/1412/00c3c909f7e673bc0e5c051c703666eb5228153c90338ef0.png",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202609/0815/cded6a0a4727639c5edd57dbd3b8a312041ee7c5f0743f7d.png",
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
@@ -1718,7 +1718,7 @@
             "conceptId": 10009763,
             "name": "Zenless Zone Zero",
             "originalName": "Zenless Zone Zero",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202607/2207/ceea996c9be9bcdabc7179a3551bae8cfcd0ae975b5a0538.png",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202608/3108/a326ff0cdbb523ce36a8e07ec3ddb3953032f6fdde1a6c33.png",
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
@@ -1988,7 +1988,7 @@
             "conceptId": 10002497,
             "name": "The Light in the Darkness",
             "originalName": "The Light in the Darkness",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202305/1507/c3785b3f4802161b1d6abff3d7467c12796a04a3affb3199.png",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202609/0507/073de7fb74c76cfc24d83e4e4a3f360224765ed1bb4653c8.png",
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
