@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-13T10:17:38.410Z",
+  "generatedAt": "2026-09-20T09:48:41.278Z",
   "accounts": [
     {
       "key": "batman",
       "label": "BATMAN_Miyukii",
       "version": 1,
       "locale": "fr-FR",
-      "generatedAt": "2026-09-13T10:17:38.409Z",
+      "generatedAt": "2026-09-20T09:48:41.277Z",
       "profile": {
         "onlineId": "BATMAN_Miyukii",
         "avatarUrl": "",
@@ -128,7 +128,7 @@
             "conceptId": 10010048,
             "name": "VALORANT",
             "originalName": "VALORANT",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202608/0420/ba61e62593e2d9fe1c16ba0ca510bd40c63780c86aed56e9.png",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202609/0921/8b9042708110602ee93c3a28f4efee0aba91c4b9419fa128.png",
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
@@ -743,7 +743,7 @@
             "conceptId": 10011142,
             "name": "Where Winds Meet (F2P)",
             "originalName": "Where Winds Meet (F2P)",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202607/2007/6d876bec54c9f552996e03a874463799a21c889e2adce93d.png",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202609/1608/170a70c25efec69c00e9575c9a5827943804a871814dff83.png",
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
@@ -2273,7 +2273,7 @@
             "conceptId": 228748,
             "name": "Fortnite",
             "originalName": "Fortnite",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202608/2000/2c7ee56fbf89ace584ee82e74ec198d061a3e035d9f8ee7f.png",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202609/1519/82cb6c66d3c7dcb2bfd6486bb352cc72b1c417ffccc597da.png",
             "platform": "Autre",
             "category": "unknown",
             "service": "none_purchased",
