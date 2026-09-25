@@ -184,16 +184,89 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-acti
 .strip::-webkit-scrollbar{height:6px}
 .strip::-webkit-scrollbar-thumb{background:var(--edge);border-radius:3px}
 .citem{flex:none;width:78px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:6px}
-.mini{width:78px;height:132px;border-radius:15px 15px 8px 8px;overflow:hidden;background-size:cover;background-position:center;
-  box-shadow:0 6px 16px -6px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.06) inset;transition:transform .2s}
+.mini{position:relative;width:78px;height:132px;border-radius:15px 15px 8px 8px;overflow:hidden;background-size:cover;background-position:center;cursor:pointer;
+  box-shadow:0 6px 16px -6px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.06) inset;transition:transform .2s,box-shadow .2s}
 .citem:hover .mini,.citem:focus-within .mini{transform:translateY(-3px)}
+.mini::after{content:"";position:absolute;inset:0;background:rgba(4,10,4,.5);opacity:0;transition:opacity .2s}
+.mini .ck{position:absolute;top:5px;right:5px;width:20px;height:20px;border-radius:50%;background:rgba(6,10,6,.55);border:1.5px solid rgba(255,255,255,.5);
+  display:flex;align-items:center;justify-content:center;opacity:.85;transition:background .2s,border-color .2s,transform .15s}
+.mini .ck svg{width:12px;height:12px;color:#fff;opacity:0;transition:opacity .15s}
+.mini.owned::after{opacity:1}
+.mini.owned .ck{background:var(--g);border-color:var(--g);transform:scale(1.08)}
+.mini.owned .ck svg{opacity:1;color:#04220a}
 .cname{font:500 11.5px/1.15 'Rajdhani',sans-serif;text-align:center;color:#c7cfc4;max-width:80px}
+
+/* ---- compte ---- */
+#account{position:absolute;left:18px;top:calc(env(safe-area-inset-top,0px) + 16px);z-index:20}
+#acctBtn{display:flex;align-items:center;gap:9px;cursor:pointer;background:rgba(8,12,8,.7);border:1px solid var(--edge);border-radius:999px;
+  padding:6px 14px 6px 6px;color:var(--ink);backdrop-filter:blur(8px);transition:border-color .2s}
+#acctBtn:hover,#acctBtn:focus-visible{border-color:var(--g);outline:none}
+#acctBtn svg{color:var(--dim)}
+.acctAvatar{width:30px;height:30px;border-radius:50%;background:#1c231c center/cover no-repeat;display:flex;align-items:center;justify-content:center;
+  font:700 14px 'Rajdhani',sans-serif;color:var(--g);flex:none}
+#acctLabel{font:600 14px 'Rajdhani',sans-serif;letter-spacing:.04em;max-width:34vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#acctMenu{position:absolute;left:0;top:calc(100% + 8px);width:260px;max-width:80vw;background:rgba(6,10,6,.94);border:1px solid var(--edge);
+  padding:14px;opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .2s,transform .2s;backdrop-filter:blur(10px)}
+#acctMenu.on{opacity:1;transform:none;pointer-events:auto}
+.acctInfo{padding-bottom:12px;margin-bottom:10px;border-bottom:1px solid var(--edge)}
+.acctInfo b{display:block;font:700 16px 'Rajdhani',sans-serif}
+.acctInfo span{font:500 12px 'Rajdhani',sans-serif;color:var(--dim);word-break:break-word}
+.acctRow{display:flex;align-items:center;gap:10px;width:100%;cursor:pointer;background:transparent;border:1px solid var(--edge);color:var(--ink);
+  padding:10px 12px;margin-bottom:8px;font:600 13.5px 'Rajdhani',sans-serif;letter-spacing:.04em;text-align:left}
+.acctRow:last-child{margin-bottom:0}
+.acctRow:hover,.acctRow:focus-visible{border-color:var(--g);color:var(--g);outline:none}
+.acctRow.off{display:none}
+
+/* ---- toast ---- */
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,14px);z-index:90;
+  max-width:min(86vw,420px);text-align:center;background:rgba(8,12,8,.92);border:1px solid var(--g);color:var(--ink);
+  padding:11px 18px;font:600 14px 'Rajdhani',sans-serif;letter-spacing:.03em;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ---- admin ---- */
+.adTabs{display:flex;gap:8px;margin-bottom:18px}
+.adTabs button{cursor:pointer;background:transparent;border:1px solid var(--edge);color:var(--dim);height:38px;padding:0 18px;font:600 14px 'Rajdhani',sans-serif;letter-spacing:.1em}
+.adTabs button.on{color:var(--g);border-color:var(--g)}
+.admLoad{color:var(--dim);font:500 15px 'Rajdhani',sans-serif}
+.urow{display:flex;align-items:center;gap:12px;border:1px solid var(--edge);background:rgba(8,12,8,.7);padding:10px 12px;margin-bottom:8px}
+.uav{width:36px;height:36px;border-radius:50%;background:#1c231c center/cover no-repeat;flex:none;display:flex;align-items:center;justify-content:center;font:700 14px 'Rajdhani',sans-serif;color:var(--g)}
+.uinfo{flex:1;min-width:0}
+.uinfo b{display:block;font:700 15px 'Rajdhani',sans-serif}
+.uinfo span{font:500 12px 'Rajdhani',sans-serif;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.urole{flex:none;font:700 11px 'Space Mono',monospace;letter-spacing:.08em;color:var(--dim);border:1px solid var(--edge);padding:4px 8px}
+.urole.on{color:var(--g);border-color:var(--g)}
+.uToggle{flex:none;cursor:pointer;background:transparent;border:1px solid var(--edge);color:var(--ink);height:32px;padding:0 12px;font:600 12px 'Rajdhani',sans-serif}
+.uToggle:hover,.uToggle:focus-visible{border-color:var(--g);color:var(--g);outline:none}
+.admBtn{display:block;width:100%;cursor:pointer;background:transparent;border:1px dashed var(--edge);color:var(--g);height:44px;margin-bottom:14px;font:700 14px 'Rajdhani',sans-serif;letter-spacing:.08em}
+.admBtn:hover,.admBtn:focus-visible{border-color:var(--g);border-style:solid;outline:none}
+.admNote{margin:0 0 18px;font:500 13px/1.5 'Rajdhani',sans-serif;color:var(--dim)}
+.gEdit{border:1px solid var(--edge);border-left:3px solid var(--c,var(--g));background:rgba(8,12,8,.7);padding:14px;margin-bottom:14px}
+.gEditHead{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.gEditHead .gName{flex:1;font:700 18px 'Rajdhani',sans-serif}
+.gEditHead .gCol{width:36px;height:36px;padding:0;border:1px solid var(--edge);background:none;flex:none}
+.gDel{flex:none;cursor:pointer;background:transparent;border:1px solid rgba(255,90,90,.4);color:#ff8a8a;height:34px;padding:0 12px;font:600 12px 'Rajdhani',sans-serif}
+.gDel:hover,.gDel:focus-visible{border-color:#ff8a8a;outline:none}
+.gEdit input[type="text"],.gEdit input:not([type]),.gTag,.iRow input:not([type=color]){
+  background:rgba(255,255,255,.05);border:1px solid var(--edge);color:var(--ink);padding:8px 10px;font:500 14px 'Rajdhani',sans-serif;width:100%}
+.gTag{margin-bottom:8px}
+.iBox{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.iRow{display:flex;gap:6px;align-items:center}
+.iRow input:not([type=color]){flex:1}
+.iRow input[type=color]{width:30px;height:30px;padding:0;border:1px solid var(--edge);background:none;flex:none}
+.iRow button{flex:none;cursor:pointer;background:transparent;border:1px solid var(--edge);color:var(--dim);width:30px;height:30px}
+.iRow button:hover,.iRow button:focus-visible{border-color:#ff8a8a;color:#ff8a8a;outline:none}
+.iAdd{display:block;cursor:pointer;background:none;border:1px dashed var(--edge);color:var(--dim);height:34px;width:100%;font:600 13px 'Rajdhani',sans-serif;margin-bottom:10px}
+.iAdd:hover,.iAdd:focus-visible{border-color:var(--g);color:var(--g);outline:none}
+.gSave{display:block;width:100%;cursor:pointer;background:var(--g);border:0;color:#04220a;height:40px;font:700 13px 'Rajdhani',sans-serif;letter-spacing:.1em}
+.gSave:hover,.gSave:focus-visible{background:var(--g2);outline:none}
 
 @media (max-width:720px){
   .soc{display:none}
   .flogo{font-size:16px}
   #panel{left:12px;right:12px;max-width:none}
   #closeBtn{font-size:13px;padding:9px 18px 9px 14px}
+  #account{left:10px}
+  #acctLabel{max-width:26vw}
 }
 @media (prefers-reduced-motion: reduce){
   .mbg .slash,#toStats::after,.down i{animation:none}
@@ -248,6 +321,23 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-acti
 
 <!-- ============ MENU + STATS ============ -->
 <div id="hub">
+  <div id="account">
+    <button id="acctBtn" type="button">
+      <span id="acctAvatar" class="acctAvatar">👤</span>
+      <span id="acctLabel">Se connecter</span>
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div id="acctMenu">
+      <div class="acctInfo"><b id="acctName"></b><span id="acctEmail"></span></div>
+      <button id="acctLoginRow" type="button" class="acctRow">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M23.5 12.27c0-.79-.07-1.54-.2-2.27H12v4.3h6.47c-.28 1.5-1.13 2.77-2.4 3.62v3.01h3.88c2.27-2.09 3.55-5.17 3.55-8.66z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.01c-1.08.72-2.45 1.15-4.05 1.15-3.11 0-5.75-2.1-6.69-4.93H1.3v3.09C3.26 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.31 14.3A7.2 7.2 0 0 1 4.93 12c0-.8.14-1.57.38-2.3V6.61H1.3A11.98 11.98 0 0 0 0 12c0 1.93.46 3.76 1.3 5.39l4.01-3.09z"/><path fill="#EA4335" d="M12 4.77c1.77 0 3.35.61 4.6 1.8l3.44-3.44C17.94 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.3 6.61l4.01 3.09C6.25 6.87 8.89 4.77 12 4.77z"/></svg>
+        Se connecter avec Google
+      </button>
+      <button id="acctAdmin" type="button" class="acctRow">Administration</button>
+      <button id="acctLogoutRow" type="button" class="acctRow off">Se déconnecter</button>
+    </div>
+  </div>
+
   <div class="mbg" aria-hidden="true">
     <div class="mtop"></div>
     <div class="mgrid"></div>
@@ -299,8 +389,8 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-acti
 
       <article class="lart">
         <h3><span>Article 4</span>Données personnelles et confidentialité</h3>
-        <p>Le site ne collecte, ne stocke ni ne transmet à l'éditeur aucune donnée à caractère personnel. Les préférences d'affichage sont conservées localement dans le navigateur de l'utilisateur (stockage local), sans transfert vers un serveur, et peuvent être effacées à tout moment en vidant les données de navigation du site.</p>
-        <p>Le site fait appel, pour son fonctionnement, à des ressources hébergées par des tiers (bibliothèques de rendu 3D et d'animation, polices de caractères) chargées directement depuis les serveurs de leurs fournisseurs respectifs. Cette opération technique peut conduire ces fournisseurs à recevoir l'adresse IP de l'utilisateur, dans les mêmes conditions que pour la consultation de tout site faisant appel à des ressources externes. L'éditeur ne contrôle pas le traitement effectué par ces tiers sur ces données.</p>
+        <p>Si le compte Google est configuré, le site enregistre ton nom, ton adresse e-mail, ta photo de profil publique et la liste des canettes que tu marques comme possédées, dans une base Firebase gérée par l'éditeur, dans le seul but de faire fonctionner ta collection personnelle. Sans connexion, ces informations restent uniquement sur ton appareil (stockage local) et ne sont transmises à personne.</p>
+        <p>Le site fait appel, pour son fonctionnement, à des ressources hébergées par des tiers (bibliothèques de rendu 3D et d'animation, polices de caractères, service d'authentification) chargées directement depuis les serveurs de leurs fournisseurs respectifs. Cette opération technique peut conduire ces fournisseurs à recevoir l'adresse IP de l'utilisateur. L'éditeur ne contrôle pas le traitement effectué par ces tiers sur ces données.</p>
       </article>
 
       <p class="fin">© 2026 MONSTER TRACKER — PAR PAGOT ENZO<br>TOUS DROITS RÉSERVÉS</p>
@@ -314,10 +404,23 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-acti
     </div>
   </section>
 
+  <section class="pane" id="paneAdmin">
+    <div class="sw">
+      <div class="sh"><button id="adBack" type="button">‹ Menu</button><h2>Administration</h2></div>
+      <div class="adTabs">
+        <button id="adTabUsers" type="button" class="on">Utilisateurs</button>
+        <button id="adTabCatalog" type="button">Catalogue</button>
+      </div>
+      <div id="adUsers"></div>
+      <div id="adCatalog" style="display:none"></div>
+    </div>
+  </section>
+
   <button id="snd" type="button" aria-label="Activer ou couper le son" title="Son">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path class="w" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>
   </button>
 </div>
+<div id="toast"></div>
 
 <script>
 (function(){
@@ -963,7 +1066,7 @@ function ensureUserDoc(u){
   });
 }
 function signIn(){
-  if(!fbReady()){toast('Compte indisponible : Firebase n\\'est pas configuré sur cette page');return}
+  if(!fbReady()){toast('Compte indisponible : Firebase n\'est pas configuré sur cette page');return}
   var p=new firebase.auth.GoogleAuthProvider();
   fbAuth.signInWithPopup(p).catch(function(e){console.warn(e);toast('Connexion annulée ou impossible')});
 }
@@ -1059,7 +1162,7 @@ function loadAdminCatalog(){
     if(!confirm('Remplacer le catalogue en ligne par celui affiché actuellement ?'))return;
     var batch=db.batch();
     CATS.forEach(function(c,i){batch.set(db.collection('catalog').doc('g'+i),{order:i,name:c.name,tag:c.tag,col:c.col,nc:c.nc||'',line:c.line||'',items:c.items.map(function(it){return{name:it[0],color:it[1],claw:it[2],pat:(it[3]&&it[3].pat)||0,pc:(it[3]&&it[3].pc)||''}})})});
-    batch.commit().then(function(){toast('Catalogue importé dans Firebase');loadAdminCatalog()}).catch(function(e){console.warn(e);toast('Échec de l\\'import')});
+    batch.commit().then(function(){toast('Catalogue importé dans Firebase');loadAdminCatalog()}).catch(function(e){console.warn(e);toast('Échec de l\'import')});
   };
   box.appendChild(imp);
   var note=document.createElement('p');note.className='admNote';
@@ -1117,7 +1220,7 @@ function gammeEditor(c,i){
     db.collection('catalog').doc('g'+idx).set({
       order:idx,name:c.name,tag:c.tag,col:c.col,nc:c.nc||'',line:c.line||'',
       items:c.items.map(function(it){return{name:it[0],color:it[1],claw:it[2],pat:(it[3]&&it[3].pat)||0,pc:(it[3]&&it[3].pc)||''}})
-    }).then(function(){toast('Gamme enregistrée');sfx.ui()}).catch(function(e){console.warn(e);toast('Échec de l\\'enregistrement')});
+    }).then(function(){toast('Gamme enregistrée');sfx.ui()}).catch(function(e){console.warn(e);toast('Échec de l\'enregistrement')});
   };
   wrap.appendChild(save);
   return wrap;
@@ -1344,18 +1447,25 @@ function animateCount(el,to,dur,money){
     el.textContent=money?EUR.format(o.v):Math.round(o.v).toLocaleString('fr-FR');
   }});
 }
+function keyOf(c,it){return c.name+'|'+it[0]}
 var statsBuilt=false;
 function buildStats(){
   var body=$('#statsBody');body.innerHTML='';
   var totalVariants=0,best=CATS[0];
   CATS.forEach(function(c){totalVariants+=c.items.length;if(c.items.length>best.items.length)best=c});
-  var totalValue=totalVariants*PRICE;
+
+  var mine=document.createElement('div');mine.className='kpis';mine.id="kpiMine";
+  mine.innerHTML=
+    '<div class="kpi"><b id="myCount">0</b><span>CANETTES DANS TA COLLECTION</span></div>'+
+    '<div class="kpi val"><b id="myValue">0 €</b><span>VALEUR DE TA COLLECTION</span></div>'+
+    '<div class="kpi"><b id="myPct">0%</b><span>DU CATALOGUE COMPLÉTÉ</span></div>';
+  body.appendChild(mine);
 
   var kpis=document.createElement('div');kpis.className='kpis';
   kpis.innerHTML=
-    '<div class="kpi"><b id="kpiGammes">'+CATS.length+'</b><span>GAMMES AU CATALOGUE</span></div>'+
+    '<div class="kpi"><b>'+CATS.length+'</b><span>GAMMES AU CATALOGUE</span></div>'+
     '<div class="kpi"><b id="kpiVariants">0</b><span>VARIANTES DE SAVEURS</span></div>'+
-    '<div class="kpi val"><b id="kpiValue">0 €</b><span>VALEUR DE LA COLLECTION</span></div>'+
+    '<div class="kpi val"><b id="kpiValue">0 €</b><span>VALEUR DU CATALOGUE COMPLET</span></div>'+
     '<div class="kpi"><b style="font-size:22px">'+best.name+'</b><span>GAMME LA PLUS FOURNIE · '+best.items.length+' SAVEURS</span></div>';
   body.appendChild(kpis);
 
@@ -1382,20 +1492,40 @@ function buildStats(){
   charts.appendChild(barbox);
   body.appendChild(charts);
 
+  var tip=document.createElement('p');tip.className='admNote';tip.style.textAlign='center';
+  tip.textContent='Touche une canette pour la marquer comme possédée — elle rejoint ta collection.';
+  body.appendChild(tip);
+
   CATS.forEach(function(c){
     var a=document.createElement('article');a.className='gc';a.style.setProperty('--c',c.col);
     var head=document.createElement('div');head.className='gch';head.innerHTML='<span>'+c.name.toUpperCase()+'</span><em>'+c.items.length+' saveurs</em>';
     var tag=document.createElement('p');tag.className='gct';tag.textContent=c.tag;
     var strip=document.createElement('div');strip.className='strip';
     c.items.forEach(function(it,j){
+      var k=keyOf(c,it);
       var item=document.createElement('div');item.className='citem';
-      var mini=document.createElement('div');mini.className='mini';mini.style.backgroundImage='url('+thumbURL(c,it,c.name.length*31+j)+')';
+      var mini=document.createElement('div');mini.className='mini';mini.dataset.key=k;
+      mini.style.backgroundImage='url('+thumbURL(c,it,c.name.length*31+j)+')';
+      mini.innerHTML='<span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l6 6L20 6"/></svg></span>';
+      mini.onclick=function(){sfx.ui();toggleOwned(k)};
       var nm=document.createElement('span');nm.className='cname';nm.textContent=it[0];
       item.appendChild(mini);item.appendChild(nm);strip.appendChild(item);
     });
     a.appendChild(head);a.appendChild(tag);a.appendChild(strip);body.appendChild(a);
   });
   statsBuilt=true;
+  refreshStatsUI();
+}
+function refreshStatsUI(){
+  if(!statsBuilt)return;
+  var owned=ownedMap(),have=0,total=0;
+  document.querySelectorAll('.mini').forEach(function(el){
+    var on=!!owned[el.dataset.key];el.classList.toggle('owned',on);if(on)have++;
+  });
+  CATS.forEach(function(c){total+=c.items.length});
+  $('#myCount').textContent=have;
+  $('#myValue').textContent=EUR.format(have*PRICE);
+  $('#myPct').textContent=(total?Math.round(have/total*100):0)+'%';
 }
 function playStatsAnim(){
   if(!statsBuilt)return;
@@ -1406,6 +1536,7 @@ function playStatsAnim(){
   var totalVariants=0;CATS.forEach(function(c){totalVariants+=c.items.length});
   animateCount($('#kpiVariants'),totalVariants,900,false);
   animateCount($('#kpiValue'),totalVariants*PRICE,1100,true);
+  refreshStatsUI();
 }
 
 /* =====================================================================
@@ -1487,6 +1618,24 @@ function fontsReady(){
   if(!document.fonts||!document.fonts.load)return Promise.resolve();
   return Promise.all([document.fonts.load('700 40px Rajdhani'),document.fonts.load('500 22px Rajdhani'),document.fonts.load('600 18px Rajdhani'),document.fonts.load('700 30px "Space Mono"')]).catch(function(){});
 }
+function loadRemoteCatalog(){
+  if(!fbReady())return Promise.resolve();
+  var timeout=new Promise(function(r){setTimeout(r,2200)});
+  var fetch=db.collection('catalog').orderBy('order').get().then(function(snap){
+    if(snap.empty)return;
+    var arr=[];
+    snap.forEach(function(doc){
+      var d=doc.data();
+      arr.push({name:d.name,tag:d.tag||'',col:d.col||'#7dff1a',nc:d.nc||undefined,line:d.line||'',
+        items:(d.items||[]).map(function(it){
+          var opt=(it.pat||it.pc)?{pat:it.pat||0,pc:it.pc||''}:undefined;
+          return opt?[it.name,it.color,it.claw,opt]:[it.name,it.color,it.claw];
+        })});
+    });
+    if(arr.length){CATS.length=0;arr.forEach(function(c){CATS.push(c)})}
+  }).catch(function(e){console.warn('Catalogue distant indisponible, utilisation du catalogue local :',e)});
+  return Promise.race([fetch,timeout]);
+}
 function warmUp(cb){
   try{renderer.compile(scene,camera)}catch(e){}
   var i=0,n=TEXS.length,per=LOW?4:8;
@@ -1497,7 +1646,9 @@ function warmUp(cb){
     if(i<n)requestAnimationFrame(stepUp);else cb();
   })();
 }
-Promise.race([fontsReady(),new Promise(function(r){setTimeout(r,2500)})]).then(function(){
+loadRemoteCatalog().then(function(){
+  return Promise.race([fontsReady(),new Promise(function(r){setTimeout(r,2500)})]);
+}).then(function(){
   try{buildAll();buildStats()}
   catch(err){
     console.error(err);
