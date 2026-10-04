@@ -1,0 +1,47 @@
+{
+  "name": "Platina — Tes trophées, ta légende",
+  "short_name": "Platina",
+  "description": "Suis tes trophées PlayStation : niveau, platinés, temps de jeu et dépenses PS Store.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": ".",
+  "scope": ".",
+  "id": "platina",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "background_color": "#05070b",
+  "theme_color": "#05070b",
+  "categories": ["games", "utilities", "lifestyle"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mes jeux",
+      "short_name": "Jeux",
+      "url": "./index.html#/app"
+    },
+    {
+      "name": "Statistiques",
+      "short_name": "Stats",
+      "url": "./index.html#/app"
+    }
+  ]
+}
