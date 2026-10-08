@@ -11,7 +11,10 @@ import {
 const NPSSO = cleanNpsso(process.env.NPSSO || "");
 const ACCOUNT_KEY = String(process.env.PSTAT_ACCOUNT_KEY || "account").trim().toLowerCase();
 const FALLBACK_ONLINE_ID = String(process.env.PSTAT_FALLBACK_ONLINE_ID || ACCOUNT_KEY).trim();
-const OUT_FILE = path.join(process.cwd(), "Platina", "pstat-accounts.json");
+// Même logique que fetch-psn-data.mjs : `platina/` sur le dépôt du site,
+// racine du dépôt si Platina est publié seul. Surchargeable avec OUT_DIR.
+const OUT_DIR = process.env.OUT_DIR || (fs.existsSync(path.join(process.cwd(), "platina")) ? "platina" : ".");
+const OUT_FILE = path.join(process.cwd(), OUT_DIR, "pstat-accounts.json");
 const LOCALE = "fr-FR";
 const FR_HEADERS = { "Accept-Language": LOCALE };
 

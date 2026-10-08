@@ -14,7 +14,13 @@ import {
 
 const NPSSO = cleanNpsso(process.env.NPSSO || "");
 const MAX_GAMES = normalizeMaxGames(process.env.MAX_GAMES || "0");
-const OUT_FILE = path.join(process.cwd(), "Platina", "psn-data.json");
+/**
+ * Dossier de publication des données. `platina/` dans le dépôt du site
+ * (batmanmiyuki.github.io), la racine du dépôt si Platina est publié seul.
+ * Surchargeable avec la variable d'environnement OUT_DIR.
+ */
+const OUT_DIR = process.env.OUT_DIR || (fs.existsSync(path.join(process.cwd(), "platina")) ? "platina" : ".");
+const OUT_FILE = path.join(process.cwd(), OUT_DIR, "psn-data.json");
 const LOCALE = "fr-FR";
 const FR_HEADERS = { "Accept-Language": LOCALE };
 

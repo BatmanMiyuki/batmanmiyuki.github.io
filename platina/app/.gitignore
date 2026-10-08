@@ -1,0 +1,17 @@
+# Dependencies and generated builds
+node_modules/
+dist/
+coverage/
+
+# Local environment / credentials
+.env
+.env.*
+!.env.example
+
+# Local progress backups (les données publiées par le workflow, elles, sont versionnées)
+*.backup.json
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
