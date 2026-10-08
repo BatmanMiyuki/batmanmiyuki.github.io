@@ -1,0 +1,51 @@
+name: Build Platina
+
+# Reconstruit la page publiée (platina/index.html + images + fichiers PWA) à
+# chaque modification des sources dans platina/app/. Le résultat est committé :
+# GitHub Pages n'a besoin d'aucune configuration.
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "platina/app/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-platina
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: platina/app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: platina/app
+        run: npm ci
+
+      - name: Type check
+        working-directory: platina/app
+        run: npm run typecheck
+
+      - name: Build and publish
+        working-directory: platina/app
+        run: npm run build
+
+      - name: Commit the published page
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Rebuild Platina page"
+          file_pattern: "platina/index.html platina/images platina/icon.svg platina/manifest.webmanifest platina/sw.js"

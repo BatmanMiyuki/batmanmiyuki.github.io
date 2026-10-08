@@ -1,0 +1,58 @@
+name: Update PlayStation data
+
+# Importe les trophées, le temps de jeu et les infos de compte PSN avec le
+# NPSSO stocké dans les secrets GitHub, puis publie platina/psn-data.json.
+# Aucun jeton ne transite par le navigateur.
+
+on:
+  workflow_dispatch:
+    inputs:
+      maxGames:
+        description: "Nombre de jeux à importer (0 = tous, 50 conseillé pour tester)"
+        required: true
+        default: "0"
+  schedule:
+    - cron: "30 4 * * 0"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-psn
+  cancel-in-progress: false
+
+jobs:
+  update-psn:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install psn-api
+        run: npm install --no-save psn-api@^2.18.0
+
+      - name: Check the PSN_NPSSO secret
+        env:
+          NPSSO: ${{ secrets.PSN_NPSSO }}
+        run: |
+          if [ -z "$NPSSO" ]; then
+            echo "::error::Secret PSN_NPSSO absent. Ajoute-le dans Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      - name: Fetch PlayStation trophies and account stats
+        env:
+          NPSSO: ${{ secrets.PSN_NPSSO }}
+          MAX_GAMES: ${{ github.event.inputs.maxGames || '0' }}
+        run: node scripts/fetch-psn-data.mjs
+
+      - name: Commit psn-data.json
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update PlayStation trophies data"
+          file_pattern: "platina/psn-data.json"
