@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Platina">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d1424" />
+      <stop offset="55%" stop-color="#070a12" />
+      <stop offset="100%" stop-color="#101c3a" />
+    </linearGradient>
+    <linearGradient id="ring" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="#8f7dff" />
+      <stop offset="45%" stop-color="#4f8cff" />
+      <stop offset="100%" stop-color="#a8c9ff" />
+    </linearGradient>
+    <linearGradient id="gem" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="40%" stop-color="#cfe6ff" />
+      <stop offset="100%" stop-color="#6ba6ff" />
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="38%" r="58%">
+      <stop offset="0%" stop-color="#4f8cff" stop-opacity="0.55" />
+      <stop offset="100%" stop-color="#4f8cff" stop-opacity="0" />
+    </radialGradient>
+    <filter id="blur" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="18" />
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)" />
+  <rect width="512" height="512" rx="112" fill="url(#glow)" />
+
+  <g transform="translate(256 256) scale(3.05) translate(-50 -50)">
+    <path d="M50 8 86 29v42L50 92 14 71V29L50 8Z" fill="none" stroke="#5b95ff" stroke-width="11" opacity="0.5" filter="url(#blur)" />
+    <path d="M50 8 86 29v42L50 92 14 71V29L50 8Z" fill="rgba(12,18,32,0.9)" stroke="url(#ring)" stroke-width="3.4" stroke-linejoin="round" />
+    <path d="M50 8 86 29v42L50 92 14 71V29L50 8Z" fill="none" stroke="#a8c9ff" stroke-opacity="0.28" stroke-width="1" />
+    <path d="M50 26 68 50 50 74 32 50 50 26Z" fill="url(#gem)" />
+    <path d="M50 26 68 50H32L50 26Z" fill="#ffffff" fill-opacity="0.55" />
+    <path d="M50 32 62 50H38L50 32Z" fill="none" stroke="#0b1220" stroke-opacity="0.22" stroke-width="1.4" />
+  </g>
+</svg>
