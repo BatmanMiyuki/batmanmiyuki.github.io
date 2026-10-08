@@ -16,7 +16,7 @@
     <title>Platina — Tes trophées, ta légende.</title>
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="./images/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -4412,7 +4412,7 @@ export default function PlayScreen() {
         <div className="flex shrink-0 items-start gap-[10px]">
           <div className="pointer-events-none relative -mr-[10px] w-[122px] md:w-[168px]">
             <div className="absolute inset-x-[6px] top-[10px] h-[92px] rounded-full bg-[radial-gradient(circle,rgba(120,170,255,0.28),transparent_68%)] blur-[10px]" />
-            <img src="images/ps5.png" alt="" className="relative w-full mix-blend-screen" />
+            <img src="ps5.png" alt="" className="relative w-full mix-blend-screen" />
           </div>
           <button
             type="button"
@@ -6545,7 +6545,7 @@ export function cn(...inputs: ClassValue[]) {
     <title>Platina — Tes trophées, ta légende.</title>
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="./images/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -9346,20 +9346,19 @@ const INDEX = new URL("index.html", SCOPE).href;
 const scopedUrl = (path) => new URL(path, SCOPE).href;
 
 const ASSETS = [
-  "./",
-  "./index.html",
-  "./icon.svg",
-  "./manifest.webmanifest",
-  "./images/avatar.jpg",
-  "./images/ps5.png",
-  "./images/trophy-tile.jpg",
-  "./images/g-elden.jpg",
-  "./images/g-ghost.jpg",
-  "./images/g-rdr.jpg",
-  "./images/g-hogwarts.jpg",
-  "./images/g-gow.jpg",
-  "./images/g-spider.jpg",
-  "./images/g-tlou.jpg",
+  "index.html",
+  "icon.svg",
+  "manifest.webmanifest",
+  "avatar.jpg",
+  "ps5.png",
+  "trophy-tile.jpg",
+  "g-elden.jpg",
+  "g-ghost.jpg",
+  "g-rdr.jpg",
+  "g-hogwarts.jpg",
+  "g-gow.jpg",
+  "g-spider.jpg",
+  "g-tlou.jpg",
 ];
 
 self.addEventListener("install", (event) => {
