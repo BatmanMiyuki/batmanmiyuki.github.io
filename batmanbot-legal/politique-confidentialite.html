@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Politique de confidentialité — BatmanBot</title>
+<style>
+  body { margin:0; background:#f4f6f5; color:#1c2021; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; line-height:1.65; }
+  .page { max-width:820px; margin:0 auto; padding:36px 22px 70px; }
+  header { border-bottom:3px solid #5EC8B5; padding-bottom:18px; margin-bottom:26px; }
+  h1 { font-size:1.9rem; margin:0 0 6px; }
+  h2 { font-size:1.15rem; margin-top:34px; color:#0f5f52; }
+  .maj { color:#5b6664; font-size:.92rem; margin:0; }
+  .encadre { background:#e9f7f4; border-left:4px solid #5EC8B5; padding:14px 16px; border-radius:6px; margin:22px 0; }
+  table { width:100%; border-collapse:collapse; margin:18px 0; font-size:.95rem; }
+  th, td { border:1px solid #d9dedd; padding:9px 11px; text-align:left; vertical-align:top; }
+  th { background:#eef2f1; }
+  ul { padding-left:22px; }
+  li { margin:6px 0; }
+  footer { margin-top:44px; padding-top:16px; border-top:1px solid #d9dedd; color:#5b6664; font-size:.9rem; }
+  a { color:#0f7a67; }
+  code { background:#eef2f1; padding:2px 6px; border-radius:4px; font-size:.92em; }
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <h1>Politique de confidentialité — BatmanBot</h1>
+  <p class="maj">Dernière mise à jour : 13 octobre 2026</p>
+</header>
+
+<p>Cette politique explique quelles données le bot Discord <strong>BatmanBot</strong> traite, pourquoi,
+où elles sont conservées et comment les faire supprimer. Responsable du traitement :
+le propriétaire du Bot, <strong>@hainezau</strong> sur Discord.</p>
+
+<div class="encadre">
+  <strong>L'essentiel :</strong> le Bot conserve uniquement des <strong>compteurs</strong>
+  (nombre de messages par jour, durées en vocal) associés à ton <strong>identifiant Discord</strong> et
+  à ton <strong>nom d'affichage</strong>. Il ne stocke <strong>jamais le contenu de tes messages</strong>,
+  ni tes photos, ni tes fichiers, ni tes données privées.
+</div>
+
+<h2>1. Données traitées</h2>
+<table>
+  <tr><th>Donnée</th><th>Pourquoi</th><th>Où / combien de temps</th></tr>
+  <tr>
+    <td>Identifiant Discord de l'utilisateur, du serveur et des salons (nombres publics)</td>
+    <td>Attribuer les compteurs à la bonne personne et au bon serveur</td>
+    <td>Fichier local du Bot, tant que les compteurs sont conservés</td>
+  </tr>
+  <tr>
+    <td>Nom d'affichage</td>
+    <td>L'afficher dans les classements</td>
+    <td><strong>Non stocké</strong> : il est lu en direct à l'affichage</td>
+  </tr>
+  <tr>
+    <td>Nombre de messages par jour et par membre</td>
+    <td>Alimenter les classements <code>/stats</code></td>
+    <td>Fichier local <code>stats.json</code>, tant que le serveur utilise le Bot</td>
+  </tr>
+  <tr>
+    <td>Durées passées en salon vocal (par jour)</td>
+    <td>Classement « Vocal »</td>
+    <td>Fichier local <code>stats.json</code></td>
+  </tr>
+  <tr>
+    <td>Réglages <code>/prevent</code> (identifiants des membres protégés) et état interne (progression des scans, horodatage du dernier passage)</td>
+    <td>Faire fonctionner la protection vocale et la récupération après une coupure</td>
+    <td>Fichier local <code>meta.json</code></td>
+  </tr>
+</table>
+
+<h2>2. Contenu des messages</h2>
+<p>Pour compter les messages, le Bot <strong>reçoit techniquement</strong> les messages publiés dans les
+salons textuels auxquels il a accès (permission « Voir les canaux » + intention Discord « Message Content »),
+et peut relire l'historique des salons (permission « Voir l'historique des messages ») pour compter des
+messages antérieurs à son arrivée ou publiés pendant une coupure.</p>
+<ul>
+  <li>Ce contenu est utilisé <strong>uniquement pour incrémenter un compteur</strong>.</li>
+  <li>Il n'est <strong>jamais enregistré</strong>, jamais recopié dans un fichier ou une base de données,
+      jamais analysé, jamais transmis à qui que ce soit.</li>
+  <li>Les messages des bots, des webhooks et les messages privés ne sont pas comptés.</li>
+</ul>
+
+<h2>3. Ce que le Bot ne fait pas</h2>
+<ul>
+  <li>Aucune lecture ni stockage des messages privés (MP).</li>
+  <li>Aucune donnée de paiement, adresse e-mail, numéro de téléphone ou adresse IP conservée.</li>
+  <li>Aucune revente, location ou partage de données avec des tiers.</li>
+  <li>Aucun traceur publicitaire, aucune analyse comportementale, aucun profilage.</li>
+</ul>
+
+<h2>4. Qui a accès aux données</h2>
+<p>Seul l'Exploitant du Bot a accès aux fichiers de comptage. Ils sont stockés
+<strong>localement</strong> sur la machine qui héberge le Bot (serveur personnel, VPS ou téléphone),
+et ne sont transmis à aucun service externe. Les classements sont affichés dans Discord,
+en réponse privée aux commandes (visibles uniquement par l'Exploitant).</p>
+
+<h2>5. Durée de conservation</h2>
+<p>Les compteurs sont conservés tant que le Bot reste présent sur le serveur et que son exploitant
+garde les fichiers de données. Tu peux demander la suppression à tout moment (voir ci-dessous).</p>
+
+<h2>6. Tes droits</h2>
+<p>Conformément au RGPD (règlement européen sur la protection des données) et aux lois applicables,
+tu disposes d'un droit d'accès, de rectification, d'effacement, de limitation et d'opposition sur tes données.</p>
+<ul>
+  <li><strong>Consultation</strong> : demande un extrait de tes compteurs à l'Exploitant.</li>
+  <li><strong>Suppression</strong> : demande l'effacement de tes compteurs ; ils seront supprimés
+      des fichiers dans un délai raisonnable.</li>
+  <li><strong>Contact</strong> : sur Discord, <strong>@hainezau</strong>.</li>
+</ul>
+<p>Un administrateur de serveur peut également demander la suppression de l'ensemble des données
+d'un serveur (généralement en même temps que le retrait du Bot).</p>
+
+<h2>7. Sécurité</h2>
+<p>Les données sont conservées dans des fichiers locaux accessibles uniquement à l'Exploitant.
+Aucun système ne peut garantir une sécurité absolue, mais les données concernées sont volontairement
+minimales : des identifiants publics et des nombres, ce qui limite fortement les risques
+en cas d'incident.</p>
+
+<h2>8. Mineurs</h2>
+<p>Le Bot n'est pas destiné aux personnes n'ayant pas l'âge minimum requis par les
+<a href="https://discord.com/terms">conditions d'utilisation de Discord</a> (13 ans, ou l'âge minimum
+légal de ton pays). Aucune donnée sensible concernant des mineurs n'est sciemment collectée.</p>
+
+<h2>9. Modifications de cette politique</h2>
+<p>Cette politique peut évoluer, notamment si les fonctionnalités du Bot changent. La date de mise à
+jour en haut de page indique la dernière version. Les changements importants seront annoncés sur les
+serveurs utilisant le Bot.</p>
+
+<h2>10. Contact</h2>
+<p>Pour toute question ou demande liée à tes données : <strong>@hainezau</strong> sur Discord.</p>
+
+<footer>
+  BatmanBot n'est ni affilié, ni associé, ni approuvé par Discord Inc. ni par DC Comics / Warner Bros.
+</footer>
+</div>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4a174e2e84ad086',t:'MTc5MTkyNzE0Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
