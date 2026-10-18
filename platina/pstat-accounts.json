@@ -6,7 +6,7 @@
       "label": "BATMAN_Miyukii",
       "version": 1,
       "locale": "fr-FR",
-      "generatedAt": "2026-10-11T11:24:06.553Z",
+      "generatedAt": "2026-10-18T09:37:22.435Z",
       "profile": {
         "onlineId": "BATMAN_Miyukii",
         "avatarUrl": "",
@@ -14,9 +14,39 @@
       },
       "playStats": {
         "totalTitles": 220,
-        "totalDurationSeconds": 21929240,
-        "totalPlayCount": 5405,
+        "totalDurationSeconds": 21948839,
+        "totalPlayCount": 5411,
         "games": [
+          {
+            "titleId": "PPSA10990_00",
+            "conceptId": 223118,
+            "name": "Roblox",
+            "originalName": "Roblox",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202604/0801/f2bdf0b6807d0e43c432e4de00f444df6c97732065904006.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 292,
+            "playDuration": "PT596H13M57S",
+            "durationSeconds": 2146437,
+            "firstPlayedDateTime": "2026-04-17T11:18:57.630000Z",
+            "lastPlayedDateTime": "2026-10-17T23:23:21.410000Z"
+          },
+          {
+            "titleId": "PPSA26339_00",
+            "conceptId": 10012768,
+            "name": "GOALS",
+            "originalName": "GOALS",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202609/0815/cded6a0a4727639c5edd57dbd3b8a312041ee7c5f0743f7d.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 59,
+            "playDuration": "PT48H58M17S",
+            "durationSeconds": 176297,
+            "firstPlayedDateTime": "2026-06-19T17:46:55.450000Z",
+            "lastPlayedDateTime": "2026-10-17T22:18:49.750000Z"
+          },
           {
             "titleId": "PPSA01651_00",
             "conceptId": 205453,
@@ -78,21 +108,6 @@
             "lastPlayedDateTime": "2026-08-17T17:39:43.720000Z"
           },
           {
-            "titleId": "PPSA10990_00",
-            "conceptId": 223118,
-            "name": "Roblox",
-            "originalName": "Roblox",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202604/0801/f2bdf0b6807d0e43c432e4de00f444df6c97732065904006.png",
-            "platform": "PS5",
-            "category": "ps5_native_game",
-            "service": "none(purchased)",
-            "playCount": 288,
-            "playDuration": "PT592H13M49S",
-            "durationSeconds": 2132029,
-            "firstPlayedDateTime": "2026-04-17T11:18:57.630000Z",
-            "lastPlayedDateTime": "2026-08-17T17:39:20.970000Z"
-          },
-          {
             "titleId": "PPSA01721_00",
             "conceptId": 201930,
             "name": "Grand Theft Auto V (PlayStation®5)",
@@ -136,21 +151,6 @@
             "durationSeconds": 7094,
             "firstPlayedDateTime": "2024-08-03T09:59:54.850000Z",
             "lastPlayedDateTime": "2026-08-15T17:16:18.460000Z"
-          },
-          {
-            "titleId": "PPSA26339_00",
-            "conceptId": 10012768,
-            "name": "GOALS",
-            "originalName": "GOALS",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202609/0815/cded6a0a4727639c5edd57dbd3b8a312041ee7c5f0743f7d.png",
-            "platform": "PS5",
-            "category": "ps5_native_game",
-            "service": "none(purchased)",
-            "playCount": 57,
-            "playDuration": "PT47H31M46S",
-            "durationSeconds": 171106,
-            "firstPlayedDateTime": "2026-06-19T17:46:55.450000Z",
-            "lastPlayedDateTime": "2026-08-15T11:29:25.880000Z"
           },
           {
             "titleId": "PPSA06776_00",
@@ -3333,5 +3333,5 @@
       "errors": []
     }
   ],
-  "generatedAt": "2026-10-11T11:24:06.553Z"
+  "generatedAt": "2026-10-18T09:37:22.436Z"
 }
