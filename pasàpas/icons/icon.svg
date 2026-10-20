@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Icône Pas à pas</title>
+  <rect width="512" height="512" fill="#29483a"/>
+  <circle cx="405" cy="108" r="112" fill="#527d61" opacity=".32"/>
+  <path d="M145 365c-6-143 84-233 235-240-3 155-95 254-235 240Z" fill="#d9e7c9"/>
+  <path d="M148 374 325 197" fill="none" stroke="#29483a" stroke-width="22" stroke-linecap="round"/>
+</svg>
