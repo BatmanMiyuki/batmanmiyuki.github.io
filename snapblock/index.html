@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>👻 Mes bloqués Snap — Compteur 100 % local</title>
+<meta name="description" content="Comptez et listez les personnes que vous avez bloquées sur Snapchat à partir de votre export officiel. Analyse 100 % locale, aucun envoi de données.">
+<!-- PWA inline : le manifest et les icônes sont générés par le script ci-dessous (aucun fichier externe) -->
+<meta name="theme-color" content="#FFFC00">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bloqués Snap">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" id="faviconSvg" sizes="any" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%23FFFC00'/%3E%3Cpath d='M256 86c-68 0-124 56-124 124v148l42-30 41 34 41-34 41 34 41-34 42 30V210c0-68-56-124-124-124z' fill='white' stroke='black' stroke-width='10' stroke-linejoin='round'/%3E%3Ccircle cx='212' cy='222' r='16' fill='black'/%3E%3Ccircle cx='300' cy='222' r='16' fill='black'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" id="appleTouchIcon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%23FFFC00'/%3E%3Cpath d='M256 86c-68 0-124 56-124 124v148l42-30 41 34 41-34 41 34 41-34 42 30V210c0-68-56-124-124-124z' fill='white' stroke='black' stroke-width='10' stroke-linejoin='round'/%3E%3Ccircle cx='212' cy='222' r='16' fill='black'/%3E%3Ccircle cx='300' cy='222' r='16' fill='black'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --yellow:#FFFC00; --black:#16161a; --bg:#f6f6f3; --card:#ffffff;
+    --muted:#666; --border:#e6e6de; --green:#0aad5d; --red:#d63030;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--black)}
+  .wrap{max-width:880px;margin:0 auto;padding:0 16px}
+  header{background:var(--yellow);border-bottom:3px solid var(--black);padding:34px 0 28px;text-align:center}
+  header h1{margin:10px 0 8px;font-size:clamp(1.5rem,4.5vw,2.3rem);line-height:1.15}
+  header p{margin:0 auto;max-width:620px;font-size:1.02rem;color:#333}
+  .badge{display:inline-block;background:var(--black);color:#fff;font-weight:700;font-size:.82rem;
+         padding:6px 14px;border-radius:999px}
+  main{padding:24px 0 40px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+        padding:20px;margin-bottom:18px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:18px}
+  .step{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  .step .num{display:inline-flex;width:30px;height:30px;border-radius:50%;background:var(--yellow);
+             border:2px solid var(--black);font-weight:900;align-items:center;justify-content:center;margin-bottom:8px}
+  .step h3{margin:0 0 6px;font-size:1rem}
+  .step p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.45}
+  .step code{background:#f0f0e8;padding:1px 5px;border-radius:5px;font-size:.82rem}
+  #dropzone{border:3px dashed #bbb;border-radius:var(--radius);padding:38px 18px;text-align:center;
+            cursor:pointer;transition:.15s;background:#fffdf0}
+  #dropzone:hover,#dropzone:focus-visible{border-color:var(--black);outline:none}
+  #dropzone.over{border-color:var(--green);background:#efffF4;background:#effff4;transform:scale(1.01)}
+  #dropzone .big{font-size:2.6rem}
+  #dropzone strong{display:block;font-size:1.2rem;margin:8px 0 4px}
+  #dropzone span{color:var(--muted);font-size:.92rem}
+  .btn{display:inline-block;border:2px solid var(--black);background:var(--yellow);color:var(--black);
+       font-weight:800;padding:10px 18px;border-radius:999px;cursor:pointer;font-size:.95rem;margin-top:14px}
+  .btn:hover{filter:brightness(.96)}
+  .btn.secondary{background:#fff}
+  .btn.small{padding:7px 14px;font-size:.85rem;margin-top:0}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
+  .privacy{text-align:center;color:var(--muted);font-size:.85rem;margin:14px 0 0}
+  #status{margin-top:14px;border-radius:12px;padding:12px 14px;font-size:.93rem;display:none;line-height:1.5}
+  #status.info{display:block;background:#eef4ff;border:1px solid #bcd2ff}
+  #status.ok{display:block;background:#e9fbf1;border:1px solid #9fe3bb}
+  #status.error{display:block;background:#ffecec;border:1px solid #ffb3b3}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+  .stat{border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;background:#fff}
+  .stat.main{background:var(--yellow);border:2px solid var(--black)}
+  .stat .n{font-size:2rem;font-weight:900;line-height:1}
+  .stat .l{color:#444;font-size:.85rem;margin-top:6px;font-weight:600}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+  .controls input[type=search]{flex:1;min-width:200px;padding:11px 14px;border:1px solid #ccc;border-radius:999px;font-size:.95rem}
+  .controls select{padding:11px 14px;border:1px solid #ccc;border-radius:999px;font-size:.95rem;background:#fff}
+  ul.people{list-style:none;padding:0;margin:8px 0 0}
+  ul.people li{display:flex;align-items:center;gap:12px;padding:10px 8px;border-bottom:1px solid #f0f0ea}
+  ul.people li:last-child{border-bottom:none}
+  .avatar{flex:0 0 42px;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+          font-weight:900;color:#fff;background:#888;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+  .who{flex:1;min-width:0}
+  .who .u{font-weight:800;word-break:break-all}
+  .who .d{color:var(--muted);font-size:.86rem;word-break:break-word}
+  .date{color:var(--muted);font-size:.8rem;white-space:nowrap;text-align:right}
+  #demoBanner{display:none;background:#fff3cd;border:1px solid #e3c56b;border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:.9rem}
+  details{margin-top:14px}
+  summary{cursor:pointer;font-weight:700}
+  #diag{white-space:pre-wrap;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.76rem;background:#101014;color:#c8f7c5;
+        border-radius:12px;padding:12px;max-height:260px;overflow:auto;margin-top:10px}
+  .faq details{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+  .faq p{margin:8px 0 0;color:#444;line-height:1.55;font-size:.93rem}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;padding:0 16px 32px;line-height:1.5}
+  .install-btn{background:var(--black);color:var(--yellow);border:2px solid var(--black);padding:12px 24px;
+               border-radius:999px;font-weight:900;font-size:1rem;cursor:pointer;margin-top:16px}
+  .install-btn:hover{transform:scale(1.03)}
+  #installedBadge{display:inline-block;margin-top:16px;background:var(--green);color:#fff;font-weight:800;
+                  font-size:.9rem;padding:9px 16px;border-radius:999px}
+  #installHelp{background:#fff;border:2px solid var(--black);border-radius:14px;padding:14px 18px;
+               max-width:640px;margin:16px auto 0;text-align:left;font-size:.92rem;line-height:1.55}
+  #installHelp p{margin:7px 0}
+  #installHelp .hl{background:#fffbd1;border-left:4px solid var(--black);padding:6px 10px;border-radius:0 8px 8px 0}
+  [hidden]{display:none !important}
+</style>
+<script>
+/* =====================================================================
+   PWA 100 % INLINE — aucun fichier manifest.json ni sw.js requis.
+   - Icônes : un SVG intégré, converti en PNG (192/512/maskable + Apple)
+     via un <canvas>, donc en data URI.
+   - Manifest : construit en JS puis injecté en
+     <link rel="manifest" href="data:application/manifest+json;base64,…">
+   - Service worker : volontairement absent. Un SW en blob:/data: est
+     refusé par les navigateurs (register() n'accepte que http/https),
+     et il n'est plus requis pour installer (Chrome 108 mobile / 112 desktop).
+     Conséquence : l'app installée se lance en ligne ; une fois la page
+     chargée, tout fonctionne hors-ligne puisque tout est dans ce fichier.
+   ===================================================================== */
+(function(){
+  'use strict';
+
+  /* --- Dessin de l'icône (fantôme blanc sur jaune) --- */
+  var GHOST = "<path d='M256 86c-68 0-124 56-124 124v148l42-30 41 34 41-34 41 34 41-34 42 30V210c0-68-56-124-124-124z' fill='white' stroke='black' stroke-width='10' stroke-linejoin='round'/>" +
+              "<circle cx='212' cy='222' r='16' fill='black'/><circle cx='300' cy='222' r='16' fill='black'/>";
+
+  function makeSvg(maskable){
+    var bg = maskable
+      ? "<rect width='512' height='512' fill='#FFFC00'/>"                 /* fond plein bord à bord */
+      : "<rect width='512' height='512' rx='110' fill='#FFFC00'/>";      /* coins arrondis */
+    var scale = maskable ? 0.78 : 1;                                      /* zone de sécurité maskable */
+    return "<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'>" + bg +
+           "<g transform='translate(256 256) scale(" + scale + ") translate(-256 -256)'>" + GHOST + "</g></svg>";
+  }
+
+  function svgToPngDataUrl(svg, size){
+    return new Promise(function(resolve, reject){
+      var img = new Image();
+      img.onload = function(){
+        try {
+          var canvas = document.createElement('canvas');
+          canvas.width = size; canvas.height = size;
+          canvas.getContext('2d').drawImage(img, 0, 0, size, size);
+          resolve(canvas.toDataURL('image/png'));
+        } catch(e){ reject(e); }
+      };
+      img.onerror = reject;
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    });
+  }
+
+  /* btoa() ne gère pas l'UTF-8 (accents) : encodage sûr par morceaux */
+  function toBase64Utf8(str){
+    var bytes = new TextEncoder().encode(str), bin = '', CH = 0x8000;
+    for (var i = 0; i < bytes.length; i += CH){
+      bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+    }
+    return btoa(bin);
+  }
+
+  /* --- Bouton d'installation --- */
+  var deferredPrompt = null;
+
+  function isStandalone(){
+    return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+           window.navigator.standalone === true;
+  }
+
+  function refreshInstallUI(){
+    var btn = document.getElementById('installBtn');
+    var badge = document.getElementById('installedBadge');
+    var help = document.getElementById('installHelp');
+    if (!btn) return; /* DOM pas encore prêt : DOMContentLoaded rappellera */
+    if (isStandalone()){
+      btn.hidden = true;
+      if (badge) badge.hidden = false;
+      if (help) help.hidden = true;
+    } else {
+      btn.hidden = false;
+      if (badge) badge.hidden = true;
+    }
+  }
+
+  /* Enregistré le plus tôt possible (dans le <head>) pour ne pas rater l'événement */
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    refreshInstallUI();
+    console.info('[PWA] beforeinstallprompt reçu : le bouton déclenchera l\'installation directe.');
+  });
+
+  window.addEventListener('appinstalled', function(){
+    deferredPrompt = null;
+    refreshInstallUI();
+    console.info('[PWA] Application installée ✅');
+  });
+
+  document.addEventListener('DOMContentLoaded', function(){
+    refreshInstallUI();
+    var btn = document.getElementById('installBtn');
+    var help = document.getElementById('installHelp');
+    if (!btn) return;
+    btn.addEventListener('click', async function(){
+      if (deferredPrompt){
+        deferredPrompt.prompt();
+        try {
+          var choice = await deferredPrompt.userChoice;
+          if (choice && choice.outcome === 'accepted'){ deferredPrompt = null; refreshInstallUI(); }
+        } catch(e){ /* prompt déjà consommé */ }
+      } else if (help){
+        /* Pas de prompt automatique disponible : on montre la marche à suivre,
+           en surlignant celle qui correspond à l'appareil */
+        help.hidden = !help.hidden;
+        if (!help.hidden){
+          var ua = navigator.userAgent || '';
+          var target = /iphone|ipad|ipod/i.test(ua) ? 'instIos'
+                     : /android/i.test(ua) ? 'instAndroid' : 'instDesktop';
+          ['instAndroid','instIos','instDesktop'].forEach(function(id){
+            var el = document.getElementById(id);
+            if (el) el.classList.toggle('hl', id === target);
+          });
+          help.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+    });
+  });
+
+  /* --- Génération + injection du manifest inline --- */
+  (async function injectInlineManifest(){
+    try {
+      if (!/^https?:$/.test(location.protocol)){
+        console.info('[PWA] Page ouverte en ' + location.protocol +
+          ' : l\'installation exige HTTPS (ou localhost). Le manifest inline n\'est pas injecté.');
+        return;
+      }
+      var normalSvg = makeSvg(false), maskableSvg = makeSvg(true);
+      var iconsPng = await Promise.all([
+        svgToPngDataUrl(normalSvg, 192),
+        svgToPngDataUrl(normalSvg, 512),
+        svgToPngDataUrl(maskableSvg, 512),
+        svgToPngDataUrl(normalSvg, 180)
+      ]);
+
+      /* Icône Apple en vrai PNG (iOS ignore le SVG) */
+      var apple = document.querySelector("link[rel='apple-touch-icon']");
+      if (!apple){ apple = document.createElement('link'); apple.rel = 'apple-touch-icon'; document.head.appendChild(apple); }
+      apple.href = iconsPng[3];
+
+      var manifest = {
+        name: 'Mes bloqués Snap — Compteur 100 % local',
+        short_name: 'Bloqués Snap',
+        description: 'Comptez et listez les personnes bloquées de votre compte Snapchat à partir de votre export officiel. Analyse 100 % locale.',
+        lang: 'fr',
+        start_url: location.href.split('#')[0],
+        display: 'standalone',
+        background_color: '#FFFC00',
+        theme_color: '#FFFC00',
+        icons: [
+          { src: iconsPng[0], sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: iconsPng[1], sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: iconsPng[2], sizes: '512x512', type: 'image/png', purpose: 'maskable' }
+        ]
+      };
+
+      var link = document.createElement('link');
+      link.rel = 'manifest';
+      link.id = 'pwaInlineManifest';
+      link.href = 'data:application/manifest+json;base64,' + toBase64Utf8(JSON.stringify(manifest));
+      document.head.appendChild(link);
+      console.info('[PWA] Manifest inline injecté ✅ (aucun fichier externe)');
+    } catch(err){
+      console.warn('[PWA] Icônes PNG impossibles, repli sur icône SVG :', err);
+      try {
+        var fallback = {
+          name: 'Mes bloqués Snap — Compteur 100 % local',
+          short_name: 'Bloqués Snap',
+          lang: 'fr',
+          start_url: location.href.split('#')[0],
+          display: 'standalone',
+          background_color: '#FFFC00',
+          theme_color: '#FFFC00',
+          icons: [{ src: document.getElementById('faviconSvg').href, sizes: 'any', type: 'image/svg+xml', purpose: 'any' }]
+        };
+        var l2 = document.createElement('link');
+        l2.rel = 'manifest'; l2.id = 'pwaInlineManifest';
+        l2.href = 'data:application/manifest+json;base64,' + toBase64Utf8(JSON.stringify(fallback));
+        document.head.appendChild(l2);
+      } catch(e2){ /* on reste un simple site web, rien de cassé */ }
+    }
+  })();
+})();
+</script>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <span class="badge">🔒 100 % LOCAL — AUCUNE DONNÉE ENVOYÉE</span>
+    <h1>👻 Combien de personnes ai-je bloquées sur Snap&nbsp;?</h1>
+    <p>Déposez l'export officiel de vos données Snapchat : ce site lit le fichier <strong>directement dans votre navigateur</strong> et vous affiche le nombre et la liste. Aucun mot de passe demandé, rien n'est envoyé sur Internet.</p>
+    <button type="button" class="install-btn" id="installBtn" hidden>📲 Installer l'app</button>
+    <span id="installedBadge" hidden>✅ App installée — vous êtes en mode application</span>
+    <div id="installHelp" hidden>
+      <p><strong>Installer via le menu du navigateur :</strong></p>
+      <p id="instAndroid">🤖 <strong>Android (Chrome)</strong> : touchez le menu <strong>⋮</strong> en haut à droite → <strong>« Installer l'application »</strong> (ou « Ajouter à l'écran d'accueil »).</p>
+      <p id="instIos">🍎 <strong>iPhone / iPad (Safari)</strong> : touchez le bouton <strong>Partager</strong> (carré avec flèche vers le haut) → <strong>« Sur l'écran d'accueil »</strong> → Ajouter.</p>
+      <p id="instDesktop">💻 <strong>Ordinateur (Chrome / Edge)</strong> : cliquez sur l'icône d'installation dans la barre d'adresse, ou menu <strong>⋮</strong> → <strong>« Installer… »</strong>.</p>
+      <p style="color:#666">ℹ️ L'installation nécessite que cette page soit ouverte en <strong>HTTPS</strong> ou via <strong>localhost</strong> — un simple double-clic sur le fichier (file://) ne peut pas créer d'app.</p>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="steps">
+    <div class="step">
+      <span class="num">1</span>
+      <h3>Demandez votre export</h3>
+      <p>Dans Snapchat : <strong>Mes données</strong> → activez uniquement <strong>« Exporter des fichiers JSON »</strong> et <strong>« Données utilisateur »</strong> → descendez en bas → <strong>Suivant / Soumettre</strong>.<br>Laissez « Souvenirs » décoché (sinon c'est énorme et lent).</p>
+    </div>
+    <div class="step">
+      <span class="num">2</span>
+      <h3>Téléchargez le ZIP</h3>
+      <p>Snapchat vous envoie un e-mail quand c'est prêt (quelques minutes en général), ou retrouvez-le via <strong>« Voir les exports »</strong>. Téléchargez le fichier <code>.zip</code>.<br>⚠️ Ne partagez ce ZIP avec personne : il contient vos données perso.</p>
+    </div>
+    <div class="step">
+      <span class="num">3</span>
+      <h3>Déposez-le ici</h3>
+      <p>Glissez le <code>.zip</code> ci-dessous — <strong>pas besoin de le dézipper</strong>. Vous pouvez aussi déposer directement le fichier <code>friends.json</code> si vous l'avez extrait.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div id="dropzone" tabindex="0" role="button" aria-label="Choisir le fichier d'export Snapchat">
+      <div class="big">📦</div>
+      <strong>Glissez votre export Snapchat ici</strong>
+      <span>Fichier .zip de l'export, ou friends.json</span><br>
+      <button class="btn" type="button">Choisir un fichier</button>
+      <input type="file" id="fileInput" accept=".zip,.json,.html,.htm,application/zip,application/json" multiple hidden>
+    </div>
+    <div class="btnrow">
+      <button class="btn secondary small" type="button" id="demoBtn">🧪 Essayer avec des données de démonstration</button>
+      <button class="btn secondary small" type="button" id="resetBtn" hidden>↺ Recommencer</button>
+    </div>
+    <p class="privacy">🛡️ Le fichier reste sur votre appareil : l'analyse se fait dans cette page, même hors-ligne. Vérifiable dans le code source.</p>
+    <div id="status" aria-live="polite"></div>
+  </div>
+
+  <section id="results" class="card" hidden>
+    <div id="demoBanner">🧪 <strong>Mode démonstration</strong> — ces pseudos sont inventés, juste pour vous montrer à quoi ressemblera le résultat avec votre vrai export.</div>
+
+    <div class="stats">
+      <div class="stat main"><div class="n" id="statBlocked">0</div><div class="l">🚫 Personnes bloquées</div></div>
+      <div class="stat" id="cardFriends"><div class="n" id="statFriends">0</div><div class="l">👥 Amis actuels</div></div>
+      <div class="stat" id="cardDeleted"><div class="n" id="statDeleted">0</div><div class="l">👋 Amis supprimés</div></div>
+      <div class="stat" id="cardRequests"><div class="n" id="statRequests">0</div><div class="l">✉️ Demandes d'amis</div></div>
+    </div>
+
+    <h2 style="margin:6px 0 0">🚫 Vos personnes bloquées</h2>
+    <div class="controls">
+      <input type="search" id="searchInput" placeholder="🔍 Rechercher un pseudo…">
+      <select id="sortSelect" aria-label="Tri">
+        <option value="az">Tri : A → Z</option>
+        <option value="za">Tri : Z → A</option>
+        <option value="recent">Tri : blocages récents d'abord</option>
+        <option value="old">Tri : blocages anciens d'abord</option>
+        <option value="file">Tri : ordre du fichier</option>
+      </select>
+    </div>
+    <p id="resultCount" style="color:var(--muted);margin:4px 0"></p>
+    <ul class="people" id="peopleList"></ul>
+    <p id="emptyList" style="color:var(--muted)" hidden>Aucun pseudo ne correspond à votre recherche.</p>
+
+    <div class="btnrow" style="justify-content:flex-start">
+      <button class="btn small" type="button" id="copyBtn">📋 Copier la liste</button>
+      <button class="btn secondary small" type="button" id="csvBtn">⬇️ Télécharger en CSV</button>
+      <button class="btn secondary small" type="button" id="txtBtn">⬇️ Télécharger en TXT</button>
+    </div>
+
+    <details>
+      <summary>🔧 Détails techniques (fichiers lus, clés trouvées)</summary>
+      <div id="diag">—</div>
+    </details>
+  </section>
+
+  <div class="faq">
+    <details>
+      <summary>📲 Comment installer ce site comme une application (PWA) ?</summary>
+      <p>Utilisez le bouton <strong>« Installer l'app »</strong> en haut de la page. Cette PWA tient en <strong>un seul fichier</strong> : le manifest et les icônes sont générés directement dans le code, il n'y a ni <code>manifest.json</code> ni <code>sw.js</code> séparés.</p>
+      <p>Condition imposée par les navigateurs : la page doit être servie en <strong>HTTPS</strong> (ou via <strong>localhost</strong> sur un ordinateur). Si vous ouvrez le fichier par double-clic (<code>file://</code>), le site fonctionne normalement, mais le navigateur ne proposera pas l'installation. Astuce : hébergez ce fichier unique sur un service gratuit (Netlify Drop, GitHub Pages, Cloudflare Pages…), ouvrez l'adresse obtenue sur votre téléphone, puis installez.</p>
+      <p>Note technique : il n'y a pas de service worker (impossible à faire tenir dans un seul fichier — les navigateurs refusent les workers en <code>blob:</code>/<code>data:</code>). L'app installée ouvre donc la page en ligne ; mais une fois chargée, l'analyse de vos fichiers se fait entièrement hors-ligne, sur votre appareil.</p>
+    </details>
+    <details>
+      <summary>Je n'ai pas reçu l'e-mail de Snapchat, c'est normal ?</summary>
+      <p>Ça prend en général quelques minutes, parfois quelques heures. Vous pouvez aussi retourner dans <strong>Mes données → Voir les exports</strong> dans l'app (ou sur accounts.snapchat.com) : le bouton <strong>Télécharger</strong> apparaîtra là dès que c'est prêt. Pensez à vérifier vos spams.</p>
+    </details>
+    <details>
+      <summary>Le site envoie-t-il mon fichier quelque part ?</summary>
+      <p>Non. Tout se passe dans votre navigateur, sur votre appareil. Aucun serveur ne reçoit votre fichier, aucun compte à créer, et <strong>on ne vous demandera jamais votre mot de passe Snapchat</strong>. Si un site vous le demande : fuyez, c'est du phishing.</p>
+    </details>
+    <details>
+      <summary>Ça me dit qui m'a bloqué, moi ?</summary>
+      <p>Non — et aucun site ne peut le savoir de façon fiable : Snapchat ne communique cette information nulle part. Ici, on affiche uniquement les personnes <strong>que vous avez bloquées vous-même</strong>.</p>
+    </details>
+    <details>
+      <summary>« Aucune liste de bloqués trouvée », que faire ?</summary>
+      <p>Vérifiez que dans l'écran « Mes données » vous aviez bien activé <strong>« Exporter des fichiers JSON »</strong> <em>et</em> <strong>« Données utilisateur »</strong>, puis refaites un export si besoin. Ouvrez aussi les « Détails techniques » ci-dessus : ils montrent les fichiers et clés détectés — ça aide à comprendre ce que contient votre export.</p>
+    </details>
+  </div>
+
+</main>
+
+<footer>
+  Site d'analyse local, non officiel — sans aucun lien avec Snap Inc. / Snapchat.<br>
+  Vos données d'export sont personnelles : ne partagez jamais le fichier ZIP d'origine.
+</footer>
+
+<script>
+/*TESTABLE_START*/
+/* ===== Fonctions pures : lecture ZIP + extraction (testables hors navigateur) ===== */
+
+function normalizeKey(k){
+  return String(k).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
+}
+
+function categoryForKey(nk){
+  if (nk.indexOf('block') !== -1 || nk.indexOf('bloqu') !== -1) return 'blocked';
+  if (nk.indexOf('deletedfriend') !== -1 || nk.indexOf('removedfriend') !== -1 ||
+      nk.indexOf('amissupprim') !== -1 || nk.indexOf('frienddeleted') !== -1) return 'deleted';
+  if (nk.indexOf('friendrequest') !== -1 || nk.indexOf('pendingrequest') !== -1 ||
+      nk.indexOf('request') !== -1 && nk.indexOf('friend') !== -1) return 'requests';
+  if (nk.indexOf('ignored') !== -1) return 'ignored';
+  if (nk === 'friends' || nk === 'friend' || nk === 'friendlist' || nk === 'amis' ||
+      nk === 'amies' || nk === 'listeamis' || nk === 'myfriends' || nk === 'allfriends') return 'friends';
+  return null;
+}
+
+function parseSnapDate(raw){
+  if (!raw) return null;
+  var s = String(raw).trim();
+  var iso = s.replace(' UTC','Z').replace(' ','T');
+  var d = new Date(iso);
+  if (!isNaN(d.getTime())) return d;
+  d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function normalizeEntry(e, sourceName){
+  if (e === null || e === undefined) return null;
+  if (typeof e === 'string' || typeof e === 'number'){
+    var v = String(e).trim();
+    return v ? { username: v, displayName: '', dateRaw: '', date: null, source: sourceName } : null;
+  }
+  if (typeof e !== 'object') return null;
+  var map = {};
+  for (var k in e){
+    if (Object.prototype.hasOwnProperty.call(e,k)){
+      var nk = normalizeKey(k);
+      if (!(nk in map)) map[nk] = e[k];
+    }
+  }
+  function pick(keys){
+    for (var i=0;i<keys.length;i++){
+      var val = map[keys[i]];
+      if (val !== undefined && val !== null && String(val).trim() !== '') return String(val).trim();
+    }
+    return '';
+  }
+  var username = pick(['username','snapchatusername','user','pseudo','handle','login','userid','uid','id']);
+  var display  = pick(['displayname','display','fullname','nickname','name','nomdaffichage']);
+  if (!username && display){ username = display; display = ''; }
+  if (display === username) display = '';
+  if (!username) return null;
+  var dateRaw = pick(['blockedtimestamp','blockeddate','creationtimestamp','createdtimestamp',
+                      'creationdate','createdat','timestamp','addedtimestamp','date','time']);
+  if (!dateRaw){
+    for (var mk in map){
+      if ((mk.indexOf('timestamp') !== -1 || mk.indexOf('date') !== -1) && map[mk]){
+        dateRaw = String(map[mk]).trim(); break;
+      }
+    }
+  }
+  return { username: username, displayName: display, dateRaw: dateRaw,
+           date: parseSnapDate(dateRaw), source: sourceName };
+}
+
+/* Cherche récursivement dans un objet JSON les listes blocked / friends / etc. */
+function extractFromJson(root, sourceName){
+  var found = { blocked: [], friends: [], deleted: [], requests: [], ignored: [],
+                present: {}, keys: [] };
+  var seenKeys = {};
+
+  function addCat(cat, arr){
+    found.present[cat] = true;
+    if (!Array.isArray(arr)) return;
+    arr.forEach(function(item){
+      var n = normalizeEntry(item, sourceName);
+      if (n) found[cat].push(n);
+    });
+  }
+
+  /* Cas : le fichier est directement une liste, et son nom parle de blocage */
+  if (Array.isArray(root)){
+    var fn = normalizeKey(sourceName || '');
+    if (fn.indexOf('block') !== -1 || fn.indexOf('bloqu') !== -1){ addCat('blocked', root); return found; }
+    return found;
+  }
+
+  function walk(node, depth){
+    if (!node || typeof node !== 'object' || depth > 7) return;
+    if (Array.isArray(node)){
+      node.forEach(function(item){ if (item && typeof item === 'object') walk(item, depth+1); });
+      return;
+    }
+    for (var key in node){
+      if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
+      var val = node[key];
+      if (depth <= 3 && !seenKeys[key]){ seenKeys[key] = true; found.keys.push(key); }
+      var cat = categoryForKey(normalizeKey(key));
+      if (cat && Array.isArray(val)){
+        addCat(cat, val);
+      } else if (val && typeof val === 'object'){
+        walk(val, depth+1);
+      }
+    }
+  }
+  walk(root, 0);
+  return found;
+}
+
+function dedupePeople(list){
+  var map = {}, out = [];
+  list.forEach(function(p){
+    var k = p.username.toLowerCase();
+    if (!map[k]){ map[k] = p; out.push(p); }
+    else {
+      if (!map[k].displayName && p.displayName) map[k].displayName = p.displayName;
+      if (!map[k].date && p.date){ map[k].date = p.date; map[k].dateRaw = p.dateRaw; }
+    }
+  });
+  return out;
+}
+
+/* --- Lecteur ZIP minimal (méthode 0 = stocké, 8 = deflate) --- */
+async function inflateRaw(bytes){
+  var stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  var buf = await new Response(stream).arrayBuffer();
+  return new Uint8Array(buf);
+}
+
+/* Retourne [{name, text}] pour les entrées .json/.html raisonnables du ZIP */
+async function readZipTextEntries(arrayBuffer){
+  var view = new DataView(arrayBuffer);
+  var bytes = new Uint8Array(arrayBuffer);
+  var len = bytes.length;
+
+  /* Chercher l'End Of Central Directory (signature PK\x05\x06) en partant de la fin */
+  var eocd = -1;
+  var minPos = Math.max(0, len - 65558);
+  for (var i = len - 22; i >= minPos; i--){
+    if (view.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+  }
+  if (eocd === -1) throw new Error("Ce fichier ne ressemble pas à un ZIP valide.");
+
+  var total = view.getUint16(eocd + 10, true);
+  var cdOffset = view.getUint32(eocd + 16, true);
+  var decoder = new TextDecoder('utf-8');
+  var results = [];
+  var pos = cdOffset;
+
+  for (var e = 0; e < total; e++){
+    if (pos + 46 > len || view.getUint32(pos, true) !== 0x02014b50) break;
+    var method    = view.getUint16(pos + 10, true);
+    var compSize  = view.getUint32(pos + 20, true);
+    var rawSize   = view.getUint32(pos + 24, true);
+    var nameLen   = view.getUint16(pos + 28, true);
+    var extraLen  = view.getUint16(pos + 30, true);
+    var cmtLen    = view.getUint16(pos + 32, true);
+    var localOff  = view.getUint32(pos + 42, true);
+    var name = decoder.decode(bytes.subarray(pos + 46, pos + 46 + nameLen));
+    pos += 46 + nameLen + extraLen + cmtLen;
+
+    var lower = name.toLowerCase();
+    var wanted = (lower.slice(-5) === '.json' || lower.slice(-5) === '.html' || lower.slice(-4) === '.htm')
+                 && lower.indexOf('__macosx') === -1 && rawSize > 0 && rawSize <= 25000000;
+    if (!wanted) continue;
+    if (compSize === 0xFFFFFFFF || rawSize === 0xFFFFFFFF) continue; /* ZIP64 non géré */
+
+    /* En-tête local : trouver le début des données */
+    if (localOff + 30 > len || view.getUint32(localOff, true) !== 0x04034b50) continue;
+    var lNameLen  = view.getUint16(localOff + 26, true);
+    var lExtraLen = view.getUint16(localOff + 28, true);
+    var dataStart = localOff + 30 + lNameLen + lExtraLen;
+    var comp = bytes.subarray(dataStart, dataStart + compSize);
+
+    try {
+      var raw;
+      if (method === 0) raw = comp;
+      else if (method === 8) raw = await inflateRaw(comp);
+      else continue;
+      results.push({ name: name, text: decoder.decode(raw) });
+    } catch(err){ /* entrée illisible : on continue avec les autres */ }
+  }
+  return results;
+}
+/*TESTABLE_END*/
+
+/* ===== Interface ===== */
+var state = { blocked: [], friends: [], deleted: [], requests: [], present: {},
+              diag: [], demo: false, blockedKeyFound: false };
+
+var $ = function(id){ return document.getElementById(id); };
+var dropzone = $('dropzone'), fileInput = $('fileInput'), statusBox = $('status');
+
+function setStatus(type, html){
+  statusBox.className = type; statusBox.innerHTML = html;
+}
+
+dropzone.addEventListener('click', function(){ fileInput.click(); });
+dropzone.addEventListener('keydown', function(ev){
+  if (ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); fileInput.click(); }
+});
+fileInput.addEventListener('change', function(){
+  if (fileInput.files.length) handleFiles(fileInput.files);
+  fileInput.value = '';
+});
+['dragenter','dragover'].forEach(function(ev){
+  dropzone.addEventListener(ev, function(e){ e.preventDefault(); dropzone.classList.add('over'); });
+});
+['dragleave','drop'].forEach(function(ev){
+  dropzone.addEventListener(ev, function(e){ e.preventDefault(); dropzone.classList.remove('over'); });
+});
+dropzone.addEventListener('drop', function(e){
+  if (e.dataTransfer && e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+});
+
+function mergeFound(found, label){
+  ['blocked','friends','deleted','requests'].forEach(function(cat){
+    if (found.present[cat]){
+      state.present[cat] = true;
+      if (cat === 'blocked') state.blockedKeyFound = true;
+    }
+    state[cat] = state[cat].concat(found[cat] || []);
+  });
+  state.diag.push(label + '\n  clés de premier niveau : ' +
+    (found.keys.length ? found.keys.slice(0, 40).join(', ') : '(aucune)') +
+    '\n  trouvé → bloqués: ' + (found.blocked ? found.blocked.length : 0) +
+    ', amis: ' + (found.friends ? found.friends.length : 0) +
+    ', supprimés: ' + (found.deleted ? found.deleted.length : 0) +
+    ', demandes: ' + (found.requests ? found.requests.length : 0));
+}
+
+function parseJsonText(text, label){
+  try {
+    var obj = JSON.parse(text);
+    mergeFound(extractFromJson(obj, label), label);
+    return true;
+  } catch(err){
+    state.diag.push(label + '\n  ⚠️ JSON illisible (' + err.message + ')');
+    return false;
+  }
+}
+
+/* Repli si l'export est en HTML : cherche une section/table « Blocked » */
+function parseHtmlText(text, label){
+  var people = [];
+  try {
+    var doc = new DOMParser().parseFromString(text, 'text/html');
+    var headings = doc.querySelectorAll('h1,h2,h3,h4,h5,caption');
+    headings.forEach(function(h){
+      var t = normalizeKey(h.textContent || '');
+      if (t.indexOf('block') === -1 && t.indexOf('bloqu') === -1) return;
+      var scopes = [];
+      if (h.tagName === 'CAPTION' && h.closest('table')) scopes.push(h.closest('table'));
+      var el = h.nextElementSibling, hops = 0;
+      while (el && hops < 5 && !/^H[1-5]$/.test(el.tagName)){ scopes.push(el); el = el.nextElementSibling; hops++; }
+      scopes.forEach(function(sc){
+        sc.querySelectorAll('table').forEach(function(tb){ collectRows(tb); });
+        if (sc.tagName === 'TABLE') collectRows(sc);
+        sc.querySelectorAll('li').forEach(function(li){
+          var n = normalizeEntry(li.textContent.trim(), label); if (n) people.push(n);
+        });
+      });
+    });
+    function collectRows(table){
+      table.querySelectorAll('tr').forEach(function(tr){
+        var cells = Array.prototype.map.call(tr.querySelectorAll('td'), function(td){ return td.textContent.trim(); });
+        if (!cells.length || !cells[0] || normalizeKey(cells[0]) === 'username') return;
+        var n = normalizeEntry({ Username: cells[0], 'Display Name': cells[1] || '',
+                                 'Creation Timestamp': cells[2] || '' }, label);
+        if (n) people.push(n);
+      });
+    }
+  } catch(err){ /* silencieux */ }
+  if (people.length){
+    state.present.blocked = true; state.blockedKeyFound = true;
+    state.blocked = state.blocked.concat(people);
+    state.diag.push(label + '\n  HTML → bloqués extraits : ' + people.length);
+  }
+}
+
+async function handleFiles(fileList){
+  resetState(false);
+  state.demo = false;
+  setStatus('info', '⏳ Lecture du fichier en cours… (tout se passe sur votre appareil)');
+  var files = Array.prototype.slice.call(fileList);
+  var readSomething = false;
+
+  for (var f = 0; f < files.length; f++){
+    var file = files[f];
+    var lower = file.name.toLowerCase();
+    try {
+      if (lower.slice(-4) === '.zip'){
+        var buf = await file.arrayBuffer();
+        var entries = await readZipTextEntries(buf);
+        state.diag.push('ZIP « ' + file.name + ' » : ' + entries.length + ' fichier(s) texte lu(s) : ' +
+                        entries.map(function(x){ return x.name; }).join(', '));
+        for (var i = 0; i < entries.length; i++){
+          var en = entries[i];
+          if (en.name.toLowerCase().slice(-5) === '.json'){ if (parseJsonText(en.text, en.name)) readSomething = true; }
+          else { parseHtmlText(en.text, en.name); readSomething = true; }
+        }
+      } else if (lower.slice(-5) === '.json'){
+        if (parseJsonText(await file.text(), file.name)) readSomething = true;
+      } else if (lower.slice(-5) === '.html' || lower.slice(-4) === '.htm'){
+        parseHtmlText(await file.text(), file.name); readSomething = true;
+      } else {
+        state.diag.push('Ignoré (format non géré) : ' + file.name);
+      }
+    } catch(err){
+      state.diag.push('Erreur sur « ' + file.name + ' » : ' + err.message);
+      setStatus('error', '❌ Impossible de lire « ' + escapeHtml(file.name) + ' » : ' + escapeHtml(err.message) +
+        '<br>💡 Astuce : dézippez l\'archive manuellement, puis déposez ici le fichier <strong>friends.json</strong>.');
+    }
+  }
+
+  ['blocked','friends','deleted','requests'].forEach(function(cat){ state[cat] = dedupePeople(state[cat]); });
+  finish(readSomething);
+}
+
+function finish(readSomething){
+  $('diag').textContent = state.diag.length ? state.diag.join('\n\n') : '—';
+  $('resetBtn').hidden = false;
+
+  if (!state.blockedKeyFound && !state.blocked.length){
+    $('results').hidden = true;
+    if (!readSomething){
+      setStatus('error', '❌ Aucun fichier exploitable trouvé. Déposez le <strong>ZIP complet</strong> de l\'export Snapchat, ou le fichier <strong>friends.json</strong> qu\'il contient.');
+    } else {
+      setStatus('error', '🤔 J\'ai lu le fichier, mais je n\'y ai trouvé <strong>aucune liste de personnes bloquées</strong>.' +
+        '<br>Vérifiez que <strong>« Exporter des fichiers JSON »</strong> et <strong>« Données utilisateur »</strong> étaient bien activés dans « Mes données », puis refaites un export si besoin.' +
+        '<br>Les « Détails techniques » dans la FAQ ci-dessous peuvent aider — ou montrez-moi ce que dit le diagnostic et on adapte le site à votre format !');
+    }
+    return;
+  }
+
+  renderResults();
+  if (state.demo){
+    setStatus('info', '🧪 Démonstration affichée ci-dessous avec de faux pseudos. Dès que vous avez votre ZIP, déposez-le pour voir vos vrais résultats.');
+  } else if (state.blocked.length === 0){
+    setStatus('ok', '✅ Export lu correctement… et la liste des bloqués est <strong>vide</strong> : d\'après Snapchat, vous n\'avez bloqué personne (ou tout a été débloqué).');
+  } else {
+    setStatus('ok', '✅ C\'est fait ! Vous avez bloqué <strong>' + state.blocked.length + ' personne' +
+              (state.blocked.length > 1 ? 's' : '') + '</strong> selon cet export. La liste complète est ci-dessous.');
+  }
+}
+
+function renderResults(){
+  $('results').hidden = false;
+  $('demoBanner').style.display = state.demo ? 'block' : 'none';
+  $('statBlocked').textContent = state.blocked.length;
+  $('statFriends').textContent = state.friends.length;
+  $('statDeleted').textContent = state.deleted.length;
+  $('statRequests').textContent = state.requests.length;
+  $('cardFriends').style.display  = state.present.friends  ? '' : 'none';
+  $('cardDeleted').style.display  = state.present.deleted  ? '' : 'none';
+  $('cardRequests').style.display = state.present.requests ? '' : 'none';
+  renderList();
+  $('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+  });
+}
+
+var AVATAR_COLORS = ['#f14668','#ff8c42','#ffd166','#06d6a0','#118ab2','#9b5de5','#ef476f','#00bbf9'];
+function colorFor(name){
+  var h = 0; for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+
+function getFiltered(){
+  var q = $('searchInput').value.toLowerCase().trim();
+  var list = state.blocked.filter(function(p){
+    return !q || p.username.toLowerCase().indexOf(q) !== -1 ||
+           (p.displayName && p.displayName.toLowerCase().indexOf(q) !== -1);
+  });
+  var mode = $('sortSelect').value;
+  if (mode === 'az') list.sort(function(a,b){ return a.username.localeCompare(b.username, 'fr'); });
+  if (mode === 'za') list.sort(function(a,b){ return b.username.localeCompare(a.username, 'fr'); });
+  if (mode === 'recent') list.sort(function(a,b){ return (b.date ? b.date.getTime() : -1) - (a.date ? a.date.getTime() : -1); });
+  if (mode === 'old') list.sort(function(a,b){ return (a.date ? a.date.getTime() : 9e15) - (b.date ? b.date.getTime() : 9e15); });
+  return list;
+}
+
+function renderList(){
+  var list = getFiltered();
+  var ul = $('peopleList');
+  ul.innerHTML = list.map(function(p){
+    var initial = escapeHtml((p.username || '?').replace(/^@+/, '').charAt(0).toUpperCase() || '?');
+    var dateTxt = p.date ? p.date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+                         : (p.dateRaw ? escapeHtml(p.dateRaw) : '');
+    return '<li>' +
+      '<div class="avatar" style="background:' + colorFor(p.username) + '">' + initial + '</div>' +
+      '<div class="who"><div class="u">@' + escapeHtml(p.username) + '</div>' +
+      (p.displayName ? '<div class="d">' + escapeHtml(p.displayName) + '</div>' : '') + '</div>' +
+      (dateTxt ? '<div class="date">' + dateTxt + '</div>' : '') +
+      '</li>';
+  }).join('');
+  $('emptyList').hidden = list.length > 0 || state.blocked.length === 0;
+  $('resultCount').textContent = state.blocked.length === 0
+    ? 'Aucune personne bloquée dans cet export.'
+    : list.length + ' pseudo' + (list.length > 1 ? 's' : '') + ' affiché' + (list.length > 1 ? 's' : '') +
+      ' sur ' + state.blocked.length + '.';
+}
+
+$('searchInput').addEventListener('input', renderList);
+$('sortSelect').addEventListener('change', renderList);
+
+$('copyBtn').addEventListener('click', async function(){
+  var txt = getFiltered().map(function(p){ return p.username; }).join('\n');
+  try { await navigator.clipboard.writeText(txt); setStatus('ok', '📋 Liste copiée dans le presse-papiers !'); }
+  catch(e){ setStatus('error', 'Copie impossible dans ce navigateur — utilisez plutôt le téléchargement TXT.'); }
+});
+
+function download(name, content, mime){
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type: mime }));
+  a.download = name; a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+}
+$('txtBtn').addEventListener('click', function(){
+  var lines = getFiltered().map(function(p){
+    return p.username + (p.displayName ? ' (' + p.displayName + ')' : '') + (p.dateRaw ? ' — ' + p.dateRaw : '');
+  });
+  download('mes-bloques-snap.txt', 'Personnes bloquées sur Snapchat : ' + lines.length + '\n\n' + lines.join('\n'), 'text/plain;charset=utf-8');
+});
+$('csvBtn').addEventListener('click', function(){
+  function q(v){ return '"' + String(v || '').replace(/"/g, '""') + '"'; }
+  var rows = [['pseudo','nom_affiche','date']].concat(getFiltered().map(function(p){
+    return [p.username, p.displayName, p.date ? p.date.toISOString().slice(0,10) : p.dateRaw];
+  }));
+  download('mes-bloques-snap.csv', '﻿' + rows.map(function(r){ return r.map(q).join(';'); }).join('\r\n'), 'text/csv;charset=utf-8');
+});
+
+function resetState(scrollTop){
+  state = { blocked: [], friends: [], deleted: [], requests: [], present: {},
+            diag: [], demo: false, blockedKeyFound: false };
+  $('results').hidden = true;
+  $('searchInput').value = '';
+  if (scrollTop) window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+$('resetBtn').addEventListener('click', function(){
+  resetState(true);
+  $('resetBtn').hidden = true;
+  statusBox.className = ''; statusBox.innerHTML = '';
+});
+
+/* --- Démonstration (structure identique à un vrai fichier friends.json) --- */
+$('demoBtn').addEventListener('click', function(){
+  resetState(false);
+  state.demo = true;
+  var demo = {
+    "Friends": [
+      { "Username": "copain.exemple1", "Display Name": "Copain Exemple", "Creation Timestamp": "2022-03-14 18:22:10 UTC" },
+      { "Username": "amie.exemple2",   "Display Name": "Amie Exemple",   "Creation Timestamp": "2023-07-02 09:41:55 UTC" },
+      { "Username": "pote.exemple3",   "Display Name": "",              "Creation Timestamp": "2024-01-25 21:05:31 UTC" }
+    ],
+    "Deleted Friends": [
+      { "Username": "ancien.ami1", "Display Name": "Ancien Ami", "Creation Timestamp": "2021-11-30 12:00:00 UTC" }
+    ],
+    "Blocked Users": [
+      { "Username": "compte.spam01",   "Display Name": "Gagne un iPhone !!!", "Creation Timestamp": "2025-12-01 08:15:00 UTC" },
+      { "Username": "fake.promo2026",  "Display Name": "Promo -90%",          "Creation Timestamp": "2026-02-18 19:47:12 UTC" },
+      { "Username": "inconnu.bizarre", "Display Name": "",                    "Creation Timestamp": "2024-06-09 23:59:41 UTC" },
+      { "Username": "bot.crypto999",   "Display Name": "Crypto Millionnaire", "Creation Timestamp": "2025-04-27 14:03:08 UTC" },
+      { "Username": "spammeur_pro",    "Display Name": "Clique ici",          "Creation Timestamp": "2023-09-15 07:26:54 UTC" },
+      { "Username": "ex.relou",        "Display Name": "Exemple Relou",       "Creation Timestamp": "2026-08-30 16:40:22 UTC" },
+      { "Username": "pub.intrusive",   "Display Name": "",                    "Creation Timestamp": "2022-05-11 10:12:37 UTC" },
+      { "Username": "troll.anonyme",   "Display Name": "Anonyme",             "Creation Timestamp": "2026-10-02 20:58:03 UTC" }
+    ]
+  };
+  mergeFound(extractFromJson(demo, 'friends.json (démo)'), 'friends.json (démo)');
+  ['blocked','friends','deleted','requests'].forEach(function(cat){ state[cat] = dedupePeople(state[cat]); });
+  finish(true);
+});
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4dfb8f7bf7d657d',t:'MTc5MjU4MDA0OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
