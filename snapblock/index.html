@@ -1,97 +1,197 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Snapblock</title>
-<meta name="description" content="Comptez et listez les personnes que vous avez bloquées sur Snapchat à partir de votre export officiel. Analyse 100 % locale, aucun envoi de données.">
+<title>SnapBlock 👻 — Mes bloqués Snapchat</title>
+<meta name="description" content="SnapBlock compte et enregistre les personnes que tu as bloquées sur Snapchat à partir de ton export officiel. Analyse et stockage 100 % locaux sur ton appareil.">
 <!-- PWA inline : le manifest et les icônes sont générés par le script ci-dessous (aucun fichier externe) -->
 <meta name="theme-color" content="#FFFC00">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Snapblock">
+<meta name="apple-mobile-web-app-title" content="SnapBlock">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" id="faviconSvg" sizes="any" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%23FFFC00'/%3E%3Cpath d='M256 86c-68 0-124 56-124 124v148l42-30 41 34 41-34 41 34 41-34 42 30V210c0-68-56-124-124-124z' fill='white' stroke='black' stroke-width='10' stroke-linejoin='round'/%3E%3Ccircle cx='212' cy='222' r='16' fill='black'/%3E%3Ccircle cx='300' cy='222' r='16' fill='black'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" id="appleTouchIcon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%23FFFC00'/%3E%3Cpath d='M256 86c-68 0-124 56-124 124v148l42-30 41 34 41-34 41 34 41-34 42 30V210c0-68-56-124-124-124z' fill='white' stroke='black' stroke-width='10' stroke-linejoin='round'/%3E%3Ccircle cx='212' cy='222' r='16' fill='black'/%3E%3Ccircle cx='300' cy='222' r='16' fill='black'/%3E%3C/svg%3E">
+
 <style>
   :root{
-    --yellow:#FFFC00; --black:#16161a; --bg:#f6f6f3; --card:#ffffff;
-    --muted:#666; --border:#e6e6de; --green:#0aad5d; --red:#d63030;
-    --radius:16px;
+    --yellow:#FFFC00; --black:#16161a; --bg:#f4f4f6; --card:#fff; --muted:#71717a;
+    --border:#e7e7ea; --green:#0aad5d; --red:#d63030; --radius:20px;
+    --topbar:66px; --tabbar:70px;
   }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--black)}
-  .wrap{max-width:880px;margin:0 auto;padding:0 16px}
-  header{background:var(--yellow);border-bottom:3px solid var(--black);padding:34px 0 28px;text-align:center}
-  header h1{margin:10px 0 8px;font-size:clamp(1.5rem,4.5vw,2.3rem);line-height:1.15}
-  header p{margin:0 auto;max-width:620px;font-size:1.02rem;color:#333}
-  .badge{display:inline-block;background:var(--black);color:#fff;font-weight:700;font-size:.82rem;
-         padding:6px 14px;border-radius:999px}
-  main{padding:24px 0 40px}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+       background:#dcdce2;color:var(--black)}
+  button{font-family:inherit;color:inherit}
+  h1,h2,h3{margin:0}
+  .app{max-width:720px;min-height:100dvh;margin:0 auto;background:var(--bg);
+       box-shadow:0 0 40px rgba(0,0,0,.18);position:relative}
+  @media(min-width:900px){.app{max-width:860px}}
+
+  /* ---------- Barre d'app ---------- */
+  .topbar{position:sticky;top:0;z-index:60;height:var(--topbar);background:var(--yellow);
+          border-bottom:2px solid var(--black);display:flex;align-items:center;gap:12px;
+          padding:0 14px;padding-top:env(safe-area-inset-top)}
+  .brand{display:flex;align-items:center;gap:11px;flex:1;min-width:0}
+  .app-icon{flex:0 0 44px;width:44px;height:44px;background:var(--black);border-radius:13px;
+            display:flex;align-items:center;justify-content:center;font-size:1.55rem}
+  .app-icon.big{flex-basis:88px;width:88px;height:88px;border-radius:24px;font-size:3rem;margin:0 auto 16px}
+  .brand-name{font-size:1.35rem;font-weight:900;letter-spacing:-.5px;line-height:1}
+  .brand-sub{font-size:.76rem;color:#555;font-weight:600;margin-top:3px;white-space:nowrap;
+             overflow:hidden;text-overflow:ellipsis}
+  .icon-btn{flex:0 0 42px;width:42px;height:42px;border-radius:50%;border:2px solid var(--black);
+            background:var(--black);color:var(--yellow);font-size:1.15rem;font-weight:900;cursor:pointer}
+  .icon-btn.light{background:#fff;color:var(--black)}
+  .icon-btn:active{transform:scale(.93)}
+
+  /* ---------- Messages ---------- */
+  #status{display:none;position:sticky;top:var(--topbar);z-index:50;margin:0;
+          padding:11px 16px;font-size:.9rem;line-height:1.45;border-bottom:1px solid var(--border)}
+  #status.info{display:block;background:#eef4ff}
+  #status.ok{display:block;background:#e9fbf1}
+  #status.error{display:block;background:#ffecec}
+  #demoBanner{display:none;margin:14px 16px 0;background:#fff3cd;border:1px solid #e3c56b;
+              border-radius:14px;padding:11px 14px;font-size:.9rem;line-height:1.5}
+  .saved-banner{background:#e9fbf1;border:1px solid #9fe3bb;border-radius:14px;padding:11px 14px;
+                margin:0 0 14px;font-size:.88rem;line-height:1.5}
+
+  /* ---------- Vues ---------- */
+  .app-main{padding:18px 16px calc(var(--tabbar) + env(safe-area-inset-bottom) + 28px)}
+  .view{animation:viewIn .18s ease-out}
+  @keyframes viewIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .view-title{font-size:1.65rem;font-weight:900;letter-spacing:-.5px;margin:2px 0 4px}
+  .view-sub{color:var(--muted);margin:0 0 16px;font-size:.93rem;line-height:1.5}
   .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-        padding:20px;margin-bottom:18px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
-  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:18px}
-  .step{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
-  .step .num{display:inline-flex;width:30px;height:30px;border-radius:50%;background:var(--yellow);
-             border:2px solid var(--black);font-weight:900;align-items:center;justify-content:center;margin-bottom:8px}
-  .step h3{margin:0 0 6px;font-size:1rem}
-  .step p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.45}
-  .step code{background:#f0f0e8;padding:1px 5px;border-radius:5px;font-size:.82rem}
-  #dropzone{border:3px dashed #bbb;border-radius:var(--radius);padding:38px 18px;text-align:center;
-            cursor:pointer;transition:.15s;background:#fffdf0}
-  #dropzone:hover,#dropzone:focus-visible{border-color:var(--black);outline:none}
-  #dropzone.over{border-color:var(--green);background:#efffF4;background:#effff4;transform:scale(1.01)}
-  #dropzone .big{font-size:2.6rem}
-  #dropzone strong{display:block;font-size:1.2rem;margin:8px 0 4px}
-  #dropzone span{color:var(--muted);font-size:.92rem}
-  .btn{display:inline-block;border:2px solid var(--black);background:var(--yellow);color:var(--black);
-       font-weight:800;padding:10px 18px;border-radius:999px;cursor:pointer;font-size:.95rem;margin-top:14px}
-  .btn:hover{filter:brightness(.96)}
+        padding:18px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+  .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 0 10px}
+  .section-head h2{font-size:1.12rem;font-weight:900}
+  .link-btn{border:none;background:none;font-weight:800;color:#7a6d00;cursor:pointer;font-size:.92rem;padding:6px}
+
+  /* ---------- Boutons ---------- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:2px solid var(--black);
+       background:var(--yellow);color:var(--black);font-weight:800;padding:11px 18px;border-radius:999px;
+       cursor:pointer;font-size:.95rem}
+  .btn:active{transform:scale(.97)}
   .btn.secondary{background:#fff}
-  .btn.small{padding:7px 14px;font-size:.85rem;margin-top:0}
-  .btnrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
-  .privacy{text-align:center;color:var(--muted);font-size:.85rem;margin:14px 0 0}
-  #status{margin-top:14px;border-radius:12px;padding:12px 14px;font-size:.93rem;display:none;line-height:1.5}
-  #status.info{display:block;background:#eef4ff;border:1px solid #bcd2ff}
-  #status.ok{display:block;background:#e9fbf1;border:1px solid #9fe3bb}
-  #status.error{display:block;background:#ffecec;border:1px solid #ffb3b3}
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
-  .stat{border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;background:#fff}
-  .stat.main{background:var(--yellow);border:2px solid var(--black)}
-  .stat .n{font-size:2rem;font-weight:900;line-height:1}
-  .stat .l{color:#444;font-size:.85rem;margin-top:6px;font-weight:600}
-  .controls{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
-  .controls input[type=search]{flex:1;min-width:200px;padding:11px 14px;border:1px solid #ccc;border-radius:999px;font-size:.95rem}
-  .controls select{padding:11px 14px;border:1px solid #ccc;border-radius:999px;font-size:.95rem;background:#fff}
-  ul.people{list-style:none;padding:0;margin:8px 0 0}
-  ul.people li{display:flex;align-items:center;gap:12px;padding:10px 8px;border-bottom:1px solid #f0f0ea}
-  ul.people li:last-child{border-bottom:none}
-  .avatar{flex:0 0 42px;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-          font-weight:900;color:#fff;background:#888;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2)}
-  .who{flex:1;min-width:0}
-  .who .u{font-weight:800;word-break:break-all}
-  .who .d{color:var(--muted);font-size:.86rem;word-break:break-word}
-  .date{color:var(--muted);font-size:.8rem;white-space:nowrap;text-align:right}
-  #demoBanner{display:none;background:#fff3cd;border:1px solid #e3c56b;border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:.9rem}
-  details{margin-top:14px}
-  summary{cursor:pointer;font-weight:700}
-  #diag{white-space:pre-wrap;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.76rem;background:#101014;color:#c8f7c5;
-        border-radius:12px;padding:12px;max-height:260px;overflow:auto;margin-top:10px}
-  .faq details{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px}
-  .faq p{margin:8px 0 0;color:#444;line-height:1.55;font-size:.93rem}
-  footer{text-align:center;color:var(--muted);font-size:.8rem;padding:0 16px 32px;line-height:1.5}
-  .install-btn{background:var(--black);color:var(--yellow);border:2px solid var(--black);padding:12px 24px;
-               border-radius:999px;font-weight:900;font-size:1rem;cursor:pointer;margin-top:16px}
-  .install-btn:hover{transform:scale(1.03)}
-  #installedBadge{display:inline-block;margin-top:16px;background:var(--green);color:#fff;font-weight:800;
+  .btn.black{background:var(--black);color:var(--yellow)}
+  .btn.danger{background:#fff;border-color:var(--red);color:var(--red)}
+  .btn.small{padding:8px 14px;font-size:.86rem}
+  .btn.large{width:100%;padding:15px 18px;font-size:1.02rem}
+  .btnrow{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin-top:14px}
+  .btnrow.start{justify-content:flex-start}
+  .install-btn{background:var(--black);color:var(--yellow);border:2px solid var(--black);padding:12px 22px;
+               border-radius:999px;font-weight:900;font-size:.98rem;cursor:pointer}
+  #installedBadge{display:inline-block;background:var(--green);color:#fff;font-weight:800;
                   font-size:.9rem;padding:9px 16px;border-radius:999px}
-  #installHelp{background:#fff;border:2px solid var(--black);border-radius:14px;padding:14px 18px;
-               max-width:640px;margin:16px auto 0;text-align:left;font-size:.92rem;line-height:1.55}
-  #installHelp p{margin:7px 0}
+  #installHelp{background:var(--bg);border-radius:14px;padding:6px 14px;margin-top:12px;font-size:.9rem;line-height:1.55}
   #installHelp .hl{background:#fffbd1;border-left:4px solid var(--black);padding:6px 10px;border-radius:0 8px 8px 0}
+
+  /* ---------- Écran vide / accueil ---------- */
+  .empty-hero{text-align:center;padding:40px 10px 6px}
+  .empty-hero h1{font-size:2rem;font-weight:900;letter-spacing:-.5px}
+  .empty-hero p{color:var(--muted);line-height:1.6;max-width:460px;margin:12px auto 20px}
+  .mini-steps{display:grid;gap:9px;max-width:460px;margin:22px auto 0;text-align:left}
+  .mini-step{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--border);
+             border-radius:16px;padding:12px 14px;font-size:.9rem;line-height:1.4;color:#444}
+  .mini-step b{color:var(--black)}
+  .mini-step .n{flex:0 0 30px;width:30px;height:30px;border-radius:50%;background:var(--yellow);
+                border:2px solid var(--black);display:flex;align-items:center;justify-content:center;font-weight:900}
+  .empty-card{text-align:center;padding:44px 18px;color:var(--muted);background:#fff;
+              border:2px dashed #d7d7dc;border-radius:var(--radius);line-height:1.6}
+  .empty-card .em{font-size:2.6rem;display:block;margin-bottom:8px}
+
+  /* ---------- Tableau de bord ---------- */
+  .hero-card{background:var(--black);color:#fff;border-radius:26px;padding:22px;margin-bottom:14px;
+             box-shadow:0 8px 24px rgba(0,0,0,.22)}
+  .hero-card .lbl{color:#d8d8de;font-weight:700;font-size:.95rem}
+  .hero-num{font-size:4.2rem;font-weight:900;line-height:1;color:var(--yellow);margin:6px 0 4px}
+  .hero-card .sub{color:#a9a9b3;font-size:.88rem;margin-bottom:16px}
+  .memory-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+               padding:15px 16px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:12px;
+               align-items:center;justify-content:space-between}
+  .memory-card .kicker{display:block;color:var(--green);font-weight:900;font-size:.68rem;letter-spacing:1.3px}
+  .memory-card .big{font-weight:900;font-size:1.12rem}
+  .memory-card small{display:block;color:var(--muted);margin-top:3px;max-width:430px;line-height:1.45}
+  .memory-card .btnrow{margin-top:0}
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .stat{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px 8px;text-align:center}
+  .stat .n{font-size:1.65rem;font-weight:900;line-height:1}
+  .stat .l{font-size:.72rem;color:var(--muted);font-weight:700;margin-top:6px;line-height:1.3}
+  .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .quick{background:#fff;border:1px solid var(--border);border-radius:18px;padding:16px;cursor:pointer;
+         text-align:left;font-size:.95rem}
+  .quick:active{transform:scale(.98)}
+  .quick .em{font-size:1.5rem;display:block;margin-bottom:7px}
+  .quick b{display:block}.quick span{color:var(--muted);font-size:.82rem}
+
+  /* ---------- Listes de personnes ---------- */
+  .controls{display:flex;gap:9px;flex-wrap:wrap;position:sticky;top:calc(var(--topbar) + 6px);z-index:20;
+            background:var(--bg);padding:6px 0}
+  .controls input[type=search]{flex:1;min-width:180px;padding:12px 15px;border:1px solid #d8d8de;
+            border-radius:999px;font-size:.97rem;background:#fff}
+  .controls select{padding:12px;border:1px solid #d8d8de;border-radius:999px;background:#fff;font-size:.92rem}
+  ul.people{list-style:none;padding:6px 12px;margin:0;background:#fff;border:1px solid var(--border);
+            border-radius:var(--radius)}
+  ul.people li{display:flex;align-items:center;gap:12px;padding:11px 6px;border-bottom:1px solid #f0f0f2}
+  ul.people li:last-child{border-bottom:none}
+  ul.people:empty{display:none}
+  .avatar{flex:0 0 44px;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;
+          justify-content:center;font-weight:900;color:#fff}
+  .who{flex:1;min-width:0}.who .u{font-weight:800;word-break:break-all}
+  .who .d{color:var(--muted);font-size:.86rem;word-break:break-word}
+  .date{color:var(--muted);font-size:.78rem;white-space:nowrap}
+  .list-note{color:var(--muted);font-size:.88rem;margin:8px 2px}
+  .segmented{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:#e7e7eb;
+             padding:4px;border-radius:999px;margin-bottom:14px}
+  .seg-btn{border:none;background:transparent;border-radius:999px;padding:10px 4px;font-weight:800;
+           font-size:.86rem;cursor:pointer;color:#555}
+  .seg-btn.active{background:var(--black);color:var(--yellow)}
+  .chip-count{font-weight:700;opacity:.75;font-size:.78rem}
+
+  /* ---------- Import ---------- */
+  #dropzone{border:3px dashed #c9c9d1;border-radius:26px;padding:36px 18px;text-align:center;
+            cursor:pointer;background:#fff;transition:.15s}
+  #dropzone:hover,#dropzone:focus-visible{border-color:var(--black);outline:none}
+  #dropzone.over{border-color:var(--green);background:#effff4;transform:scale(1.01)}
+  #dropzone .big{font-size:2.7rem}
+  #dropzone strong{display:block;font-size:1.22rem;margin:9px 0 5px}
+  #dropzone span{color:var(--muted);font-size:.92rem;line-height:1.5}
+  .privacy{text-align:center;color:var(--muted);font-size:.85rem;line-height:1.55;margin:15px 4px 0}
+  details{background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:10px}
+  summary{cursor:pointer;font-weight:800;line-height:1.45}
+  details p,details li{color:#444;line-height:1.6;font-size:.92rem}
+  details ol{padding-left:20px}
+  code{background:#f0f0e8;padding:1px 5px;border-radius:5px;font-size:.84em}
+
+  /* ---------- Réglages ---------- */
+  .setting-row{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid #f0f0f2;font-size:.93rem}
+  .setting-row:last-child{border-bottom:none}
+  .setting-row .k{color:var(--muted);font-weight:700;flex:0 0 42%}
+  .setting-row .v{text-align:right;font-weight:600;word-break:break-word}
+  #diag{white-space:pre-wrap;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.74rem;
+        background:#101014;color:#c8f7c5;border-radius:12px;padding:12px;max-height:260px;overflow:auto;margin-top:10px}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;line-height:1.6;padding:18px 4px}
+
+  /* ---------- Barre d'onglets ---------- */
+  .tabbar{position:fixed;left:50%;bottom:0;transform:translateX(-50%);z-index:70;width:min(720px,100%);
+          height:calc(var(--tabbar) + env(safe-area-inset-bottom));padding:6px 6px env(safe-area-inset-bottom);
+          background:rgba(255,255,255,.97);border-top:1px solid #ddd;display:grid;grid-template-columns:repeat(5,1fr)}
+  @media(min-width:900px){.tabbar{width:860px}}
+  .tab{border:none;background:transparent;cursor:pointer;border-radius:16px;position:relative;
+       display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+       font-size:.68rem;font-weight:700;color:#8a8a93;padding:4px 2px}
+  .tab .ic{font-size:1.32rem;line-height:1}
+  .tab.active{background:var(--yellow);color:var(--black)}
+  .nav-badge{position:absolute;top:3px;left:calc(50% + 3px);background:var(--red);color:#fff;
+             font-size:.62rem;font-weight:900;min-width:18px;height:18px;border-radius:999px;
+             display:flex;align-items:center;justify-content:center;padding:0 5px;border:2px solid #fff}
   [hidden]{display:none !important}
 </style>
 <script>
+
 /* =====================================================================
    PWA 100 % INLINE — aucun fichier manifest.json ni sw.js requis.
    - Icônes : un SVG intégré, converti en PNG (192/512/maskable + Apple)
@@ -234,9 +334,9 @@
       apple.href = iconsPng[3];
 
       var manifest = {
-        name: 'Mes bloqués Snap — Compteur 100 % local',
-        short_name: 'Bloqués Snap',
-        description: 'Comptez et listez les personnes bloquées de votre compte Snapchat à partir de votre export officiel. Analyse 100 % locale.',
+        name: 'SnapBlock — Mes bloqués Snapchat',
+        short_name: 'SnapBlock',
+        description: 'SnapBlock compte et enregistre les personnes que tu as bloquées sur Snapchat, à partir de ton export officiel. Tout reste sur ton appareil.',
         lang: 'fr',
         start_url: location.href.split('#')[0],
         display: 'standalone',
@@ -259,8 +359,8 @@
       console.warn('[PWA] Icônes PNG impossibles, repli sur icône SVG :', err);
       try {
         var fallback = {
-          name: 'Mes bloqués Snap — Compteur 100 % local',
-          short_name: 'Bloqués Snap',
+          name: 'SnapBlock — Mes bloqués Snapchat',
+          short_name: 'SnapBlock',
           lang: 'fr',
           start_url: location.href.split('#')[0],
           display: 'standalone',
@@ -276,133 +376,254 @@
     }
   })();
 })();
+
 </script>
 </head>
 <body>
+<div class="app">
 
-<header>
-  <div class="wrap">
-    <span class="badge">🔒 100 % LOCAL — AUCUNE DONNÉE ENVOYÉE</span>
-    <h1>👻 Combien de personnes ai-je bloquées sur Snap&nbsp;?</h1>
-    <p>Déposez l'export officiel de vos données Snapchat : ce site lit le fichier <strong>directement dans votre navigateur</strong> et vous affiche le nombre et la liste. Aucun mot de passe demandé, rien n'est envoyé sur Internet.</p>
-    <button type="button" class="install-btn" id="installBtn" hidden>📲 Installer l'app</button>
-    <span id="installedBadge" hidden>✅ App installée — vous êtes en mode application</span>
-    <div id="installHelp" hidden>
-      <p><strong>Installer via le menu du navigateur :</strong></p>
-      <p id="instAndroid">🤖 <strong>Android (Chrome)</strong> : touchez le menu <strong>⋮</strong> en haut à droite → <strong>« Installer l'application »</strong> (ou « Ajouter à l'écran d'accueil »).</p>
-      <p id="instIos">🍎 <strong>iPhone / iPad (Safari)</strong> : touchez le bouton <strong>Partager</strong> (carré avec flèche vers le haut) → <strong>« Sur l'écran d'accueil »</strong> → Ajouter.</p>
-      <p id="instDesktop">💻 <strong>Ordinateur (Chrome / Edge)</strong> : cliquez sur l'icône d'installation dans la barre d'adresse, ou menu <strong>⋮</strong> → <strong>« Installer… »</strong>.</p>
-      <p style="color:#666">ℹ️ L'installation nécessite que cette page soit ouverte en <strong>HTTPS</strong> ou via <strong>localhost</strong> — un simple double-clic sur le fichier (file://) ne peut pas créer d'app.</p>
+  <header class="topbar">
+    <div class="brand">
+      <div class="app-icon">👻</div>
+      <div>
+        <div class="brand-name">SnapBlock</div>
+        <div class="brand-sub" id="viewSubtitle">Mes bloqués Snapchat</div>
+      </div>
     </div>
-  </div>
-</header>
+    <button class="icon-btn" type="button" id="headerImportBtn" title="Importer un export" aria-label="Importer un export">＋</button>
+    <button class="icon-btn light" type="button" id="headerSettingsBtn" title="Réglages" aria-label="Réglages">⚙️</button>
+  </header>
 
-<main class="wrap">
+  <div id="status" aria-live="polite"></div>
+  <div id="demoBanner">🧪 <strong>Mode démonstration</strong> — pseudos inventés, rien n'est enregistré. Va dans <strong>Importer → Quitter la démo</strong> pour retrouver ta vraie liste.</div>
 
-  <div class="steps">
-    <div class="step">
-      <span class="num">1</span>
-      <h3>Demandez votre export</h3>
-      <p>Dans Snapchat : <strong>Mes données</strong> → activez uniquement <strong>« Exporter des fichiers JSON »</strong> et <strong>« Données utilisateur »</strong> → descendez en bas → <strong>Suivant / Soumettre</strong>.<br>Laissez « Souvenirs » décoché (sinon c'est énorme et lent).</p>
-    </div>
-    <div class="step">
-      <span class="num">2</span>
-      <h3>Téléchargez le ZIP</h3>
-      <p>Snapchat vous envoie un e-mail quand c'est prêt (quelques minutes en général), ou retrouvez-le via <strong>« Voir les exports »</strong>. Téléchargez le fichier <code>.zip</code>.<br>⚠️ Ne partagez ce ZIP avec personne : il contient vos données perso.</p>
-    </div>
-    <div class="step">
-      <span class="num">3</span>
-      <h3>Déposez-le ici</h3>
-      <p>Glissez le <code>.zip</code> ci-dessous — <strong>pas besoin de le dézipper</strong>. Vous pouvez aussi déposer directement le fichier <code>friends.json</code> si vous l'avez extrait.</p>
-    </div>
-  </div>
+  <main class="app-main">
 
-  <div class="card">
-    <div id="dropzone" tabindex="0" role="button" aria-label="Choisir le fichier d'export Snapchat">
-      <div class="big">📦</div>
-      <strong>Glissez votre export Snapchat ici</strong>
-      <span>Fichier .zip de l'export, ou friends.json</span><br>
-      <button class="btn" type="button">Choisir un fichier</button>
-      <input type="file" id="fileInput" accept=".zip,.json,.html,.htm,application/zip,application/json" multiple hidden>
-    </div>
-    <div class="btnrow">
-      <button class="btn secondary small" type="button" id="demoBtn">🧪 Essayer avec des données de démonstration</button>
-      <button class="btn secondary small" type="button" id="resetBtn" hidden>↺ Recommencer</button>
-    </div>
-    <p class="privacy">🛡️ Le fichier reste sur votre appareil : l'analyse se fait dans cette page, même hors-ligne. Vérifiable dans le code source.</p>
-    <div id="status" aria-live="polite"></div>
-  </div>
+    <!-- ============ ACCUEIL ============ -->
+    <section class="view" id="view-accueil">
+      <div class="empty-hero" data-empty-only>
+        <div class="app-icon big">👻</div>
+        <h1>Bienvenue sur SnapBlock</h1>
+        <p>Découvre <strong>combien de personnes tu as bloquées</strong> sur Snapchat, et qui. Importe ton export officiel une fois : SnapBlock le lit sur ton appareil et garde ta liste en mémoire.</p>
+        <button class="btn large" type="button" data-goto="import">📥 Importer mon export Snapchat</button>
+        <div class="btnrow"><button class="btn secondary" type="button" id="demoBtn2">🧪 Voir une démo d'abord</button></div>
+        <div class="mini-steps">
+          <div class="mini-step"><span class="n">1</span><span>Dans Snapchat : <b>Mes données</b> → JSON + Données utilisateur</span></div>
+          <div class="mini-step"><span class="n">2</span><span>Télécharge le <b>ZIP</b> quand Snapchat t'écrit qu'il est prêt</span></div>
+          <div class="mini-step"><span class="n">3</span><span>Dépose-le dans SnapBlock — <b>une seule fois suffit</b></span></div>
+        </div>
+      </div>
 
-  <section id="results" class="card" hidden>
-    <div id="demoBanner">🧪 <strong>Mode démonstration</strong> — ces pseudos sont inventés, juste pour vous montrer à quoi ressemblera le résultat avec votre vrai export.</div>
+      <div data-requires-data hidden>
+        <section class="hero-card">
+          <div class="lbl">🚫 Personnes bloquées</div>
+          <div class="hero-num" id="statBlocked">0</div>
+          <div class="sub" id="dashUpdated">—</div>
+          <button class="btn" type="button" data-goto="bloques">Voir la liste complète →</button>
+        </section>
 
-    <div class="stats">
-      <div class="stat main"><div class="n" id="statBlocked">0</div><div class="l">🚫 Personnes bloquées</div></div>
-      <div class="stat" id="cardFriends"><div class="n" id="statFriends">0</div><div class="l">👥 Amis actuels</div></div>
-      <div class="stat" id="cardDeleted"><div class="n" id="statDeleted">0</div><div class="l">👋 Amis supprimés</div></div>
-      <div class="stat" id="cardRequests"><div class="n" id="statRequests">0</div><div class="l">✉️ Demandes d'amis</div></div>
-    </div>
+        <section id="savedStrip" class="memory-card" hidden>
+          <div>
+            <span class="kicker">💾 ENREGISTRÉ SUR CET APPAREIL</span>
+            <span class="big"><span id="savedCount">0</span> bloqué(s) en mémoire</span>
+            <small id="savedWhen"></small>
+          </div>
+          <div class="btnrow">
+            <button class="btn small" type="button" id="savedViewBtn">👀 Ma liste</button>
+            <button class="btn secondary small" type="button" id="savedUpdateBtn">🔄 Mettre à jour</button>
+          </div>
+        </section>
 
-    <h2 style="margin:6px 0 0">🚫 Vos personnes bloquées</h2>
-    <div class="controls">
-      <input type="search" id="searchInput" placeholder="🔍 Rechercher un pseudo…">
-      <select id="sortSelect" aria-label="Tri">
-        <option value="az">Tri : A → Z</option>
-        <option value="za">Tri : Z → A</option>
-        <option value="recent">Tri : blocages récents d'abord</option>
-        <option value="old">Tri : blocages anciens d'abord</option>
-        <option value="file">Tri : ordre du fichier</option>
-      </select>
-    </div>
-    <p id="resultCount" style="color:var(--muted);margin:4px 0"></p>
-    <ul class="people" id="peopleList"></ul>
-    <p id="emptyList" style="color:var(--muted)" hidden>Aucun pseudo ne correspond à votre recherche.</p>
+        <div class="stats-row">
+          <div class="stat" id="cardFriends"><div class="n" id="statFriends">0</div><div class="l">👥 Amis actuels</div></div>
+          <div class="stat" id="cardDeleted"><div class="n" id="statDeleted">0</div><div class="l">👋 Amis supprimés</div></div>
+          <div class="stat" id="cardRequests"><div class="n" id="statRequests">0</div><div class="l">✉️ Demandes reçues</div></div>
+        </div>
 
-    <div class="btnrow" style="justify-content:flex-start">
-      <button class="btn small" type="button" id="copyBtn">📋 Copier la liste</button>
-      <button class="btn secondary small" type="button" id="csvBtn">⬇️ Télécharger en CSV</button>
-      <button class="btn secondary small" type="button" id="txtBtn">⬇️ Télécharger en TXT</button>
-    </div>
+        <div class="section-head"><h2>🕘 Bloqués récemment</h2><button class="link-btn" type="button" data-goto="bloques">Tout voir →</button></div>
+        <ul class="people" id="recentList"></ul>
+        <p class="list-note" id="recentEmpty" hidden>Aucune personne bloquée dans ta liste actuelle.</p>
 
-    <details>
-      <summary>🔧 Détails techniques (fichiers lus, clés trouvées)</summary>
-      <div id="diag">—</div>
-    </details>
-  </section>
+        <div class="section-head"><h2>⚡ Accès rapide</h2></div>
+        <div class="quick-grid">
+          <button class="quick" type="button" data-goto="import"><span class="em">🔄</span><b>Mettre à jour</b><span>Importer un nouvel export</span></button>
+          <button class="quick" type="button" data-goto="amis"><span class="em">👥</span><b>Mes amis</b><span>Amis, supprimés, demandes</span></button>
+          <button class="quick" type="button" data-goto="bloques"><span class="em">🔍</span><b>Chercher un pseudo</b><span>Dans tes bloqués</span></button>
+          <button class="quick" type="button" data-goto="reglages"><span class="em">⚙️</span><b>Réglages</b><span>Données, installation, aide</span></button>
+        </div>
+      </div>
+    </section>
 
-  <div class="faq">
-    <details>
-      <summary>📲 Comment installer ce site comme une application (PWA) ?</summary>
-      <p>Utilisez le bouton <strong>« Installer l'app »</strong> en haut de la page. Cette PWA tient en <strong>un seul fichier</strong> : le manifest et les icônes sont générés directement dans le code, il n'y a ni <code>manifest.json</code> ni <code>sw.js</code> séparés.</p>
-      <p>Condition imposée par les navigateurs : la page doit être servie en <strong>HTTPS</strong> (ou via <strong>localhost</strong> sur un ordinateur). Si vous ouvrez le fichier par double-clic (<code>file://</code>), le site fonctionne normalement, mais le navigateur ne proposera pas l'installation. Astuce : hébergez ce fichier unique sur un service gratuit (Netlify Drop, GitHub Pages, Cloudflare Pages…), ouvrez l'adresse obtenue sur votre téléphone, puis installez.</p>
-      <p>Note technique : il n'y a pas de service worker (impossible à faire tenir dans un seul fichier — les navigateurs refusent les workers en <code>blob:</code>/<code>data:</code>). L'app installée ouvre donc la page en ligne ; mais une fois chargée, l'analyse de vos fichiers se fait entièrement hors-ligne, sur votre appareil.</p>
-    </details>
-    <details>
-      <summary>Je n'ai pas reçu l'e-mail de Snapchat, c'est normal ?</summary>
-      <p>Ça prend en général quelques minutes, parfois quelques heures. Vous pouvez aussi retourner dans <strong>Mes données → Voir les exports</strong> dans l'app (ou sur accounts.snapchat.com) : le bouton <strong>Télécharger</strong> apparaîtra là dès que c'est prêt. Pensez à vérifier vos spams.</p>
-    </details>
-    <details>
-      <summary>Le site envoie-t-il mon fichier quelque part ?</summary>
-      <p>Non. Tout se passe dans votre navigateur, sur votre appareil. Aucun serveur ne reçoit votre fichier, aucun compte à créer, et <strong>on ne vous demandera jamais votre mot de passe Snapchat</strong>. Si un site vous le demande : fuyez, c'est du phishing.</p>
-    </details>
-    <details>
-      <summary>Ça me dit qui m'a bloqué, moi ?</summary>
-      <p>Non — et aucun site ne peut le savoir de façon fiable : Snapchat ne communique cette information nulle part. Ici, on affiche uniquement les personnes <strong>que vous avez bloquées vous-même</strong>.</p>
-    </details>
-    <details>
-      <summary>« Aucune liste de bloqués trouvée », que faire ?</summary>
-      <p>Vérifiez que dans l'écran « Mes données » vous aviez bien activé <strong>« Exporter des fichiers JSON »</strong> <em>et</em> <strong>« Données utilisateur »</strong>, puis refaites un export si besoin. Ouvrez aussi les « Détails techniques » ci-dessus : ils montrent les fichiers et clés détectés — ça aide à comprendre ce que contient votre export.</p>
-    </details>
-  </div>
+    <!-- ============ BLOQUÉS ============ -->
+    <section class="view" id="view-bloques" hidden>
+      <h2 class="view-title">🚫 Mes bloqués</h2>
+      <p class="view-sub">Toutes les personnes que tu as bloquées sur Snapchat, d'après ton dernier export importé.</p>
 
-</main>
+      <div class="empty-card" data-empty-only>
+        <span class="em">👻</span>
+        Aucune liste pour le moment.<br>Importe ton export Snapchat pour remplir cet écran.
+        <div class="btnrow"><button class="btn" type="button" data-goto="import">📥 Importer mon export</button></div>
+      </div>
 
-<footer>
-  Site d'analyse local, non officiel — sans aucun lien avec Snap Inc. / Snapchat.<br>
-  Vos données d'export sont personnelles : ne partagez jamais le fichier ZIP d'origine.
-</footer>
+      <div data-requires-data hidden>
+        <div id="savedBanner" class="saved-banner" hidden>💾 <strong>Liste enregistrée sur cet appareil</strong> <span id="savedBannerDate"></span> — elle sera toujours là quand tu reviendras. Un nouvel export la remplacera.</div>
+        <div class="controls">
+          <input type="search" id="searchInput" placeholder="🔍 Rechercher un pseudo…">
+          <select id="sortSelect" aria-label="Tri">
+            <option value="az">Tri : A → Z</option>
+            <option value="za">Tri : Z → A</option>
+            <option value="recent">Récents d'abord</option>
+            <option value="old">Anciens d'abord</option>
+            <option value="file">Ordre du fichier</option>
+          </select>
+        </div>
+        <p class="list-note" id="resultCount"></p>
+        <ul class="people" id="peopleList"></ul>
+        <p class="list-note" id="emptyList" hidden>Aucun pseudo ne correspond à ta recherche.</p>
+        <div class="btnrow start">
+          <button class="btn small" type="button" id="copyBtn">📋 Copier</button>
+          <button class="btn secondary small" type="button" id="csvBtn">⬇️ CSV</button>
+          <button class="btn secondary small" type="button" id="txtBtn">⬇️ TXT</button>
+        </div>
+      </div>
+    </section>
 
+    <!-- ============ AMIS ============ -->
+    <section class="view" id="view-amis" hidden>
+      <h2 class="view-title">👥 Amis &amp; demandes</h2>
+      <p class="view-sub">Les autres listes contenues dans ton export Snapchat.</p>
+
+      <div class="empty-card" data-empty-only>
+        <span class="em">👥</span>
+        Rien à afficher pour le moment.<br>Tes amis apparaîtront ici après ton premier import.
+        <div class="btnrow"><button class="btn" type="button" data-goto="import">📥 Importer mon export</button></div>
+      </div>
+
+      <div data-requires-data hidden>
+        <div class="segmented" role="tablist" aria-label="Catégorie">
+          <button class="seg-btn active" type="button" data-cat="friends">Amis <span class="chip-count" id="chipCountFriends"></span></button>
+          <button class="seg-btn" type="button" data-cat="deleted">Supprimés <span class="chip-count" id="chipCountDeleted"></span></button>
+          <button class="seg-btn" type="button" data-cat="requests">Demandes <span class="chip-count" id="chipCountRequests"></span></button>
+        </div>
+        <div class="controls"><input type="search" id="catSearch" placeholder="🔍 Rechercher dans cette liste…"></div>
+        <p class="list-note" id="catCount"></p>
+        <ul class="people" id="catList"></ul>
+        <p class="list-note" id="catEmpty" hidden></p>
+      </div>
+    </section>
+
+    <!-- ============ IMPORTER ============ -->
+    <section class="view" id="view-import" hidden>
+      <h2 class="view-title">📥 Importer</h2>
+      <p class="view-sub">Ajoute ton export officiel Snapchat, ou mets ta liste à jour avec un nouvel export. L'ancien est alors remplacé.</p>
+
+      <div class="card">
+        <div id="dropzone" tabindex="0" role="button" aria-label="Choisir le fichier d'export Snapchat">
+          <div class="big">📦</div>
+          <strong id="dropTitle">Importe ton export Snapchat</strong>
+          <span id="dropSub">Fichier .zip de l'export, ou friends.json — SnapBlock enregistrera la liste sur ton appareil</span><br>
+          <button class="btn" type="button" id="dropChoiceBtn" style="margin-top:14px">Choisir un fichier</button>
+          <input type="file" id="fileInput" accept=".zip,.json,.html,.htm,application/zip,application/json" multiple hidden>
+        </div>
+        <div class="btnrow">
+          <button class="btn secondary small" type="button" id="demoBtn">🧪 Données de démonstration</button>
+          <button class="btn secondary small" type="button" id="resetBtn" hidden>🗑 Effacer la liste enregistrée</button>
+        </div>
+        <p class="privacy">🛡️ Ton fichier est lu <strong>sur ton appareil</strong> et la liste extraite est enregistrée uniquement dans le stockage local de l'app — aucun serveur, aucun mot de passe demandé.</p>
+      </div>
+
+      <details>
+        <summary>📖 Guide : comment obtenir mon export Snapchat ?</summary>
+        <ol>
+          <li>Ouvre <strong>Snapchat</strong> → ton profil → ⚙️ → <strong>Mes données</strong> (ou va sur <strong>accounts.snapchat.com</strong>).</li>
+          <li>Active uniquement <strong>« Exporter des fichiers JSON »</strong> et <strong>« Données utilisateur »</strong>. Laisse « Souvenirs » décoché, sinon c'est énorme et lent.</li>
+          <li>Descends en bas → <strong>Suivant / Soumettre</strong>. Si une période est demandée, prends tout l'historique.</li>
+          <li>Snapchat t'envoie un e-mail quand c'est prêt (quelques minutes en général), ou passe par <strong>« Voir les exports »</strong>. Télécharge le <strong>.zip</strong>.</li>
+          <li>Dépose le ZIP ci-dessus — pas besoin de le dézipper. ⚠️ Ne partage ce fichier avec personne, il contient tes données perso.</li>
+        </ol>
+      </details>
+
+      <details>
+        <summary>⏱ Pourquoi pas de connexion directe à mon compte Snap ?</summary>
+        <p>Parce que Snap ne le permet pas : sa connexion officielle pour les applis tierces ne donne accès qu'au nom affiché et au Bitmoji — jamais aux amis ni aux bloqués. Tout site qui te demande ton mot de passe Snapchat est dangereux (vol de compte, verrouillage). L'export officiel est la seule méthode sûre — et avec la mémoire de SnapBlock, tu n'as à le faire que de temps en temps.</p>
+      </details>
+    </section>
+
+    <!-- ============ RÉGLAGES ============ -->
+    <section class="view" id="view-reglages" hidden>
+      <h2 class="view-title">⚙️ Réglages</h2>
+      <p class="view-sub">Installation, données enregistrées et aide.</p>
+
+      <div class="card">
+        <h3>📲 Application</h3>
+        <p style="color:#555;line-height:1.6;font-size:.93rem">Installe SnapBlock sur ton écran d'accueil pour l'ouvrir comme une vraie app.</p>
+        <button type="button" class="install-btn" id="installBtn" hidden>📲 Installer l'app</button>
+        <span id="installedBadge" hidden>✅ App installée</span>
+        <div id="installHelp" hidden>
+          <p><strong>Installer via le menu du navigateur :</strong></p>
+          <p id="instAndroid">🤖 <strong>Android (Chrome)</strong> : menu <strong>⋮</strong> → <strong>« Installer l'application »</strong>.</p>
+          <p id="instIos">🍎 <strong>iPhone / iPad (Safari)</strong> : bouton <strong>Partager</strong> → <strong>« Sur l'écran d'accueil »</strong>.</p>
+          <p id="instDesktop">💻 <strong>Ordinateur (Chrome / Edge)</strong> : icône d'installation dans la barre d'adresse, ou menu <strong>⋮</strong> → « Installer… ».</p>
+          <p style="color:#666">ℹ️ Il faut ouvrir SnapBlock en <strong>HTTPS</strong> (ou localhost sur PC) : un double-clic sur le fichier ne peut pas créer d'app.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>💾 Mes données sur cet appareil</h3>
+        <div class="setting-row"><span class="k">Liste enregistrée le</span><span class="v" id="settingsSavedAt">—</span></div>
+        <div class="setting-row"><span class="k">Fichier(s) source</span><span class="v" id="settingsSource">—</span></div>
+        <div class="setting-row"><span class="k">Contenu</span><span class="v" id="settingsCounts">—</span></div>
+        <div class="btnrow start">
+          <button class="btn secondary small" type="button" id="settingsUpdateBtn">🔄 Mettre à jour la liste</button>
+          <button class="btn danger small" type="button" id="clearSavedBtn2">🗑 Tout effacer</button>
+        </div>
+        <p style="color:#777;font-size:.85rem;line-height:1.55;margin-bottom:0">Ta liste vit uniquement dans le stockage local de cette app/ce navigateur, sur cet appareil et à cette adresse. Si tu changes d'appareil ou effaces les données du navigateur, réimporte simplement un export.</p>
+      </div>
+
+      <div class="card">
+        <h3>🛡️ Confidentialité</h3>
+        <p style="color:#555;line-height:1.6;font-size:.93rem;margin-bottom:0">Aucun serveur, aucun compte, aucune statistique : l'analyse de ton fichier se fait dans cette page. SnapBlock ne te demandera <strong>jamais</strong> ton mot de passe Snapchat. Si un site te le demande : fuis, c'est du phishing.</p>
+      </div>
+
+      <details>
+        <summary>🔧 Détails techniques (diagnostic d'import)</summary>
+        <div id="diag">—</div>
+      </details>
+
+      <details>
+        <summary>❓ Je n'ai pas reçu l'e-mail de Snapchat</summary>
+        <p>Ça prend en général quelques minutes, parfois quelques heures. Tu peux aussi retourner dans <strong>Mes données → Voir les exports</strong> dans l'app (ou sur accounts.snapchat.com) : le bouton Télécharger y apparaîtra. Pense à vérifier tes spams.</p>
+      </details>
+
+      <details>
+        <summary>❓ SnapBlock peut-il me dire qui m'a bloqué, moi ?</summary>
+        <p>Non — et aucun site ne peut le savoir de façon fiable : Snapchat ne communique cette information nulle part. SnapBlock affiche uniquement les personnes <strong>que tu as bloquées toi-même</strong>.</p>
+      </details>
+
+      <details>
+        <summary>❓ « Aucune liste de bloqués trouvée » lors de l'import</summary>
+        <p>Vérifie que dans « Mes données » tu avais bien activé <strong>« Exporter des fichiers JSON »</strong> <em>et</em> <strong>« Données utilisateur »</strong>, puis refais un export si besoin. Le diagnostic ci-dessus montre les fichiers et clés détectés dans ton export.</p>
+      </details>
+
+      <footer>
+        SnapBlock — app d'analyse locale, non officielle, sans aucun lien avec Snap Inc. / Snapchat.<br>
+        Tes données d'export sont personnelles : ne partage jamais le ZIP d'origine.
+      </footer>
+    </section>
+
+  </main>
+
+  <nav class="tabbar" aria-label="Navigation principale">
+    <button class="tab active" type="button" data-view-target="accueil"><span class="ic">🏠</span>Accueil</button>
+    <button class="tab" type="button" data-view-target="bloques"><span class="ic">🚫</span>Bloqués<span class="nav-badge" id="navBlockedBadge" hidden>0</span></button>
+    <button class="tab" type="button" data-view-target="amis"><span class="ic">👥</span>Amis</button>
+    <button class="tab" type="button" data-view-target="import"><span class="ic">📥</span>Importer</button>
+    <button class="tab" type="button" data-view-target="reglages"><span class="ic">⚙️</span>Réglages</button>
+  </nav>
+
+</div>
 <script>
+
 /*TESTABLE_START*/
 /* ===== Fonctions pures : lecture ZIP + extraction (testables hors navigateur) ===== */
 
@@ -594,7 +815,140 @@ async function readZipTextEntries(arrayBuffer){
 
 /* ===== Interface ===== */
 var state = { blocked: [], friends: [], deleted: [], requests: [], present: {},
-              diag: [], demo: false, blockedKeyFound: false };
+              diag: [], demo: false, blockedKeyFound: false, sourceFiles: [] };
+
+/* ===== SnapBlock : mémoire locale (localStorage) =====
+   À chaque import réussi, la liste extraite est enregistrée sur l'appareil.
+   Au démarrage, elle est restaurée : pas besoin de refournir le fichier.
+   Un nouvel import REMPLACE entièrement l'ancienne sauvegarde. */
+var STORAGE_KEY = 'snapblock:data:v1';
+var savedMeta = { savedAt: null, restored: false, sourceFiles: [], storageError: null };
+var previousStateSnapshot = null, previousSavedMetaSnapshot = null; /* pendant un import */
+var preDemoSnapshot = null, preDemoSavedMetaSnapshot = null;        /* pendant la démo */
+
+function serializePerson(p){
+  return { u: p.username, d: p.displayName || '', r: p.dateRaw || '',
+           t: (p.date && !isNaN(p.date.getTime())) ? p.date.toISOString() : null };
+}
+function deserializePerson(o){
+  if (!o || !o.u) return null;
+  return { username: String(o.u), displayName: String(o.d || ''), dateRaw: String(o.r || ''),
+           date: o.t ? new Date(o.t) : parseSnapDate(o.r), source: 'SnapBlock (mémoire locale)' };
+}
+function clonePeople(list){
+  return (list || []).map(serializePerson).map(deserializePerson).filter(Boolean);
+}
+function cloneState(s){
+  return { blocked: clonePeople(s.blocked), friends: clonePeople(s.friends),
+           deleted: clonePeople(s.deleted), requests: clonePeople(s.requests),
+           present: Object.assign({}, s.present), diag: (s.diag || []).slice(),
+           demo: !!s.demo, blockedKeyFound: !!s.blockedKeyFound,
+           sourceFiles: (s.sourceFiles || []).slice() };
+}
+function cloneSavedMeta(m){
+  return { savedAt: m.savedAt ? new Date(m.savedAt.getTime()) : null,
+           restored: !!m.restored, sourceFiles: (m.sourceFiles || []).slice(),
+           storageError: m.storageError || null };
+}
+function requestPersistentStorage(){
+  try {
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function(){});
+  } catch(e){ /* best effort */ }
+}
+function saveCurrentState(){
+  if (state.demo) return false;
+  try {
+    var payload = {
+      v: 1, app: 'SnapBlock', savedAt: new Date().toISOString(),
+      sourceFiles: (state.sourceFiles || []).slice(),
+      present: state.present, blockedKeyFound: state.blockedKeyFound,
+      data: {
+        blocked:  state.blocked.map(serializePerson),
+        friends:  state.friends.map(serializePerson),
+        deleted:  state.deleted.map(serializePerson),
+        requests: state.requests.map(serializePerson)
+      }
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    savedMeta = { savedAt: new Date(payload.savedAt), restored: false,
+                  sourceFiles: payload.sourceFiles, storageError: null };
+    requestPersistentStorage();
+    return true;
+  } catch(e){
+    savedMeta.storageError = e.message;
+    console.warn('[SnapBlock] Enregistrement local impossible :', e);
+    return false;
+  }
+}
+function loadSavedState(){
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    var p = JSON.parse(raw);
+    if (!p || p.v !== 1 || !p.data || !Array.isArray(p.data.blocked)) return false;
+    state = {
+      blocked:  (p.data.blocked  || []).map(deserializePerson).filter(Boolean),
+      friends:  (p.data.friends  || []).map(deserializePerson).filter(Boolean),
+      deleted:  (p.data.deleted  || []).map(deserializePerson).filter(Boolean),
+      requests: (p.data.requests || []).map(deserializePerson).filter(Boolean),
+      present: p.present || { blocked: true },
+      diag: [], demo: false, blockedKeyFound: !!p.blockedKeyFound,
+      sourceFiles: p.sourceFiles || []
+    };
+    savedMeta = { savedAt: p.savedAt ? new Date(p.savedAt) : null, restored: true,
+                  sourceFiles: p.sourceFiles || [], storageError: null };
+    return true;
+  } catch(e){
+    console.warn('[SnapBlock] Sauvegarde locale illisible :', e);
+    return false;
+  }
+}
+function hasSavedDataInStorage(){
+  try { return !!localStorage.getItem(STORAGE_KEY); } catch(e){ return false; }
+}
+function clearSavedState(){
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e){ /* ignore */ }
+}
+function formatSavedDate(d){
+  if (!d || isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) +
+         ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+}
+function updateSavedUI(){
+  var hasSaved = !!savedMeta.savedAt && !state.demo;
+  var strip = $('savedStrip');
+  if (strip){
+    strip.hidden = !hasSaved;
+    if (hasSaved){
+      $('savedCount').textContent = state.blocked.length;
+      $('savedWhen').textContent = 'Enregistrée le ' + formatSavedDate(savedMeta.savedAt) +
+        ' — sur cet appareil uniquement, aucun fichier à refournir.';
+    }
+  }
+  var banner = $('savedBanner');
+  if (banner){
+    banner.hidden = !hasSaved;
+    if (hasSaved) $('savedBannerDate').textContent = 'le ' + formatSavedDate(savedMeta.savedAt);
+  }
+  var dropTitle = $('dropTitle'), dropSub = $('dropSub'), dropBtn = $('dropChoiceBtn');
+  if (dropTitle && dropSub && dropBtn){
+    if (hasSaved){
+      dropTitle.textContent = '🔄 Mettre à jour ma liste SnapBlock';
+      dropSub.textContent = 'Dépose un nouvel export (.zip ou friends.json) : il remplacera la liste enregistrée ci-dessus';
+      dropBtn.textContent = 'Choisir un nouvel export';
+    } else {
+      dropTitle.textContent = 'Importe ton export Snapchat';
+      dropSub.textContent = "Fichier .zip de l'export, ou friends.json — SnapBlock enregistrera la liste sur ton appareil";
+      dropBtn.textContent = 'Choisir un fichier';
+    }
+  }
+  var rb = $('resetBtn');
+  if (rb){
+    rb.textContent = state.demo ? '↩ Quitter la démo'
+                   : (hasSaved ? '🗑 Effacer la liste enregistrée' : '↺ Recommencer');
+    rb.hidden = !(state.demo || hasSaved || state.blocked.length || state.blockedKeyFound);
+  }
+}
 
 var $ = function(id){ return document.getElementById(id); };
 var dropzone = $('dropzone'), fileInput = $('fileInput'), statusBox = $('status');
@@ -687,10 +1041,22 @@ function parseHtmlText(text, label){
 }
 
 async function handleFiles(fileList){
+  var files = Array.prototype.slice.call(fileList);
+  /* On garde l'ancienne liste de côté : si ce nouvel import échoue,
+     on la restaurera au lieu de tout perdre.
+     (Si on était en démo, c'est la vraie liste d'avant la démo qui compte.) */
+  if (state.demo && preDemoSnapshot){
+    previousStateSnapshot = cloneState(preDemoSnapshot);
+    previousSavedMetaSnapshot = preDemoSavedMetaSnapshot ? cloneSavedMeta(preDemoSavedMetaSnapshot) : null;
+  } else {
+    previousStateSnapshot = cloneState(state);
+    previousSavedMetaSnapshot = cloneSavedMeta(savedMeta);
+  }
+  preDemoSnapshot = null; preDemoSavedMetaSnapshot = null;
   resetState(false);
   state.demo = false;
-  setStatus('info', '⏳ Lecture du fichier en cours… (tout se passe sur votre appareil)');
-  var files = Array.prototype.slice.call(fileList);
+  state.sourceFiles = files.map(function(f){ return f.name; });
+  setStatus('info', '⏳ Lecture du fichier en cours… (tout se passe sur ton appareil)');
   var readSomething = false;
 
   for (var f = 0; f < files.length; f++){
@@ -726,34 +1092,60 @@ async function handleFiles(fileList){
 }
 
 function finish(readSomething){
-  $('diag').textContent = state.diag.length ? state.diag.join('\n\n') : '—';
-  $('resetBtn').hidden = false;
-
+  /* ----- Échec : aucune liste de bloqués dans ce fichier ----- */
   if (!state.blockedKeyFound && !state.blocked.length){
-    $('results').hidden = true;
-    if (!readSomething){
-      setStatus('error', '❌ Aucun fichier exploitable trouvé. Déposez le <strong>ZIP complet</strong> de l\'export Snapchat, ou le fichier <strong>friends.json</strong> qu\'il contient.');
+    var errMsg = !readSomething
+      ? '❌ Aucun fichier exploitable trouvé. Dépose le <strong>ZIP complet</strong> de l\'export Snapchat, ou le fichier <strong>friends.json</strong> qu\'il contient.'
+      : '🤔 J\'ai lu le fichier, mais je n\'y ai trouvé <strong>aucune liste de personnes bloquées</strong>.' +
+        '<br>Vérifie que <strong>« Exporter des fichiers JSON »</strong> et <strong>« Données utilisateur »</strong> étaient bien activés dans « Mes données », puis refais un export si besoin.' +
+        '<br>Les « Détails techniques » ci-dessous peuvent aider — ou montre-moi ce que dit le diagnostic et on adapte SnapBlock à ton format !';
+
+    /* Si une liste était déjà enregistrée, on la conserve intacte */
+    if (previousStateSnapshot && !previousStateSnapshot.demo &&
+        (previousStateSnapshot.blockedKeyFound || previousStateSnapshot.blocked.length)){
+      var attemptDiag = state.diag.slice();
+      state = previousStateSnapshot;
+      savedMeta = previousSavedMetaSnapshot || savedMeta;
+      state.diag = state.diag.concat(['— Import refusé (liste précédente conservée) —']).concat(attemptDiag);
+      $('diag').textContent = state.diag.join('\n\n');
+      renderResults({ scroll: false });
+      setStatus('error', errMsg + '<br>💾 <strong>Ta liste SnapBlock précédente a été conservée.</strong>');
     } else {
-      setStatus('error', '🤔 J\'ai lu le fichier, mais je n\'y ai trouvé <strong>aucune liste de personnes bloquées</strong>.' +
-        '<br>Vérifiez que <strong>« Exporter des fichiers JSON »</strong> et <strong>« Données utilisateur »</strong> étaient bien activés dans « Mes données », puis refaites un export si besoin.' +
-        '<br>Les « Détails techniques » dans la FAQ ci-dessous peuvent aider — ou montrez-moi ce que dit le diagnostic et on adapte le site à votre format !');
+      $('diag').textContent = state.diag.length ? state.diag.join('\n\n') : '—';
+      hideDataUI();
+      setStatus('error', errMsg);
     }
+    previousStateSnapshot = null; previousSavedMetaSnapshot = null;
+    updateSavedUI();
     return;
   }
 
+  /* ----- Succès : la nouvelle liste remplace l'ancienne et s'enregistre ----- */
+  var savedOk = false;
+  if (!state.demo) savedOk = saveCurrentState();
+  $('diag').textContent = state.diag.length ? state.diag.join('\n\n') : '—';
   renderResults();
+  previousStateSnapshot = null; previousSavedMetaSnapshot = null;
+
   if (state.demo){
-    setStatus('info', '🧪 Démonstration affichée ci-dessous avec de faux pseudos. Dès que vous avez votre ZIP, déposez-le pour voir vos vrais résultats.');
-  } else if (state.blocked.length === 0){
-    setStatus('ok', '✅ Export lu correctement… et la liste des bloqués est <strong>vide</strong> : d\'après Snapchat, vous n\'avez bloqué personne (ou tout a été débloqué).');
+    setStatus('info', '🧪 Démonstration affichée ci-dessous avec de faux pseudos (non enregistrée). Dès que tu as ton ZIP, dépose-le pour voir tes vrais résultats.');
   } else {
-    setStatus('ok', '✅ C\'est fait ! Vous avez bloqué <strong>' + state.blocked.length + ' personne' +
-              (state.blocked.length > 1 ? 's' : '') + '</strong> selon cet export. La liste complète est ci-dessous.');
+    var saveNote = savedOk
+      ? '<br>💾 <strong>Liste enregistrée dans SnapBlock</strong> le ' + formatSavedDate(savedMeta.savedAt) + ' : tu pourras fermer l\'app et la retrouver sans refournir le fichier.'
+      : '<br>⚠️ Liste affichée, mais <strong>enregistrement local impossible</strong> dans ce navigateur' + (savedMeta.storageError ? ' (' + escapeHtml(savedMeta.storageError) + ')' : '') + ' : il faudra refournir le fichier à la prochaine visite.';
+    if (state.blocked.length === 0){
+      setStatus('ok', '✅ Export lu correctement… et la liste des bloqués est <strong>vide</strong> : d\'après Snapchat, tu n\'as bloqué personne (ou tout a été débloqué).' + saveNote);
+    } else {
+      setStatus('ok', '✅ C\'est fait ! Tu as bloqué <strong>' + state.blocked.length + ' personne' +
+                (state.blocked.length > 1 ? 's' : '') + '</strong> selon cet export. La liste complète est ci-dessous.' + saveNote);
+    }
   }
+  updateSavedUI();
 }
 
-function renderResults(){
-  $('results').hidden = false;
+function renderResults(opts){
+  opts = opts || {};
+  showDataUI();
   $('demoBanner').style.display = state.demo ? 'block' : 'none';
   $('statBlocked').textContent = state.blocked.length;
   $('statFriends').textContent = state.friends.length;
@@ -763,7 +1155,11 @@ function renderResults(){
   $('cardDeleted').style.display  = state.present.deleted  ? '' : 'none';
   $('cardRequests').style.display = state.present.requests ? '' : 'none';
   renderList();
-  $('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  renderDashboard();
+  renderCategory();
+  updateSavedUI();
+  if (opts.view) showView(opts.view);
+  else if (opts.scroll !== false) showView('bloques');
 }
 
 function escapeHtml(s){
@@ -792,26 +1188,115 @@ function getFiltered(){
   return list;
 }
 
+function personItemHtml(p){
+  var initial = escapeHtml((p.username || '?').replace(/^@+/, '').charAt(0).toUpperCase() || '?');
+  var dateTxt = p.date ? p.date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+                       : (p.dateRaw ? escapeHtml(p.dateRaw) : '');
+  return '<li>' +
+    '<div class="avatar" style="background:' + colorFor(p.username) + '">' + initial + '</div>' +
+    '<div class="who"><div class="u">@' + escapeHtml(p.username) + '</div>' +
+    (p.displayName ? '<div class="d">' + escapeHtml(p.displayName) + '</div>' : '') + '</div>' +
+    (dateTxt ? '<div class="date">' + dateTxt + '</div>' : '') +
+    '</li>';
+}
+
 function renderList(){
   var list = getFiltered();
   var ul = $('peopleList');
-  ul.innerHTML = list.map(function(p){
-    var initial = escapeHtml((p.username || '?').replace(/^@+/, '').charAt(0).toUpperCase() || '?');
-    var dateTxt = p.date ? p.date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
-                         : (p.dateRaw ? escapeHtml(p.dateRaw) : '');
-    return '<li>' +
-      '<div class="avatar" style="background:' + colorFor(p.username) + '">' + initial + '</div>' +
-      '<div class="who"><div class="u">@' + escapeHtml(p.username) + '</div>' +
-      (p.displayName ? '<div class="d">' + escapeHtml(p.displayName) + '</div>' : '') + '</div>' +
-      (dateTxt ? '<div class="date">' + dateTxt + '</div>' : '') +
-      '</li>';
-  }).join('');
+  ul.innerHTML = list.map(personItemHtml).join('');
   $('emptyList').hidden = list.length > 0 || state.blocked.length === 0;
   $('resultCount').textContent = state.blocked.length === 0
     ? 'Aucune personne bloquée dans cet export.'
     : list.length + ' pseudo' + (list.length > 1 ? 's' : '') + ' affiché' + (list.length > 1 ? 's' : '') +
       ' sur ' + state.blocked.length + '.';
 }
+
+
+/* ===== SnapBlock App : navigation par écrans ===== */
+var VIEW_TITLES = { accueil: 'Mes bloqués Snapchat', bloques: 'Personnes bloquées',
+                    amis: 'Amis & demandes', import: 'Importer un export', reglages: 'Réglages SnapBlock' };
+function showView(name){
+  if (!document.getElementById('view-' + name)) name = 'accueil';
+  document.querySelectorAll('.view').forEach(function(sec){ sec.hidden = sec.id !== 'view-' + name; });
+  document.querySelectorAll('[data-view-target]').forEach(function(btn){
+    btn.classList.toggle('active', btn.getAttribute('data-view-target') === name);
+  });
+  var sub = $('viewSubtitle'); if (sub) sub.textContent = VIEW_TITLES[name] || 'Mes bloqués Snapchat';
+  document.body.setAttribute('data-view', name);
+  window.scrollTo(0, 0);
+}
+function showDataUI(){
+  document.querySelectorAll('[data-requires-data]').forEach(function(el){ el.hidden = false; });
+  document.querySelectorAll('[data-empty-only]').forEach(function(el){ el.hidden = true; });
+}
+function hideDataUI(){
+  document.querySelectorAll('[data-requires-data]').forEach(function(el){ el.hidden = true; });
+  document.querySelectorAll('[data-empty-only]').forEach(function(el){ el.hidden = false; });
+  var b = $('navBlockedBadge'); if (b) b.hidden = true;
+}
+
+function renderDashboard(){
+  var badge = $('navBlockedBadge');
+  if (badge){ badge.textContent = state.blocked.length; badge.hidden = !(state.blocked.length > 0); }
+  var recent = state.blocked.slice().sort(function(a,b){
+    return (b.date ? b.date.getTime() : -1) - (a.date ? a.date.getTime() : -1);
+  }).slice(0, 5);
+  var rl = $('recentList'); if (rl) rl.innerHTML = recent.map(personItemHtml).join('');
+  var re = $('recentEmpty'); if (re) re.hidden = recent.length > 0;
+  var countTxt = state.blocked.length + ' bloqué(s) · ' + state.friends.length + ' ami(s) · ' +
+                 state.deleted.length + ' supprimé(s) · ' + state.requests.length + ' demande(s)';
+  var du = $('dashUpdated');
+  if (du) du.textContent = state.demo ? '🧪 Mode démo — données temporaires'
+    : (savedMeta.savedAt ? 'Mis à jour le ' + formatSavedDate(savedMeta.savedAt) : 'Liste actuelle (non enregistrée)');
+  var s1 = $('settingsSavedAt'); if (s1) s1.textContent = savedMeta.savedAt ? formatSavedDate(savedMeta.savedAt) : '—';
+  var s2 = $('settingsSource');  if (s2) s2.textContent = (savedMeta.sourceFiles && savedMeta.sourceFiles.length) ? savedMeta.sourceFiles.join(', ') : ((state.sourceFiles && state.sourceFiles.length) ? state.sourceFiles.join(', ') : '—');
+  var s3 = $('settingsCounts');  if (s3) s3.textContent = countTxt;
+  var cf = $('chipCountFriends');  if (cf) cf.textContent = '(' + state.friends.length + ')';
+  var cd = $('chipCountDeleted');  if (cd) cd.textContent = '(' + state.deleted.length + ')';
+  var cr = $('chipCountRequests'); if (cr) cr.textContent = '(' + state.requests.length + ')';
+}
+
+var currentCat = 'friends';
+var CAT_LABELS = { friends: 'ami(s)', deleted: 'ami(s) supprimé(s)', requests: 'demande(s)' };
+function renderCategory(){
+  var listEl = $('catList'); if (!listEl) return;
+  var all = state[currentCat] || [];
+  var q = ($('catSearch') ? $('catSearch').value : '').toLowerCase().trim();
+  var list = all.filter(function(p){
+    return !q || p.username.toLowerCase().indexOf(q) !== -1 ||
+           (p.displayName && p.displayName.toLowerCase().indexOf(q) !== -1);
+  }).slice().sort(function(a,b){ return a.username.localeCompare(b.username, 'fr'); });
+  listEl.innerHTML = list.map(personItemHtml).join('');
+  var cc = $('catCount');
+  if (cc) cc.textContent = list.length + ' ' + CAT_LABELS[currentCat] + ' affiché(s) sur ' + all.length + '.';
+  var ce = $('catEmpty');
+  if (ce){
+    ce.hidden = list.length > 0;
+    ce.textContent = !state.present[currentCat]
+      ? "Ton export ne contient pas cette liste."
+      : (q ? "Aucun pseudo ne correspond à ta recherche." : "Cette liste est vide dans ton export.");
+  }
+  document.querySelectorAll('.seg-btn').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-cat') === currentCat);
+  });
+}
+
+/* Boutons de navigation */
+document.querySelectorAll('[data-view-target]').forEach(function(btn){
+  btn.addEventListener('click', function(){ showView(btn.getAttribute('data-view-target')); });
+});
+document.querySelectorAll('[data-goto]').forEach(function(btn){
+  btn.addEventListener('click', function(){ showView(btn.getAttribute('data-goto')); });
+});
+var _hib = $('headerImportBtn'); if (_hib) _hib.addEventListener('click', function(){ fileInput.click(); });
+var _hsb = $('headerSettingsBtn'); if (_hsb) _hsb.addEventListener('click', function(){ showView('reglages'); });
+var _su = $('settingsUpdateBtn'); if (_su) _su.addEventListener('click', function(){ showView('import'); });
+var _cb2 = $('clearSavedBtn2'); if (_cb2) _cb2.addEventListener('click', function(){ $('resetBtn').click(); });
+var _d2 = $('demoBtn2'); if (_d2) _d2.addEventListener('click', function(){ $('demoBtn').click(); });
+document.querySelectorAll('.seg-btn').forEach(function(b){
+  b.addEventListener('click', function(){ currentCat = b.getAttribute('data-cat'); renderCategory(); });
+});
+var _cs = $('catSearch'); if (_cs) _cs.addEventListener('input', renderCategory);
 
 $('searchInput').addEventListener('input', renderList);
 $('sortSelect').addEventListener('change', renderList);
@@ -832,31 +1317,66 @@ $('txtBtn').addEventListener('click', function(){
   var lines = getFiltered().map(function(p){
     return p.username + (p.displayName ? ' (' + p.displayName + ')' : '') + (p.dateRaw ? ' — ' + p.dateRaw : '');
   });
-  download('mes-bloques-snap.txt', 'Personnes bloquées sur Snapchat : ' + lines.length + '\n\n' + lines.join('\n'), 'text/plain;charset=utf-8');
+  download('snapblock-mes-bloques.txt', 'SnapBlock — Personnes bloquées sur Snapchat : ' + lines.length + '\n\n' + lines.join('\n'), 'text/plain;charset=utf-8');
 });
 $('csvBtn').addEventListener('click', function(){
   function q(v){ return '"' + String(v || '').replace(/"/g, '""') + '"'; }
   var rows = [['pseudo','nom_affiche','date']].concat(getFiltered().map(function(p){
     return [p.username, p.displayName, p.date ? p.date.toISOString().slice(0,10) : p.dateRaw];
   }));
-  download('mes-bloques-snap.csv', '﻿' + rows.map(function(r){ return r.map(q).join(';'); }).join('\r\n'), 'text/csv;charset=utf-8');
+  download('snapblock-mes-bloques.csv', '﻿' + rows.map(function(r){ return r.map(q).join(';'); }).join('\r\n'), 'text/csv;charset=utf-8');
 });
 
 function resetState(scrollTop){
   state = { blocked: [], friends: [], deleted: [], requests: [], present: {},
-            diag: [], demo: false, blockedKeyFound: false };
-  $('results').hidden = true;
+            diag: [], demo: false, blockedKeyFound: false, sourceFiles: [] };
+  savedMeta = { savedAt: null, restored: false, sourceFiles: [], storageError: null };
+  hideDataUI();
   $('searchInput').value = '';
-  if (scrollTop) window.scrollTo({ top: 0, behavior: 'smooth' });
+  if ($('catSearch')) $('catSearch').value = '';
+  updateSavedUI();
+  if (scrollTop) showView('accueil');
 }
 $('resetBtn').addEventListener('click', function(){
-  resetState(true);
-  $('resetBtn').hidden = true;
-  statusBox.className = ''; statusBox.innerHTML = '';
+  /* En mode démo : on revient à la vraie liste (si elle existe) */
+  if (state.demo){
+    if (preDemoSnapshot && (preDemoSnapshot.blockedKeyFound || preDemoSnapshot.blocked.length)){
+      state = preDemoSnapshot;
+      savedMeta = preDemoSavedMetaSnapshot || savedMeta;
+      preDemoSnapshot = null; preDemoSavedMetaSnapshot = null;
+      $('diag').textContent = state.diag.length ? state.diag.join('\n\n') : '—';
+      renderResults({ view: 'bloques' });
+      setStatus('ok', '↩ Démo fermée : voici ta liste SnapBlock enregistrée.');
+    } else if (loadSavedState()){
+      preDemoSnapshot = null; preDemoSavedMetaSnapshot = null;
+      renderResults({ view: 'bloques' });
+      setStatus('ok', '↩ Démo fermée : voici ta liste SnapBlock enregistrée.');
+    } else {
+      preDemoSnapshot = null; preDemoSavedMetaSnapshot = null;
+      resetState(true);
+      statusBox.className = ''; statusBox.innerHTML = '';
+    }
+    updateSavedUI();
+    return;
+  }
+  /* Sinon : effacement de la liste enregistrée (avec confirmation) */
+  if (savedMeta.savedAt || hasSavedDataInStorage()){
+    if (!window.confirm('Supprimer définitivement ta liste SnapBlock enregistrée sur cet appareil ?\n\nIl faudra réimporter un export Snapchat pour la recréer.')) return;
+    clearSavedState();
+    resetState(true);
+    setStatus('info', '🗑 Liste SnapBlock effacée de cet appareil. Importe un nouvel export quand tu veux pour la recréer.');
+  } else {
+    resetState(true);
+    statusBox.className = ''; statusBox.innerHTML = '';
+  }
 });
 
-/* --- Démonstration (structure identique à un vrai fichier friends.json) --- */
+/* --- Démonstration (structure identique à un vrai fichier friends.json) ---
+   La démo est temporaire : elle n'écrase jamais la vraie liste enregistrée. */
 $('demoBtn').addEventListener('click', function(){
+  preDemoSnapshot = cloneState(state);
+  preDemoSavedMetaSnapshot = cloneSavedMeta(savedMeta);
+  previousStateSnapshot = null; previousSavedMetaSnapshot = null;
   resetState(false);
   state.demo = true;
   var demo = {
@@ -883,6 +1403,27 @@ $('demoBtn').addEventListener('click', function(){
   ['blocked','friends','deleted','requests'].forEach(function(cat){ state[cat] = dedupePeople(state[cat]); });
   finish(true);
 });
+
+/* --- Boutons du bandeau « liste enregistrée » --- */
+$('savedViewBtn').addEventListener('click', function(){ showView('bloques'); });
+$('savedUpdateBtn').addEventListener('click', function(){ fileInput.click(); });
+
+/* --- Démarrage SnapBlock : restaurer la liste enregistrée, si elle existe --- */
+(function initSnapBlock(){
+  if (loadSavedState()){
+    state.diag = ['Liste restaurée depuis la mémoire SnapBlock de cet appareil.' +
+      '\n  enregistrée le : ' + formatSavedDate(savedMeta.savedAt) +
+      '\n  fichier(s) source : ' + (savedMeta.sourceFiles.length ? savedMeta.sourceFiles.join(', ') : '(inconnu)') +
+      '\n  bloqués: ' + state.blocked.length + ', amis: ' + state.friends.length +
+      ', supprimés: ' + state.deleted.length + ', demandes: ' + state.requests.length];
+    $('diag').textContent = state.diag.join('\n\n');
+    renderResults({ scroll: false });
+    setStatus('ok', '💾 <strong>Bon retour sur SnapBlock !</strong> Ta liste enregistrée le ' +
+      formatSavedDate(savedMeta.savedAt) + ' est déjà dans l\'app — aucun fichier à refournir.');
+  }
+  updateSavedUI();
+})();
+
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4dfb8f7bf7d657d',t:'MTc5MjU4MDA0OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
