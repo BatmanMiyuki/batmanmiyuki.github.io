@@ -6,17 +6,47 @@
       "label": "BATMAN_Miyukii",
       "version": 1,
       "locale": "fr-FR",
-      "generatedAt": "2026-10-18T09:37:22.435Z",
+      "generatedAt": "2026-10-25T09:48:37.696Z",
       "profile": {
         "onlineId": "BATMAN_Miyukii",
         "avatarUrl": "",
         "isPlus": false
       },
       "playStats": {
-        "totalTitles": 220,
-        "totalDurationSeconds": 21948839,
-        "totalPlayCount": 5411,
+        "totalTitles": 224,
+        "totalDurationSeconds": 22145099,
+        "totalPlayCount": 5450,
         "games": [
+          {
+            "titleId": "PPSA01721_00",
+            "conceptId": 201930,
+            "name": "Grand Theft Auto V (PlayStation®5)",
+            "originalName": "Grand Theft Auto V (PlayStation®5)",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202202/2816/K6mmm89oNII1iI1aqaClO0wh.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 165,
+            "playDuration": "PT111H41M43S",
+            "durationSeconds": 402103,
+            "firstPlayedDateTime": "2024-09-20T18:15:04.480000Z",
+            "lastPlayedDateTime": "2026-10-25T00:05:14.730000Z"
+          },
+          {
+            "titleId": "PPSA01923_00",
+            "conceptId": 228748,
+            "name": "Fortnite",
+            "originalName": "Fortnite",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202609/2817/0b31b8306c4fae90e94a2fbf5d14fe9cf3ea014da70309cf.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 912,
+            "playDuration": "PT893H44M4S",
+            "durationSeconds": 3217444,
+            "firstPlayedDateTime": "2023-09-03T12:13:55.000000Z",
+            "lastPlayedDateTime": "2026-10-25T00:04:32.520000Z"
+          },
           {
             "titleId": "PPSA10990_00",
             "conceptId": 223118,
@@ -26,11 +56,116 @@
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
-            "playCount": 292,
-            "playDuration": "PT596H13M57S",
-            "durationSeconds": 2146437,
+            "playCount": 306,
+            "playDuration": "PT623H54M",
+            "durationSeconds": 2246040,
             "firstPlayedDateTime": "2026-04-17T11:18:57.630000Z",
-            "lastPlayedDateTime": "2026-10-17T23:23:21.410000Z"
+            "lastPlayedDateTime": "2026-10-24T23:40:52.010000Z"
+          },
+          {
+            "titleId": "PPSA27718_00",
+            "conceptId": 10013616,
+            "name": "Tomb Raider: Anniversary PS4 & PS5",
+            "originalName": "Tomb Raider: Anniversary PS4 & PS5",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202509/1818/decbb09e70d03e7320919e661b457cc3438d96c7427b0ac6.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 1,
+            "playDuration": "PT5H11M30S",
+            "durationSeconds": 18690,
+            "firstPlayedDateTime": "2026-10-21T15:24:41.050000Z",
+            "lastPlayedDateTime": "2026-10-24T14:35:25.380000Z"
+          },
+          {
+            "titleId": "PPSA22327_00",
+            "conceptId": 10010647,
+            "name": "Forza Horizon 5",
+            "originalName": "Forza Horizon 5",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202501/2717/42b3ee6b1b2094212231b0b0a82824f687fc5c4dc9bde31c.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 6,
+            "playDuration": "PT7H33M47S",
+            "durationSeconds": 27227,
+            "firstPlayedDateTime": "2026-10-18T15:06:50.850000Z",
+            "lastPlayedDateTime": "2026-10-23T14:35:00.830000Z"
+          },
+          {
+            "titleId": "PPSA01968_00",
+            "conceptId": 234585,
+            "name": "DEATH STRANDING™",
+            "originalName": "DEATH STRANDING™",
+            "coverUrl": "https://image.api.playstation.com/vulcan/img/rnd/202009/2921/40aD0BqRUHyHdXdC6nwtwON5.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 1,
+            "playDuration": "PT1H48S",
+            "durationSeconds": 3648,
+            "firstPlayedDateTime": "2026-10-22T15:23:56.690000Z",
+            "lastPlayedDateTime": "2026-10-22T16:31:24.060000Z"
+          },
+          {
+            "titleId": "PPSA17221_00",
+            "conceptId": 212779,
+            "name": "Minecraft",
+            "originalName": "Minecraft",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202407/0401/670c294ded3baf4fa11068db2ec6758c63f7daeb266a35a1.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 135,
+            "playDuration": "PT104H15M28S",
+            "durationSeconds": 375328,
+            "firstPlayedDateTime": "2024-10-29T16:58:27.690000Z",
+            "lastPlayedDateTime": "2026-10-21T14:17:12.850000Z"
+          },
+          {
+            "titleId": "CUSA57232_00",
+            "conceptId": 10017349,
+            "name": "Cup Heroes",
+            "originalName": "Cup Heroes",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202512/0512/d13a64f7c42f09674218aa0356b8ae720d1b2504c8974624.png",
+            "platform": "PS4",
+            "category": "ps4_game",
+            "service": "none(purchased)",
+            "playCount": 5,
+            "playDuration": "PT1H12M20S",
+            "durationSeconds": 4340,
+            "firstPlayedDateTime": "2026-06-08T12:46:23.830000Z",
+            "lastPlayedDateTime": "2026-10-21T13:14:09.160000Z"
+          },
+          {
+            "titleId": "PPSA15724_00",
+            "conceptId": 10008121,
+            "name": "Chess Royal",
+            "originalName": "Chess Royal",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202307/2512/c0e55fccff68dc2e56475f5496d5254a98ea7557b22507ed.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 29,
+            "playDuration": "PT5H50M34S",
+            "durationSeconds": 21034,
+            "firstPlayedDateTime": "2025-05-01T15:26:34.750000Z",
+            "lastPlayedDateTime": "2026-10-21T10:52:48.130000Z"
+          },
+          {
+            "titleId": "PPSA36466_00",
+            "conceptId": 10018845,
+            "name": "Chess Mate",
+            "originalName": "Chess Mate",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202603/1612/19cdb91a317105a5e1598788ab1541af61d609d7428cce7a.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 1,
+            "playDuration": "PT3M31S",
+            "durationSeconds": 211,
+            "firstPlayedDateTime": "2026-10-20T10:50:16.400000Z",
+            "lastPlayedDateTime": "2026-10-20T10:54:15.350000Z"
           },
           {
             "titleId": "PPSA26339_00",
@@ -41,11 +176,11 @@
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
-            "playCount": 59,
-            "playDuration": "PT48H58M17S",
-            "durationSeconds": 176297,
+            "playCount": 61,
+            "playDuration": "PT52H9M26S",
+            "durationSeconds": 187766,
             "firstPlayedDateTime": "2026-06-19T17:46:55.450000Z",
-            "lastPlayedDateTime": "2026-10-17T22:18:49.750000Z"
+            "lastPlayedDateTime": "2026-10-18T13:44:26.780000Z"
           },
           {
             "titleId": "PPSA01651_00",
@@ -106,21 +241,6 @@
             "durationSeconds": 87093,
             "firstPlayedDateTime": "2024-05-29T16:44:39.660000Z",
             "lastPlayedDateTime": "2026-08-17T17:39:43.720000Z"
-          },
-          {
-            "titleId": "PPSA01721_00",
-            "conceptId": 201930,
-            "name": "Grand Theft Auto V (PlayStation®5)",
-            "originalName": "Grand Theft Auto V (PlayStation®5)",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202202/2816/K6mmm89oNII1iI1aqaClO0wh.png",
-            "platform": "PS5",
-            "category": "ps5_native_game",
-            "service": "none(purchased)",
-            "playCount": 164,
-            "playDuration": "PT111H41M43S",
-            "durationSeconds": 402103,
-            "firstPlayedDateTime": "2024-09-20T18:15:04.480000Z",
-            "lastPlayedDateTime": "2026-08-15T22:12:35.020000Z"
           },
           {
             "titleId": "CUSA02779_00",
@@ -331,21 +451,6 @@
             "durationSeconds": 212955,
             "firstPlayedDateTime": "2023-02-19T11:24:19.590000Z",
             "lastPlayedDateTime": "2026-07-24T20:23:18.230000Z"
-          },
-          {
-            "titleId": "PPSA17221_00",
-            "conceptId": 212779,
-            "name": "Minecraft",
-            "originalName": "Minecraft",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202407/0401/670c294ded3baf4fa11068db2ec6758c63f7daeb266a35a1.png",
-            "platform": "PS5",
-            "category": "ps5_native_game",
-            "service": "none(purchased)",
-            "playCount": 134,
-            "playDuration": "PT104H11M36S",
-            "durationSeconds": 375096,
-            "firstPlayedDateTime": "2024-10-29T16:58:27.690000Z",
-            "lastPlayedDateTime": "2026-07-24T20:07:43.780000Z"
           },
           {
             "titleId": "CUSA12398_00",
@@ -618,21 +723,6 @@
             "lastPlayedDateTime": "2026-07-04T17:57:34.810000Z"
           },
           {
-            "titleId": "CUSA57232_00",
-            "conceptId": 10017349,
-            "name": "Cup Heroes",
-            "originalName": "Cup Heroes",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202512/0512/d13a64f7c42f09674218aa0356b8ae720d1b2504c8974624.png",
-            "platform": "PS4",
-            "category": "ps4_game",
-            "service": "none(purchased)",
-            "playCount": 4,
-            "playDuration": "PT50M7S",
-            "durationSeconds": 3007,
-            "firstPlayedDateTime": "2026-06-08T12:46:23.830000Z",
-            "lastPlayedDateTime": "2026-07-04T17:09:19.330000Z"
-          },
-          {
             "titleId": "PPSA05688_00",
             "conceptId": 203946,
             "name": "Spotify",
@@ -661,21 +751,6 @@
             "durationSeconds": 14747,
             "firstPlayedDateTime": "2026-05-27T06:05:17.470000Z",
             "lastPlayedDateTime": "2026-07-02T14:51:24.400000Z"
-          },
-          {
-            "titleId": "PPSA01923_00",
-            "conceptId": 228748,
-            "name": "Fortnite",
-            "originalName": "Fortnite",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202609/2817/0b31b8306c4fae90e94a2fbf5d14fe9cf3ea014da70309cf.png",
-            "platform": "PS5",
-            "category": "ps5_native_game",
-            "service": "none(purchased)",
-            "playCount": 903,
-            "playDuration": "PT884H32M44S",
-            "durationSeconds": 3184364,
-            "firstPlayedDateTime": "2023-09-03T12:13:55.000000Z",
-            "lastPlayedDateTime": "2026-06-29T22:04:53.710000Z"
           },
           {
             "titleId": "CUSA31174_00",
@@ -742,7 +817,7 @@
             "conceptId": 10011142,
             "name": "Where Winds Meet (F2P)",
             "originalName": "Where Winds Meet (F2P)",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202609/1608/170a70c25efec69c00e9575c9a5827943804a871814dff83.png",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202610/1410/c4d22396830728db25505b2b0b623d5c4259f44a7aab1447.png",
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
@@ -751,21 +826,6 @@
             "durationSeconds": 23474,
             "firstPlayedDateTime": "2026-02-27T12:39:49.610000Z",
             "lastPlayedDateTime": "2026-05-02T09:25:30.690000Z"
-          },
-          {
-            "titleId": "PPSA15724_00",
-            "conceptId": 10008121,
-            "name": "Chess Royal",
-            "originalName": "Chess Royal",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202307/2512/c0e55fccff68dc2e56475f5496d5254a98ea7557b22507ed.png",
-            "platform": "PS5",
-            "category": "ps5_native_game",
-            "service": "none(purchased)",
-            "playCount": 27,
-            "playDuration": "PT5H37M47S",
-            "durationSeconds": 20267,
-            "firstPlayedDateTime": "2025-05-01T15:26:34.750000Z",
-            "lastPlayedDateTime": "2026-05-02T09:05:05.030000Z"
           },
           {
             "titleId": "CUSA06122_00",
@@ -1717,7 +1777,7 @@
             "conceptId": 10009763,
             "name": "Zenless Zone Zero",
             "originalName": "Zenless Zone Zero",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202608/3108/a326ff0cdbb523ce36a8e07ec3ddb3953032f6fdde1a6c33.png",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202610/1406/d49402c271539cba203f446395138d5f3689647e2fc30abd.png",
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
@@ -3320,8 +3380,8 @@
         ]
       },
       "library": {
-        "total": 170,
-        "owned": 170,
+        "total": 175,
+        "owned": 175,
         "psPlus": 0
       },
       "warnings": [
@@ -3333,5 +3393,5 @@
       "errors": []
     }
   ],
-  "generatedAt": "2026-10-18T09:37:22.436Z"
+  "generatedAt": "2026-10-25T09:48:37.697Z"
 }
