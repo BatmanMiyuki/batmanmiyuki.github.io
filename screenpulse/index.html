@@ -565,6 +565,8 @@ function App() {
   const [bonusCust,setBonusCust]   = useState('');
   const [bonusH,setBonusH]         = useState('');
   const [bonusM,setBonusM]         = useState('');
+  const [bonusSign,setBonusSign]   = useState(1);     // 1 = ajouter · -1 = retirer
+  const [bonusMsg,setBonusMsg]     = useState(null);  // retour de la dernière opération
 
   // ── Photo de signature du header (uploadée dans l'app, stockée localement)
   const [signature,setSignature]   = useState(()=>load('app_signature',''));
@@ -816,17 +818,72 @@ function App() {
   const delApp=(dk,app)=>setData(p=>{const o=p[dk]||{total:0,apps:{}}; const apps={...o.apps}; delete apps[app]; return {...p,[dk]:{...o,apps}}; });
 
   // ── Heures « bonus » (manuelles, hors jours) ───────────────────────────────
-  const addBonus=(sign)=>{
+  const applyBonus=(sign)=>{
     const app=(bonusApp==='_c'?bonusCust.trim():bonusApp);
     if(!app) return;
-    const h=(parseFloat(bonusH)||0)+(parseFloat(bonusM)||0)/60;
-    if(h<=0) return;
-    setBonus(p=>{
-      const next={...p};
-      const cur=(next[app]||0)+sign*h;
-      if(cur<0.01) delete next[app]; else next[app]=Math.round(cur*100)/100;
-      return next;
-    });
+    const hIn=Math.round(((parseFloat(bonusH)||0)+(parseFloat(bonusM)||0)/60)*60)/60;
+    if(hIn<=0) return;
+
+    // ── Ajout : heures « bonus », hors journées ──
+    if(sign>0){
+      setBonus(p=>{const next={...p}; next[app]=Math.round(((next[app]||0)+hIn)*100)/100; return next;});
+      setBonusMsg({type:'ok',text:`+${fmtH(hIn)} ajoutées à ${app} (hors journées : la moyenne/jour ne bouge pas).`});
+      setBonusH('');setBonusM('');
+      return;
+    }
+
+    // ── Retrait : bonus d'abord, puis journées de la plus récente à la plus ancienne ──
+    const avail=appGrandTotal(app);
+    if(avail<=0.0048){
+      setBonusMsg({type:'warn',text:`${app} n'a aucun temps enregistré : rien à retirer.`});
+      return;
+    }
+    const done=Math.min(hIn,avail);
+    let restMin=Math.round(done*60);
+
+    const bonusMin=Math.round((bonus[app]||0)*60);
+    const takeB=Math.min(bonusMin,restMin);
+    restMin-=takeB;
+    if(takeB>0){
+      setBonus(p=>{
+        const next={...p};
+        const left=(Math.round((next[app]||0)*60)-takeB)/60;
+        if(left>0.004) next[app]=Math.round(left*100)/100; else delete next[app];
+        return next;
+      });
+    }
+
+    const plan=[];
+    if(restMin>0){
+      Object.keys(data).sort().reverse().forEach(k=>{
+        if(restMin<=0) return;
+        const cur=Math.round((((data[k]||{}).apps||{})[app]||0)*60);
+        if(cur<=0) return;
+        const take=Math.min(cur,restMin);
+        restMin-=take;
+        plan.push({k,take});
+      });
+      if(plan.length){
+        setData(p=>{
+          const next={...p};
+          plan.forEach(({k,take})=>{
+            const e=next[k]||{total:0,apps:{}};
+            const apps={...e.apps};
+            const left=(Math.round((apps[app]||0)*60)-take)/60;
+            if(left>0.004) apps[app]=Math.round(left*1e6)/1e6; else delete apps[app];
+            next[k]={...e,apps};
+          });
+          return next;
+        });
+      }
+    }
+
+    const bits=[];
+    if(takeB>0) bits.push(`bonus −${fmtH(takeB/60)}`);
+    plan.forEach(({k,take})=>{ bits.push(`${fmtS(new Date(k+'T00:00:00'))} −${fmtH(take/60)}`); });
+    const removedMin=takeB+plan.reduce((a,p)=>a+p.take,0);
+    const limited=hIn>avail+0.0048?` — plafonné au total disponible de ${app}`:'';
+    setBonusMsg({type:'ok',text:`−${fmtH(removedMin/60)} retirées de ${app}${bits.length?' : '+bits.join(' · '):''}${limited}`});
     setBonusH('');setBonusM('');
   };
   const delBonus=(app)=>setBonus(p=>{const next={...p};delete next[app];return next;});
@@ -837,6 +894,14 @@ function App() {
     return [...s].sort((a,b)=>a.localeCompare(b,'fr'));
   },[allKnownApps,myApps]);
   const bonusList=useMemo(()=>Object.entries(bonus).filter(([,h])=>h>0).sort((a,b)=>b[1]-a[1]),[bonus]);
+  const bonusTarget=bonusApp==='_c'?bonusCust.trim():bonusApp;
+  const bonusPreview=(parseFloat(bonusH)||0)+(parseFloat(bonusM)||0)/60;
+  const appGrandTotal=(app)=>{
+    if(!app) return 0;
+    let t=bonus[app]||0;
+    Object.keys(data).forEach(k=>{ t+=(((data[k]||{}).apps)||{})[app]||0; });
+    return t;
+  };
 
   // ── Photo de signature : upload + miniature (≤480px) pour rester léger ─────
   const handleSignatureFile=(file)=>{
@@ -1042,7 +1107,7 @@ function App() {
             ))}
           </nav>
           <img key={signature?'custom':'file'} src={signature||SIGNATURE_SRC} alt="signature" style={S.sig} onError={e=>{e.currentTarget.style.display='none';}} onLoad={e=>{e.currentTarget.style.display='';}}/>
-          <span style={S.ver}>v38</span>
+          <span style={S.ver}>v39</span>
         </div>
       </header>
 
@@ -1386,7 +1451,7 @@ function App() {
                   <div style={{...S.ct,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
                     <span>🏆 Classement</span>
                     <span style={{display:'flex',alignItems:'center',gap:12}}>
-                      <button style={S.sab} onClick={()=>{setBonusOpen(true);setBonusApp('');setBonusCust('');setBonusH('');setBonusM('');}}>⏱ + Temps</button>
+                      <button style={S.sab} title="Ajouter ou retirer du temps à une app" onClick={()=>{setBonusOpen(true);setBonusApp('');setBonusCust('');setBonusH('');setBonusM('');setBonusSign(1);setBonusMsg(null);}}>⏱ ± Temps</button>
                       {stats.sorted.length>10&&<button style={S.sab} onClick={()=>setShowAll(true)}>Voir tout ({stats.sorted.length}) →</button>}
                     </span>
                   </div>
@@ -1941,7 +2006,7 @@ function App() {
                 <div style={{display:'flex',flexDirection:'column',gap:0}}>
                   {[
                     { label:'Application', value:'ScreenPulse' },
-                    { label:'Version', value:'v38' },
+                    { label:'Version', value:'v39' },
                     { label:'Édition', value:'Cinématique' },
                     { label:'Jours trackés', value:`${daysTracked} jours` },
                     { label:'Premier jour', value: firstDayFmt || '–' },
@@ -1972,7 +2037,7 @@ function App() {
                     ))}
                   </div>
                   <div className="mono" style={{fontSize:10,color:'var(--text-faint)',letterSpacing:'0.1em',padding:'8px 18px',border:'1px solid var(--border)',borderRadius:999,display:'inline-block'}}>
-                    VERSION v38 · ÉDITION CINÉMATIQUE
+                    VERSION v39 · ÉDITION CINÉMATIQUE
                   </div>
                 </div>
               </div>
@@ -2095,17 +2160,24 @@ function App() {
         </div>
       )}
 
-      {/* ─── Bonus modal : heures ajoutées à une app (hors journées) ─── */}
+      {/* ─── Bonus modal : ajouter / retirer du temps à une app ─── */}
       {bonusOpen&&(
         <div style={S.ov} onClick={()=>setBonusOpen(false)}>
           <div style={{...S.mo,maxWidth:480,maxHeight:'86vh',display:'flex',flexDirection:'column'}} onClick={e=>e.stopPropagation()}>
-            <div style={S.mt}>⏱ Ajouter du temps à une app</div>
+            <div style={S.mt}>{bonusSign>0?'⏱ Ajouter du temps à une app':'⏱ Retirer du temps à une app'}</div>
             <div style={S.msub}>
-              Ces heures s'ajoutent au <strong>total de l'app</strong> et la font monter dans le <strong>classement</strong>,
-              mais elles ne sont rattachées à aucune journée : la <strong>moyenne/jour ne change pas</strong>.
+              {bonusSign>0
+                ? <>Ces heures s'ajoutent au <strong>total de l'app</strong> et la font monter dans le <strong>classement</strong>, mais elles ne sont rattachées à aucune journée : la <strong>moyenne/jour ne change pas</strong>.</>
+                : <>Ces heures sont retirées du <strong>total de l'app</strong> et la font descendre dans le <strong>classement</strong>. Le retrait puise d'abord dans les <strong>heures bonus</strong>, puis dans les <strong>journées les plus récentes</strong>. Une app ne descend jamais sous 0 h, et la moyenne/jour ne change pas.</>}
             </div>
+
+            <div style={{display:'flex',gap:8,marginBottom:14}}>
+              <button style={{...S.seg,...(bonusSign>0?S.segAdd:S.segIdle)}} onClick={()=>{setBonusSign(1);setBonusMsg(null);}}>＋ Ajouter</button>
+              <button style={{...S.seg,...(bonusSign<0?S.segDel:S.segIdle)}} onClick={()=>{setBonusSign(-1);setBonusMsg(null);}}>− Retirer</button>
+            </div>
+
             <div style={{marginBottom:12}}>
-              <select style={S.sel} value={bonusApp} onChange={e=>setBonusApp(e.target.value)}>
+              <select style={S.sel} value={bonusApp} onChange={e=>{setBonusApp(e.target.value);setBonusMsg(null);}}>
                 <option value="">Choisir une application...</option>
                 {bonusOptions.map(a=><option key={a} value={a}>{a}</option>)}
                 <option value="_c">✏️ Autre (nom personnalisé)…</option>
@@ -2114,20 +2186,34 @@ function App() {
             {bonusApp==='_c'&&(
               <input style={{...S.inp,marginBottom:12,fontSize:13}} placeholder="Nom de l'app…" value={bonusCust} onChange={e=>setBonusCust(e.target.value)}/>
             )}
-            {bonusApp&&bonusApp!=='_c'&&bonus[bonusApp]>0&&(
-              <div style={{fontSize:11,color:'var(--text-muted)',marginBottom:12}}>
-                Bonus actuel de <strong style={{color:'var(--text-primary)'}}>{bonusApp}</strong> : <span className="mono" style={{color:'var(--accent-green)'}}>+{fmtH(bonus[bonusApp])}</span>
-              </div>
-            )}
+            {bonusTarget&&(()=>{
+              const tot=appGrandTotal(bonusTarget);
+              return (
+                <div style={{fontSize:11,color:'var(--text-muted)',marginBottom:12,lineHeight:1.7}}>
+                  Total actuel de <strong style={{color:'var(--text-primary)'}}>{bonusTarget}</strong> : <span className="mono">{fmtH(tot)}</span>
+                  {bonus[bonusTarget]>0&&<> · dont bonus <span className="mono" style={{color:'var(--accent-green)'}}>+{fmtH(bonus[bonusTarget])}</span></>}
+                  {bonusPreview>0&&<> → après : <span className="mono" style={{color:bonusSign>0?'var(--accent-green)':'var(--accent-red)'}}>{fmtH(Math.max(0,tot+bonusSign*bonusPreview))}</span></>}
+                </div>
+              );
+            })()}
             <div style={{display:'flex',gap:10,marginBottom:14}}>
               <div style={{flex:1,display:'flex',alignItems:'center',gap:8}}><input style={S.inp} type="number" min="0" placeholder="0" value={bonusH} onChange={e=>setBonusH(e.target.value)}/><span style={{fontSize:13,color:'var(--text-muted)',flexShrink:0}}>h</span></div>
-              <div style={{flex:1,display:'flex',alignItems:'center',gap:8}}><input style={S.inp} type="number" min="0" placeholder="0" value={bonusM} onChange={e=>setBonusM(e.target.value)}/><span style={{fontSize:13,color:'var(--text-muted)',flexShrink:0}}>min</span></div>
+              <div style={{flex:1,display:'flex',alignItems:'center',gap:8}}><input style={S.inp} type="number" min="0" max="59" placeholder="0" value={bonusM} onChange={e=>setBonusM(e.target.value)}/><span style={{fontSize:13,color:'var(--text-muted)',flexShrink:0}}>min</span></div>
             </div>
             <div style={{display:'flex',gap:8}}>
-              <button style={S.btnGreen} onClick={()=>addBonus(1)}>+ Ajouter</button>
-              <button style={S.btnDanger} onClick={()=>addBonus(-1)}>− Retirer</button>
+              {bonusSign>0
+                ? <button style={S.btnGreen} onClick={()=>applyBonus(1)}>+ Ajouter</button>
+                : <button style={S.btnDanger} onClick={()=>applyBonus(-1)}>− Retirer</button>}
               <button style={S.btnGhostSm} onClick={()=>setBonusOpen(false)}>Fermer</button>
             </div>
+            {bonusMsg&&(
+              <div style={{marginTop:12,fontSize:11.5,lineHeight:1.6,borderRadius:12,padding:'10px 12px',
+                border:`1px solid ${bonusMsg.type==='warn'?'rgba(255,214,10,0.3)':'rgba(48,209,88,0.3)'}`,
+                background:bonusMsg.type==='warn'?'rgba(255,214,10,0.06)':'rgba(48,209,88,0.06)',
+                color:bonusMsg.type==='warn'?'var(--accent-yellow)':'var(--accent-green)'}}>
+                {bonusMsg.text}
+              </div>
+            )}
             {bonusList.length>0&&(
               <div style={{borderTop:'1px solid var(--border-modal)',marginTop:16,paddingTop:14,overflowY:'auto'}}>
                 <div style={{fontSize:11,fontWeight:700,color:'var(--text-muted)',letterSpacing:'0.06em',marginBottom:10}}>
@@ -2211,6 +2297,10 @@ const S={
   btnSmallPrimary:{padding:'10px 18px',borderRadius:999,border:'none',background:'var(--accent)',color:'#000',fontWeight:700,fontSize:13,cursor:'pointer',fontFamily:'inherit',flexShrink:0},
   btnGreen:{flex:1,padding:'12px',borderRadius:999,border:'1px solid rgba(48,209,88,0.35)',background:'rgba(48,209,88,0.1)',color:'var(--accent-green)',cursor:'pointer',fontSize:13,fontFamily:'inherit',fontWeight:700},
   btnDanger:{flex:1,padding:'12px',borderRadius:999,border:'1px solid rgba(255,69,58,0.3)',background:'rgba(255,69,58,0.08)',color:'var(--accent-red)',cursor:'pointer',fontSize:13,fontFamily:'inherit',fontWeight:700},
+  seg:   {flex:1,padding:'10px',borderRadius:999,fontSize:13,fontFamily:'inherit',fontWeight:700,cursor:'pointer',textAlign:'center',background:'transparent'},
+  segAdd:{border:'1px solid rgba(48,209,88,0.5)',background:'rgba(48,209,88,0.14)',color:'var(--accent-green)'},
+  segDel:{border:'1px solid rgba(255,69,58,0.5)',background:'rgba(255,69,58,0.14)',color:'var(--accent-red)'},
+  segIdle:{border:'1px solid var(--border-modal)',background:'transparent',color:'var(--text-muted)'},
   stepBtn:{width:30,height:30,borderRadius:999,border:'1px solid var(--border)',background:'transparent',color:'var(--text-primary)',cursor:'pointer',fontSize:16,display:'flex',alignItems:'center',justifyContent:'center'},
   rrb:  {background:'rgba(255,69,58,0.08)',border:'1px solid rgba(255,69,58,0.3)',color:'var(--accent-red)',cursor:'pointer',fontSize:12,padding:'5px 12px',borderRadius:999,fontFamily:'inherit',fontWeight:600},
   rpb:  {padding:'8px 16px',borderRadius:999,border:'1px solid var(--border-modal)',background:'transparent',color:'var(--text-muted)',cursor:'pointer',fontSize:13,fontFamily:'inherit'},
@@ -2247,7 +2337,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 // ── PWA : Service Worker ──────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
   const SW = `
-const CACHE = 'screenpulse-cinematic-v38';
+const CACHE = 'screenpulse-cinematic-v39';
 const ASSETS = [
   'https://unpkg.com/react@18.3.1/umd/react.production.min.js',
   'https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js',
@@ -2369,5 +2459,5 @@ window.addEventListener('appinstalled', () => {
   if (wrap) wrap.innerHTML = '<div style="padding:11px 14px;border-radius:12px;background:rgba(48,209,88,0.08);border:1px solid rgba(48,209,88,0.3);color:#30d158;font-size:12px;font-weight:700;text-align:center;">✅ ScreenPulse est installée sur ta tablette !</div>';
 });
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a50a81db1cbc88ed',t:'MTc5MzAyODY3OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
