@@ -147,6 +147,8 @@ const fmtH   = h => { let hh=Math.floor(h); let mm=Math.round((h-hh)*60); if(mm=
 const fmtDate= d => d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
 const fmtS   = d => d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
 const fmtY   = d => d.getFullYear();
+// recherche insensible aux accents, à la casse et aux espaces
+const normTxt = v => String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 
 const COLORS  = ['#ff453a','#ffd60a','#30d158','#4d96ff','#c77dff','#ff9f0a','#00cec9','#fd79a8','#a29bfe','#55efc4'];
 const PRESETS = ['TikTok','Instagram','YouTube','Netflix','Snapchat','Twitter/X','WhatsApp','Spotify','Chrome','Safari','Discord','Twitch','Reddit','Pinterest','LinkedIn'];
@@ -562,7 +564,8 @@ function App() {
   const [bonus,setBonus]           = useState(()=>load('app_bonus',{}));
   const [bonusOpen,setBonusOpen]   = useState(false);
   const [bonusApp,setBonusApp]     = useState('');
-  const [bonusCust,setBonusCust]   = useState('');
+  const [bonusSearch,setBonusSearch]= useState('');
+  const [bonusListOpen,setBonusListOpen]=useState(false);
   const [bonusH,setBonusH]         = useState('');
   const [bonusM,setBonusM]         = useState('');
   const [bonusSign,setBonusSign]   = useState(1);     // 1 = ajouter · -1 = retirer
@@ -819,7 +822,7 @@ function App() {
 
   // ── Heures « bonus » (manuelles, hors jours) ───────────────────────────────
   const applyBonus=(sign)=>{
-    const app=(bonusApp==='_c'?bonusCust.trim():bonusApp);
+    const app=(bonusApp||'').trim();
     if(!app) return;
     const hIn=Math.round(((parseFloat(bonusH)||0)+(parseFloat(bonusM)||0)/60)*60)/60;
     if(hIn<=0) return;
@@ -894,13 +897,33 @@ function App() {
     return [...s].sort((a,b)=>a.localeCompare(b,'fr'));
   },[allKnownApps,myApps]);
   const bonusList=useMemo(()=>Object.entries(bonus).filter(([,h])=>h>0).sort((a,b)=>b[1]-a[1]),[bonus]);
-  const bonusTarget=bonusApp==='_c'?bonusCust.trim():bonusApp;
+  // total classement de chaque app (journées + bonus), pour l'afficher dans la recherche
+  const appTotalsMap=useMemo(()=>{
+    const m={};
+    Object.values(data).forEach(v=>Object.entries(v.apps||{}).forEach(([a,h])=>{ m[a]=(m[a]||0)+h; }));
+    Object.entries(bonus||{}).forEach(([a,h])=>{ if(typeof h==='number'&&h>0) m[a]=(m[a]||0)+h; });
+    return m;
+  },[data,bonus]);
+  const bonusTarget=bonusApp;
   const bonusPreview=(parseFloat(bonusH)||0)+(parseFloat(bonusM)||0)/60;
-  const appGrandTotal=(app)=>{
-    if(!app) return 0;
-    let t=bonus[app]||0;
-    Object.keys(data).forEach(k=>{ t+=(((data[k]||{}).apps)||{})[app]||0; });
-    return t;
+  const appGrandTotal=(app)=>app?(appTotalsMap[app]||0):0;
+  const bonusMatches=useMemo(()=>{
+    const q=normTxt(bonusSearch);
+    if(!q) return bonusOptions;
+    const starts=[],rest=[];
+    bonusOptions.forEach(a=>{
+      const n=normTxt(a);
+      if(n.startsWith(q)) starts.push(a);
+      else if(n.includes(q)) rest.push(a);
+    });
+    return [...starts,...rest];
+  },[bonusOptions,bonusSearch]);
+  const bonusExactMatch=useMemo(()=>bonusOptions.find(a=>normTxt(a)===normTxt(bonusSearch))||null,[bonusOptions,bonusSearch]);
+  const pickBonus=(app)=>{ setBonusApp(app); setBonusSearch(app); setBonusListOpen(false); setBonusMsg(null); };
+  const typeBonusSearch=(v)=>{
+    setBonusSearch(v); setBonusListOpen(true); setBonusMsg(null);
+    const exact=bonusOptions.find(a=>normTxt(a)===normTxt(v));
+    setBonusApp(exact||'');
   };
 
   // ── Photo de signature : upload + miniature (≤480px) pour rester léger ─────
@@ -1107,7 +1130,7 @@ function App() {
             ))}
           </nav>
           <img key={signature?'custom':'file'} src={signature||SIGNATURE_SRC} alt="signature" style={S.sig} onError={e=>{e.currentTarget.style.display='none';}} onLoad={e=>{e.currentTarget.style.display='';}}/>
-          <span style={S.ver}>v39</span>
+          <span style={S.ver}>v40</span>
         </div>
       </header>
 
@@ -1451,7 +1474,7 @@ function App() {
                   <div style={{...S.ct,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
                     <span>🏆 Classement</span>
                     <span style={{display:'flex',alignItems:'center',gap:12}}>
-                      <button style={S.sab} title="Ajouter ou retirer du temps à une app" onClick={()=>{setBonusOpen(true);setBonusApp('');setBonusCust('');setBonusH('');setBonusM('');setBonusSign(1);setBonusMsg(null);}}>⏱ ± Temps</button>
+                      <button style={S.sab} title="Ajouter ou retirer du temps à une app" onClick={()=>{setBonusOpen(true);setBonusApp('');setBonusSearch('');setBonusListOpen(false);setBonusH('');setBonusM('');setBonusSign(1);setBonusMsg(null);}}>⏱ ± Temps</button>
                       {stats.sorted.length>10&&<button style={S.sab} onClick={()=>setShowAll(true)}>Voir tout ({stats.sorted.length}) →</button>}
                     </span>
                   </div>
@@ -2006,7 +2029,7 @@ function App() {
                 <div style={{display:'flex',flexDirection:'column',gap:0}}>
                   {[
                     { label:'Application', value:'ScreenPulse' },
-                    { label:'Version', value:'v39' },
+                    { label:'Version', value:'v40' },
                     { label:'Édition', value:'Cinématique' },
                     { label:'Jours trackés', value:`${daysTracked} jours` },
                     { label:'Premier jour', value: firstDayFmt || '–' },
@@ -2037,7 +2060,7 @@ function App() {
                     ))}
                   </div>
                   <div className="mono" style={{fontSize:10,color:'var(--text-faint)',letterSpacing:'0.1em',padding:'8px 18px',border:'1px solid var(--border)',borderRadius:999,display:'inline-block'}}>
-                    VERSION v39 · ÉDITION CINÉMATIQUE
+                    VERSION v40 · ÉDITION CINÉMATIQUE
                   </div>
                 </div>
               </div>
@@ -2176,17 +2199,55 @@ function App() {
               <button style={{...S.seg,...(bonusSign<0?S.segDel:S.segIdle)}} onClick={()=>{setBonusSign(-1);setBonusMsg(null);}}>− Retirer</button>
             </div>
 
-            <div style={{marginBottom:12}}>
-              <select style={S.sel} value={bonusApp} onChange={e=>{setBonusApp(e.target.value);setBonusMsg(null);}}>
-                <option value="">Choisir une application...</option>
-                {bonusOptions.map(a=><option key={a} value={a}>{a}</option>)}
-                <option value="_c">✏️ Autre (nom personnalisé)…</option>
-              </select>
+            {/* Recherche d'app */}
+            <div style={{position:'relative',marginBottom:8}}>
+              <span style={{position:'absolute',left:14,top:'50%',transform:'translateY(-50%)',fontSize:14,color:'var(--text-muted)',pointerEvents:'none'}}>🔍</span>
+              <input
+                style={{...S.inp,width:'100%',paddingLeft:38,paddingRight:bonusSearch?36:14,fontSize:13}}
+                placeholder="Rechercher une application…"
+                value={bonusSearch}
+                onChange={e=>typeBonusSearch(e.target.value)}
+                onFocus={()=>setBonusListOpen(true)}
+                onKeyDown={e=>{
+                  if(e.key==='Enter'){ e.preventDefault(); const f=bonusMatches[0]; if(f) pickBonus(f); }
+                  else if(e.key==='Escape'){ setBonusListOpen(false); }
+                }}
+                autoComplete="off"
+              />
+              {!!bonusSearch&&(
+                <button onClick={()=>{setBonusSearch('');setBonusApp('');setBonusListOpen(true);}} title="Effacer"
+                  style={{position:'absolute',right:10,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',color:'var(--text-muted)',cursor:'pointer',fontSize:15,lineHeight:1,padding:4}}>✕</button>
+              )}
             </div>
-            {bonusApp==='_c'&&(
-              <input style={{...S.inp,marginBottom:12,fontSize:13}} placeholder="Nom de l'app…" value={bonusCust} onChange={e=>setBonusCust(e.target.value)}/>
+
+            {bonusListOpen&&(
+              <div style={{maxHeight:222,overflowY:'auto',border:'1px solid var(--border-modal)',borderRadius:14,marginBottom:12,background:'rgba(255,255,255,0.02)'}}>
+                {bonusMatches.length===0&&!bonusSearch.trim()&&(
+                  <div style={{padding:'14px 12px',fontSize:12,color:'var(--text-muted)',textAlign:'center'}}>Aucune app enregistrée — tape un nom pour en créer une.</div>
+                )}
+                {bonusMatches.slice(0,80).map(a=>(
+                  <button key={a} onClick={()=>pickBonus(a)}
+                    style={{display:'flex',alignItems:'center',gap:10,width:'100%',padding:'9px 12px',border:'none',borderBottom:'1px solid var(--border)',
+                      background:a===bonusApp?'rgba(77,150,255,0.14)':'transparent',color:'var(--text-primary)',cursor:'pointer',fontFamily:'inherit',fontSize:13,textAlign:'left'}}>
+                    <AppIcon name={a} color={COLORS[0]} size={16} appImages={appImages}/>
+                    <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a}</span>
+                    <span className="mono" style={{fontSize:11,color:'var(--text-muted)',flexShrink:0}}>{fmtH(appGrandTotal(a))}</span>
+                  </button>
+                ))}
+                {bonusMatches.length>80&&(
+                  <div style={{padding:'8px 12px',fontSize:11,color:'var(--text-faint)',textAlign:'center'}}>+{bonusMatches.length-80} autres — affine la recherche</div>
+                )}
+                {!!bonusSearch.trim()&&!bonusExactMatch&&(
+                  <button onClick={()=>pickBonus(bonusSearch.trim())}
+                    style={{display:'flex',alignItems:'center',gap:10,width:'100%',padding:'9px 12px',border:'none',background:'transparent',
+                      color:'var(--accent)',cursor:'pointer',fontFamily:'inherit',fontSize:13,textAlign:'left'}}>
+                    <span style={{width:16,textAlign:'center'}}>✏️</span>
+                    <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>Utiliser «&nbsp;{bonusSearch.trim()}&nbsp;»</span>
+                  </button>
+                )}
+              </div>
             )}
-            {bonusTarget&&(()=>{
+            {!!bonusTarget&&(()=>{
               const tot=appGrandTotal(bonusTarget);
               return (
                 <div style={{fontSize:11,color:'var(--text-muted)',marginBottom:12,lineHeight:1.7}}>
@@ -2201,9 +2262,14 @@ function App() {
               <div style={{flex:1,display:'flex',alignItems:'center',gap:8}}><input style={S.inp} type="number" min="0" max="59" placeholder="0" value={bonusM} onChange={e=>setBonusM(e.target.value)}/><span style={{fontSize:13,color:'var(--text-muted)',flexShrink:0}}>min</span></div>
             </div>
             <div style={{display:'flex',gap:8}}>
-              {bonusSign>0
-                ? <button style={S.btnGreen} onClick={()=>applyBonus(1)}>+ Ajouter</button>
-                : <button style={S.btnDanger} onClick={()=>applyBonus(-1)}>− Retirer</button>}
+              <button
+                style={{...((bonusSign>0)?S.btnGreen:S.btnDanger),opacity:(bonusTarget&&bonusPreview>0)?1:0.45,cursor:(bonusTarget&&bonusPreview>0)?'pointer':'not-allowed'}}
+                disabled={!bonusTarget||bonusPreview<=0}
+                onClick={()=>applyBonus(bonusSign)}>
+                {bonusSign>0
+                  ? '✓ Ajouter'+(bonusTarget&&bonusPreview>0?` ${fmtH(bonusPreview)} à ${bonusTarget}`:'')
+                  : '✓ Retirer'+(bonusTarget&&bonusPreview>0?` ${fmtH(bonusPreview)} de ${bonusTarget}`:'')}
+              </button>
               <button style={S.btnGhostSm} onClick={()=>setBonusOpen(false)}>Fermer</button>
             </div>
             {bonusMsg&&(
@@ -2295,8 +2361,8 @@ const S={
   btnGhost:{padding:'14px 26px',borderRadius:999,border:'1px solid var(--border-modal)',background:'transparent',color:'var(--text-primary)',fontWeight:600,fontSize:14,cursor:'pointer',fontFamily:'inherit'},
   btnGhostSm:{flex:1,padding:'12px',borderRadius:999,border:'1px solid var(--border-modal)',background:'transparent',color:'var(--text-primary)',cursor:'pointer',fontSize:13,fontFamily:'inherit',fontWeight:600},
   btnSmallPrimary:{padding:'10px 18px',borderRadius:999,border:'none',background:'var(--accent)',color:'#000',fontWeight:700,fontSize:13,cursor:'pointer',fontFamily:'inherit',flexShrink:0},
-  btnGreen:{flex:1,padding:'12px',borderRadius:999,border:'1px solid rgba(48,209,88,0.35)',background:'rgba(48,209,88,0.1)',color:'var(--accent-green)',cursor:'pointer',fontSize:13,fontFamily:'inherit',fontWeight:700},
-  btnDanger:{flex:1,padding:'12px',borderRadius:999,border:'1px solid rgba(255,69,58,0.3)',background:'rgba(255,69,58,0.08)',color:'var(--accent-red)',cursor:'pointer',fontSize:13,fontFamily:'inherit',fontWeight:700},
+  btnGreen:{flex:1,padding:'12px',borderRadius:999,border:'1px solid rgba(48,209,88,0.35)',background:'rgba(48,209,88,0.1)',color:'var(--accent-green)',cursor:'pointer',fontSize:13,fontFamily:'inherit',fontWeight:700,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'},
+  btnDanger:{flex:1,padding:'12px',borderRadius:999,border:'1px solid rgba(255,69,58,0.3)',background:'rgba(255,69,58,0.08)',color:'var(--accent-red)',cursor:'pointer',fontSize:13,fontFamily:'inherit',fontWeight:700,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'},
   seg:   {flex:1,padding:'10px',borderRadius:999,fontSize:13,fontFamily:'inherit',fontWeight:700,cursor:'pointer',textAlign:'center',background:'transparent'},
   segAdd:{border:'1px solid rgba(48,209,88,0.5)',background:'rgba(48,209,88,0.14)',color:'var(--accent-green)'},
   segDel:{border:'1px solid rgba(255,69,58,0.5)',background:'rgba(255,69,58,0.14)',color:'var(--accent-red)'},
@@ -2337,7 +2403,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 // ── PWA : Service Worker ──────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
   const SW = `
-const CACHE = 'screenpulse-cinematic-v39';
+const CACHE = 'screenpulse-cinematic-v40';
 const ASSETS = [
   'https://unpkg.com/react@18.3.1/umd/react.production.min.js',
   'https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js',
@@ -2459,5 +2525,5 @@ window.addEventListener('appinstalled', () => {
   if (wrap) wrap.innerHTML = '<div style="padding:11px 14px;border-radius:12px;background:rgba(48,209,88,0.08);border:1px solid rgba(48,209,88,0.3);color:#30d158;font-size:12px;font-weight:700;text-align:center;">✅ ScreenPulse est installée sur ta tablette !</div>';
 });
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a50a81db1cbc88ed',t:'MTc5MzAyODY3OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a50a9773afc7260a',t:'MTc5MzAyOTU2Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
