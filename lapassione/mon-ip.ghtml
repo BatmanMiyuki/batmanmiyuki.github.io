@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#090d19">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://api.ipify.org https://api6.ipify.org https://ipwho.is https://ipapi.co https://api.bigdatacloud.net; img-src data:; base-uri 'none'; form-action 'none'">
+  <title>Mon IP · Outil réseau</title>
+  <style>
+    :root{color-scheme:dark;--bg:#090d19;--card:#111827;--card2:#141e2e;--line:#28354a;--muted:#94a4ba;--dim:#6d7d95;--text:#eff7fa;--aqua:#8be8dc;--blue:#a4b7ff;--shadow:0 25px 80px #0006}
+    *,*::before,*::after{box-sizing:border-box}
+    html{min-height:100%;background:var(--bg)}
+    body{min-height:100vh;margin:0;background:radial-gradient(ellipse at 82% 8%,#16333a 0,transparent 32%),radial-gradient(ellipse at 12% 27%,#182044 0,transparent 37%),var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.14;background-image:linear-gradient(#bfd4fb0d 1px,transparent 1px),linear-gradient(90deg,#bfd4fb0d 1px,transparent 1px);background-size:56px 56px;mask-image:linear-gradient(#000,transparent 85%)}
+    button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #a7f6e7;outline-offset:4px}button:disabled{cursor:not-allowed;opacity:.46}
+    .page{position:relative;max-width:1120px;margin:auto;padding:0 34px}
+    .top{height:84px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff14}
+    .brand{display:flex;gap:12px;align-items:center;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+    .mark{display:grid;place-items:center;width:37px;height:37px;border:1px solid #4f8b85;border-radius:11px;color:var(--aqua);background:#1a3939aa}
+    .mark svg{width:20px;height:20px}.brand em{font-style:normal;color:var(--muted);font-weight:500;letter-spacing:.08em}
+    .top-right{display:flex;align-items:center;gap:8px;color:#a8b8c8;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+    .dot{width:7px;height:7px;background:#87e7ce;border-radius:50%;box-shadow:0 0 12px #87e7ce88;flex:none}
+    main{width:min(790px,100%);margin:0 auto;padding:72px 0 58px}
+    .eyebrow{display:inline-flex;align-items:center;gap:9px;color:#a5c8c9;font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+    .eyebrow .line{height:1px;width:22px;background:#78c9bd}
+    h1{margin:19px 0 15px;font-size:clamp(42px,6vw,69px);letter-spacing:-.055em;line-height:1.06;font-weight:720}
+    h1 span{color:var(--aqua)}
+    .lead{margin:0;color:#a8b8c8;font-size:17px;line-height:1.6;max-width:600px}
+    .panel{margin-top:36px;border:1px solid #35435a;border-radius:23px;background:linear-gradient(145deg,#182235ed,#111827f7 58%,#101b26f5);box-shadow:var(--shadow);overflow:hidden}
+    .panel-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:23px 25px;border-bottom:1px solid #ffffff10}
+    .panel-title{display:flex;gap:13px;align-items:center}
+    .panel-icon{width:41px;height:41px;display:grid;place-items:center;border-radius:12px;background:#b8fff211;border:1px solid #7bdac529;color:var(--aqua)}
+    .panel-icon svg{width:20px;height:20px}
+    .panel-title strong{display:block;font-size:15px;letter-spacing:-.01em}.panel-title small{display:block;margin-top:4px;color:#8c9db1;font-size:11px}
+    .refresh{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 13px;background:#ffffff09;color:#d6e5ef;border:1px solid #ffffff20;border-radius:10px;font-size:12px;font-weight:700;white-space:nowrap;transition:background .16s,border-color .16s}
+    .refresh:hover:not(:disabled){background:#ffffff13;border-color:#8be8dc88}.refresh svg{width:15px;height:15px}
+    .addresses{padding:9px 25px}
+    .iprow{display:grid;grid-template-columns:112px minmax(0,1fr) auto;align-items:center;gap:16px;padding:22px 0}
+    .iprow+.iprow{border-top:1px solid #ffffff12}
+    .row-label{display:flex;gap:10px;align-items:center}.row-number{font:600 10px ui-monospace,SFMono-Regular,Menlo,monospace;color:#647e90}
+    .row-label strong{display:block;font-size:14px}.row-label small{display:block;color:#76899f;font-size:10px;margin-top:4px;letter-spacing:.03em}
+    .result{min-width:0}.result code{display:block;color:#f0faf9;font:600 clamp(16px,2.5vw,21px) ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:-.03em;overflow-wrap:anywhere;word-break:break-word;user-select:all}
+    .result code.pending,.result code.unavailable{font-family:inherit;font-weight:500;font-size:14px;letter-spacing:0;color:#9baabd;user-select:text}
+    .result small{display:block;margin-top:7px;color:#8193a8;font-size:11px;line-height:1.4}
+    .copy{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;min-width:88px;padding:0 11px;color:#b8eee3;background:#1a3839;border:1px solid #3b7369;border-radius:10px;font-size:12px;font-weight:750;transition:background .16s,border-color .16s}
+    .copy:hover:not(:disabled){background:#244b49;border-color:#7bd4c1}.copy svg{width:14px;height:14px}
+    .panel-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:15px 25px;background:#0a111b80;border-top:1px solid #ffffff0e}
+    .status{display:flex;align-items:center;gap:8px;color:#a9bdc4;font-size:11px}.status .dot{width:6px;height:6px}
+    .status.error .dot{background:#e9ac7b;box-shadow:0 0 10px #e9ac7b77}.foot-note{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#77889b}
+    .copy-status{min-height:20px;padding:11px 3px 0;color:#a8dfd3;font-size:12px}
+    .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:25px}
+    .note{border:1px solid #283548;border-radius:16px;background:#101827b0;padding:20px 21px}
+    .note-head{display:flex;align-items:center;gap:10px;color:#d5e3ec;font-size:13px;font-weight:750}.note-head svg{height:17px;width:17px;color:#91c7c4;flex:none}
+    .note p{margin:10px 0 0;color:#9aabbd;font-size:13px;line-height:1.6}
+    .privacy{margin-top:25px;color:#8091a6;font-size:12px;line-height:1.7}.privacy a{color:#b5d9d4;text-decoration:underline;text-underline-offset:3px}
+    .footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:22px 0 30px;border-top:1px solid #ffffff12;color:#74849a;font-size:11px;line-height:1.4}.footer strong{color:#9eaebe;letter-spacing:.06em}
+    noscript{display:block;margin-top:20px;padding:15px;border:1px solid #946c58;border-radius:12px;color:#ffd7bf;background:#463127}
+    [hidden]{display:none!important}
+    .info-panel,.location-panel{padding:25px}
+    .section-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+    .kicker{color:#8be8dc;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+    h2{margin:8px 0 7px;color:#f2fafb;font-size:24px;line-height:1.16;letter-spacing:-.035em}
+    .section-intro{margin:0;color:#a1b2c2;font-size:13px;line-height:1.6}
+    .section-badge{flex:none;padding:8px 10px;border:1px solid #47656a;border-radius:99px;color:#a4ddd4;background:#72c9b510;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+    .search-box{margin-top:22px;padding:16px;border:1px solid #ffffff12;border-radius:14px;background:#080f1a88}
+    .search-box label{display:block;margin:0 0 9px;color:#dce8ee;font-size:12px;font-weight:750}
+    .search-row{display:flex;gap:9px}.search-row input{min-width:0;flex:1;padding:12px 13px;border:1px solid #394a60;border-radius:10px;color:#f2fafb;background:#0d1725;font:500 16px ui-monospace,SFMono-Regular,Menlo,monospace;outline:none}
+    .search-row input:focus{border-color:#87d9cc;box-shadow:0 0 0 3px #73d5c51c}.search-row input::placeholder{color:#728195}
+    .primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #91e7d8;border-radius:10px;background:#94eadb;color:#0b2829;font-size:12px;font-weight:800;line-height:1.2;text-decoration:none;transition:filter .16s}
+    .primary:hover:not(:disabled){filter:brightness(1.08)}.primary svg{width:16px;height:16px;flex:none}
+    .quick{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:12px}.quick-label{margin-right:2px;color:#899caf;font-size:11px}
+    .chip{min-height:38px;padding:7px 11px;border:1px solid #36485c;border-radius:9px;color:#c1d9dc;background:#162433;font-size:11px;font-weight:750}.chip:hover:not(:disabled){border-color:#7dbbb2;background:#203443}
+    .lookup-current{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:22px;color:#93a4b7;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}.lookup-current code{color:#e4faf4;font:600 14px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:0;text-transform:none;overflow-wrap:anywhere;word-break:break-word;user-select:all}
+    .lookup-status{min-height:20px;margin:9px 0 0;color:#9cb1bf;font-size:12px;line-height:1.5}.lookup-status.error,.gps-status.error{color:#ffc9a7}
+    .geo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin:16px 0 0;border:1px solid #2b3b50;border-radius:14px;background:#2b3b50;overflow:hidden}
+    .geo-cell{min-width:0;margin:0;padding:15px 14px;background:#111d2c}.geo-cell dt{color:#95a8bb;font-size:11px;line-height:1.35}.geo-cell dd{margin:7px 0 0;color:#ebf8f8;font-size:14px;font-weight:700;line-height:1.4;overflow-wrap:anywhere;word-break:break-word}.geo-cell.featured{background:#14282f}.geo-cell.featured dd{color:#b1f3e8}
+    .caution{display:flex;gap:10px;align-items:flex-start;margin:17px 0 0;padding:13px 14px;border:1px solid #775e42;border-radius:12px;color:#e8d6be;background:#55412a38;font-size:12px;line-height:1.6}.caution svg{width:17px;height:17px;flex:none;margin-top:1px;color:#e5bd8b}.caution p{margin:0}
+    .location-panel{background:linear-gradient(145deg,#19303aef,#111c2bf7 70%)}
+    .location-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:19px}.location-actions .refresh{min-height:44px}
+    .gps-status{min-height:20px;margin:12px 0 0;color:#b2c6c8;font-size:12px;line-height:1.5}
+    .gps-result{margin-top:12px;padding:16px;border:1px solid #5b999052;border-radius:13px;background:#0a1b23aa}
+    .gps-result dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0}.gps-result dt{color:#9fb9c0;font-size:11px}.gps-result dd{margin:6px 0 0;color:#e0fbf5;font:600 14px ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere}.gps-result dd.accuracy{font:700 13px system-ui,sans-serif}
+    .city-consent{margin-top:17px;padding-top:15px;border-top:1px solid #ffffff19}.city-consent p{margin:0 0 11px;color:#b9ccca;font-size:12px;line-height:1.6}.city-consent a{color:#c8f4e9;text-underline-offset:3px}.city-consent .refresh{min-height:44px}.city-status{min-height:0;margin:10px 0 0;color:#b8ccc8;font-size:12px;line-height:1.5}.city-status.error{color:#ffc9a7}.place-result{margin-top:12px;padding:12px 13px;border:1px solid #4b847b;border-radius:10px;color:#d8f4eb;background:#15312fe0;font-size:12px;line-height:1.6;overflow-wrap:anywhere}.place-result strong{color:#bcf5e4;font-size:14px}
+    .map-row{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin-top:16px}.map-row a{color:#ccf7ef;text-decoration:none}.map-warning{margin:0;color:#a6bbbf;font-size:11px;line-height:1.5}
+    .device-line{margin-top:16px;color:#9eb1c1;font-size:12px;line-height:1.5}.device-line strong{color:#d9e9ed}
+    @media(max-width:600px){.info-panel,.location-panel{padding:20px 17px}.section-top{gap:10px}.section-badge{font-size:8px;padding:7px}.search-box{padding:13px}.geo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.geo-cell{padding:13px 11px}.geo-cell dd{font-size:13px}.gps-result dl{grid-template-columns:repeat(2,minmax(0,1fr))}.gps-result dl>div:last-child{grid-column:1/-1}.section-intro{font-size:12px}}
+    @media(max-width:370px){.search-row{flex-wrap:wrap}.search-row input{flex-basis:100%}.search-row .primary{width:100%}.section-badge{display:none}}
+    @media(max-width:600px){.page{padding:0 20px}.top{height:70px}.brand{font-size:10px;gap:9px}.mark{height:33px;width:33px}.top-right{font-size:9px;letter-spacing:.06em}main{padding:56px 0 45px}h1{font-size:clamp(38px,10vw,54px)}.lead{font-size:15px}.panel{margin-top:29px;border-radius:19px}.panel-head{padding:19px 17px}.panel-title small{font-size:10px}.addresses{padding:5px 17px}.iprow{grid-template-columns:1fr auto;gap:12px;padding:18px 0}.row-label{grid-column:1/-1}.row-label strong,.row-label small{display:inline}.row-label small{margin-left:7px}.result code{font-size:17px}.panel-foot{padding:14px 17px}.cards{grid-template-columns:1fr}.note{padding:17px 18px}.footer{align-items:flex-start;flex-direction:column}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="top">
+      <div class="brand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2.5 20 6.8v5.8c0 4.5-3.2 7.2-8 8.9-4.8-1.7-8-4.4-8-8.9V6.8L12 2.5Z"/><path d="M8 12h8M12 8v8"/></svg></span><span>OUTILS DU BOT <em> / RÉSEAU</em></span></div>
+      <div class="top-right"><span class="dot" aria-hidden="true"></span> Page d'information</div>
+    </header>
+    <main>
+      <div class="eyebrow"><span class="line" aria-hidden="true"></span> CONNEXION INTERNET</div>
+      <h1>Ton IP,<br><span>en un instant.</span></h1>
+      <p class="lead">Découvre ton adresse publique, sa localisation estimée et les informations de ton réseau.</p>
+      <noscript>Active JavaScript pour afficher ton adresse IP, ou ouvre <a href="https://api64.ipify.org/">le service ipify directement</a>.</noscript>
+      <section class="panel" aria-labelledby="panel-heading">
+        <div class="panel-head">
+          <div class="panel-title"><span class="panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"/><path d="M3.7 12h16.6M12 3.5a13 13 0 0 0 0 17M12 3.5a13 13 0 0 1 0 17"/></svg></span><div><strong id="panel-heading">Adresses publiques</strong><small>Détectées depuis cet appareil</small></div></div>
+          <button class="refresh" id="refresh" type="button" aria-label="Actualiser les adresses IP"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14-4L4 9m0 0V4m0 5h5M4 13a8 8 0 0 0 14 4l2-2m0 0v5m0-5h-5"/></svg>Actualiser</button>
+        </div>
+        <div class="addresses">
+          <div class="iprow"><div class="row-label"><span class="row-number">01</span><div><strong>IPv4</strong><small>FORMAT COURANT</small></div></div><div class="result"><code id="ip4" class="pending">Recherche…</code><small id="hint4">Vérification en cours</small></div><button class="copy" id="copy4" type="button" disabled aria-label="Copier l’adresse IPv4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8" y="8" width="11" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2"/></svg><span>Copier</span></button></div>
+          <div class="iprow"><div class="row-label"><span class="row-number">02</span><div><strong>IPv6</strong><small>SI DISPONIBLE</small></div></div><div class="result"><code id="ip6" class="pending">Recherche…</code><small id="hint6">Vérification en cours</small></div><button class="copy" id="copy6" type="button" disabled aria-label="Copier l’adresse IPv6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8" y="8" width="11" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2"/></svg><span>Copier</span></button></div>
+        </div>
+        <div class="panel-foot"><div class="status" id="status" role="status" aria-live="polite"><span class="dot" aria-hidden="true"></span><span id="status-text">Recherche en cours…</span></div><span class="foot-note">Aucun stockage par cette page</span></div>
+      </section>
+      <div class="copy-status" id="copy-status" aria-live="polite"></div>
+      <section class="panel info-panel" aria-labelledby="details-heading">
+        <div class="section-top">
+          <div><div class="kicker">Localisation &amp; réseau</div><h2 id="details-heading">Les infos de l’IP</h2><p class="section-intro">Ville, pays et fournisseur déduits de l’adresse analysée.</p></div>
+          <span class="section-badge">Estimation IP</span>
+        </div>
+        <div class="search-box">
+          <label for="lookup-input">Rechercher une autre adresse IPv4 ou IPv6</label>
+          <div class="search-row"><input id="lookup-input" type="text" placeholder="Ex. 1.1.1.1" maxlength="45" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="lookup-help"><button id="lookup-button" class="primary" type="button">Rechercher</button></div>
+          <div class="quick" id="lookup-help"><span class="quick-label">Ou analyser :</span><button class="chip" type="button" id="own-lookup">Ma connexion</button><button class="chip" type="button" id="detail4" disabled>Mon IPv4</button><button class="chip" type="button" id="detail6" disabled>Mon IPv6</button></div>
+        </div>
+        <div class="lookup-current"><span>Adresse analysée</span><code id="lookup-ip">Recherche…</code></div>
+        <p class="lookup-status" id="lookup-status" role="status" aria-live="polite">Récupération des informations…</p>
+        <dl class="geo-grid" id="geo-grid" hidden>
+          <div class="geo-cell featured"><dt>Ville estimée</dt><dd id="geo-city">—</dd></div>
+          <div class="geo-cell featured"><dt>Pays</dt><dd id="geo-country">—</dd></div>
+          <div class="geo-cell featured"><dt>Région</dt><dd id="geo-region">—</dd></div>
+          <div class="geo-cell"><dt>Code postal estimé</dt><dd id="geo-postal">—</dd></div>
+          <div class="geo-cell"><dt>Fournisseur d’accès</dt><dd id="geo-isp">—</dd></div>
+          <div class="geo-cell"><dt>Organisation du réseau</dt><dd id="geo-org">—</dd></div>
+          <div class="geo-cell"><dt>Numéro de réseau</dt><dd id="geo-asn">—</dd></div>
+          <div class="geo-cell"><dt>Domaine du réseau</dt><dd id="geo-domain">—</dd></div>
+          <div class="geo-cell"><dt>Type d’adresse</dt><dd id="geo-type">—</dd></div>
+          <div class="geo-cell"><dt>Fuseau horaire estimé</dt><dd id="geo-timezone">—</dd></div>
+          <div class="geo-cell"><dt>Coordonnées IP estimées</dt><dd id="geo-coords">—</dd></div>
+          <div class="geo-cell"><dt>Continent</dt><dd id="geo-continent">—</dd></div>
+          <div class="geo-cell"><dt>Plage réseau</dt><dd id="geo-network">—</dd></div>
+          <div class="geo-cell"><dt>Nom d’hôte</dt><dd id="geo-hostname">—</dd></div>
+          <div class="geo-cell"><dt>Indicatif du pays</dt><dd id="geo-calling">—</dd></div>
+        </dl>
+        <p class="device-line" id="device-info"></p>
+        <div class="caution"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 3 2.7 20h18.6L12 3Z"/><path d="M12 9v5m0 3h.01"/></svg><p><strong>Une ville IP est approximative.</strong> En 4G/5G, avec un VPN ou un relais, elle peut être celle d’une passerelle située ailleurs. Une IP ou une ville ne prouvent pas l’identité d’une personne.</p></div>
+      </section>
+      <section class="panel location-panel" aria-labelledby="location-heading">
+        <div class="section-top"><div><div class="kicker">Facultatif · avec autorisation</div><h2 id="location-heading">Position de cet appareil</h2><p class="section-intro">Pour une position généralement plus précise que l’IP, ton navigateur peut utiliser le GPS, le Wi-Fi ou le réseau. La précision dépend de l’appareil.</p></div><span class="section-badge">À ta demande</span></div>
+        <div class="location-actions"><button class="primary" id="gps-button" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="2.5"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3"/></svg>Afficher ma position</button><button class="refresh" id="gps-clear" type="button" hidden>Effacer la position</button></div>
+        <p class="gps-status" id="gps-status" role="status" aria-live="polite">Aucune position demandée.</p>
+        <div class="gps-result" id="gps-result" hidden>
+          <dl><div><dt>Latitude</dt><dd id="gps-lat">—</dd></div><div><dt>Longitude</dt><dd id="gps-lon">—</dd></div><div><dt>Précision estimée</dt><dd id="gps-accuracy" class="accuracy">—</dd></div></dl>
+          <div class="city-consent"><p><strong>Pour afficher la ville ici :</strong> le bouton ci-dessous envoie tes coordonnées précises et ton IP à <a href="https://www.bigdatacloud.com/docs/article/why-is-reverse-geocoding-api-free" target="_blank" rel="noopener noreferrer">BigDataCloud</a>, qui indique utiliser ces données de façon agrégée pour améliorer sa base de localisation IP.</p><button class="refresh" id="gps-city-button" type="button">Trouver ma ville</button><p class="city-status" id="gps-city-status" role="status" aria-live="polite"></p><div class="place-result" id="gps-place-result" hidden><strong>Ville / localité : <span id="gps-place-name">—</span></strong><br><span id="gps-place-detail"></span></div></div>
+          <div class="map-row"><a class="refresh" id="gps-map" target="_blank" rel="noopener noreferrer">Ouvrir dans Plans</a><p class="map-warning">En ouvrant Plans, ces coordonnées sont transmises à Apple.</p></div>
+        </div>
+        <p class="device-line">Cette position concerne uniquement l’appareil qui appuie sur le bouton. La page ne la conserve pas et ne la transmet pas à IPWhois ou IPapi. Le navigateur peut utiliser ses propres services de localisation.</p>
+      </section>
+      <section class="cards" aria-label="Comprendre les adresses">
+        <article class="note"><div class="note-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10v6m0-9h.01"/></svg>Reconnaître ta connexion</div><p>Compare l’IP et le fournisseur avec ceux de ton appareil. Plusieurs personnes peuvent partager une IP : ce n’est pas une preuve d’identité.</p></article>
+        <article class="note"><div class="note-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M8 22h8M12 18v4M8 10h8M8 14h5"/></svg>Pour ton bot</div><p>Cette page n’ouvre pas le tableau privé. Chaque visiteur voit les informations de sa propre connexion.</p></article>
+      </section>
+      <p class="privacy">Cette page ne conserve pas d’historique. Pour afficher les adresses, ton navigateur contacte <a href="https://www.ipify.org/" target="_blank" rel="noopener noreferrer">ipify</a> ; pour leurs détails, il contacte <a href="https://ipwhois.io/" target="_blank" rel="noopener noreferrer">IPWhois</a>, ou <a href="https://ipapi.co/" target="_blank" rel="noopener noreferrer">IPapi</a> si le premier service échoue. Ces services reçoivent ta connexion et les services de détails reçoivent aussi l’IP recherchée lorsqu’ils sont contactés. L’hébergeur reçoit également ta connexion. Selon le réseau, un VPN ou un relais, les adresses vues par ces services peuvent différer. Les services gratuits peuvent être temporairement indisponibles.</p>
+    </main>
+    <footer class="footer"><strong>OUTILS DU BOT · MON IP</strong><span>Sans compte · Sans mot de passe · Sans historique</span></footer>
+  </div>
+  <script>
+    (function () {
+      'use strict';
+      function el(id) { return document.getElementById(id); }
+
+      var config = {
+        4: { url: 'https://api.ipify.org?format=json', value: el('ip4'), hint: el('hint4'), button: el('copy4'), detail: el('detail4') },
+        6: { url: 'https://api6.ipify.org?format=json', value: el('ip6'), hint: el('hint6'), button: el('copy6'), detail: el('detail6') }
+      };
+      var refresh = el('refresh');
+      var status = el('status');
+      var statusText = el('status-text');
+      var copyStatus = el('copy-status');
+      var values = { 4: null, 6: null };
+      var generation = 0;
+      var infoGeneration = 0;
+      var infoController = null;
+      var gpsGeneration = 0;
+      var gpsPosition = null;
+      var gpsCityGeneration = 0;
+      var gpsCityController = null;
+      var unavailable = 'Non disponible';
+
+      // Valide une véritable IPv4 ou IPv6, et fournit une forme comparable.
+      // Les champs reçus des services ne sont jamais interprétés comme du HTML.
+      function normaliserIP(ip) {
+        if (typeof ip !== 'string' || ip.length < 2 || ip.length > 45) return null;
+        if (ip.indexOf(':') >= 0) {
+          if (!/^[0-9a-fA-F:.]+$/.test(ip)) return null;
+          try {
+            var hostname = new URL('https://[' + ip + ']/').hostname;
+            if (!/^\[[0-9a-f:]+\]$/i.test(hostname)) return null;
+            return hostname.slice(1, -1).toLowerCase();
+          } catch (_) { return null; }
+        }
+        var parts = ip.split('.');
+        if (parts.length !== 4 || !parts.every(function (part) {
+          return /^(0|[1-9]\d{0,2})$/.test(part) && Number(part) <= 255;
+        })) return null;
+        return parts.join('.');
+      }
+
+      function valide(ip, type) {
+        return !!normaliserIP(ip) && ((ip.indexOf(':') !== -1) === (type === 6));
+      }
+
+      function reset(type) {
+        var c = config[type];
+        values[type] = null;
+        c.button.disabled = true;
+        c.detail.disabled = true;
+        c.value.textContent = 'Recherche…';
+        c.value.className = 'pending';
+        c.hint.textContent = 'Vérification en cours';
+      }
+
+      async function chercher(type, courant) {
+        var c = config[type];
+        var controller = new AbortController();
+        var timer = setTimeout(function () { controller.abort(); }, 9000);
+        try {
+          var response = await fetch(c.url, { mode: 'cors', credentials: 'omit', cache: 'no-store', referrerPolicy: 'no-referrer', signal: controller.signal });
+          if (!response.ok) throw new Error('service indisponible');
+          var data = await response.json();
+          var ip = data && data.ip;
+          if (!valide(ip, type)) throw new Error('réponse non reconnue');
+          if (courant !== generation) return false;
+          values[type] = ip;
+          c.value.textContent = ip;
+          c.value.className = '';
+          c.hint.textContent = 'Adresse détectée';
+          c.button.disabled = false;
+          c.detail.disabled = false;
+          return true;
+        } catch (_) {
+          if (courant !== generation) return false;
+          values[type] = null;
+          c.value.textContent = 'Non détectée';
+          c.value.className = 'unavailable';
+          c.hint.textContent = type === 6 ? 'Pas d’IPv6 détectée ou service indisponible' : 'Connexion ou service indisponible';
+          c.button.disabled = true;
+          c.detail.disabled = true;
+          return false;
+        } finally { clearTimeout(timer); }
+      }
+
+      async function actualiser() {
+        var courant = ++generation;
+        reset(4); reset(6);
+        copyStatus.textContent = '';
+        status.classList.remove('error');
+        statusText.textContent = 'Recherche en cours…';
+        refresh.disabled = true;
+        var resultats = await Promise.all([chercher(4, courant), chercher(6, courant)]);
+        if (courant !== generation) return;
+        refresh.disabled = false;
+        if (resultats[0] || resultats[1]) {
+          statusText.textContent = 'Vérification terminée';
+        } else {
+          status.classList.add('error');
+          statusText.textContent = 'Impossible de récupérer une adresse. Vérifie Internet puis réessaie.';
+        }
+      }
+
+      function copieAncienne(ip) {
+        var zone = document.createElement('textarea');
+        zone.value = ip;
+        zone.setAttribute('readonly', '');
+        zone.style.position = 'fixed';
+        zone.style.top = '0'; zone.style.left = '0'; zone.style.opacity = '0';
+        document.body.appendChild(zone);
+        zone.focus(); zone.select(); zone.setSelectionRange(0, ip.length);
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (_) { ok = false; }
+        zone.remove();
+        return ok;
+      }
+
+      async function copier(type) {
+        var ip = values[type];
+        if (!ip) return;
+        var ok = false;
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(ip);
+            ok = true;
+          } else {
+            ok = copieAncienne(ip);
+          }
+        } catch (_) { ok = copieAncienne(ip); }
+        copyStatus.textContent = ok ? 'Adresse IPv' + type + ' copiée.' : 'Sélectionne l’adresse pour la copier manuellement.';
+      }
+
+      function texte(value) {
+        if (typeof value === 'string') return value.trim().slice(0, 160) || unavailable;
+        if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+        return unavailable;
+      }
+      function champ(id, value) { el(id).textContent = texte(value); }
+      function pays(data) {
+        var code = typeof data.country_code === 'string' ? data.country_code.toUpperCase() : '';
+        var nom = texte(data.country);
+        if (/^[A-Z]{2}$/.test(code)) {
+          try {
+            if (typeof Intl.DisplayNames === 'function') {
+              var traduit = new Intl.DisplayNames(['fr'], { type: 'region' }).of(code);
+              if (traduit && traduit.toUpperCase() !== code) nom = traduit;
+            }
+          } catch (_) { /* Garder le nom fourni par le service. */ }
+          return nom === unavailable ? code : nom + ' (' + code + ')';
+        }
+        return nom;
+      }
+      function continent(data) {
+        var noms = { AF: 'Afrique', AN: 'Antarctique', AS: 'Asie', EU: 'Europe', NA: 'Amérique du Nord', OC: 'Océanie', SA: 'Amérique du Sud' };
+        var code = typeof data.continent_code === 'string' ? data.continent_code.toUpperCase() : '';
+        return noms[code] || texte(data.continent);
+      }
+      function coordsIP(data) {
+        var lat = data.latitude, lon = data.longitude;
+        if (typeof lat !== 'number' || typeof lon !== 'number' || !Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return unavailable;
+        return lat.toFixed(3) + ', ' + lon.toFixed(3);
+      }
+      function zoneHoraire(data) {
+        var timezone = data && typeof data.timezone === 'object' && data.timezone ? data.timezone : {};
+        var zone = texte(timezone.id), utc = texte(timezone.utc);
+        if (utc !== unavailable) utc = /^UTC/i.test(utc) ? utc : 'UTC ' + utc;
+        if (zone !== unavailable && utc !== unavailable) return zone + ' · ' + utc;
+        return zone !== unavailable ? zone : utc;
+      }
+      function afficherInfos(data) {
+        var connection = data && typeof data.connection === 'object' && data.connection ? data.connection : {};
+        var asn = texte(connection.asn);
+        if (/^\d+$/.test(asn)) asn = 'AS' + asn;
+        champ('geo-city', data.city);
+        champ('geo-country', pays(data));
+        champ('geo-region', data.region);
+        champ('geo-postal', data.postal);
+        champ('geo-isp', connection.isp);
+        champ('geo-org', connection.org);
+        champ('geo-asn', asn);
+        champ('geo-domain', connection.domain);
+        champ('geo-type', data.ip.indexOf(':') >= 0 ? 'IPv6' : 'IPv4');
+        champ('geo-timezone', zoneHoraire(data));
+        champ('geo-coords', coordsIP(data));
+        champ('geo-continent', continent(data));
+        champ('geo-network', data.network);
+        champ('geo-hostname', data.hostname);
+        var calling = texte(data.calling_code);
+        if (/^\d+$/.test(calling)) calling = '+' + calling;
+        champ('geo-calling', calling);
+      }
+      function adapterIPapi(data) {
+        var utc = typeof data.utc_offset === 'string' ? data.utc_offset : '';
+        if (/^[+-]\d{4}$/.test(utc)) utc = utc.slice(0, 3) + ':' + utc.slice(3);
+        return {
+          ip: data.ip, city: data.city, region: data.region, postal: data.postal,
+          country: data.country_name, country_code: data.country_code,
+          continent_code: data.continent_code, latitude: data.latitude, longitude: data.longitude,
+          connection: { asn: data.asn, org: data.org },
+          timezone: { id: data.timezone, utc: utc },
+          network: data.network, hostname: data.hostname, calling_code: data.country_calling_code
+        };
+      }
+
+      // Chaque fournisseur retourne l'adresse analysée, qui peut différer de
+      // celle vue par ipify. On ne mélange jamais les résultats de deux IP.
+      async function requeteInfos(fournisseur, ip) {
+        var controller = new AbortController();
+        infoController = controller;
+        var timer = setTimeout(function () { controller.abort(); }, fournisseur === 'IPWhois' ? 7000 : 9000);
+        try {
+          var suffix = ip ? encodeURIComponent(ip) : '';
+          var url = fournisseur === 'IPWhois' ? 'https://ipwho.is/' + suffix : 'https://ipapi.co/' + (suffix ? suffix + '/' : '') + 'json/';
+          var response = await fetch(url, { mode: 'cors', credentials: 'omit', cache: 'no-store', referrerPolicy: 'no-referrer', signal: controller.signal });
+          if (response.status === 429) throw new Error('limite');
+          if (!response.ok) throw new Error('indisponible');
+          var data = await response.json();
+          if (!data || (fournisseur === 'IPWhois' && data.success !== true) || (fournisseur === 'IPapi' && data.error)) throw new Error('aucun-resultat');
+          if (!normaliserIP(data.ip)) throw new Error('invalide');
+          if (ip && normaliserIP(ip) !== normaliserIP(data.ip)) throw new Error('invalide');
+          return fournisseur === 'IPapi' ? adapterIPapi(data) : data;
+        } finally {
+          clearTimeout(timer);
+          if (infoController === controller) infoController = null;
+        }
+      }
+      async function chercherInfos(ip) {
+        var courant = ++infoGeneration;
+        if (infoController) infoController.abort();
+        var message = el('lookup-status');
+        el('lookup-ip').textContent = ip || 'Détection…';
+        el('geo-grid').hidden = true;
+        message.classList.remove('error');
+        message.textContent = 'Récupération des informations…';
+        var premiereErreur = null;
+        try {
+          var data, source = 'IPWhois';
+          try {
+            data = await requeteInfos('IPWhois', ip);
+          } catch (err) {
+            if (courant !== infoGeneration) return;
+            premiereErreur = err;
+            message.textContent = 'Service principal indisponible ; recherche de secours…';
+            source = 'IPapi';
+            data = await requeteInfos('IPapi', ip);
+          }
+          if (courant !== infoGeneration) return;
+          el('lookup-ip').textContent = data.ip;
+          afficherInfos(data);
+          el('geo-grid').hidden = false;
+          message.textContent = 'Source : ' + source + (source === 'IPapi' ? ' (secours)' : '') + '. Localisation estimée, pas une position GPS.';
+        } catch (err) {
+          if (courant !== infoGeneration) return;
+          el('geo-grid').hidden = true;
+          el('lookup-ip').textContent = ip || '—';
+          message.classList.add('error');
+          if ((err && err.message === 'limite') || (premiereErreur && premiereErreur.message === 'limite')) {
+            message.textContent = 'Limite du service gratuit atteinte ou service de secours indisponible. Réessaie plus tard.';
+          } else if ((err && err.message === 'aucun-resultat') || (premiereErreur && premiereErreur.message === 'aucun-resultat')) {
+            message.textContent = 'Aucune information pour cette adresse. Elle peut être privée, réservée ou inconnue du service.';
+          } else {
+            message.textContent = 'Informations indisponibles. Vérifie Internet ou réessaie plus tard.';
+          }
+        }
+      }
+      function rechercherSaisie() {
+        var ip = el('lookup-input').value.trim();
+        if (!normaliserIP(ip)) {
+          ++infoGeneration;
+          if (infoController) infoController.abort();
+          infoController = null;
+          el('lookup-ip').textContent = '—';
+          el('geo-grid').hidden = true;
+          el('lookup-status').classList.add('error');
+          el('lookup-status').textContent = 'Saisis une adresse IPv4 ou IPv6 valide, sans lien ni port.';
+          return;
+        }
+        chercherInfos(ip);
+      }
+      function appareil() {
+        var ua = navigator.userAgent || '';
+        var type = 'Appareil non reconnu';
+        if (/iPhone/i.test(ua)) type = 'iPhone';
+        else if (/iPad/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1)) type = 'iPad';
+        else if (/Android/i.test(ua)) type = 'Android';
+        else if (/Windows/i.test(ua)) type = 'Windows';
+        else if (/Macintosh|Mac OS X/i.test(ua)) type = 'Mac';
+        else if (/Linux/i.test(ua)) type = 'Linux';
+        var browser = 'navigateur non reconnu';
+        if (/EdgiOS|EdgA|Edg\//i.test(ua)) browser = 'Edge';
+        else if (/OPR\//i.test(ua)) browser = 'Opera';
+        else if (/FxiOS|Firefox/i.test(ua)) browser = 'Firefox';
+        else if (/CriOS|Chrome|Chromium/i.test(ua)) browser = 'Chrome';
+        else if (/Safari/i.test(ua)) browser = 'Safari';
+        el('device-info').textContent = 'Cet appareil (détection du navigateur, même si tu recherches une autre IP) : ' + type + ' · ' + browser + '.';
+      }
+
+      function reinitialiserVille() {
+        ++gpsCityGeneration;
+        if (gpsCityController) gpsCityController.abort();
+        gpsCityController = null;
+        el('gps-city-button').disabled = false;
+        el('gps-city-status').textContent = '';
+        el('gps-city-status').classList.remove('error');
+        el('gps-place-result').hidden = true;
+        el('gps-place-name').textContent = '—';
+        el('gps-place-detail').textContent = '';
+      }
+      function effacerPosition() {
+        ++gpsGeneration;
+        gpsPosition = null;
+        reinitialiserVille();
+        el('gps-result').hidden = true;
+        el('gps-clear').hidden = true;
+        el('gps-button').disabled = false;
+        el('gps-lat').textContent = '—';
+        el('gps-lon').textContent = '—';
+        el('gps-accuracy').textContent = '—';
+        el('gps-map').removeAttribute('href');
+        el('gps-status').classList.remove('error');
+        el('gps-status').textContent = 'Position effacée de cette page. L’autorisation du navigateur reste inchangée.';
+      }
+      function erreurPosition(courant, code) {
+        if (courant !== gpsGeneration) return;
+        el('gps-button').disabled = false;
+        el('gps-clear').hidden = true;
+        el('gps-result').hidden = true;
+        el('gps-status').classList.add('error');
+        if (code === 1) el('gps-status').textContent = 'Autorisation refusée. Autorise la localisation pour ce site dans les réglages du navigateur si tu souhaites l’utiliser.';
+        else if (code === 3) el('gps-status').textContent = 'La recherche a pris trop de temps. Vérifie la localisation de l’appareil puis réessaie.';
+        else el('gps-status').textContent = 'Position indisponible. Vérifie les réglages de localisation puis réessaie.';
+      }
+      function demanderPosition() {
+        var courant = ++gpsGeneration;
+        gpsPosition = null;
+        reinitialiserVille();
+        el('gps-result').hidden = true;
+        el('gps-lat').textContent = '—';
+        el('gps-lon').textContent = '—';
+        el('gps-accuracy').textContent = '—';
+        el('gps-map').removeAttribute('href');
+        el('gps-status').classList.remove('error');
+        if (!window.isSecureContext) {
+          el('gps-status').classList.add('error');
+          el('gps-status').textContent = 'La localisation nécessite une page sécurisée en HTTPS.';
+          return;
+        }
+        if (!navigator.geolocation) {
+          el('gps-status').classList.add('error');
+          el('gps-status').textContent = 'La localisation n’est pas disponible dans ce navigateur.';
+          return;
+        }
+        el('gps-button').disabled = true;
+        el('gps-clear').hidden = false;
+        el('gps-status').textContent = 'Demande de position en cours. Accepte l’autorisation du navigateur si elle apparaît.';
+        try {
+          navigator.geolocation.getCurrentPosition(function (position) {
+            if (courant !== gpsGeneration) return;
+            var c = position && position.coords;
+            if (!c || typeof c.latitude !== 'number' || typeof c.longitude !== 'number' || !Number.isFinite(c.latitude) || !Number.isFinite(c.longitude) || Math.abs(c.latitude) > 90 || Math.abs(c.longitude) > 180) {
+              erreurPosition(courant, 2); return;
+            }
+            var lat = c.latitude.toFixed(5), lon = c.longitude.toFixed(5);
+            gpsPosition = { latitude: lat, longitude: lon, timestamp: typeof position.timestamp === 'number' && Number.isFinite(position.timestamp) ? position.timestamp : Date.now() };
+            el('gps-lat').textContent = lat;
+            el('gps-lon').textContent = lon;
+            var accuracy = c.accuracy;
+            if (typeof accuracy === 'number' && Number.isFinite(accuracy) && accuracy >= 0) {
+              el('gps-accuracy').textContent = accuracy >= 1000 ? 'Rayon ≈ ' + (accuracy / 1000).toFixed(1).replace('.', ',') + ' km' : 'Rayon ≈ ' + Math.max(1, Math.round(accuracy)) + ' m';
+            } else {
+              el('gps-accuracy').textContent = unavailable;
+            }
+            el('gps-map').href = 'https://maps.apple.com/?ll=' + encodeURIComponent(lat + ',' + lon) + '&q=' + encodeURIComponent('Position de cet appareil');
+            el('gps-result').hidden = false;
+            el('gps-button').disabled = false;
+            el('gps-status').textContent = 'Position obtenue avec ton autorisation. La précision indiquée est une estimation.';
+          }, function (error) { erreurPosition(courant, error && error.code); }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+        } catch (_) { erreurPosition(courant, 2); }
+      }
+
+      // Cette recherche ne part qu'après un second clic explicite : elle
+      // transmet les coordonnées actuelles et l'IP au service indiqué à l'écran.
+      async function chercherVille() {
+        var message = el('gps-city-status');
+        if (!gpsPosition) return;
+        if (Date.now() - gpsPosition.timestamp > 2 * 60 * 1000) {
+          message.classList.add('error');
+          message.textContent = 'La position date de plus de 2 minutes. Appuie de nouveau sur « Afficher ma position » avant de chercher la ville.';
+          return;
+        }
+        var courant = ++gpsCityGeneration;
+        if (gpsCityController) gpsCityController.abort();
+        var controller = new AbortController();
+        gpsCityController = controller;
+        var timer = setTimeout(function () { controller.abort(); }, 10000);
+        var point = gpsPosition;
+        el('gps-city-button').disabled = true;
+        el('gps-place-result').hidden = true;
+        message.classList.remove('error');
+        message.textContent = 'Recherche de la ville…';
+        try {
+          var url = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + encodeURIComponent(point.latitude) + '&longitude=' + encodeURIComponent(point.longitude) + '&localityLanguage=fr';
+          var response = await fetch(url, { mode: 'cors', credentials: 'omit', cache: 'no-store', referrerPolicy: 'no-referrer', signal: controller.signal });
+          if (!response.ok) throw new Error('indisponible');
+          var data = await response.json();
+          var source = data && typeof data.lookupSource === 'string' ? data.lookupSource.toLowerCase().replace(/[^a-z]/g, '') : '';
+          if (source !== 'coordinates' && source !== 'reversegeocoding') throw new Error('source');
+          if (typeof data.latitude !== 'number' || typeof data.longitude !== 'number' || !Number.isFinite(data.latitude) || !Number.isFinite(data.longitude) || Math.abs(data.latitude - Number(point.latitude)) > 0.0002 || Math.abs(data.longitude - Number(point.longitude)) > 0.0002) throw new Error('source');
+          if (courant !== gpsCityGeneration) return;
+          var city = texte(data.city), locality = texte(data.locality), region = texte(data.principalSubdivision), country = texte(data.countryName), postal = texte(data.postcode);
+          if (city === unavailable) city = locality;
+          var details = [];
+          if (locality !== unavailable && locality !== city) details.push('Localité : ' + locality);
+          if (region !== unavailable) details.push('Région : ' + region);
+          if (country !== unavailable) details.push('Pays : ' + country);
+          if (postal !== unavailable) details.push('Code postal : ' + postal);
+          el('gps-place-name').textContent = city;
+          el('gps-place-detail').textContent = details.join(' · ');
+          el('gps-place-result').hidden = false;
+          message.textContent = 'Ville déduite de la position fournie, sous réserve de sa précision. Source : BigDataCloud.';
+        } catch (_) {
+          if (courant !== gpsCityGeneration) return;
+          el('gps-place-result').hidden = true;
+          message.classList.add('error');
+          message.textContent = 'Ville indisponible pour cette position. Tu peux réessayer ou ouvrir Plans.';
+        } finally {
+          clearTimeout(timer);
+          if (gpsCityController === controller) gpsCityController = null;
+          if (courant === gpsCityGeneration) el('gps-city-button').disabled = false;
+        }
+      }
+
+      config[4].button.addEventListener('click', function () { copier(4); });
+      config[6].button.addEventListener('click', function () { copier(6); });
+      config[4].detail.addEventListener('click', function () { if (values[4]) chercherInfos(values[4]); });
+      config[6].detail.addEventListener('click', function () { if (values[6]) chercherInfos(values[6]); });
+      refresh.addEventListener('click', function () { actualiser(); chercherInfos(''); });
+      el('lookup-button').addEventListener('click', rechercherSaisie);
+      el('lookup-input').addEventListener('keydown', function (event) { if (event.key === 'Enter') { event.preventDefault(); rechercherSaisie(); } });
+      el('own-lookup').addEventListener('click', function () { chercherInfos(''); });
+      el('gps-button').addEventListener('click', demanderPosition);
+      el('gps-city-button').addEventListener('click', chercherVille);
+      el('gps-clear').addEventListener('click', effacerPosition);
+      appareil();
+      actualiser();
+      chercherInfos('');
+    })();
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a57d86ad2b8ccdbb',t:'MTc5NDIzNDczOA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a57d86ad2b8ccdbb',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
