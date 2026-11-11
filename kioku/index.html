@@ -1460,10 +1460,23 @@ input:checked + .slider::before { transform: translateX(22px); }
 <!-- KIOKU Cloud — Firebase (optionnel, pour comptes cross-device) -->
 <script>
 // Config Firebase stockée localement (Settings > Cloud). Si vide => mode local seul.
-window.KIOKU_FIREBASE_CONFIG = null;
+// Config Firebase par défaut (intégrée) — multi-appareils direct sans coller
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBZlI7w0RYAxZbU6-9IYPhvBIUzxvQpT1g",
+  authDomain: "kioku-ff66d.firebaseapp.com",
+  projectId: "kioku-ff66d",
+  storageBucket: "kioku-ff66d.firebasestorage.app",
+  messagingSenderId: "19191878885",
+  appId: "1:19191878885:web:8c99430c9d0ea91d4b300c",
+  measurementId: "G-KJD41H5P1Q"
+};
+window.KIOKU_FIREBASE_CONFIG = DEFAULT_FIREBASE_CONFIG;
 try{
   const raw = localStorage.getItem('kioku.firebaseConfig');
-  if(raw) window.KIOKU_FIREBASE_CONFIG = JSON.parse(raw);
+  if(raw){
+    const override = JSON.parse(raw);
+    if(override && override.apiKey) window.KIOKU_FIREBASE_CONFIG = override;
+  }
 }catch(e){}
 window.USE_FIREBASE = !!(window.KIOKU_FIREBASE_CONFIG && window.KIOKU_FIREBASE_CONFIG.apiKey);
 </script>
@@ -5917,5 +5930,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5899cb14948c913',t:'MTc5NDM2MTQ2OQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5899cb14948c913',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a589bc864c8de191',t:'MTc5NDM2Mjc3Mw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a589bc864c8de191',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
