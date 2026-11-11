@@ -2838,24 +2838,34 @@ const Friends = {
     try{
       const {collection, getDocs} = window.firebaseHelpers;
       const snap = await getDocs(collection(window.firebaseDb, 'users'));
-      const all = [];
+      const cloud = [];
+      const seenIds = new Set();
       snap.forEach(docSnap=>{
         const d = docSnap.data();
         const uid = docSnap.id;
         if(!d || !d.username) return;
-        // évite doublons avec local si déjà présent
-        all.push({ id: uid, username: d.username||'', email: d.email||'', avatar: d.avatar||'', color: d.color||'', createdAt: d.createdAt||Date.now(), friends: d.friends||[], incoming: d.incoming||[], outgoing: d.outgoing||[] });
+        seenIds.add(uid);
+        cloud.push({ id: uid, username: d.username||'', email: d.email||'', avatar: d.avatar||'', color: d.color||'', createdAt: d.createdAt||Date.now(), friends: d.friends||[], incoming: d.incoming||[], outgoing: d.outgoing||[], _source:'cloud' });
       });
-      // filtre comme en local
-      return all.filter(a=>{
+      // Ajoute aussi les comptes locaux qui ne sont pas encore dans le Cloud (pour que tes tests locaux apparaissent)
+      // Cela permet de trouver ton compte principal même si tu l'as créé en local avant
+      const localExtra = Auth.accounts.filter(a=>{
+        if(seenIds.has(a.id)) return false;
         if(a.id===cur.id) return false;
-        // utilise les listes cloud du current (les plus à jour sont dans Firestore, mais on prend le local miroir)
-        // On récupère les listes à jour depuis Firestore pour cur aussi
         if(cur.friends.includes(a.id)) return false;
         if(cur.outgoing.includes(a.id) || cur.incoming.includes(a.id)) return false;
         if(!q) return true;
         return a.username.toLowerCase().includes(q) || (a.email||'').toLowerCase().includes(q) || a.id.toLowerCase().includes(q);
-      });
+      }).map(a=> ({...a, _source:'local'}));
+      const all = [...cloud.filter(a=>{
+        if(a.id===cur.id) return false;
+        if(cur.friends.includes(a.id)) return false;
+        if(cur.outgoing.includes(a.id) || cur.incoming.includes(a.id)) return false;
+        if(!q) return true;
+        return a.username.toLowerCase().includes(q) || (a.email||'').toLowerCase().includes(q) || a.id.toLowerCase().includes(q);
+      }), ...localExtra];
+      console.log('[KIOKU] searchUsersCloud local',Auth.accounts.length,'cloud',cloud.length,'all',all.length,'q',q);
+      return all;
     }catch(e){ console.warn('[KIOKU] searchUsersCloud fail', e); return this.searchUsers(q); }
   },
 
@@ -5588,9 +5598,10 @@ const Settings = {
                 <span class="fc-badge" style="background:rgba(61,220,151,.15);border-color:rgba(61,220,151,.3);color:#7ef0bc">● Synchro</span>
               </div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-                <button class="btn btn-sm" onclick="Settings.syncToCloud()">⬆️ Pousser vers Cloud</button>
-                <button class="btn btn-sm" onclick="Settings.pullFromCloud()">⬇️ Tirer depuis Cloud</button>
-                <button class="btn btn-sm btn-danger" onclick="Settings.disableCloud()">🔌 Désactiver Cloud</button>
+                <button class="btn btn-sm" onclick="Settings.syncToCloud()">⬆️ Pousser mes animes</button>
+                <button class="btn btn-sm" onclick="Settings.pullFromCloud()">⬇️ Tirer mes animes</button>
+                <button class="btn btn-sm" style="background:rgba(255,61,139,.12);border-color:rgba(255,61,139,.25)" onclick="Settings.pushAllLocalAccountsToCloud()">📤 Pousser tous les comptes locaux → Cloud</button>
+                <button class="btn btn-sm btn-danger" onclick="Settings.disableCloud()">🔌 Désactiver</button>
               </div>
               <div style="margin-top:8px;font-size:11px;color:var(--muted)">Tes animes sont sauvegardés à la fois en local et dans Firestore. Tu peux te connecter depuis un autre appareil avec le même email/mdp et retrouver tout.</div>
             `;
@@ -6092,5 +6103,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a589c3f8ef7ce191',t:'MTc5NDM2MzA3OA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a589c3f8ef7ce191',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a58dce18eabae175',t:'MTc5NDQwNTQzNg=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a58dce18eabae175',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
