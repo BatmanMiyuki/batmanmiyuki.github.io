@@ -1660,6 +1660,7 @@ input:checked + .slider::before { transform: translateX(22px); }
         <div class="panel-head-icon">👤 <h3>Compte & Amis</h3></div>
         <p class="muted" style="font-size:13.5px;margin-bottom:14px">Gère ton compte, sauvegarde ta collection par profil et ajoute des amis pour comparer vos animes.</p>
         <div id="settings-account-box"></div>
+        <div id="settings-debug-box" style="margin-top:16px; padding:12px; background:rgba(0,0,0,.18); border:1px solid var(--stroke); border-radius:12px; font-size:12.5px"></div>
       </div>
       <!-- Bloc Signature & Profil -->
       <div class="panel">
@@ -1979,39 +1980,54 @@ const Store = {
 
   load() {
     const k = this.key();
-    // reset
     this.data.animes = [];
     this.data.watchLog = [];
-    // keep settings default, will be merged
+    this.data.settings = { newsCache: null, newsCachedAt: 0 };
     try {
       const raw = localStorage.getItem(k);
       if (raw) {
-        const parsed = JSON.parse(raw);
-        this.data.animes = Array.isArray(parsed.animes) ? parsed.animes : [];
-        this.data.watchLog = Array.isArray(parsed.watchLog) ? parsed.watchLog : [];
-        this.data.settings = Object.assign({ newsCache: null, newsCachedAt: 0 }, parsed.settings || {});
-      } else if(k !== BASE_KEY){
-        // pas de données pour ce compte → essayer de migrer l'ancien stockage invité si il existe et non vide
+        try{
+          const parsed = JSON.parse(raw);
+          this.data.animes = Array.isArray(parsed.animes) ? parsed.animes : [];
+          this.data.watchLog = Array.isArray(parsed.watchLog) ? parsed.watchLog : [];
+          if(parsed.settings && typeof parsed.settings==='object'){
+            this.data.settings = Object.assign({ newsCache: null, newsCachedAt: 0 }, parsed.settings);
+          }
+        }catch(e){ console.warn('[KIOKU] JSON corrompu pour',k,e); }
+      }
+      // Si on est sur un compte et qu'il n'a aucune donnée, on tente de récupérer depuis l'ancien stockage invité
+      // (sans limite de temps, pour éviter la perte de données)
+      if(k !== BASE_KEY && (!this.data.animes || this.data.animes.length===0)){
         try{
           const legacyRaw = localStorage.getItem(BASE_KEY);
           if(legacyRaw){
-            const lp = JSON.parse(legacyRaw);
-            if(Array.isArray(lp.animes) && lp.animes.length){
-              // on ne migre que si c'est la première connexion et que le compte est récent (< 60s)
-              const cur = Auth.getCurrent();
-              if(cur && (Date.now() - (cur.createdAt||0) < 60000)){
-                this.data.animes = lp.animes;
-                this.data.watchLog = lp.watchLog||[];
-                this.data.settings = Object.assign({ newsCache: null, newsCachedAt: 0 }, lp.settings||{});
-                // sauvegarde immédiate dans le namespace du compte
-                try{ localStorage.setItem(k, JSON.stringify(this.data)); }catch(e){}
+            try{
+              const lp = JSON.parse(legacyRaw);
+              if(Array.isArray(lp.animes) && lp.animes.length>0){
+                // On ne récupère que si on n'a jamais sauvegardé pour ce compte
+                const hasUserData = !!localStorage.getItem(k);
+                if(!hasUserData){
+                  console.log('[KIOKU] Migration auto depuis invité vers',k, lp.animes.length, 'animes');
+                  this.data.animes = lp.animes;
+                  this.data.watchLog = Array.isArray(lp.watchLog)?lp.watchLog:[];
+                  if(lp.settings) this.data.settings = Object.assign({ newsCache: null, newsCachedAt: 0 }, lp.settings);
+                  try{ localStorage.setItem(k, JSON.stringify(this.data)); toast('Données invité récupérées automatiquement ✨'); }catch(e){}
+                }
               }
-            }
+            }catch(e){}
           }
         }catch(e){}
       }
+      // Ultime fallback : si toujours vide et qu'il existe d'autres clés kioku.v1__* avec des données, on propose pas automatiquement mais on log
+      if(k !== BASE_KEY && this.data.animes.length===0){
+        try{
+          const keys = Object.keys(localStorage).filter(x=>x.startsWith(BASE_KEY+'__'));
+          // console.log('[KIOKU] clés dispo',keys);
+        }catch(e){}
+      }
     } catch (e) { console.warn('[KIOKU] lecture impossible', e); }
-    this.data.animes.forEach(normalize);
+    // Toujours normaliser même si vide
+    try{ this.data.animes.forEach(normalize); }catch(e){}
     return this.data;
   },
 
@@ -2106,13 +2122,37 @@ const Auth = {
   load(){
     try{
       const raw = localStorage.getItem(ACCOUNTS_KEY);
-      this.accounts = raw ? JSON.parse(raw) : [];
+      if(raw){
+        try{
+          const parsed = JSON.parse(raw);
+          this.accounts = Array.isArray(parsed) ? parsed : [];
+        }catch(e){
+          console.warn('[KIOKU] accounts JSON corrompu',e);
+          // tentative de récupération : si c'est une string vide ou corrompue, on reset mais on sauvegarde l'ancien
+          try{ localStorage.setItem(ACCOUNTS_KEY+'_backup_'+Date.now(), raw); }catch(ee){}
+          this.accounts=[];
+        }
+      } else {
+        this.accounts=[];
+      }
       if(!Array.isArray(this.accounts)) this.accounts=[];
-    }catch(e){ this.accounts=[]; }
+    }catch(e){ console.warn('[KIOKU] load accounts fail',e); this.accounts=[]; }
     try{
       const sid = localStorage.getItem(SESSION_KEY);
-      if(sid) this.current = this.accounts.find(a=>a.id===sid) || null;
-    }catch(e){}
+      if(sid){
+        const found = this.accounts.find(a=>a.id===sid);
+        if(found) this.current = found;
+        else {
+          console.warn('[KIOKU] session id',sid,'introuvable parmi',this.accounts.map(a=>a.id));
+          // garde la session mais tente de retrouver par username/email ? non
+          this.current = null;
+          // on nettoie la session corrompue
+          // localStorage.removeItem(SESSION_KEY);
+        }
+      } else {
+        this.current = null;
+      }
+    }catch(e){ console.warn('[KIOKU] load session fail',e); this.current=null; }
     this.accounts.forEach(a=>{
       a.friends = Array.isArray(a.friends)?a.friends:[];
       a.incoming = Array.isArray(a.incoming)?a.incoming:[];
@@ -2120,10 +2160,16 @@ const Auth = {
       a.createdAt = a.createdAt || Date.now();
       a.color = a.color || randomGradient();
       a.avatar = a.avatar || '';
-      a.username = a.username || 'Anonyme';
-      a.email = a.email || '';
+      a.username = (a.username || 'Anonyme').trim() || 'Anonyme';
+      a.email = (a.email || '').trim();
+      a.id = a.id || uid();
     });
-    this.current = this.current ? this.accounts.find(a=>a.id===this.current.id) || null : null;
+    // re-valide le current après normalisation
+    if(this.current){
+      const fresh = this.accounts.find(a=>a.id===this.current.id);
+      this.current = fresh || null;
+    }
+    console.log('[KIOKU] Auth.load ->', this.accounts.length, 'comptes, current:', this.current?this.current.username:'invité');
   },
   save(){
     try{
@@ -2157,9 +2203,10 @@ const Auth = {
     if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return {ok:false, msg:'Email invalide'};
     if(this.accounts.some(a=> (a.email||'').toLowerCase()===email.toLowerCase())) return {ok:false, msg:'Cet email est déjà utilisé'};
     if(!password || password.length<4) return {ok:false, msg:'Mot de passe trop court (4 caractères min)'};
-    // capture legacy data before switching session
     let legacyRaw=null;
     try{ legacyRaw = localStorage.getItem(BASE_KEY); }catch(e){}
+    // Si on est déjà connecté, on sauvegarde d'abord la collection actuelle avant de changer de compte
+    try{ Store.save(); }catch(e){}
     const id = uid();
     const acc = {
       id, username, email,
@@ -2175,34 +2222,46 @@ const Auth = {
     const newKey = BASE_KEY + '__' + id;
     try{
       const hasNew = localStorage.getItem(newKey);
-      if(!hasNew && legacyRaw){
-        try{
-          const lp = JSON.parse(legacyRaw);
-          if(Array.isArray(lp.animes) && lp.animes.length){
-            localStorage.setItem(newKey, legacyRaw);
-          } else {
-            localStorage.setItem(newKey, JSON.stringify({animes:[],watchLog:[],settings:{newsCache:null,newsCachedAt:0}}));
+      if(!hasNew){
+        if(legacyRaw){
+          try{
+            const lp = JSON.parse(legacyRaw);
+            if(Array.isArray(lp.animes) && lp.animes.length>0){
+              localStorage.setItem(newKey, legacyRaw);
+              console.log('[KIOKU] Migration invité ->',username, lp.animes.length, 'animes');
+            } else {
+              localStorage.setItem(newKey, JSON.stringify({animes:[],watchLog:[],settings:{newsCache:null,newsCachedAt:0}}));
+            }
+          }catch(e){
+            try{ localStorage.setItem(newKey, legacyRaw); }catch(ee){}
           }
-        }catch(e){ localStorage.setItem(newKey, legacyRaw); }
-      } else if(!hasNew){
-        localStorage.setItem(newKey, JSON.stringify({animes:[],watchLog:[],settings:{newsCache:null,newsCachedAt:0}}));
+        } else {
+          localStorage.setItem(newKey, JSON.stringify({animes:[],watchLog:[],settings:{newsCache:null,newsCachedAt:0}}));
+        }
       }
-    }catch(e){}
+    }catch(e){ console.warn('[KIOKU] register migration fail',e); }
     Store.load();
     this.renderTopbar();
     this.updateBadges();
+    console.log('[KIOKU] Compte créé',username,'id',id,'key',newKey,'animes',Store.all().length);
     return {ok:true};
   },
 
   login({login,password}){
+    // Sauvegarde la collection actuelle avant de changer de compte
+    try{ Store.save(); }catch(e){}
     const acc = this.findByLogin(login);
-    if(!acc) return {ok:false, msg:'Compte introuvable — vérifie pseudo/email'};
+    if(!acc){
+      console.warn('[KIOKU] login fail, comptes dispo:', this.accounts.map(a=>a.username+':'+a.email));
+      return {ok:false, msg:'Compte introuvable — vérifie pseudo/email. Comptes sur cet appareil: ' + (this.accounts.map(a=>a.username).join(', ')||'aucun')};
+    }
     if(acc.passwordHash !== hashPW(password)) return {ok:false, msg:'Mot de passe incorrect'};
     this.current = acc;
     this.save();
     Store.load();
     this.renderTopbar();
     this.updateBadges();
+    console.log('[KIOKU] Login ok',acc.username,'animes',Store.all().length);
     return {ok:true};
   },
 
@@ -2525,13 +2584,13 @@ const Friends = {
 
   searchUsers(q){
     q=(q||'').toLowerCase().trim();
-    if(!q) return [];
     const cur=Auth.getCurrent();
+    if(!cur) return [];
     return Auth.accounts.filter(a=>{
-      if(!cur || a.id===cur.id) return false;
+      if(a.id===cur.id) return false;
       if(cur.friends.includes(a.id)) return false;
-      // si déjà demande en cours, ne pas reproposer
       if(cur.outgoing.includes(a.id) || cur.incoming.includes(a.id)) return false;
+      if(!q) return true;
       return a.username.toLowerCase().includes(q) || a.email.toLowerCase().includes(q) || a.id.toLowerCase().includes(q);
     });
   },
@@ -5107,14 +5166,44 @@ const Settings = {
             </div>
           `;
         } else {
+          const accs = (typeof Auth!=='undefined' && Auth.accounts) ? Auth.accounts : [];
           box.innerHTML = `
             <div style="padding:14px;background:var(--surface);border:1px dashed var(--stroke-2);border-radius:12px;text-align:center">
               <div style="font-size:28px">🔒</div>
               <b>Mode invité</b><br><small style="color:var(--muted)">Tes données sont en local sans compte. Crée un compte pour isoler ta collection et ajouter des amis.</small>
+              ${accs.length ? `<div style="margin-top:10px; padding:8px; background:rgba(255,61,139,.08); border-radius:8px; font-size:12px">Comptes sur cet appareil: <b>${accs.map(a=>esc(a.username)).join(', ')}</b><br><small>Utilise leur pseudo/email pour te connecter</small></div>` : ''}
               <div style="display:flex;gap:8px;justify-content:center;margin-top:10px"><button class="btn btn-primary btn-sm" onclick="Auth.openModal('login')">👤 Se connecter</button><button class="btn btn-sm" onclick="Auth.openModal('register')">✨ S'inscrire</button></div>
             </div>
           `;
         }
+      }
+      // debug box : affiche l'état du stockage pour diagnostiquer les pertes
+      const dbg=document.getElementById('settings-debug-box');
+      if(dbg){
+        try{
+          const keys = Object.keys(localStorage).filter(k=>k.startsWith('kioku.'));
+          const guestRaw = localStorage.getItem(BASE_KEY);
+          let guestCount=0; try{ const g=JSON.parse(guestRaw||'{}'); guestCount=Array.isArray(g.animes)?g.animes.length:0; }catch(e){}
+          const curKey = (typeof Store!=='undefined' && Store.key) ? Store.key() : BASE_KEY;
+          let curCount=0; try{ curCount=Store.all().length; }catch(e){}
+          const accCount = (typeof Auth!=='undefined' && Auth.accounts) ? Auth.accounts.length : 0;
+          const sess = localStorage.getItem(SESSION_KEY) || 'aucune';
+          dbg.innerHTML = `
+            <div style="font-weight:800; margin-bottom:6px">🔧 Diagnostic stockage</div>
+            <div style="display:grid; gap:4px; color:var(--muted)">
+              <div>Clés kioku: <b style="color:var(--text)">${keys.join(', ')||'aucune'}</b></div>
+              <div>Compte actuel: <b style="color:var(--text)">${Auth.isLogged()?Auth.getCurrent().username+' ('+curKey+')':'invité ('+BASE_KEY+')'}</b> · ${curCount} animes</div>
+              <div>Invité (${BASE_KEY}): <b style="color:var(--text)">${guestCount} animes</b></div>
+              <div>Comptes enregistrés: <b style="color:var(--text)">${accCount}</b> · Session: <span style="font-family:monospace; font-size:11px">${esc(sess).slice(0,16)}</span></div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px">
+              <button class="btn btn-sm" onclick="Settings.recoverGuestData()">♻️ Récupérer données invité → compte actuel</button>
+              <button class="btn btn-sm" onclick="Settings.showAllStorage()">👁️ Voir tout le stockage</button>
+              <button class="btn btn-sm" onclick="if(confirm('Forcer la sauvegarde actuelle ?')){Store.save(); toast('Sauvegardé sur '+Store.key()); Settings.render();}">💾 Forcer sauvegarde</button>
+            </div>
+            <div style="margin-top:8px; font-size:11px; color:var(--muted-2)">Si tes animes disparaissent au refresh, clique “Récupérer données invité” puis exporte un JSON en backup.</div>
+          `;
+        }catch(e){ dbg.innerHTML='<small style="color:var(--muted)">Debug indisponible</small>'; }
       }
     }catch(e){}
     const prefs = this.getPrefs();
@@ -5224,6 +5313,52 @@ const Settings = {
     }).catch(() => {
       toast('Erreur de copie', 'err');
     });
+  },
+
+  recoverGuestData(){
+    try{
+      const guestRaw = localStorage.getItem(BASE_KEY);
+      if(!guestRaw){ toast('Aucune donnée invité trouvée','err'); return; }
+      const guest = JSON.parse(guestRaw);
+      if(!Array.isArray(guest.animes) || !guest.animes.length){ toast('Données invité vides','err'); return; }
+      if(!Auth.isLogged()){ toast('Connecte-toi d\'abord à ton compte','err'); return; }
+      if(!confirm(`Récupérer ${guest.animes.length} anime(s) depuis le mode invité vers ${Auth.getCurrent().username} ? Les doublons seront ignorés.`)) return;
+      const curIds = new Set(Store.all().map(a=>a.id));
+      const curTitles = new Set(Store.all().map(a=> (a.title||'').toLowerCase()));
+      let added=0;
+      guest.animes.forEach(a=>{
+        const titleKey=(a.title||'').toLowerCase();
+        if(curTitles.has(titleKey) || curIds.has(a.id)) return;
+        // clone avec nouvel id pour éviter conflit
+        const clone = JSON.parse(JSON.stringify(a));
+        // garde l'id d'origine mais assure unicité
+        if(curIds.has(clone.id)) clone.id = uid();
+        Store.data.animes.push(normalize(clone));
+        added++;
+      });
+      if(guest.watchLog && Array.isArray(guest.watchLog)){
+        Store.data.watchLog = (Store.data.watchLog||[]).concat(guest.watchLog);
+      }
+      Store.save();
+      Router.refresh();
+      Settings.render();
+      toast(`Récupéré ${added} anime(s) depuis invité ✨`);
+    }catch(e){ console.warn(e); toast('Récupération échouée','err'); }
+  },
+
+  showAllStorage(){
+    try{
+      const out = {};
+      Object.keys(localStorage).filter(k=>k.startsWith('kioku.')).forEach(k=>{
+        try{
+          const v=JSON.parse(localStorage.getItem(k));
+          if(v && Array.isArray(v.animes)) out[k]= v.animes.length + ' animes';
+          else if(v && Array.isArray(v)) out[k]= v.length + ' comptes';
+          else out[k]= (localStorage.getItem(k)||'').slice(0,120);
+        }catch(e){ out[k]= (localStorage.getItem(k)||'').slice(0,120); }
+      });
+      alert('Stockage KIOKU:\n' + JSON.stringify(out, null, 2) + '\n\nClés complètes:\n' + Object.keys(localStorage).filter(k=>k.startsWith('kioku.')).join('\n'));
+    }catch(e){ alert('Erreur debug: '+e.message); }
   }
 };
 
@@ -5444,5 +5579,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a586fa0c9a5c2d58',t:'MTc5NDMzMzgzNg=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a586fa0c9a5c2d58',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5898dfacf5dc913',t:'MTc5NDM2MDg2Nw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5898dfacf5dc913',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
