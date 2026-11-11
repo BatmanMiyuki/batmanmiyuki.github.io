@@ -2982,63 +2982,37 @@ const Friends = {
     const data=this.getFriendData(friendId);
     const animes=data.animes;
     const watchLog=data.watchLog||[];
-    const isFriend = Auth.isLogged() && Auth.getCurrent().friends.includes(friendId);
-    let watchedMin=0; animes.forEach(a=> a.seasons.forEach(s=>{ const dur=s.duration||22; const w=s.watched||[]; if(w.length) watchedMin+=w.length*dur; else if(a.status==='completed'&&s.episodes) watchedMin+=s.episodes*dur; }));
-    let commonHTML='';
-    if(Auth.isLogged()){
-      const meAnimes=Store.all();
-      const meSet=new Set(meAnimes.map(a=> (a.anilistId? 'id:'+a.anilistId : a.title.trim().toLowerCase())));
-      const frSet=new Set(animes.map(a=> (a.anilistId? 'id:'+a.anilistId : a.title.trim().toLowerCase())));
-      const common=[...meSet].filter(x=>frSet.has(x)).length;
-      commonHTML = `<span class="mini-stat">🤝 <b>${common}</b> en commun</span>`;
-    }
-    // Génère les stats complètes de l'ami via le builder central
+    const isFriend = Auth.isLogged() && Auth.getCurrent() && Auth.getCurrent().friends.includes(friendId);
+
+    // On génère EXACTEMENT le même HTML que la page Stats, mais avec les données de l'ami
+    // → plein écran, même hero, mêmes grilles, mêmes panels. Pas de petite fenêtre.
     const friendStatsHTML = Stats.buildHTML(animes, watchLog, {isFriend:true, friendName: friend.username});
 
     page.innerHTML = `
       <div class="page-head" style="align-items:center; flex-wrap:wrap">
         <button class="btn btn-sm" onclick="Router.go('friends')" style="flex-shrink:0">← Amis</button>
-        <div class="page-head-text" style="flex:1; min-width:220px">
-          <div class="eyebrow">${isFriend?'Ami':'Utilisateur'} · ${isFriend?'✓ Ami':'○ Non ami'}</div>
-          <h1 class="title" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-            ${avatarHTML(friend,'lg')}
-            <span>${esc(friend.username)} <small style="font-size:14px;color:var(--muted);font-weight:600">· ${esc(friend.email)}</small></span>
-          </h1>
-          <p class="subtitle">Membre depuis ${new Date(friend.createdAt).toLocaleDateString('fr-FR')} · ${animes.length} anime(s) · ⏱️ ${fmtDuration(watchedMin)} regardées</p>
+        <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:260px">
+          ${avatarHTML(friend,'lg')}
+          <div class="page-head-text" style="flex:1">
+            <div class="eyebrow">Profil · Statistiques ${isFriend ? '· ✓ Ami' : '· Lecture seule'}</div>
+            <h1 class="title" style="font-size:clamp(22px,3.2vw,30px)">Statistiques de <em>${esc(friend.username)}</em></h1>
+            <p class="subtitle">Membre depuis ${new Date(friend.createdAt).toLocaleDateString('fr-FR')} · ${esc(friend.email)} · ${animes.length} anime(s) dans sa collection</p>
+          </div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap; align-items:center">
-          ${Auth.isLogged() && !isFriend && friendId!==Auth.getCurrent().id ? `<button class="btn btn-primary" onclick="Friends.sendRequest('${friend.id}')">➕ Ajouter</button>` : ''}
-          <button class="btn ${isFriend?'btn-primary':''}" onclick="Friends.openCompare('${friend.id}')">⚔️ Comparer</button>
-          ${isFriend ? `<button class="btn" style="color:var(--danger)" onclick="Friends.removeFriend('${friend.id}')">✕ Retirer</button>` : ''}
+          ${Auth.isLogged() && !isFriend && friendId!==Auth.getCurrent().id ? `<button class="btn btn-primary" onclick="Friends.sendRequest('${friend.id}')">➕ Ajouter en ami</button>` : ''}
+          <button class="btn btn-primary" onclick="Friends.openCompare('${friend.id}')">⚔️ Comparer</button>
+          ${isFriend ? `<button class="btn" style="color:var(--danger); border-color:rgba(255,84,112,.25)" onclick="Friends.removeFriend('${friend.id}')">✕ Retirer</button>` : ''}
         </div>
       </div>
 
-      <div class="friend-hero" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px; align-items:center; justify-content:space-between">
-        <div style="display:flex;gap:10px;flex-wrap:wrap; align-items:center">
-          <span class="mini-stat">📺 <b>${animes.length}</b> animes</span>
-          <span class="mini-stat">⏱️ <b>${fmtDuration(watchedMin)}</b></span>
-          ${commonHTML}
-          ${isFriend?'<span class="mini-stat" style="background:rgba(61,220,151,.12);border-color:rgba(61,220,151,.25);color:#7ef0bc">✓ Vous êtes amis</span>':'<span class="mini-stat" style="opacity:.7">Lecture seule</span>'}
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="Friends.openCompare('${friend.id}')">⚔️ Comparer nos stats</button>
-      </div>
+      ${friendStatsHTML}
 
-      <div style="background:var(--surface);border:1px solid var(--stroke);border-radius:12px;padding:10px 14px;margin-bottom:18px; display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)">
-        <span>📊 <b style="color:var(--text)">Stats complètes de ${esc(friend.username)}</b> — même mise en page que ta page Stats, mais en lecture seule.</span>
-        <span style="margin-left:auto; display:flex;gap:8px">
-          <button class="btn btn-sm" onclick="document.getElementById('friend-stats-block')?.scrollIntoView({behavior:'smooth'})">↓ Voir ses stats</button>
-          <button class="btn btn-sm btn-primary" onclick="Friends.openCompare('${friend.id}')">⚔️ Comparer</button>
-        </span>
-      </div>
-
-      <div id="friend-stats-block">${friendStatsHTML}</div>
-
-      <div style="margin-top:22px; display:flex;gap:10px; flex-wrap:wrap; justify-content:center">
+      <div style="margin-top:22px; display:flex;gap:10px; flex-wrap:wrap; justify-content:center; padding-top:18px; border-top:1px solid var(--stroke)">
         <button class="btn" onclick="Router.go('friends')">← Retour aux amis</button>
         <button class="btn btn-primary" onclick="Friends.openCompare('${friend.id}')">⚔️ Comparer avec ${esc(friend.username)}</button>
       </div>
     `;
-    // reset monthOffset for friend view ? keep global but allow navigation
   },
 
 };
@@ -5470,5 +5444,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a58680c36b86c0ae',t:'MTc5NDMyODg2OA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a58680c36b86c0ae',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a586fa0c9a5c2d58',t:'MTc5NDMzMzgzNg=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a586fa0c9a5c2d58',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
