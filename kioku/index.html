@@ -2820,6 +2820,8 @@ const Friends = {
     q=(q||'').toLowerCase().trim();
     const cur=Auth.getCurrent();
     if(!cur) return [];
+    // En mode Cloud, on cherche aussi dans Firestore (cross-device) — le rendu async s'en charge
+    // Ici on garde le filtre local synchrone pour le mode local
     return Auth.accounts.filter(a=>{
       if(a.id===cur.id) return false;
       if(cur.friends.includes(a.id)) return false;
@@ -2829,13 +2831,84 @@ const Friends = {
     });
   },
 
-  sendRequest(targetId){
+  async searchUsersCloud(q){
+    q=(q||'').toLowerCase().trim();
     const cur=Auth.getCurrent();
+    if(!cur || !window.USE_FIREBASE || !window.firebaseDb) return this.searchUsers(q);
+    try{
+      const {collection, getDocs} = window.firebaseHelpers;
+      const snap = await getDocs(collection(window.firebaseDb, 'users'));
+      const all = [];
+      snap.forEach(docSnap=>{
+        const d = docSnap.data();
+        const uid = docSnap.id;
+        if(!d || !d.username) return;
+        // évite doublons avec local si déjà présent
+        all.push({ id: uid, username: d.username||'', email: d.email||'', avatar: d.avatar||'', color: d.color||'', createdAt: d.createdAt||Date.now(), friends: d.friends||[], incoming: d.incoming||[], outgoing: d.outgoing||[] });
+      });
+      // filtre comme en local
+      return all.filter(a=>{
+        if(a.id===cur.id) return false;
+        // utilise les listes cloud du current (les plus à jour sont dans Firestore, mais on prend le local miroir)
+        // On récupère les listes à jour depuis Firestore pour cur aussi
+        if(cur.friends.includes(a.id)) return false;
+        if(cur.outgoing.includes(a.id) || cur.incoming.includes(a.id)) return false;
+        if(!q) return true;
+        return a.username.toLowerCase().includes(q) || (a.email||'').toLowerCase().includes(q) || a.id.toLowerCase().includes(q);
+      });
+    }catch(e){ console.warn('[KIOKU] searchUsersCloud fail', e); return this.searchUsers(q); }
+  },
+
+  async fetchCloudUsersForCache(){
+    if(!window.USE_FIREBASE || !window.firebaseDb) return;
+    try{
+      const {collection, getDocs} = window.firebaseHelpers;
+      const snap = await getDocs(collection(window.firebaseDb, 'users'));
+      snap.forEach(docSnap=>{
+        const d = docSnap.data();
+        const uid = docSnap.id;
+        if(!this._cloudCache) this._cloudCache = new Map();
+        this._cloudCache.set(uid, { id: uid, username: d.username||'', email: d.email||'', avatar: d.avatar||'', color: d.color||'', createdAt: d.createdAt||Date.now(), friends: d.friends||[], incoming: d.incoming||[], outgoing: d.outgoing||[] });
+      });
+    }catch(e){}
+  },
+
+  async sendRequest(targetId){
+    const cur=Auth.getCurrent();
+    if(!cur) return;
+    // Cloud : on écrit dans Firestore pour que l'autre appareil le voie
+    if(window.USE_FIREBASE && window.firebaseDb && window.firebaseAuth && window.firebaseAuth.currentUser){
+      try{
+        const {doc, getDoc, updateDoc, arrayUnion} = window.firebaseHelpers;
+        const curUid = window.firebaseAuth.currentUser.uid;
+        // Vérifie que la cible existe dans Firestore
+        const targetRef = doc(window.firebaseDb, 'users', targetId);
+        const targetSnap = await getDoc(targetRef);
+        if(!targetSnap.exists()){ toast('Utilisateur introuvable dans le Cloud','err'); return; }
+        const targetData = targetSnap.data();
+        // si déjà ami / déjà demandé, vérifie
+        if((targetData.friends||[]).includes(curUid)){ toast('Déjà ami','err'); return; }
+        // si target a déjà envoyé une demande, on accepte direct
+        if((cur.incoming||[]).includes(targetId)){
+          await this.acceptRequest(targetId);
+          return;
+        }
+        const curRef = doc(window.firebaseDb, 'users', curUid);
+        await updateDoc(curRef, { outgoing: arrayUnion(targetId) });
+        await updateDoc(targetRef, { incoming: arrayUnion(curUid) });
+        // Met à jour le miroir local aussi
+        if(!cur.outgoing.includes(targetId)) cur.outgoing.push(targetId);
+        Auth.save();
+        Auth.updateBadges();
+        toast('Demande envoyée à ' + (targetData.username||'ami') + ' ✨ (Cloud)');
+        this.render();
+        return;
+      }catch(e){ console.warn('[KIOKU] cloud sendRequest fail', e); toast('Erreur Cloud: '+e.message,'err'); return; }
+    }
     const target=Auth.findById(targetId);
     if(!cur||!target) return;
     if(cur.friends.includes(targetId)) { toast('Déjà ami','err'); return; }
     if(cur.outgoing.includes(targetId)) { toast('Demande déjà envoyée','err'); return; }
-    // si target a déjà envoyé une demande, on accepte direct
     if(cur.incoming.includes(targetId)){
       this.acceptRequest(targetId);
       return;
@@ -2847,8 +2920,28 @@ const Friends = {
     toast('Demande envoyée à ' + target.username + ' ✨');
     this.render();
   },
-  acceptRequest(fromId){
+  async acceptRequest(fromId){
     const cur=Auth.getCurrent();
+    if(!cur) return;
+    if(window.USE_FIREBASE && window.firebaseDb && window.firebaseAuth && window.firebaseAuth.currentUser){
+      try{
+        const {doc, updateDoc, arrayUnion, arrayRemove} = window.firebaseHelpers;
+        const curUid = window.firebaseAuth.currentUser.uid;
+        const fromRef = doc(window.firebaseDb, 'users', fromId);
+        const curRef = doc(window.firebaseDb, 'users', curUid);
+        await updateDoc(curRef, { incoming: arrayRemove(fromId), friends: arrayUnion(fromId) });
+        await updateDoc(fromRef, { outgoing: arrayRemove(curUid), friends: arrayUnion(curUid) });
+        cur.incoming = cur.incoming.filter(x=>x!==fromId);
+        if(!cur.friends.includes(fromId)) cur.friends.push(fromId);
+        Auth.save(); Auth.updateBadges();
+        // tente de récupérer le pseudo pour le toast
+        let fromName='ami';
+        try{ const s=await window.firebaseHelpers.getDoc(fromRef); if(s.exists()) fromName=s.data().username||fromName; }catch(e){}
+        toast('Tu es maintenant ami avec ' + fromName + ' 🎉 (Cloud)');
+        this.render();
+        return;
+      }catch(e){ console.warn(e); toast('Erreur Cloud: '+e.message,'err'); return; }
+    }
     const from=Auth.findById(fromId);
     if(!cur||!from) return;
     cur.incoming = cur.incoming.filter(x=>x!==fromId);
@@ -2860,8 +2953,19 @@ const Friends = {
     toast('Tu es maintenant ami avec ' + from.username + ' 🎉');
     this.render();
   },
-  rejectRequest(fromId){
+  async rejectRequest(fromId){
     const cur=Auth.getCurrent();
+    if(!cur) return;
+    if(window.USE_FIREBASE && window.firebaseDb && window.firebaseAuth && window.firebaseAuth.currentUser){
+      try{
+        const {doc, updateDoc, arrayRemove} = window.firebaseHelpers;
+        const curUid = window.firebaseAuth.currentUser.uid;
+        await updateDoc(doc(window.firebaseDb, 'users', curUid), { incoming: arrayRemove(fromId) });
+        await updateDoc(doc(window.firebaseDb, 'users', fromId), { outgoing: arrayRemove(curUid) });
+        cur.incoming = cur.incoming.filter(x=>x!==fromId);
+        Auth.save(); Auth.updateBadges(); toast('Demande refusée (Cloud)'); this.render(); return;
+      }catch(e){ console.warn(e); }
+    }
     const from=Auth.findById(fromId);
     if(!cur) return;
     cur.incoming = cur.incoming.filter(x=>x!==fromId);
@@ -2882,8 +2986,22 @@ const Friends = {
     toast('Demande annulée');
     this.render();
   },
-  removeFriend(friendId){
+  async removeFriend(friendId){
     const cur=Auth.getCurrent();
+    if(!cur) return;
+    if(window.USE_FIREBASE && window.firebaseDb && window.firebaseAuth && window.firebaseAuth.currentUser){
+      try{
+        const {doc, updateDoc, arrayRemove, getDoc} = window.firebaseHelpers;
+        const curUid = window.firebaseAuth.currentUser.uid;
+        let name='ami';
+        try{ const s=await getDoc(doc(window.firebaseDb,'users',friendId)); if(s.exists()) name=s.data().username||name; }catch(e){}
+        if(!confirm('Retirer ' + name + ' de tes amis ?')) return;
+        await updateDoc(doc(window.firebaseDb,'users',curUid), { friends: arrayRemove(friendId) });
+        await updateDoc(doc(window.firebaseDb,'users',friendId), { friends: arrayRemove(curUid) });
+        cur.friends = cur.friends.filter(x=>x!==friendId);
+        Auth.save(); toast(name + ' retiré de tes amis (Cloud)'); this.render(); return;
+      }catch(e){ console.warn(e); toast('Erreur Cloud','err'); return; }
+    }
     const fr=Auth.findById(friendId);
     if(!cur||!fr) return;
     if(!confirm('Retirer ' + fr.username + ' de tes amis ?')) return;
@@ -2895,9 +3013,26 @@ const Friends = {
   },
 
   // ── Rendu page principale ──
-  render(){
+  async render(){
     const root=document.getElementById('friends-page-content');
     if(!root) return;
+    // En mode Cloud, synchronise les listes friends/incoming/outgoing depuis Firestore avant d'afficher
+    if(window.USE_FIREBASE && window.firebaseDb && window.firebaseAuth && window.firebaseAuth.currentUser){
+      try{
+        const {doc, getDoc} = window.firebaseHelpers;
+        const snap = await getDoc(doc(window.firebaseDb, 'users', window.firebaseAuth.currentUser.uid));
+        if(snap.exists()){
+          const d=snap.data();
+          const cur=Auth.getCurrent();
+          if(cur){
+            cur.friends = d.friends||[];
+            cur.incoming = d.incoming||[];
+            cur.outgoing = d.outgoing||[];
+            Auth.save(); Auth.updateBadges();
+          }
+        }
+      }catch(e){}
+    }
     if(!Auth.isLogged()){
       root.innerHTML = `
         <div class="empty-friends" style="padding:42px 22px">
@@ -2972,7 +3107,7 @@ const Friends = {
     }
   },
 
-  renderTab(){
+  async renderTab(){
     const box=document.getElementById('friends-tab-content');
     if(!box) return;
     const cur=Auth.getCurrent();
@@ -3036,11 +3171,38 @@ const Friends = {
       }
       box.innerHTML = html;
     } else if(this._tab==='discover'){
+      // Mode Cloud : on charge depuis Firestore pour voir les comptes d'autres appareils
+      if(window.USE_FIREBASE && window.firebaseDb && window.firebaseAuth && window.firebaseAuth.currentUser){
+        box.innerHTML = `<div style="text-align:center;padding:18px;color:var(--muted)"><div class="spinner" style="width:22px;height:22px;border-width:2px;margin:0 auto 8px"></div>Recherche dans le Cloud...</div>`;
+        try{
+          const results = await this.searchUsersCloud(q);
+          if(!results.length){
+            const snapCount = await (async()=>{ try{ const{collection,getDocs}=window.firebaseHelpers; const s=await getDocs(collection(window.firebaseDb,'users')); return s.size; }catch(e){return 0}})();
+            box.innerHTML = q
+              ? `<div class="empty-friends">Aucun utilisateur trouvé pour “${esc(q)}”.<br><small>${snapCount} compte(s) au total dans le Cloud.</small><br><small>Vérifie l'orthographe ou demande à ton ami de se créer un compte.</small></div>`
+              : (results.length===0 && snapCount<=1 ? `<div class="empty-friends"><div style="font-size:32px">🔍</div><h3>Découvre des amis</h3><p>Tu es seul dans le Cloud pour l'instant (${snapCount} compte).<br>Invite un ami à créer son compte sur <b>batmanmiyuki.github.io/kioku</b> puis cherche son pseudo ici.</p><div style="margin-top:12px;font-size:12px;color:var(--muted)">💡 Ton pseudo: <b>${esc(cur.username)}</b> — donne-le à ton ami</div></div>` : `<div class="empty-friends">Aucun utilisateur à découvrir.<br><small>Essaie de chercher un pseudo précis.</small></div>`);
+            return;
+          }
+          box.innerHTML = `
+            <div style="margin-bottom:10px;color:var(--muted);font-size:13px">${results.length} utilisateur(s) trouvé(s) ${q?`pour “${esc(q)}”`:'(Cloud)'} · <span style="color:var(--cyan)">☁️ Cloud</span></div>
+            <div style="display:grid;gap:8px">${results.map(a=> `
+              <div class="discover-card">
+                ${avatarHTML(a)}
+                <div style="flex:1;min-width:0"><b>${esc(a.username)}</b><br><small style="color:var(--muted)">${esc(a.email)} · ${new Date(a.createdAt).toLocaleDateString('fr-FR')} · <span style="color:var(--cyan)">☁️ Cloud</span></small></div>
+                <button class="btn btn-primary btn-sm" onclick="Friends.sendRequest('${a.id}')">➕ Ajouter</button>
+                <button class="btn btn-sm" onclick="Friends.openFriend('${a.id}')">👁️ Voir</button>
+              </div>
+            `).join('')}</div>
+          `;
+        }catch(e){
+          box.innerHTML = `<div class="empty-friends">Erreur Cloud: ${esc(e.message)}<br><small>Vérifie tes règles Firestore et ta connexion.</small></div>`;
+        }
+        return;
+      }
       let results=[];
       if(q){
         results=this.searchUsers(q);
       } else {
-        // show all discoverable (not friends, not pending, not self) limited to 12
         const curId=cur.id;
         results=Auth.accounts.filter(a=> a.id!==curId && !cur.friends.includes(a.id) && !cur.incoming.includes(a.id) && !cur.outgoing.includes(a.id)).slice(0,12);
       }
@@ -5930,5 +6092,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a589bc864c8de191',t:'MTc5NDM2Mjc3Mw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a589bc864c8de191',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a589c3f8ef7ce191',t:'MTc5NDM2MzA3OA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a589c3f8ef7ce191',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
