@@ -1526,7 +1526,7 @@ if(window.USE_FIREBASE){
         <span class="brand-icon-fallback" style="display:none">🌸</span>
       </div>
       <div class="brand-txt">
-        <img src="logo.png" alt="KIOKU" class="brand-logo-img" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';" />
+        <img src="kioku.png" alt="KIOKU" class="brand-logo-img" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';" />
         <div class="brand-name" style="display:none">KIOKU</div>
         <div class="brand-sub">記憶 · ANIME</div>
       </div>
@@ -5855,6 +5855,38 @@ const Settings = {
     if(!window.USE_FIREBASE || !window.firebaseAuth || !window.firebaseAuth.currentUser){ toast("Connecte-toi d'abord (Firebase)","err"); return; }
     try{ Store.save(); toast('Poussé vers Cloud ✨'); }catch(e){ toast('Erreur push','err'); }
   },
+  async pushAllLocalAccountsToCloud(){
+    if(!window.USE_FIREBASE || !window.firebaseDb){ toast("Cloud non configuré","err"); return; }
+    const cur = Auth.getCurrent();
+    if(!cur){ toast("Connecte-toi d'abord avec ton compte principal","err"); return; }
+    if(!window.firebaseAuth || !window.firebaseAuth.currentUser){
+      toast("Tu dois être connecté en Cloud (reconnecte-toi) — puis réessaie","err");
+      console.warn("[KIOKU] pushAll: currentUser", window.firebaseAuth?.currentUser, "local current", cur);
+      return;
+    }
+    toast("Poussée en cours... ⏳");
+    let pushed=0, skipped=0, errors=0;
+    for(const acc of Auth.accounts){
+      try{
+        const {doc, getDoc, setDoc} = window.firebaseHelpers;
+        const ref = doc(window.firebaseDb, 'users', acc.id);
+        const snap = await getDoc(ref);
+        if(!snap.exists()){
+          await setDoc(ref, { username: acc.username, email: acc.email, avatar: acc.avatar||'', color: acc.color||'', createdAt: acc.createdAt||Date.now(), friends: acc.friends||[], incoming: acc.incoming||[], outgoing: acc.outgoing||[], updatedAt: Date.now() });
+          pushed++;
+          console.log("[KIOKU] poussé", acc.username, acc.id);
+        } else {
+          skipped++;
+        }
+      }catch(e){ console.warn("[KIOKU] push fail", acc.username, e); errors++; }
+    }
+    // pousse aussi tes animes
+    try{ Store.save(); }catch(e){}
+    if(pushed>0) toast(`Poussé ${pushed} compte(s) locaux vers Cloud ✨ (${skipped} déjà présents)`);
+    else if(errors>0) toast(`Aucun poussé, ${errors} erreurs — vérifie tes règles Firestore`,"err");
+    else toast(`Tous les comptes sont déjà dans le Cloud (${skipped} présents)`);
+    Settings.render();
+  },
   async pullFromCloud(){
     if(!window.USE_FIREBASE || !window.firebaseAuth || !window.firebaseAuth.currentUser){ toast("Connecte-toi d'abord","err"); return; }
     const ok = await Store.loadFromCloud();
@@ -6103,5 +6135,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a58dce18eabae175',t:'MTc5NDQwNTQzNg=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a58dce18eabae175',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
