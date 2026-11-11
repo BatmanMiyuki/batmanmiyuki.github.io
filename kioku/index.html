@@ -1456,6 +1456,46 @@ input:checked + .slider::before { transform: translateX(22px); }
 .friend-hero{padding:22px 22px; border-radius:18px; background:linear-gradient(135deg, rgba(255,61,139,.07), rgba(53,230,255,.06)); border:1px solid rgba(255,255,255,.08)}
 
 </style>
+
+<!-- KIOKU Cloud — Firebase (optionnel, pour comptes cross-device) -->
+<script>
+// Config Firebase stockée localement (Settings > Cloud). Si vide => mode local seul.
+window.KIOKU_FIREBASE_CONFIG = null;
+try{
+  const raw = localStorage.getItem('kioku.firebaseConfig');
+  if(raw) window.KIOKU_FIREBASE_CONFIG = JSON.parse(raw);
+}catch(e){}
+window.USE_FIREBASE = !!(window.KIOKU_FIREBASE_CONFIG && window.KIOKU_FIREBASE_CONFIG.apiKey);
+</script>
+<script type="module">
+// On charge Firebase uniquement si une config est présente — sinon on reste 100% local (donc ton app marche sans internet)
+if(window.USE_FIREBASE){
+  const cfg = window.KIOKU_FIREBASE_CONFIG;
+  try{
+    const [{initializeApp}, {getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile}, {getFirestore, doc, setDoc, getDoc, getDocs, collection, enableIndexedDbPersistence}] = await Promise.all([
+      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js'),
+      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
+    ]);
+    const app = initializeApp(cfg);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    // offline cache Firestore
+    try{ await enableIndexedDbPersistence(db); }catch(e){}
+    window.firebaseApp = app;
+    window.firebaseAuth = auth;
+    window.firebaseDb = db;
+    window.firebaseHelpers = {doc, setDoc, getDoc, getDocs, collection, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile};
+    console.log('[KIOKU] Firebase Cloud activé', cfg.projectId);
+    // Notifie le reste de l'app
+    window.dispatchEvent(new Event('kioku-firebase-ready'));
+  }catch(e){
+    console.warn('[KIOKU] Firebase init fail', e);
+    window.USE_FIREBASE = false;
+  }
+}
+</script>
+
 </head>
 <body>
 
@@ -1660,6 +1700,7 @@ input:checked + .slider::before { transform: translateX(22px); }
         <div class="panel-head-icon">👤 <h3>Compte & Amis</h3></div>
         <p class="muted" style="font-size:13.5px;margin-bottom:14px">Gère ton compte, sauvegarde ta collection par profil et ajoute des amis pour comparer vos animes.</p>
         <div id="settings-account-box"></div>
+        <div id="settings-cloud-box" style="margin-top:16px"></div>
         <div id="settings-debug-box" style="margin-top:16px; padding:12px; background:rgba(0,0,0,.18); border:1px solid var(--stroke); border-radius:12px; font-size:12.5px"></div>
       </div>
       <!-- Bloc Signature & Profil -->
@@ -1889,6 +1930,41 @@ input:checked + .slider::before { transform: translateX(22px); }
   </div>
 </div>
 
+<div class="modal-back" id="cloud-modal">
+  <div class="modal" role="dialog" aria-modal="true" style="max-width:560px">
+    <div class="modal-head">
+      <h2>☁️ Activer le Cloud KIOKU</h2>
+      <button class="btn btn-icon" onclick="Settings.closeCloudModal()" aria-label="Fermer">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:linear-gradient(135deg, rgba(255,61,139,.08), rgba(53,230,255,.08)); border:1px solid rgba(255,61,139,.15); border-radius:12px; padding:14px; margin-bottom:14px">
+        <b style="color:var(--text)">Pourquoi activer le Cloud ?</b><br>
+        <small style="color:var(--muted); line-height:1.6">
+        • Chaque compte aura <b style="color:var(--text)">ses animes sauvegardés dans le cloud</b> (Firestore) → tu te connectes depuis n'importe quel téléphone/PC et tu retrouves tout<br>
+        • Les amis fonctionnent <b style="color:var(--text)">entre appareils</b> (plus besoin d'être sur le même appareil)<br>
+        • Toujours <b style="color:var(--text)">single-file</b> sur GitHub Pages, gratuit
+        </small>
+      </div>
+      <ol style="font-size:13px; line-height:1.7; color:var(--muted); padding-left:18px; margin-bottom:14px">
+        <li>Va sur <a href="https://console.firebase.google.com/" target="_blank" style="color:var(--cyan); font-weight:700">console.firebase.google.com</a> → <b style="color:var(--text)">Créer un projet</b> (nom: kioku, gratuit)</li>
+        <li>Dans le projet : <b style="color:var(--text)">Créer une application Web</b> (&lt;/&gt;) → copie la config <code>const firebaseConfig = {...}</code></li>
+        <li>Active <b style="color:var(--text)">Authentication → Email/Password</b> (activer)</li>
+        <li>Active <b style="color:var(--text)">Firestore Database → Créer</b> (mode test, pour commencer)</li>
+        <li>Colle la config JSON ci-dessous :</li>
+      </ol>
+      <div class="field"><label>Colle ta config Firebase (JSON)</label>
+        <textarea id="cloud-config-input" rows="7" placeholder='{"apiKey":"AIza...","authDomain":"kioku-xxx.firebaseapp.com","projectId":"kioku-xxx",...}' style="width:100%; font-family:monospace; font-size:12px; padding:10px; background:#0f0c1e; border:1px solid var(--stroke); border-radius:10px; color:var(--text)"></textarea>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px">
+        <button class="btn btn-primary" onclick="Settings.saveCloudConfig()">💾 Activer le Cloud</button>
+        <button class="btn" onclick="Settings.closeCloudModal()">Annuler</button>
+        <button class="btn btn-sm" onclick="Settings.fillDemoConfig()" title="Remplir avec un exemple">📋 Exemple</button>
+      </div>
+      <div style="margin-top:10px; font-size:11px; color:var(--muted-2)">Ta config est stockée en local (<code>kioku.firebaseConfig</code>) et ne quitte jamais ton navigateur sauf pour se connecter à Firebase. Tu peux la supprimer à tout moment dans Paramètres.</div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-back" id="compare-modal">
   <div class="modal" role="dialog" aria-modal="true" style="max-width:760px">
     <div class="modal-head">
@@ -2038,6 +2114,39 @@ const Store = {
     } catch (e) {
       toast('Stockage plein — impossible de sauvegarder', 'err');
     }
+    // Cloud sync si activé et connecté
+    try{
+      if(window.USE_FIREBASE && window.firebaseDb && window.firebaseAuth && window.firebaseAuth.currentUser){
+        const uid = window.firebaseAuth.currentUser.uid;
+        const {doc, setDoc} = window.firebaseHelpers;
+        const ref = doc(window.firebaseDb, 'users', uid);
+        // on sauvegarde toute la collection dans un seul doc pour rester simple (limite 1Mo, largement assez pour ~500 animes)
+        setDoc(ref, { animes: this.data.animes, watchLog: this.data.watchLog||[], settings: this.data.settings||{}, username: (Auth.getCurrent()?.username||''), email: (Auth.getCurrent()?.email||''), updatedAt: Date.now() }, {merge:true}).catch(e=>console.warn('[KIOKU] cloud save fail',e));
+      }
+    }catch(e){}
+  },
+
+  async loadFromCloud(){
+    if(!window.USE_FIREBASE || !window.firebaseDb || !window.firebaseAuth || !window.firebaseAuth.currentUser) return false;
+    try{
+      const uid = window.firebaseAuth.currentUser.uid;
+      const {doc, getDoc} = window.firebaseHelpers;
+      const snap = await getDoc(doc(window.firebaseDb, 'users', uid));
+      if(snap.exists()){
+        const d = snap.data();
+        if(d && Array.isArray(d.animes)){
+          this.data.animes = d.animes;
+          this.data.watchLog = Array.isArray(d.watchLog)?d.watchLog:[];
+          if(d.settings) this.data.settings = Object.assign({newsCache:null, newsCachedAt:0}, d.settings);
+          this.data.animes.forEach(normalize);
+          // cache local aussi
+          try{ localStorage.setItem(this.key(), JSON.stringify(this.data)); }catch(e){}
+          console.log('[KIOKU] Cloud load', this.data.animes.length, 'animes for', uid);
+          return true;
+        }
+      }
+    }catch(e){ console.warn('[KIOKU] cloud load fail',e); }
+    return false;
   },
 
   all()      { return this.data.animes; },
@@ -2176,6 +2285,15 @@ const Auth = {
       localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(this.accounts));
       if(this.current) localStorage.setItem(SESSION_KEY, this.current.id);
       else localStorage.removeItem(SESSION_KEY);
+    }catch(e){}
+    // Cloud: sauvegarde la liste d'amis dans Firestore aussi
+    try{
+      if(window.USE_FIREBASE && window.firebaseDb && window.firebaseAuth && window.firebaseAuth.currentUser && this.current){
+        const {doc, setDoc} = window.firebaseHelpers;
+        const uid = window.firebaseAuth.currentUser.uid;
+        // On ne peut pas mapper directement l'id local vers uid Firebase, mais on garde la compat : on stocke le profil local dans Firestore
+        setDoc(doc(window.firebaseDb, 'users', uid), { username: this.current.username, email: this.current.email, avatar: this.current.avatar||'', color: this.current.color||'', friends: this.current.friends||[], incoming: this.current.incoming||[], outgoing: this.current.outgoing||[], updatedAt: Date.now() }, {merge:true}).catch(()=>{});
+      }
     }catch(e){}
   },
   getCurrent(){ return this.current; },
@@ -2434,24 +2552,52 @@ const Auth = {
   clearErrors(){
     document.querySelectorAll('.auth-error').forEach(e=>e.classList.remove('show'));
   },
-  submitLogin(){
+  async submitLogin(){
     this.clearErrors();
     const login=document.getElementById('auth-login-id')?.value||'';
     const pw=document.getElementById('auth-login-pw')?.value||'';
     if(!login.trim()||!pw){ this.showError('auth-login-err','Remplis tous les champs'); return; }
+    if(window.USE_FIREBASE){
+      const btn=document.querySelector('#auth-login-panel .btn-primary');
+      if(btn){ btn.textContent='Connexion...'; btn.disabled=true; }
+      const cr = await this.loginCloud({login,password:pw});
+      if(btn){ btn.textContent='Se connecter →'; btn.disabled=false; }
+      if(cr){
+        if(!cr.ok){ this.showError('auth-login-err', cr.msg); return; }
+        toast('Bienvenue, ' + this.current.username + ' ✨ (Cloud)');
+        this.closeModal();
+        Router.refresh();
+        return;
+      }
+      // si cr est null, fallback local
+    }
     const r=this.login({login, password:pw});
     if(!r.ok){ this.showError('auth-login-err', r.msg); return; }
     toast('Bienvenue, ' + this.current.username + ' ✨');
     this.closeModal();
     Router.refresh();
   },
-  submitRegister(){
+  async submitRegister(){
     this.clearErrors();
     const username=document.getElementById('auth-reg-user')?.value||'';
     const email=document.getElementById('auth-reg-email')?.value||'';
     const pw=document.getElementById('auth-reg-pw')?.value||'';
     const pw2=document.getElementById('auth-reg-pw2')?.value||'';
     if(pw!==pw2){ this.showError('auth-reg-err','Les mots de passe ne correspondent pas'); return; }
+    // Si Cloud actif, tente Firebase d'abord
+    if(window.USE_FIREBASE){
+      const btn=document.querySelector('#auth-modal .btn-primary');
+      if(btn){ btn.textContent='Création...'; btn.disabled=true; }
+      const cr = await this.registerCloud({username,email,password:pw});
+      if(btn){ btn.textContent='Créer mon compte ✨'; btn.disabled=false; }
+      if(cr){
+        if(!cr.ok){ this.showError('auth-reg-err', cr.msg); return; }
+        toast('Compte créé (Cloud) — bienvenue ' + username + ' 🎉');
+        this.renderModal();
+        setTimeout(()=>{ this.closeModal(); Router.refresh(); }, 800);
+        return;
+      }
+    }
     const r=this.register({username,email,password:pw});
     if(!r.ok){ this.showError('auth-reg-err', r.msg); return; }
     toast('Compte créé — bienvenue ' + username + ' 🎉');
@@ -2551,6 +2697,81 @@ const Auth = {
       if(pending>0){ el.textContent=pending; el.style.display='grid'; }
       else el.style.display='none';
     });
+  }
+,
+  // ── Cloud wrappers (si Firebase actif, on passe par Firebase Auth) ──
+  async registerCloud({username,email,password}){
+    if(!window.USE_FIREBASE || !window.firebaseAuth) return null;
+    try{
+      const {createUserWithEmailAndPassword, updateProfile} = window.firebaseHelpers;
+      const cred = await createUserWithEmailAndPassword(window.firebaseAuth, email, password);
+      try{ await updateProfile(cred.user, {displayName: username}); }catch(e){}
+      // crée le doc Firestore
+      const {doc, setDoc} = window.firebaseHelpers;
+      await setDoc(doc(window.firebaseDb, 'users', cred.user.uid), { username, email, avatar:'', color: randomGradient(), createdAt: Date.now(), friends:[], incoming:[], outgoing:[] });
+      // Crée aussi le compte local miroir pour compatibilité
+      const acc = { id: cred.user.uid, username, email, passwordHash: hashPW(password), avatar:'', color: randomGradient(), createdAt: Date.now(), friends:[], incoming:[], outgoing:[] };
+      this.accounts.push(acc);
+      this.current = acc;
+      this.save();
+      // pousse les animes actuels vers le cloud
+      try{ Store.save(); }catch(e){}
+      this.renderTopbar(); this.updateBadges();
+      return {ok:true, cloud:true};
+    }catch(e){
+      console.warn('[KIOKU] Firebase register fail', e);
+      let msg = e.message||'Erreur Firebase';
+      if(e.code==='auth/email-already-in-use') msg='Cet email est déjà utilisé (Firebase)';
+      if(e.code==='auth/weak-password') msg='Mot de passe trop faible';
+      return {ok:false, msg};
+    }
+  },
+  async loginCloud({login,password}){
+    if(!window.USE_FIREBASE || !window.firebaseAuth) return null;
+    try{
+      const {signInWithEmailAndPassword} = window.firebaseHelpers;
+      // login peut être pseudo ou email — Firebase ne connaît que l'email, donc si c'est un pseudo on cherche l'email local
+      let email = login;
+      if(!email.includes('@')){
+        const acc = this.findByLogin(login);
+        if(acc) email = acc.email;
+        else {
+          // cherche dans Firestore par username ? fallback local
+          return null;
+        }
+      }
+      const cred = await signInWithEmailAndPassword(window.firebaseAuth, email, password);
+      // récupère le profil Firestore
+      const {doc, getDoc} = window.firebaseHelpers;
+      const snap = await getDoc(doc(window.firebaseDb, 'users', cred.user.uid));
+      let data = snap.exists()? snap.data() : null;
+      // crée / met à jour le compte local miroir
+      let acc = this.accounts.find(a=>a.id===cred.user.uid);
+      if(!acc){
+        acc = { id: cred.user.uid, username: (data&&data.username)||cred.user.displayName||email.split('@')[0], email: email, passwordHash: hashPW(password), avatar:(data&&data.avatar)||'', color:(data&&data.color)||randomGradient(), createdAt: (data&&data.createdAt)||Date.now(), friends:(data&&data.friends)||[], incoming:(data&&data.incoming)||[], outgoing:(data&&data.outgoing)||[] };
+        this.accounts.push(acc);
+      } else {
+        // sync depuis cloud
+        if(data){
+          acc.username = data.username||acc.username;
+          acc.avatar = data.avatar||acc.avatar;
+          acc.friends = data.friends||acc.friends;
+          acc.incoming = data.incoming||acc.incoming;
+          acc.outgoing = data.outgoing||acc.outgoing;
+        }
+        acc.passwordHash = hashPW(password);
+      }
+      this.current = acc;
+      this.save();
+      // charge les animes depuis cloud
+      await Store.loadFromCloud();
+      this.renderTopbar(); this.updateBadges(); Router.refresh();
+      return {ok:true, cloud:true};
+    }catch(e){
+      console.warn('[KIOKU] Firebase login fail', e);
+      if(e.code==='auth/user-not-found' || e.code==='auth/wrong-password' || e.code==='auth/invalid-credential') return {ok:false, msg:'Email ou mot de passe incorrect (Cloud)'};
+      return null;
+    }
   }
 };
 
@@ -5177,6 +5398,46 @@ const Settings = {
           `;
         }
       }
+      // Cloud panel
+      const cloudBox=document.getElementById('settings-cloud-box');
+      if(cloudBox){
+        try{
+          const isCloud = !!window.USE_FIREBASE;
+          const cfg = window.KIOKU_FIREBASE_CONFIG;
+          const user = (window.firebaseAuth && window.firebaseAuth.currentUser) ? window.firebaseAuth.currentUser : null;
+          if(isCloud){
+            cloudBox.innerHTML = `
+              <div style="display:flex;align-items:center;gap:10px;padding:12px;background:linear-gradient(135deg, rgba(53,230,255,.10), rgba(155,92,255,.10)); border:1px solid rgba(53,230,255,.25); border-radius:12px">
+                <span style="width:10px;height:10px;border-radius:50%;background:#3ddc97;box-shadow:0 0 8px #3ddc97"></span>
+                <div style="flex:1"><b style="color:var(--text)">☁️ Cloud activé</b><br><small style="color:var(--muted)">Projet: <b style="color:var(--text)">${cfg ? esc(cfg.projectId||'') : ''}</b> · ${user ? 'Connecté Firebase: '+esc(user.email) : 'Non connecté Firebase (mode local)'} </small></div>
+                <span class="fc-badge" style="background:rgba(61,220,151,.15);border-color:rgba(61,220,151,.3);color:#7ef0bc">● Synchro</span>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                <button class="btn btn-sm" onclick="Settings.syncToCloud()">⬆️ Pousser vers Cloud</button>
+                <button class="btn btn-sm" onclick="Settings.pullFromCloud()">⬇️ Tirer depuis Cloud</button>
+                <button class="btn btn-sm btn-danger" onclick="Settings.disableCloud()">🔌 Désactiver Cloud</button>
+              </div>
+              <div style="margin-top:8px;font-size:11px;color:var(--muted)">Tes animes sont sauvegardés à la fois en local et dans Firestore. Tu peux te connecter depuis un autre appareil avec le même email/mdp et retrouver tout.</div>
+            `;
+          } else {
+            cloudBox.innerHTML = `
+              <div style="padding:12px;background:var(--surface);border:1px dashed var(--stroke-2);border-radius:12px">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="width:10px;height:10px;border-radius:50%;background:var(--muted-2)"></span>
+                  <div style="flex:1"><b>☁️ Cloud désactivé — mode local seul</b><br><small style="color:var(--muted)">Chaque compte reste sur cet appareil uniquement. Active le Cloud pour du vrai multi-appareils.</small></div>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+                  <button class="btn btn-primary btn-sm" onclick="Settings.openCloudModal()">☁️ Activer le Cloud (2 min)</button>
+                  <button class="btn btn-sm" onclick="window.open('https://console.firebase.google.com/','_blank')">🔗 Console Firebase</button>
+                </div>
+                <div style="margin-top:10px;padding:8px 10px;background:rgba(255,61,139,.06);border:1px solid rgba(255,61,139,.15);border-radius:8px;font-size:12px;color:var(--muted)">
+                  <b style="color:var(--text)">Comment ça marche ?</b> Clique “Activer”, crée un projet Firebase (gratuit), copie la config <code>apiKey ...</code> et colle-la. Ensuite crée ton compte — il sera cross-device. Tout est déjà codé, tu n'as qu'à coller.
+                </div>
+              </div>
+            `;
+          }
+        }catch(e){ cloudBox.innerHTML='<small>Cloud indisponible</small>'; }
+      }
       // debug box : affiche l'état du stockage pour diagnostiquer les pertes
       const dbg=document.getElementById('settings-debug-box');
       if(dbg){
@@ -5359,6 +5620,59 @@ const Settings = {
       });
       alert('Stockage KIOKU:\n' + JSON.stringify(out, null, 2) + '\n\nClés complètes:\n' + Object.keys(localStorage).filter(k=>k.startsWith('kioku.')).join('\n'));
     }catch(e){ alert('Erreur debug: '+e.message); }
+  },
+
+  openCloudModal(){
+    const m=document.getElementById('cloud-modal');
+    if(m){ m.classList.add('open'); document.body.style.overflow='hidden'; }
+    const inp=document.getElementById('cloud-config-input');
+    if(inp){
+      try{ const cur=localStorage.getItem('kioku.firebaseConfig'); if(cur) inp.value=JSON.stringify(JSON.parse(cur), null, 2); }catch(e){}
+      setTimeout(()=>inp.focus(),60);
+    }
+  },
+  closeCloudModal(){
+    const m=document.getElementById('cloud-modal');
+    if(m) m.classList.remove('open');
+    document.body.style.overflow='';
+  },
+  saveCloudConfig(){
+    const inp=document.getElementById('cloud-config-input');
+    if(!inp) return;
+    const raw=(inp.value||'').trim();
+    if(!raw){ toast('Colle ta config JSON','err'); return; }
+    try{
+      let cfg=JSON.parse(raw);
+      // supporte aussi le format "const firebaseConfig = {...}" copié
+      if(!cfg.apiKey && raw.includes('apiKey')){
+        const m=raw.match(/\{[\s\S]*\}/);
+        if(m) cfg=JSON.parse(m[0].replace(/'/g,'"').replace(/(\w+):/g,'"$1":'));
+      }
+      if(!cfg.apiKey || !cfg.projectId){ toast('Config incomplète (apiKey/projectId manquant)','err'); return; }
+      localStorage.setItem('kioku.firebaseConfig', JSON.stringify(cfg));
+      toast('Cloud configuré — rechargement...');
+      setTimeout(()=>location.reload(), 900);
+    }catch(e){ toast('JSON invalide: '+e.message,'err'); }
+  },
+  fillDemoConfig(){
+    const inp=document.getElementById('cloud-config-input');
+    if(inp) inp.value = JSON.stringify({apiKey:"AIzaSy...-REMPLACE", authDomain:"kioku-demo.firebaseapp.com", projectId:"kioku-demo", storageBucket:"kioku-demo.appspot.com", messagingSenderId:"123456789", appId:"1:123456789:web:abcdef"}, null, 2);
+    toast('Remplace avec ta vraie config Firebase');
+  },
+  disableCloud(){
+    if(!confirm('Désactiver le Cloud ? Tu repasses en mode local seul (tes données locales restent).')) return;
+    localStorage.removeItem('kioku.firebaseConfig');
+    toast('Cloud désactivé — rechargement');
+    setTimeout(()=>location.reload(), 700);
+  },
+  async syncToCloud(){
+    if(!window.USE_FIREBASE || !window.firebaseAuth || !window.firebaseAuth.currentUser){ toast("Connecte-toi d'abord (Firebase)","err"); return; }
+    try{ Store.save(); toast('Poussé vers Cloud ✨'); }catch(e){ toast('Erreur push','err'); }
+  },
+  async pullFromCloud(){
+    if(!window.USE_FIREBASE || !window.firebaseAuth || !window.firebaseAuth.currentUser){ toast("Connecte-toi d'abord","err"); return; }
+    const ok = await Store.loadFromCloud();
+    if(ok){ Router.refresh(); Settings.render(); toast('Tiré depuis Cloud ✨'); } else toast('Rien à tirer','err');
   }
 };
 
@@ -5536,6 +5850,9 @@ function boot() {
   document.getElementById('assist-q').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); UI.assistSearch(); }
   });
+  document.getElementById('cloud-modal')?.addEventListener('mousedown', e => {
+    if (e.target.id === 'cloud-modal') Settings.closeCloudModal();
+  });
   document.getElementById('auth-modal')?.addEventListener('mousedown', e => {
     if (e.target.id === 'auth-modal') Auth.closeModal();
   });
@@ -5544,6 +5861,26 @@ function boot() {
   });
   document.addEventListener('click', e=>{
     if(!e.target.closest('#topbar-auth') && !e.target.closest('.auth-dropdown')) Auth.closeDropdown();
+  });
+  window.addEventListener('kioku-firebase-ready', async ()=>{
+    console.log('[KIOKU] Firebase ready, tentative cloud load');
+    try{
+      if(window.firebaseAuth){
+        const {onAuthStateChanged} = window.firebaseHelpers;
+        onAuthStateChanged(window.firebaseAuth, async (user)=>{
+          if(user){
+            // user connecté Firebase -> on tente de charger ses données cloud
+            console.log('[KIOKU] Firebase user', user.email);
+            // Si on a un compte local avec même email, on lie
+            // On charge depuis cloud après un petit délai
+            setTimeout(async()=>{
+              const ok = await Store.loadFromCloud();
+              if(ok){ Router.refresh(); Settings.render(); Auth.renderTopbar(); }
+            }, 600);
+          }
+        });
+      }
+    }catch(e){}
   });
   document.getElementById('form-modal')?.addEventListener('mousedown', e => {
     if (e.target.id === 'form-modal') UI.closeForm();
@@ -5562,6 +5899,7 @@ function boot() {
       Auth.closeModal();
       Friends.closeCompare();
       Auth.closeDropdown();
+      Settings.closeCloudModal();
     }
     const formOpen = document.getElementById('form-modal')?.classList.contains('open');
     const linkOpen = document.getElementById('link-modal')?.classList.contains('open');
@@ -5579,5 +5917,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5898dfacf5dc913',t:'MTc5NDM2MDg2Nw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5898dfacf5dc913',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5899cb14948c913',t:'MTc5NDM2MTQ2OQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5899cb14948c913',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
