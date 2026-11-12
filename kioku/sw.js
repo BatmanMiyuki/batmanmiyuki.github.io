@@ -1,5 +1,5 @@
 // ── KIOKU · Service Worker ───────────────────────────────────────────────────
-const CACHE = 'kioku-v16';
+const CACHE = 'kioku-v18';
 
 const SHELL = [
   './',
