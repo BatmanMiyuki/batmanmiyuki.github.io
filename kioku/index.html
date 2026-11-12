@@ -3494,7 +3494,7 @@ const Friends = {
           <div class="page-head-text" style="flex:1">
             <div class="eyebrow">Profil · Statistiques ${isFriend ? '· ✓ Ami' : '· Lecture seule'}</div>
             <h1 class="title" style="font-size:clamp(22px,3.2vw,30px)">Statistiques de <em>${esc(friend.username)}</em></h1>
-            <p class="subtitle">Membre depuis ${new Date(friend.createdAt).toLocaleDateString('fr-FR')} · ${esc(friend.email)} · ${animes.length} anime(s) dans sa collection</p>
+            <p class="subtitle">Membre depuis ${new Date(friend.createdAt).toLocaleDateString('fr-FR')} · ${esc(friend.email)} · <b>${animes.filter(a=>!a.parentId && a.status!=='planned' && a.status!=='soon').length}</b> oeuvre(s) vue(s) sur <b>${animes.filter(a=>!a.parentId).length}</b> oeuvres · <small style="color:var(--muted)">${animes.length} entrées avec suites</small></p>
           </div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap; align-items:center">
@@ -4499,7 +4499,7 @@ const Stats = {
       </div>
 
       <div class="stat-grid">
-        ${this.stat('📺', uniqueSeenCount, isFriend ? 'Animes vus' : 'Animes vus')}
+        ${this.stat('📺', uniqueSeenCount, isFriend ? 'Oeuvres vues' : 'Animes vus')}
         ${this.stat('🔖', uniquePlannedCount, 'À regarder')}
         ${this.stat('🎞️', epsWatched.toLocaleString('fr-FR'), 'Épisodes vus')}
         ${this.stat('🗂️', seasons, 'Saisons suivies')}
@@ -6188,5 +6188,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a594240bce0dd104',t:'MTc5NDQ3MTg3MQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a594240bce0dd104',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a594447d7ca62a23',t:'MTc5NDQ3MzIwMA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a594447d7ca62a23',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
