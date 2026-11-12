@@ -1526,7 +1526,7 @@ if(window.USE_FIREBASE){
         <span class="brand-icon-fallback" style="display:none">🌸</span>
       </div>
       <div class="brand-txt">
-        <img src="kioku.png" alt="KIOKU" class="brand-logo-img" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';" />
+        <img src="logo.png" alt="KIOKU" class="brand-logo-img" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';" />
         <div class="brand-name" style="display:none">KIOKU</div>
         <div class="brand-sub">記憶 · ANIME</div>
       </div>
@@ -3330,40 +3330,32 @@ const Friends = {
     body.innerHTML = this.buildCompareHTML(friend);
   },
   buildCompareHTML(friend){
-    const meAnimes = Store.all();
+    const meAnimesAll = Store.all();
     const friendData = this.getFriendData(friend.id);
-    const frAnimes = friendData.animes;
+    const frAnimesAll = friendData.animes;
+    // On compte uniquement les oeuvres (top-level, sans parentId) comme dans la page Stats
+    const meTop = meAnimesAll.filter(a=> !a.parentId);
+    const frTop = frAnimesAll.filter(a=> !a.parentId);
+    const meSeenTop = meTop.filter(a=> a.status!=='planned' && a.status!=='soon');
+    const frSeenTop = frTop.filter(a=> a.status!=='planned' && a.status!=='soon');
 
     const titleKey = a => (a.anilistId ? 'id:'+a.anilistId : (a.title||'').trim().toLowerCase());
-    const meMap = new Map(meAnimes.map(a=>[titleKey(a), a]));
-    const frMap = new Map(frAnimes.map(a=>[titleKey(a), a]));
+    // Pour la comparaison on utilise les oeuvres top-level uniquement (évite de compter les suites 2 fois)
+    const meMap = new Map(meTop.map(a=>[titleKey(a), a]));
+    const frMap = new Map(frTop.map(a=>[titleKey(a), a]));
 
     const commonKeys = [...meMap.keys()].filter(k=> frMap.has(k));
     const onlyMe = [...meMap.keys()].filter(k=> !frMap.has(k));
     const onlyFriend = [...frMap.keys()].filter(k=> !meMap.has(k));
 
-    const meTime = meAnimes.reduce((s,a)=> s+Calc.watchedMin(a),0);
-    const frTime = frAnimes.reduce((s,a)=>{
-      let t=0;
-      a.seasons.forEach(ss=>{
-        const dur=ss.duration||22;
-        const w=ss.watched||[];
-        if(w.length) t+= w.length*dur;
-        else if(a.status==='completed' && ss.episodes) t+= ss.episodes*dur;
-      });
-      return s+t;
-    },0);
-    const meEps = meAnimes.reduce((s,a)=> s+Calc.watchedEps(a),0);
-    const frEps = frAnimes.reduce((s,a)=>{
-      let e=0;
-      a.seasons.forEach(ss=>{
-        const w=ss.watched||[];
-        if(w.length) e+= w.length;
-        else if(a.status==='completed' && ss.episodes) e+= ss.episodes;
-      });
-      return s+e;
-    },0);
-    const compat = meAnimes.length && frAnimes.length ? Math.round(commonKeys.length / Math.max(meAnimes.length, frAnimes.length) * 100) : 0;
+    // Temps et épisodes vus : même calcul que Stats (somme directe, pas Calc qui double-compte les familles)
+    const calcTime = (all) => all.reduce((s,a)=> s + (a.seasons||[]).reduce((t,ss)=>{ const dur=ss.duration||22; const w=ss.watched||[]; if(w.length) return t+w.length*dur; if(a.status==='completed' && ss.episodes) return t+ss.episodes*dur; return t; },0),0);
+    const calcEps = (all) => all.reduce((s,a)=> s + (a.seasons||[]).reduce((t,ss)=>{ const w=ss.watched||[]; if(w.length) return t+w.length; if(a.status==='completed' && ss.episodes) return t+ss.episodes; return t; },0),0);
+    const meTime = calcTime(meAnimesAll);
+    const frTime = calcTime(frAnimesAll);
+    const meEps = calcEps(meAnimesAll);
+    const frEps = calcEps(frAnimesAll);
+    const compat = meTop.length && frTop.length ? Math.round(commonKeys.length / Math.max(meTop.length, frTop.length) * 100) : 0;
 
     const commonList = commonKeys.slice(0,8).map(k=>{
       const a=meMap.get(k); const b=frMap.get(k);
@@ -3389,8 +3381,9 @@ const Friends = {
               <b>${esc(Auth.getCurrent().username)}</b>
             </div>
             <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-              <span class="mini-stat">📺 <b>${meAnimes.length}</b> animes</span>
+              <span class="mini-stat">📺 <b>${meSeenTop.length}</b> oeuvres vues</span>
               <span class="mini-stat">🎞️ <b>${meEps}</b> ép.</span>
+              <span class="mini-stat" style="opacity:.7">${meTop.length} oeuvres</span>
             </div>
             <div style="margin-top:8px;font-weight:800;font-size:18px">${fmtDuration(meTime)}</div>
             <small>Temps regardé</small>
@@ -3402,8 +3395,9 @@ const Friends = {
               <b>${esc(friend.username)}</b>
             </div>
             <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-              <span class="mini-stat">📺 <b>${frAnimes.length}</b> animes</span>
+              <span class="mini-stat">📺 <b>${frSeenTop.length}</b> oeuvres vues</span>
               <span class="mini-stat">🎞️ <b>${frEps}</b> ép.</span>
+              <span class="mini-stat" style="opacity:.7">${frTop.length} oeuvres</span>
             </div>
             <div style="margin-top:8px;font-weight:800;font-size:18px">${fmtDuration(frTime)}</div>
             <small>Temps regardé</small>
@@ -3437,17 +3431,20 @@ const Friends = {
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
         <div>
-          <h4 style="font-size:13px;font-weight:800;margin-bottom:8px">🎯 Que toi as vu (${onlyMe.slice(0,6).length})</h4>
+          <h4 style="font-size:13px;font-weight:800;margin-bottom:8px">🎯 Uniquement chez toi (${onlyMe.length})</h4>
           <div style="display:grid;gap:6px">
             ${onlyMe.slice(0,6).map(k=>{
               const a=meMap.get(k);
-              return `<div class="compare-item" style="padding:8px 10px"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">${esc(a.title)}</span><span style="color:var(--muted);font-size:12px">${a.isMovie?'🎬':'📺'} ${Calc.pct(a)}%</span></div>`;
+              // pct calculé direct sans Calc double-compte
+              let tot=0, seen=0; (a.seasons||[]).forEach(s=>{ tot+=s.episodes; const w=s.watched||[]; if(w.length) seen+=new Set(w).size; else if(a.status==='completed'&&s.episodes) seen+=s.episodes; });
+              const pct = tot? Math.round(seen/tot*100) : (a.status==='completed'?100:0);
+              return `<div class="compare-item" style="padding:8px 10px"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">${esc(a.title)}</span><span style="color:var(--muted);font-size:12px">${a.isMovie?'🎬':'📺'} ${pct}%</span></div>`;
             }).join('') || '<small style="color:var(--muted)">Rien à afficher</small>'}
             ${onlyMe.length>6?`<small style="color:var(--muted)">+ ${onlyMe.length-6} autre(s)</small>`:''}
           </div>
         </div>
         <div>
-          <h4 style="font-size:13px;font-weight:800;margin-bottom:8px">👀 Que ${esc(friend.username)} a vu (${onlyFriend.slice(0,6).length})</h4>
+          <h4 style="font-size:13px;font-weight:800;margin-bottom:8px">👀 Uniquement chez ${esc(friend.username)} (${onlyFriend.length})</h4>
           <div style="display:grid;gap:6px">
             ${onlyFriend.slice(0,6).map(k=>{
               const a=frMap.get(k);
@@ -6188,5 +6185,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a594447d7ca62a23',t:'MTc5NDQ3MzIwMA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a594447d7ca62a23',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a594515a6a797904',t:'MTc5NDQ3MzcyNw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a594515a6a797904',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
