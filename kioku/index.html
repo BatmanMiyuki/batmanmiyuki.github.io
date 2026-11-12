@@ -1526,7 +1526,7 @@ if(window.USE_FIREBASE){
         <span class="brand-icon-fallback" style="display:none">🌸</span>
       </div>
       <div class="brand-txt">
-        <img src="kioku.png" alt="KIOKU" class="brand-logo-img" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';" />
+        <img src="logo.png" alt="KIOKU" class="brand-logo-img" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';" />
         <div class="brand-name" style="display:none">KIOKU</div>
         <div class="brand-sub">記憶 · ANIME</div>
       </div>
@@ -2717,14 +2717,23 @@ const Auth = {
     if(!window.USE_FIREBASE || !window.firebaseAuth) return null;
     try{
       const {createUserWithEmailAndPassword, updateProfile} = window.firebaseHelpers;
+      console.log('[KIOKU] Firebase register', email);
       const cred = await createUserWithEmailAndPassword(window.firebaseAuth, email, password);
-      try{ await updateProfile(cred.user, {displayName: username}); }catch(e){}
-      // crée le doc Firestore
-      const {doc, setDoc} = window.firebaseHelpers;
-      await setDoc(doc(window.firebaseDb, 'users', cred.user.uid), { username, email, avatar:'', color: randomGradient(), createdAt: Date.now(), friends:[], incoming:[], outgoing:[] });
+      try{ await updateProfile(cred.user, {displayName: username}); }catch(e){ console.warn(e); }
+      // crée le doc Firestore — avec retry et merge
+      try{
+        const {doc, setDoc, getDoc} = window.firebaseHelpers;
+        const ref = doc(window.firebaseDb, 'users', cred.user.uid);
+        const snap = await getDoc(ref);
+        if(!snap.exists()){
+          await setDoc(ref, { username, email, avatar:'', color: randomGradient(), createdAt: Date.now(), friends:[], incoming:[], outgoing:[], updatedAt: Date.now() });
+          console.log('[KIOKU] Firestore doc créé pour', cred.user.uid);
+        }
+      }catch(e){ console.warn('[KIOKU] Firestore doc create fail', e); toast('Compte créé mais Firestore a échoué: '+e.message,'err'); }
       // Crée aussi le compte local miroir pour compatibilité
       const acc = { id: cred.user.uid, username, email, passwordHash: hashPW(password), avatar:'', color: randomGradient(), createdAt: Date.now(), friends:[], incoming:[], outgoing:[] };
-      this.accounts.push(acc);
+      // évite doublon si déjà présent
+      if(!this.accounts.some(a=>a.id===acc.id)) this.accounts.push(acc);
       this.current = acc;
       this.save();
       // pousse les animes actuels vers le cloud
@@ -2732,10 +2741,12 @@ const Auth = {
       this.renderTopbar(); this.updateBadges();
       return {ok:true, cloud:true};
     }catch(e){
-      console.warn('[KIOKU] Firebase register fail', e);
+      console.error('[KIOKU] Firebase register fail', e);
       let msg = e.message||'Erreur Firebase';
-      if(e.code==='auth/email-already-in-use') msg='Cet email est déjà utilisé (Firebase)';
-      if(e.code==='auth/weak-password') msg='Mot de passe trop faible';
+      if(e.code==='auth/email-already-in-use') msg='Cet email est déjà utilisé (Firebase) — essaie Connexion';
+      if(e.code==='auth/weak-password') msg='Mot de passe trop faible (6 caractères min Firebase)';
+      if(e.code==='auth/invalid-email') msg='Email invalide';
+      if(e.code==='auth/network-request-failed') msg='Pas de réseau';
       return {ok:false, msg};
     }
   },
@@ -2743,28 +2754,40 @@ const Auth = {
     if(!window.USE_FIREBASE || !window.firebaseAuth) return null;
     try{
       const {signInWithEmailAndPassword} = window.firebaseHelpers;
-      // login peut être pseudo ou email — Firebase ne connaît que l'email, donc si c'est un pseudo on cherche l'email local
       let email = login;
       if(!email.includes('@')){
         const acc = this.findByLogin(login);
         if(acc) email = acc.email;
         else {
-          // cherche dans Firestore par username ? fallback local
-          return null;
+          // tente de chercher le pseudo dans Firestore
+          try{
+            const {collection, getDocs} = window.firebaseHelpers;
+            const snap = await getDocs(collection(window.firebaseDb, 'users'));
+            let found=null;
+            snap.forEach(d=>{ const data=d.data(); if((data.username||'').toLowerCase()===login.toLowerCase()) found={id:d.id, email:data.email}; });
+            if(found && found.email) email = found.email;
+            else return null;
+          }catch(e){ return null; }
         }
       }
+      console.log('[KIOKU] Firebase login', email);
       const cred = await signInWithEmailAndPassword(window.firebaseAuth, email, password);
-      // récupère le profil Firestore
-      const {doc, getDoc} = window.firebaseHelpers;
-      const snap = await getDoc(doc(window.firebaseDb, 'users', cred.user.uid));
+      // récupère / crée le profil Firestore si manquant (cas compte créé à la main dans Authentication)
+      const {doc, getDoc, setDoc} = window.firebaseHelpers;
+      let snap = await getDoc(doc(window.firebaseDb, 'users', cred.user.uid));
       let data = snap.exists()? snap.data() : null;
+      if(!snap.exists()){
+        console.log('[KIOKU] Firestore doc manquant pour', cred.user.uid, '-> création');
+        const username = cred.user.displayName || email.split('@')[0];
+        data = { username, email, avatar:'', color: randomGradient(), createdAt: Date.now(), friends:[], incoming:[], outgoing:[], updatedAt: Date.now() };
+        try{ await setDoc(doc(window.firebaseDb, 'users', cred.user.uid), data); }catch(e){ console.warn(e); }
+      }
       // crée / met à jour le compte local miroir
       let acc = this.accounts.find(a=>a.id===cred.user.uid);
       if(!acc){
         acc = { id: cred.user.uid, username: (data&&data.username)||cred.user.displayName||email.split('@')[0], email: email, passwordHash: hashPW(password), avatar:(data&&data.avatar)||'', color:(data&&data.color)||randomGradient(), createdAt: (data&&data.createdAt)||Date.now(), friends:(data&&data.friends)||[], incoming:(data&&data.incoming)||[], outgoing:(data&&data.outgoing)||[] };
         this.accounts.push(acc);
       } else {
-        // sync depuis cloud
         if(data){
           acc.username = data.username||acc.username;
           acc.avatar = data.avatar||acc.avatar;
@@ -2776,16 +2799,17 @@ const Auth = {
       }
       this.current = acc;
       this.save();
-      // charge les animes depuis cloud
       await Store.loadFromCloud();
       this.renderTopbar(); this.updateBadges(); Router.refresh();
       return {ok:true, cloud:true};
     }catch(e){
-      console.warn('[KIOKU] Firebase login fail', e);
-      if(e.code==='auth/user-not-found' || e.code==='auth/wrong-password' || e.code==='auth/invalid-credential') return {ok:false, msg:'Email ou mot de passe incorrect (Cloud)'};
-      return null;
+      console.error('[KIOKU] Firebase login fail', e);
+      let msg = e.message||'Erreur Firebase';
+      if(e.code==='auth/user-not-found' || e.code==='auth/wrong-password' || e.code==='auth/invalid-credential' || e.code==='auth/invalid-login-credentials') msg='Email ou mot de passe incorrect (Cloud)';
+      if(e.code==='auth/too-many-requests') msg='Trop de tentatives, réessaie plus tard';
+      return {ok:false, msg};
     }
-  }
+  },
 };
 
 const Friends = {
@@ -5601,6 +5625,7 @@ const Settings = {
                 <button class="btn btn-sm" onclick="Settings.syncToCloud()">⬆️ Pousser mes animes</button>
                 <button class="btn btn-sm" onclick="Settings.pullFromCloud()">⬇️ Tirer mes animes</button>
                 <button class="btn btn-sm" style="background:rgba(255,61,139,.12);border-color:rgba(255,61,139,.25)" onclick="Settings.pushAllLocalAccountsToCloud()">📤 Pousser tous les comptes locaux → Cloud</button>
+                <button class="btn btn-sm" style="background:rgba(53,230,255,.12);border-color:rgba(53,230,255,.25)" onclick="Settings.repairMyFirestoreDoc()">🩹 Réparer mon doc Firestore</button>
                 <button class="btn btn-sm btn-danger" onclick="Settings.disableCloud()">🔌 Désactiver</button>
               </div>
               <div style="margin-top:8px;font-size:11px;color:var(--muted)">Tes animes sont sauvegardés à la fois en local et dans Firestore. Tu peux te connecter depuis un autre appareil avec le même email/mdp et retrouver tout.</div>
@@ -5880,12 +5905,31 @@ const Settings = {
         }
       }catch(e){ console.warn("[KIOKU] push fail", acc.username, e); errors++; }
     }
-    // pousse aussi tes animes
     try{ Store.save(); }catch(e){}
     if(pushed>0) toast(`Poussé ${pushed} compte(s) locaux vers Cloud ✨ (${skipped} déjà présents)`);
     else if(errors>0) toast(`Aucun poussé, ${errors} erreurs — vérifie tes règles Firestore`,"err");
     else toast(`Tous les comptes sont déjà dans le Cloud (${skipped} présents)`);
     Settings.render();
+  },
+  async repairMyFirestoreDoc(){
+    if(!window.USE_FIREBASE || !window.firebaseDb || !window.firebaseAuth || !window.firebaseAuth.currentUser){ toast("Connecte-toi d'abord","err"); return; }
+    try{
+      const uid = window.firebaseAuth.currentUser.uid;
+      const email = window.firebaseAuth.currentUser.email;
+      const cur = Auth.getCurrent();
+      const {doc, getDoc, setDoc} = window.firebaseHelpers;
+      const ref = doc(window.firebaseDb, 'users', uid);
+      const snap = await getDoc(ref);
+      if(snap.exists()){
+        toast('Ton doc Firestore existe déjà ✨');
+        console.log(snap.data());
+        return;
+      }
+      const username = cur ? cur.username : (window.firebaseAuth.currentUser.displayName || email.split('@')[0]);
+      await setDoc(ref, { username, email, avatar: cur?cur.avatar:'', color: cur?cur.color:randomGradient(), createdAt: Date.now(), friends:[], incoming:[], outgoing:[], updatedAt: Date.now() });
+      toast('Doc Firestore créé pour '+username+' ✨');
+      Settings.render();
+    }catch(e){ console.error(e); toast('Erreur: '+e.message,'err'); }
   },
   async pullFromCloud(){
     if(!window.USE_FIREBASE || !window.firebaseAuth || !window.firebaseAuth.currentUser){ toast("Connecte-toi d'abord","err"); return; }
