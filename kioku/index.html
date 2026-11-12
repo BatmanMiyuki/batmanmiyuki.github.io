@@ -1526,7 +1526,7 @@ if(window.USE_FIREBASE){
         <span class="brand-icon-fallback" style="display:none">🌸</span>
       </div>
       <div class="brand-txt">
-        <img src="logo.png" alt="KIOKU" class="brand-logo-img" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';" />
+        <img src="kioku.png" alt="KIOKU" class="brand-logo-img" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';" />
         <div class="brand-name" style="display:none">KIOKU</div>
         <div class="brand-sub">記憶 · ANIME</div>
       </div>
@@ -2732,12 +2732,21 @@ const Auth = {
       }catch(e){ console.warn('[KIOKU] Firestore doc create fail', e); toast('Compte créé mais Firestore a échoué: '+e.message,'err'); }
       // Crée aussi le compte local miroir pour compatibilité
       const acc = { id: cred.user.uid, username, email, passwordHash: hashPW(password), avatar:'', color: randomGradient(), createdAt: Date.now(), friends:[], incoming:[], outgoing:[] };
-      // évite doublon si déjà présent
       if(!this.accounts.some(a=>a.id===acc.id)) this.accounts.push(acc);
       this.current = acc;
       this.save();
-      // pousse les animes actuels vers le cloud
-      try{ Store.save(); }catch(e){}
+      // Nouveau compte doit démarrer vide (pas avec la bibliothèque de l'ancien compte)
+      // On vide le Store en mémoire et on crée un doc Firestore vide
+      try{
+        Store.data.animes = [];
+        Store.data.watchLog = [];
+        Store.data.settings = { newsCache: null, newsCachedAt: 0 };
+        // Sauvegarde vide côté local et cloud
+        const k = Store.key();
+        try{ localStorage.setItem(k, JSON.stringify(Store.data)); }catch(e){}
+        const {doc, setDoc} = window.firebaseHelpers;
+        await setDoc(doc(window.firebaseDb, 'users', cred.user.uid), { animes: [], watchLog: [], settings: Store.data.settings, username, email, avatar:'', color: acc.color, createdAt: acc.createdAt, friends:[], incoming:[], outgoing:[], updatedAt: Date.now() }, {merge:true});
+      }catch(e){ console.warn(e); }
       this.renderTopbar(); this.updateBadges();
       return {ok:true, cloud:true};
     }catch(e){
@@ -6179,5 +6188,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a594146d7f29b82b',t:'MTc5NDQ3MTIzMQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a594146d7f29b82b',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
