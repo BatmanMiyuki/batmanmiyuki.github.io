@@ -3429,35 +3429,6 @@ const Friends = {
         </div>
       ` : `<div class="empty-friends" style="padding:18px"><b>Aucun anime en commun</b><br><small>Vous n'avez pas encore d'anime avec le même titre.</small></div>`}
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
-        <div>
-          <h4 style="font-size:13px;font-weight:800;margin-bottom:8px">🎯 Uniquement chez toi (${onlyMe.length})</h4>
-          <div style="display:grid;gap:6px">
-            ${onlyMe.slice(0,6).map(k=>{
-              const a=meMap.get(k);
-              // pct calculé direct sans Calc double-compte
-              let tot=0, seen=0; (a.seasons||[]).forEach(s=>{ tot+=s.episodes; const w=s.watched||[]; if(w.length) seen+=new Set(w).size; else if(a.status==='completed'&&s.episodes) seen+=s.episodes; });
-              const pct = tot? Math.round(seen/tot*100) : (a.status==='completed'?100:0);
-              return `<div class="compare-item" style="padding:8px 10px"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">${esc(a.title)}</span><span style="color:var(--muted);font-size:12px">${a.isMovie?'🎬':'📺'} ${pct}%</span></div>`;
-            }).join('') || '<small style="color:var(--muted)">Rien à afficher</small>'}
-            ${onlyMe.length>6?`<small style="color:var(--muted)">+ ${onlyMe.length-6} autre(s)</small>`:''}
-          </div>
-        </div>
-        <div>
-          <h4 style="font-size:13px;font-weight:800;margin-bottom:8px">👀 Uniquement chez ${esc(friend.username)} (${onlyFriend.length})</h4>
-          <div style="display:grid;gap:6px">
-            ${onlyFriend.slice(0,6).map(k=>{
-              const a=frMap.get(k);
-              let pct=0, tot=0, seen=0;
-              a.seasons.forEach(s=>{ tot+=s.episodes; const w=s.watched||[]; if(w.length) seen+= new Set(w).size; else if(a.status==='completed'&&s.episodes) seen+=s.episodes; });
-              pct = tot? Math.round(seen/tot*100) : (a.status==='completed'?100:0);
-              return `<div class="compare-item" style="padding:8px 10px"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">${esc(a.title)}</span><span style="color:var(--muted);font-size:12px">${a.isMovie?'🎬':'📺'} ${pct}%</span></div>`;
-            }).join('') || '<small style="color:var(--muted)">Rien à afficher</small>'}
-            ${onlyFriend.length>6?`<small style="color:var(--muted)">+ ${onlyFriend.length-6} autre(s)</small>`:''}
-          </div>
-        </div>
-      </div>
-
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
         <button class="btn btn-primary" onclick="Friends.closeCompare();Friends.openFriend('${friend.id}')">📂 Voir sa collection</button>
         <button class="btn" onclick="Friends.closeCompare()">Fermer</button>
@@ -6185,5 +6156,5 @@ function boot() {
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a594b8fb2b177918',t:'MTc5NDQ3Nzk3MQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a594b8fb2b177918',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
