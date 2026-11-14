@@ -57,7 +57,8 @@ body.cinema-mode .exit-cinema{opacity:1;pointer-events:auto}
 body.cinema-mode .tools{opacity:0;pointer-events:none}
 .tbtn{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;background:rgba(28,32,39,.75);border:1.5px solid rgba(255,255,255,.4);transition:background .2s}
 .tbtn:hover{background:rgba(28,32,39,.92)}
-.tbtn.pill{width:auto;border-radius:999px;padding:0 16px;gap:8px;font:600 13px/1 system-ui,sans-serif}
+.tbtn.pill{width:auto;border-radius:999px;padding:0 16px;gap:8px;font:600 13px/1 system-ui,sans-serif;background:rgba(47,55,69,.92)}
+.tbtn.pill:hover{background:#3c4657}
 
 /* Couverture */
 .cover{position:relative;width:100%;height:100%;container-type:inline-size;background:var(--cover);color:var(--foil);border-radius:6px 14px 14px 6px;box-shadow:0 30px 60px rgba(0,0,0,.55),inset 3.2cqw 0 0 #262D39}
@@ -110,7 +111,7 @@ body.cinema-mode .tools{opacity:0;pointer-events:none}
 .pol .sq{aspect-ratio:1/1;overflow:hidden;display:flex}
 .pol .sq .slot{border-radius:0}
 
-/* Boutons d'ajout/suppression visibles uniquement en mode édition (?edit=1) */
+/* Boutons d'ajout/suppression visibles en mode édition */
 .slotbtn,.slotclr{display:none}
 body.edit-mode .slotbtn,body.edit-mode .slotclr{display:block}
 body.edit-mode .slotbtn{position:absolute;inset:0;width:100%;height:100%;z-index:4;border:2px dashed #2F3745;background:rgba(244,242,237,.25);cursor:pointer;padding:0}
@@ -122,7 +123,7 @@ body.edit-mode .has-photo .slotbtn::after{display:none}
 body.edit-mode .has-photo .slotclr{display:flex}
 
 /* Toast d'export */
-.toast{position:fixed;bottom:76px;left:max(16px,env(safe-area-inset-left,0px));z-index:60;background:rgba(28,32,39,.95);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:12px 16px;font:500 13px/1.45 system-ui,sans-serif;max-width:340px;box-shadow:0 12px 32px rgba(0,0,0,.45);display:none}
+.toast{position:fixed;bottom:76px;left:max(16px,env(safe-area-inset-left,0px));z-index:60;background:rgba(28,32,39,.95);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:12px 16px;font:500 13px/1.45 system-ui,sans-serif;max-width:360px;box-shadow:0 12px 32px rgba(0,0,0,.45);display:none}
 .toast.show{display:block}
 
 :focus-visible{outline:3px solid #9FB0C6;outline-offset:2px}
@@ -161,13 +162,11 @@ body.edit-mode .has-photo .slotclr{display:flex}
 var BACKGROUND_SRC = 'video_1.mp4';
 var COVER_IMG = 'cover.png';
 
-/* Option alternative : tu peux aussi indiquer tes chemins d'images ici, ex:
-   var PUBLIC_PHOTOS = { p1: 'photos/p1.jpg', p2: 'photos/p2.jpg', ... };
-   ou simplement utiliser le fichier photos.json généré via ?edit=1 */
+/* Option alternative : chemins manuels, ou laissez vide et utilisez photos.json */
 var PUBLIC_PHOTOS = {};
 
 var IS_EDIT = new URLSearchParams(window.location.search).has('edit');
-if (IS_EDIT) document.body.classList.add('edit-mode');
+var exportBtnAdded = false;
 
 var N=18;
 var publicUrls={}, userUrls={}, pending=null, bgVideoElement=null;
@@ -179,7 +178,7 @@ function getPhotoSrc(id){
   return '';
 }
 
-/* Stockage local (utilisé uniquement en mode ?edit=1 pour préparer/exporter les photos) */
+/* Stockage local (utilisé en mode édition et pour récupérer les photos déjà ajoutées) */
 var idb=null;
 function idbOpen(cb){try{var r=indexedDB.open('mei-album-v4',1);r.onupgradeneeded=function(){r.result.createObjectStore('kv');};r.onsuccess=function(){idb=r.result;cb();};r.onerror=function(){cb();};}catch(e){cb();}}
 function idbPut(k,v){if(!idb)return;try{idb.transaction('kv','readwrite').objectStore('kv').put(v,k);}catch(e){}}
@@ -383,7 +382,7 @@ function exitCinemaMode() {
 cinemabtn.addEventListener('click', enterCinemaMode);
 exitcinema.addEventListener('click', exitCinemaMode);
 
-/* Export des photos en photos.json pour publication GitHub Pages (?edit=1) */
+/* Export des photos en photos.json pour publication GitHub Pages */
 var ALL_SLOTS=['p1','p2','p3a','p3b','p3c','p4a','p4b','p4c','p4d','p5','p6a','p6b','p6c','p7a','p7b','pano','p8a','p8b','p8c','p9a','p9b','p9c','p10a','p10b','p10c','p10d','p11','p12a','p12b','p13a','p13b','p13c','p14a','p14b','p14c','p14d','p14e','p14f','p15','p16a','p16b','p16c','p17a','p17b','p17c','p17d','p18'];
 function showToast(msg, ms){
   var el=document.getElementById('toast');
@@ -411,34 +410,51 @@ function compressImageToDataURL(src){
     img.src=src;
   });
 }
-if(IS_EDIT){
-  var toolsEl=document.getElementById('tools');
-  var expBtn=document.createElement('button');
-  expBtn.className='tbtn pill';
-  expBtn.type='button';
-  expBtn.title='Exporter toutes vos photos pour que tout le monde les voie sur GitHub';
-  expBtn.textContent='Exporter photos.json';
-  expBtn.addEventListener('click',function(){
-    var keys=ALL_SLOTS.filter(function(k){return Boolean(getPhotoSrc(k));});
-    if(!keys.length){showToast('Aucune photo trouvée dans cet album. Ajoutez des photos avec + d’abord.',4500);return;}
-    showToast('Préparation de '+keys.length+' photo(s)...');
-    var out={};
-    Promise.all(keys.map(function(k){
-      var s=getPhotoSrc(k);
-      if(s.indexOf('photos/')===0){out[k]=s;return Promise.resolve();}
-      return compressImageToDataURL(s).then(function(d){if(d)out[k]=d;});
-    })).then(function(){
-      var blob=new Blob([JSON.stringify(out)],{type:'application/json'});
-      var a=document.createElement('a');
-      a.href=URL.createObjectURL(blob);
-      a.download='photos.json';
-      a.click();
-      setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
-      showToast('photos.json téléchargé ('+Object.keys(out).length+' photos) ! Déposez-le sur GitHub à côté de index.html.',7000);
+
+function enableEditMode(){
+  IS_EDIT = true;
+  document.body.classList.add('edit-mode');
+  if (!exportBtnAdded) {
+    exportBtnAdded = true;
+    var toolsEl=document.getElementById('tools');
+    var expBtn=document.createElement('button');
+    expBtn.className='tbtn pill';
+    expBtn.type='button';
+    expBtn.title='Exporter toutes vos photos pour que tout le monde les voie sur GitHub';
+    expBtn.textContent='Exporter photos.json';
+    expBtn.addEventListener('click',function(){
+      var keys=ALL_SLOTS.filter(function(k){return Boolean(getPhotoSrc(k));});
+      if(!keys.length){showToast('Aucune photo trouvée dans cet album. Ajoutez des photos avec + d’abord.',4500);return;}
+      showToast('Préparation de '+keys.length+' photo(s)...');
+      var out={};
+      Promise.all(keys.map(function(k){
+        var s=getPhotoSrc(k);
+        if(s.indexOf('photos/')===0){out[k]=s;return Promise.resolve();}
+        return compressImageToDataURL(s).then(function(d){if(d)out[k]=d;});
+      })).then(function(){
+        var blob=new Blob([JSON.stringify(out)],{type:'application/json'});
+        var a=document.createElement('a');
+        a.href=URL.createObjectURL(blob);
+        a.download='photos.json';
+        a.click();
+        setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+        showToast('photos.json téléchargé ('+Object.keys(out).length+' photos) ! Déposez-le sur GitHub à côté de index.html.',7000);
+      });
     });
-  });
-  toolsEl.appendChild(expBtn);
+    toolsEl.appendChild(expBtn);
+  }
+  if (!idb) {
+    idbOpen(function(){
+      idbAll(function(all){
+        var any=false;
+        for(var k in all){userUrls[k]=URL.createObjectURL(all[k]);any=true;}
+        if(any)render();
+      });
+    });
+  }
 }
+
+if (IS_EDIT) enableEditMode();
 
 /* Événements de clic et clavier */
 prev.addEventListener('click',function(){go(vi-1);});
@@ -513,27 +529,21 @@ function initBackground(){
   }
 }
 
-/* Démarrage : chargement de photos.json pour tous les visiteurs + IndexedDB si ?edit=1 */
+/* Démarrage : charge photos.json si présent ; sinon active automatiquement le mode édition + export */
 views=buildViews();vi=0;render();
 initBackground();
 
 fetch('photos.json?v='+Date.now())
   .then(function(r){return r.ok?r.json():{};})
   .then(function(data){
-    if(data&&typeof data==='object'){publicUrls=data;render();}
+    var countKeys=data&&typeof data==='object'?Object.keys(data).length:0;
+    if(countKeys>0){publicUrls=data;render();}
+    else if(!IS_EDIT){enableEditMode();}
   })
-  .catch(function(){});
-
-if(IS_EDIT){
-  idbOpen(function(){
-    idbAll(function(all){
-      var any=false;
-      for(var k in all){userUrls[k]=URL.createObjectURL(all[k]);any=true;}
-      if(any)render();
-    });
+  .catch(function(){
+    if(!IS_EDIT){enableEditMode();}
   });
-}
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5a7726acbe9dcf9',t:'MTc5NDY3NDMxMA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5a7726acbe9dcf9',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
