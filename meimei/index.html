@@ -22,12 +22,12 @@ body{background:var(--desk);color:var(--text);font-family:system-ui,sans-serif;o
 /* Fond vidéo vivant & Mode Cinéma */
 #bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:var(--desk)}
 #bg canvas,#bg video{position:absolute;inset:0;width:100%;height:100%;display:block;transition:transform 1.5s cubic-bezier(0.4, 0, 0.2, 1), filter 1.5s ease}
-#bg video{object-fit:cover}
-#bg.media::after{content:"";position:absolute;inset:0;background:rgba(16,20,26,.32);transition:background 1.5s ease;pointer-events:none}
+#bg video{object-fit:cover;transform:translateZ(0)}
+#bg.media::after{content:"";position:absolute;inset:0;background:rgba(16,20,26,.28);transition:background 1.5s ease;pointer-events:none}
 
-/* État Cinéma (fond mis en valeur, livre effacé) */
-body.cinema-mode #bg video{transform:scale(1.08);filter:saturate(1.15)}
-body.cinema-mode #bg.media::after{background:rgba(16,20,26,.05)}
+/* État Cinéma (fond mis en valeur, livre effacé, zoom minimal pour garder la netteté) */
+body.cinema-mode #bg video{transform:scale(1.02);filter:saturate(1.08) contrast(1.02)}
+body.cinema-mode #bg.media::after{background:rgba(16,20,26,.04)}
 
 .stage{position:relative;z-index:1;height:100%;container-type:size;display:flex;align-items:center;justify-content:center;padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
 
@@ -53,10 +53,11 @@ body.cinema-mode .exit-cinema{opacity:1;pointer-events:auto}
 .exit-cinema:hover{background:rgba(28,32,39,.95)}
 
 /* Barre d'outils (en bas à gauche) */
-.tools{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:40;display:flex;gap:8px;transition:opacity .5s}
+.tools{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:40;display:flex;align-items:center;gap:8px;transition:opacity .5s}
 body.cinema-mode .tools{opacity:0;pointer-events:none}
 .tbtn{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;background:rgba(28,32,39,.75);border:1.5px solid rgba(255,255,255,.4);transition:background .2s}
 .tbtn:hover{background:rgba(28,32,39,.92)}
+.tbtn.pill{width:auto;border-radius:999px;padding:0 16px;gap:8px;font:600 13px/1 system-ui,sans-serif}
 
 /* Couverture */
 .cover{position:relative;width:100%;height:100%;container-type:inline-size;background:var(--cover);color:var(--foil);border-radius:6px 14px 14px 6px;box-shadow:0 30px 60px rgba(0,0,0,.55),inset 3.2cqw 0 0 #262D39}
@@ -94,13 +95,13 @@ body.cinema-mode .tools{opacity:0;pointer-events:none}
 .slot.b{background:var(--mist2)} .slot.c{background:var(--mist3)}
 .slot .bgimg{position:absolute;left:-12%;top:-12%;width:124%;height:124%;object-fit:cover;filter:blur(22px) saturate(1.1);opacity:.75}
 .slot .fg{position:relative;width:100%;height:100%;object-fit:contain;display:block}
-.slot>svg{width:clamp(20px,3.4vmin,32px);height:clamp(20px,3.4vmin,32px);opacity:.7}
+.slot>svg{width:clamp(20px,3.4vmin,32px);height:clamp(20px,3.4vmin,32px);opacity:.45}
 .framed{border:clamp(6px,1.2vmin,12px) solid #fff;box-shadow:0 2px 12px rgba(32,36,43,.28)}
 .grid{flex:1;min-height:0;display:grid;gap:var(--gap)}
 .grid>*{min-width:0;min-height:0}
 .abs{position:absolute}
 .pano{height:56%;position:relative;overflow:hidden;background:var(--mist2);margin:calc(-1*var(--pad)) calc(-1*var(--pad)) 0;flex:none;display:flex;align-items:center;justify-content:center;color:var(--slate)}
-.pano>svg{width:clamp(20px,3.4vmin,32px);height:clamp(20px,3.4vmin,32px);opacity:.7}
+.pano>svg{width:clamp(20px,3.4vmin,32px);height:clamp(20px,3.4vmin,32px);opacity:.45}
 .pano .bgimg,.pano .fg{position:absolute;top:0;height:100%;width:200%;max-width:none}
 .pano .bgimg{object-fit:cover;filter:blur(22px);opacity:.75}
 .pano .fg{object-fit:contain}
@@ -109,15 +110,20 @@ body.cinema-mode .tools{opacity:0;pointer-events:none}
 .pol .sq{aspect-ratio:1/1;overflow:hidden;display:flex}
 .pol .sq .slot{border-radius:0}
 
-/* Boutons d'ajout de photo */
-.slotbtn,.slotclr{display:block}
-.slotbtn{position:absolute;inset:0;width:100%;height:100%;z-index:4;border:2px dashed #2F3745;background:rgba(244,242,237,.25);cursor:pointer;padding:0}
-.slotbtn::after{content:"+";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;background:#20242B;color:#fff;font:600 24px/36px system-ui,sans-serif}
-.slotclr{display:none;position:absolute;top:6px;right:6px;z-index:5;width:30px;height:30px;border-radius:50%;border:0;background:#20242B;color:#fff;cursor:pointer;align-items:center;justify-content:center;font:600 18px/1 system-ui,sans-serif}
-.has-photo .slotbtn{background:transparent;border:none;opacity:0;transition:opacity .2s}
-.has-photo .slotbtn:hover{opacity:1;background:rgba(0,0,0,.35)}
-.has-photo .slotbtn::after{display:none}
-.has-photo .slotclr{display:flex}
+/* Boutons d'ajout/suppression visibles uniquement en mode édition (?edit=1) */
+.slotbtn,.slotclr{display:none}
+body.edit-mode .slotbtn,body.edit-mode .slotclr{display:block}
+body.edit-mode .slotbtn{position:absolute;inset:0;width:100%;height:100%;z-index:4;border:2px dashed #2F3745;background:rgba(244,242,237,.25);cursor:pointer;padding:0}
+body.edit-mode .slotbtn::after{content:"+";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;background:#20242B;color:#fff;font:600 24px/36px system-ui,sans-serif}
+body.edit-mode .slotclr{display:none;position:absolute;top:6px;right:6px;z-index:5;width:30px;height:30px;border-radius:50%;border:0;background:#20242B;color:#fff;cursor:pointer;align-items:center;justify-content:center;font:600 18px/1 system-ui,sans-serif}
+body.edit-mode .has-photo .slotbtn{background:transparent;border:none;opacity:0;transition:opacity .2s}
+body.edit-mode .has-photo .slotbtn:hover{opacity:1;background:rgba(0,0,0,.35)}
+body.edit-mode .has-photo .slotbtn::after{display:none}
+body.edit-mode .has-photo .slotclr{display:flex}
+
+/* Toast d'export */
+.toast{position:fixed;bottom:76px;left:max(16px,env(safe-area-inset-left,0px));z-index:60;background:rgba(28,32,39,.95);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:12px 16px;font:500 13px/1.45 system-ui,sans-serif;max-width:340px;box-shadow:0 12px 32px rgba(0,0,0,.45);display:none}
+.toast.show{display:block}
 
 :focus-visible{outline:3px solid #9FB0C6;outline-offset:2px}
 @media (max-width:759px){.arrow{width:46px;height:46px}.book{border-radius:12px}}
@@ -136,11 +142,12 @@ body.cinema-mode .tools{opacity:0;pointer-events:none}
 </div>
 
 <!-- Boutons d'outils en bas à gauche -->
-<div class="tools">
+<div class="tools" id="tools">
 <button class="tbtn" id="cinemabtn" type="button" title="Regarder la vidéo en plein écran avec le son">
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
 </button>
 </div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <!-- Bouton pour quitter le mode cinéma -->
 <button class="exit-cinema" id="exitcinema" type="button" title="Retourner à l'album">
@@ -154,10 +161,25 @@ body.cinema-mode .tools{opacity:0;pointer-events:none}
 var BACKGROUND_SRC = 'video_1.mp4';
 var COVER_IMG = 'cover.png';
 
-var N=18;
-var userUrls={},pending=null,bgVideoElement=null;
+/* Option alternative : tu peux aussi indiquer tes chemins d'images ici, ex:
+   var PUBLIC_PHOTOS = { p1: 'photos/p1.jpg', p2: 'photos/p2.jpg', ... };
+   ou simplement utiliser le fichier photos.json généré via ?edit=1 */
+var PUBLIC_PHOTOS = {};
 
-/* Stockage local des photos ajoutées */
+var IS_EDIT = new URLSearchParams(window.location.search).has('edit');
+if (IS_EDIT) document.body.classList.add('edit-mode');
+
+var N=18;
+var publicUrls={}, userUrls={}, pending=null, bgVideoElement=null;
+
+function getPhotoSrc(id){
+  if (IS_EDIT && userUrls[id]) return userUrls[id];
+  if (publicUrls[id]) return publicUrls[id];
+  if (PUBLIC_PHOTOS[id]) return PUBLIC_PHOTOS[id];
+  return '';
+}
+
+/* Stockage local (utilisé uniquement en mode ?edit=1 pour préparer/exporter les photos) */
 var idb=null;
 function idbOpen(cb){try{var r=indexedDB.open('mei-album-v4',1);r.onupgradeneeded=function(){r.result.createObjectStore('kv');};r.onsuccess=function(){idb=r.result;cb();};r.onerror=function(){cb();};}catch(e){cb();}}
 function idbPut(k,v){if(!idb)return;try{idb.transaction('kv','readwrite').objectStore('kv').put(v,k);}catch(e){}}
@@ -167,7 +189,7 @@ function idbAll(cb){if(!idb){cb({});return;}var out={};try{var c=idb.transaction
 var ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 9"/></svg>';
 
 function slot(id,tone,style,cls){
-  var s=userUrls[id]||'';
+  var s=getPhotoSrc(id);
   var has=Boolean(s);
   var inner=has?('<img class="bgimg" src="'+s+'" alt="" aria-hidden="true"><img class="fg" src="'+s+'" alt="Photo de l’album">'):ICON;
   return '<div class="slot '+(tone||'')+' '+(cls||'')+(has?' has-photo':'')+'" data-slot="'+id+'"'+(style?' style="'+style+'"':'')+'>'+inner+
@@ -177,7 +199,7 @@ function slot(id,tone,style,cls){
 function bleed(id){return slot(id,'','position:absolute;inset:0;flex:none;border-radius:0');}
 function pol(style,id,tone){return '<div class="pol" style="'+style+'"><div class="sq">'+slot(id,tone,'')+'</div></div>';}
 function pano(side){
-  var s=userUrls['pano']||'';
+  var s=getPhotoSrc('pano');
   var has=Boolean(s);
   var inner=has?('<img class="bgimg" src="'+s+'" alt="" aria-hidden="true"><img class="fg" src="'+s+'" alt="Photo panoramique">'):ICON;
   return '<div class="pano '+side+(has?' has-photo':'')+'" data-slot="pano">'+inner+
@@ -320,7 +342,7 @@ book.addEventListener('pointerup',function(e){
   }
 });
 
-/* Gestion du mode Cinéma (Fondu livre, zoom vidéo et fondu audio) */
+/* Gestion du mode Cinéma */
 var cinemabtn = document.getElementById('cinemabtn');
 var exitcinema = document.getElementById('exitcinema');
 var audioFadeInterval = null;
@@ -331,15 +353,11 @@ function enterCinemaMode() {
     bgVideoElement.muted = false;
     bgVideoElement.volume = 0;
     bgVideoElement.play().catch(function(){});
-    
     if (audioFadeInterval) clearInterval(audioFadeInterval);
     var vol = 0;
     audioFadeInterval = setInterval(function() {
       vol += 0.04;
-      if (vol >= 1) {
-        vol = 1;
-        clearInterval(audioFadeInterval);
-      }
+      if (vol >= 1) { vol = 1; clearInterval(audioFadeInterval); }
       bgVideoElement.volume = vol;
     }, 80);
   }
@@ -365,6 +383,63 @@ function exitCinemaMode() {
 cinemabtn.addEventListener('click', enterCinemaMode);
 exitcinema.addEventListener('click', exitCinemaMode);
 
+/* Export des photos en photos.json pour publication GitHub Pages (?edit=1) */
+var ALL_SLOTS=['p1','p2','p3a','p3b','p3c','p4a','p4b','p4c','p4d','p5','p6a','p6b','p6c','p7a','p7b','pano','p8a','p8b','p8c','p9a','p9b','p9c','p10a','p10b','p10c','p10d','p11','p12a','p12b','p13a','p13b','p13c','p14a','p14b','p14c','p14d','p14e','p14f','p15','p16a','p16b','p16c','p17a','p17b','p17c','p17d','p18'];
+function showToast(msg, ms){
+  var el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  if(ms){setTimeout(function(){el.classList.remove('show');},ms);}
+}
+function compressImageToDataURL(src){
+  return new Promise(function(resolve){
+    var img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=function(){
+      var maxSide=1400;
+      var w=img.naturalWidth, h=img.naturalHeight;
+      if(w>maxSide||h>maxSide){
+        if(w>=h){h=Math.round(h*(maxSide/w));w=maxSide;}
+        else{w=Math.round(w*(maxSide/h));h=maxSide;}
+      }
+      var c=document.createElement('canvas');
+      c.width=w; c.height=h;
+      var ctx=c.getContext('2d');
+      ctx.drawImage(img,0,0,w,h);
+      resolve(c.toDataURL('image/jpeg',0.84));
+    };
+    img.onerror=function(){resolve('');};
+    img.src=src;
+  });
+}
+if(IS_EDIT){
+  var toolsEl=document.getElementById('tools');
+  var expBtn=document.createElement('button');
+  expBtn.className='tbtn pill';
+  expBtn.type='button';
+  expBtn.title='Exporter toutes vos photos pour que tout le monde les voie sur GitHub';
+  expBtn.textContent='Exporter photos.json';
+  expBtn.addEventListener('click',function(){
+    var keys=ALL_SLOTS.filter(function(k){return Boolean(getPhotoSrc(k));});
+    if(!keys.length){showToast('Aucune photo trouvée dans cet album. Ajoutez des photos avec + d’abord.',4500);return;}
+    showToast('Préparation de '+keys.length+' photo(s)...');
+    var out={};
+    Promise.all(keys.map(function(k){
+      var s=getPhotoSrc(k);
+      if(s.indexOf('photos/')===0){out[k]=s;return Promise.resolve();}
+      return compressImageToDataURL(s).then(function(d){if(d)out[k]=d;});
+    })).then(function(){
+      var blob=new Blob([JSON.stringify(out)],{type:'application/json'});
+      var a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='photos.json';
+      a.click();
+      setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+      showToast('photos.json téléchargé ('+Object.keys(out).length+' photos) ! Déposez-le sur GitHub à côté de index.html.',7000);
+    });
+  });
+  toolsEl.appendChild(expBtn);
+}
+
 /* Événements de clic et clavier */
 prev.addEventListener('click',function(){go(vi-1);});
 next.addEventListener('click',function(){go(vi+1);});
@@ -372,9 +447,12 @@ document.addEventListener('click',function(e){
   var t=e.target.closest&&e.target.closest('[data-open],[data-pick],[data-clear]');
   if(!t)return;
   if(t.hasAttribute('data-open')){go(vi+1);return;}
+  if(!IS_EDIT)return;
   if(t.hasAttribute('data-pick')){pending=t.getAttribute('data-pick');photoin.click();return;}
   var id=t.getAttribute('data-clear');
-  if(userUrls[id]){URL.revokeObjectURL(userUrls[id]);delete userUrls[id];idbDel(id);render();}
+  if(userUrls[id]){URL.revokeObjectURL(userUrls[id]);delete userUrls[id];idbDel(id);}
+  if(publicUrls[id])delete publicUrls[id];
+  render();
 });
 photoin.addEventListener('change',function(){
   var f=photoin.files&&photoin.files[0];photoin.value='';
@@ -423,6 +501,7 @@ function initBackground(){
     v.muted=true;
     v.defaultMuted=true;
     v.playsInline=true;
+    v.preload='auto';
     v.setAttribute('playsinline','');
     v.addEventListener('error', startFallbackParticles);
     bgEl.appendChild(v);
@@ -434,17 +513,27 @@ function initBackground(){
   }
 }
 
-/* Démarrage */
+/* Démarrage : chargement de photos.json pour tous les visiteurs + IndexedDB si ?edit=1 */
 views=buildViews();vi=0;render();
 initBackground();
-idbOpen(function(){
-  idbAll(function(all){
-    var any=false;
-    for(var k in all){userUrls[k]=URL.createObjectURL(all[k]);any=true;}
-    if(any)render();
+
+fetch('photos.json?v='+Date.now())
+  .then(function(r){return r.ok?r.json():{};})
+  .then(function(data){
+    if(data&&typeof data==='object'){publicUrls=data;render();}
+  })
+  .catch(function(){});
+
+if(IS_EDIT){
+  idbOpen(function(){
+    idbAll(function(all){
+      var any=false;
+      for(var k in all){userUrls[k]=URL.createObjectURL(all[k]);any=true;}
+      if(any)render();
+    });
   });
-});
+}
 })();
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5a7726acbe9dcf9',t:'MTc5NDY3NDMxMA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5a7726acbe9dcf9',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
