@@ -6,7 +6,7 @@
       "label": "BATMAN_Miyukii",
       "version": 1,
       "locale": "fr-FR",
-      "generatedAt": "2026-11-08T13:08:15.642Z",
+      "generatedAt": "2026-11-15T12:43:54.241Z",
       "profile": {
         "onlineId": "BATMAN_Miyukii",
         "avatarUrl": "",
@@ -14,24 +14,9 @@
       },
       "playStats": {
         "totalTitles": 223,
-        "totalDurationSeconds": 22388694,
-        "totalPlayCount": 5482,
+        "totalDurationSeconds": 22460911,
+        "totalPlayCount": 5498,
         "games": [
-          {
-            "titleId": "PPSA10990_00",
-            "conceptId": 223118,
-            "name": "Roblox",
-            "originalName": "Roblox",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202604/0801/f2bdf0b6807d0e43c432e4de00f444df6c97732065904006.png",
-            "platform": "PS5",
-            "category": "ps5_native_game",
-            "service": "none(purchased)",
-            "playCount": 319,
-            "playDuration": "PT662H31M22S",
-            "durationSeconds": 2385082,
-            "firstPlayedDateTime": "2026-04-17T11:18:57.630000Z",
-            "lastPlayedDateTime": "2026-11-08T12:32:15.780000Z"
-          },
           {
             "titleId": "PPSA01923_00",
             "conceptId": 228748,
@@ -41,11 +26,26 @@
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
-            "playCount": 918,
-            "playDuration": "PT907H28M31S",
-            "durationSeconds": 3266911,
+            "playCount": 927,
+            "playDuration": "PT920H46M28S",
+            "durationSeconds": 3314788,
             "firstPlayedDateTime": "2023-09-03T12:13:55.000000Z",
-            "lastPlayedDateTime": "2026-11-08T00:24:15.780000Z"
+            "lastPlayedDateTime": "2026-11-15T12:29:20.880000Z"
+          },
+          {
+            "titleId": "PPSA10990_00",
+            "conceptId": 223118,
+            "name": "Roblox",
+            "originalName": "Roblox",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202604/0801/f2bdf0b6807d0e43c432e4de00f444df6c97732065904006.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 326,
+            "playDuration": "PT669H17M2S",
+            "durationSeconds": 2409422,
+            "firstPlayedDateTime": "2026-04-17T11:18:57.630000Z",
+            "lastPlayedDateTime": "2026-11-15T12:28:50.170000Z"
           },
           {
             "titleId": "CUSA04099_00",
@@ -817,7 +817,7 @@
             "conceptId": 10011142,
             "name": "Where Winds Meet (F2P)",
             "originalName": "Where Winds Meet (F2P)",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202610/1410/c4d22396830728db25505b2b0b623d5c4259f44a7aab1447.png",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202611/1310/644cfefdf5d3a02191c4444153321a90a961b7140d3874ce.png",
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
@@ -3052,7 +3052,7 @@
             "conceptId": 232860,
             "name": "PUBG: BATTLEGROUNDS",
             "originalName": "PUBG: BATTLEGROUNDS",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202610/1501/dd9df72f2e03104ac0bf697e51a2249752b954ca2f738187.png",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202602/0504/a667297e99ffe4f306b1b513ffd1f38b429ab22ab4848408.png",
             "platform": "Autre",
             "category": "unknown",
             "service": "none_purchased",
@@ -3378,5 +3378,5 @@
       "errors": []
     }
   ],
-  "generatedAt": "2026-11-08T13:08:15.643Z"
+  "generatedAt": "2026-11-15T12:43:54.242Z"
 }
