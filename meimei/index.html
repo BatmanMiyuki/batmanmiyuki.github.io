@@ -682,7 +682,7 @@ function initBackground(){
   }
 }
 
-/* Démarrage : charge photos.json si présent ; sinon active automatiquement le mode édition */
+/* Démarrage : mode lecture seule pour les visiteurs, édition uniquement via ?edit=1 */
 syncBookViews();
 vi=0;
 render();
@@ -706,21 +706,10 @@ fetch('photos.json?v='+Date.now())
         publicUrls=copy;
         syncBookViews();
         render();
-      }else if(!IS_EDIT){
-        enableEditMode();
-        render();
       }
-    }else if(!IS_EDIT){
-      enableEditMode();
-      render();
     }
   })
-  .catch(function(){
-    if(!IS_EDIT){
-      enableEditMode();
-      render();
-    }
-  });
+  .catch(function(){});
 })();
 </script>
 </body>
