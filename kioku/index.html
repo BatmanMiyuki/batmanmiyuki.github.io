@@ -1455,6 +1455,34 @@ input:checked + .slider::before { transform: translateX(22px); }
 /* Page-head plus aérée pour profils */
 .friend-hero{padding:22px 22px; border-radius:18px; background:linear-gradient(135deg, rgba(255,61,139,.07), rgba(53,230,255,.06)); border:1px solid rgba(255,255,255,.08)}
 
+
+/* ── Calendrier sorties ── */
+.cal-wrap{ background:var(--surface); border:1px solid var(--stroke); border-radius:16px; padding:14px; margin-top:14px }
+.cal-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px }
+.cal-title{ font-weight:800; font-size:16px }
+.cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:6px }
+.cal-cell{ min-height:86px; background:rgba(255,255,255,.04); border:1px solid var(--stroke); border-radius:10px; padding:6px; position:relative; overflow:hidden }
+.cal-cell.today{ border-color:var(--pink); box-shadow:0 0 0 1px rgba(255,61,139,.25) inset }
+.cal-cell.muted{ opacity:.45 }
+.cal-date{ font-size:11px; font-weight:800; color:var(--muted); margin-bottom:4px; display:flex; justify-content:space-between; align-items:center }
+.cal-dot{ width:6px; height:6px; border-radius:50%; background:var(--pink); }
+.cal-item{ font-size:11px; line-height:1.2; padding:4px 6px; border-radius:8px; background:linear-gradient(135deg, rgba(255,61,139,.14), rgba(155,92,255,.12)); border:1px solid rgba(255,61,139,.18); margin-top:4px; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:600 }
+.cal-item.movie{ background:linear-gradient(135deg, rgba(255,206,79,.14), rgba(255,61,139,.10)); border-color:rgba(255,206,79,.22) }
+.cal-legend{ display:flex; gap:8px; flex-wrap:wrap; font-size:11px; color:var(--muted); margin-top:8px }
+/* ── Export Story ── */
+.story-preview{ width:270px; height:480px; border-radius:16px; overflow:hidden; border:1px solid var(--stroke); background:#0d0a1a; position:relative; transform:scale(1); transform-origin:top left; margin:0 auto }
+.story-actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:12px }
+/* ── Thèmes ── */
+.theme-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:10px }
+.theme-card{ padding:12px; border-radius:12px; border:1px solid var(--stroke); background:var(--surface); cursor:pointer; text-align:center; transition:.15s }
+.theme-card.active{ border-color:var(--pink); box-shadow:0 0 0 1px rgba(255,61,139,.3) inset, 0 6px 16px rgba(255,61,139,.15) }
+.theme-dot{ width:22px; height:22px; border-radius:50%; margin:0 auto 8px; border:2px solid rgba(255,255,255,.15) }
+/* Thème clair */
+:root[data-theme="light"]{ color-scheme: light; --bg:#f6f2ff; --bg-2:#ffffff; --surface:rgba(0,0,0,.04); --surface-2:rgba(0,0,0,.06); --stroke:rgba(0,0,0,.08); --stroke-2:rgba(0,0,0,.12); --text:#1a1030; --muted:#6b5a8a; --muted-2:#9a8ab8; --grad:linear-gradient(120deg, #ff3d8b, #9b5cff 55%, #35e6ff); }
+:root[data-theme="light"] .topbar{ background:rgba(246,242,255,.92); border-bottom-color:rgba(0,0,0,.06) }
+:root[data-theme="light"] .card, :root[data-theme="light"] .panel, :root[data-theme="light"] .stat, :root[data-theme="light"] .cal-wrap{ background:#fff; border-color:rgba(0,0,0,.06); box-shadow:0 8px 24px rgba(0,0,0,.06) }
+:root[data-theme="light"] .card-title, :root[data-theme="light"] .title, :root[data-theme="light"] h3{ color:#1a1030 }
+
 </style>
 
 <!-- KIOKU Cloud — Firebase (optionnel, pour comptes cross-device) -->
@@ -1667,7 +1695,15 @@ if(window.USE_FIREBASE){
       <button class="btn btn-sm" onclick="News.load(true)">🔄 Actualiser</button>
       <button class="btn btn-sm btn-primary" onclick="UI.openForm(null,'soon')">＋ Sortie à surveiller</button>
     </div>
+    <div class="toolbar" style="margin-top:10px">
+      <div class="chips">
+        <button class="chip active" id="news-view-list" onclick="News.setView('list')">📋 Liste</button>
+        <button class="chip" id="news-view-cal" onclick="News.setView('calendar')">📅 Calendrier</button>
+      </div>
+      <span class="muted" style="font-size:12px">Calendrier = tes sorties surveillées par date</span>
+    </div>
     <div id="news-content"></div>
+    <div id="news-calendar" style="display:none"></div>
   </section>
 
   <!-- ══════════ Page : Stats ══════════ -->
@@ -1708,6 +1744,21 @@ if(window.USE_FIREBASE){
     </div>
 
     <div class="settings-grid">
+      <!-- Bloc Thèmes -->
+      <div class="panel" style="border-color:rgba(53,230,255,.18);background:linear-gradient(135deg, rgba(53,230,255,.06), rgba(155,92,255,.04))">
+        <div class="panel-head-icon">🎨 <h3>Thèmes & Apparence</h3></div>
+        <p class="muted" style="font-size:13px;margin-bottom:12px">Choisis ton ambiance. Clair/sombre + accent + pétales.</p>
+        <div class="theme-grid" id="theme-grid"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <span class="muted" style="font-size:12px;align-self:center">Accent :</span>
+          <button class="theme-dot" style="background:#ff3d8b" onclick="Theme.setAccent('#ff3d8b')" title="Rose"></button>
+          <button class="theme-dot" style="background:#35e6ff" onclick="Theme.setAccent('#35e6ff')" title="Cyan"></button>
+          <button class="theme-dot" style="background:#9b5cff" onclick="Theme.setAccent('#9b5cff')" title="Violet"></button>
+          <button class="theme-dot" style="background:#ffce4f" onclick="Theme.setAccent('#ffce4f')" title="Or"></button>
+          <button class="theme-dot" style="background:#3ddc97" onclick="Theme.setAccent('#3ddc97')" title="Vert"></button>
+        </div>
+      </div>
+
       <!-- Bloc Compte -->
       <div class="panel" style="border-color:rgba(255,61,139,.22);background:linear-gradient(135deg, rgba(255,61,139,.06), rgba(53,230,255,.04))">
         <div class="panel-head-icon">👤 <h3>Compte & Amis</h3></div>
@@ -1940,6 +1991,23 @@ if(window.USE_FIREBASE){
       <button class="btn btn-icon" onclick="Auth.closeModal()" aria-label="Fermer">✕</button>
     </div>
     <div class="modal-body" id="auth-modal-body"></div>
+  </div>
+</div>
+
+<div class="modal-back" id="story-modal">
+  <div class="modal" role="dialog" aria-modal="true" style="max-width:380px">
+    <div class="modal-head">
+      <h2>📸 Ta Story KIOKU</h2>
+      <button class="btn btn-icon" onclick="Story.close()" aria-label="Fermer">✕</button>
+    </div>
+    <div class="modal-body" style="text-align:center">
+      <div id="story-preview-box" class="story-preview"></div>
+      <div class="story-actions">
+        <button class="btn btn-primary" onclick="Story.export()">⬇️ Télécharger PNG</button>
+        <button class="btn" onclick="Story.close()">Fermer</button>
+      </div>
+      <p class="muted" style="font-size:12px;margin-top:10px">1080×1920 — prête pour Insta/Discord</p>
+    </div>
   </div>
 </div>
 
@@ -4447,6 +4515,15 @@ const Stats = {
     const genreHTML = this.genrePanel(all);
     const dataPanel = isFriend ? '' : `
       <div class="panel">
+        <h3>📸 Partage</h3>
+        <p class="muted" style="font-size:13px;margin-bottom:10px">Génère une image story pour Insta/Discord avec tes stats.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <button class="btn btn-primary" onclick="Story.export()">📸 Exporter ma Story (1080×1920)</button>
+          <button class="btn" onclick="Story.preview()">👁️ Aperçu</button>
+        </div>
+      </div>
+
+      <div class="panel">
         <h3>Données</h3>
         <div style="display:flex;flex-wrap:wrap;gap:10px">
           <button class="btn" onclick="Data.export()">⬇️ Exporter (JSON)</button>
@@ -4721,6 +4798,206 @@ const Stats = {
   }
 };
 
+/* ------------------------------------------------------------
+   8c. Calendrier, Story & Thèmes
+------------------------------------------------------------ */
+const NewsCalendar = {
+  view: 'list',
+};
+
+const NewsView = {
+  setView(v){
+    NewsCalendar.view = v;
+    document.getElementById('news-view-list')?.classList.toggle('active', v==='list');
+    document.getElementById('news-view-cal')?.classList.toggle('active', v==='calendar');
+    const listEl = document.getElementById('news-content');
+    const calEl = document.getElementById('news-calendar');
+    if(v==='calendar'){
+      if(listEl) listEl.style.display='none';
+      if(calEl){ calEl.style.display='block'; News.renderCalendar(); }
+    } else {
+      if(listEl) listEl.style.display='block';
+      if(calEl) calEl.style.display='none';
+      News.render();
+    }
+  }
+};
+// expose for toolbar
+News.setView = (v)=> NewsView.setView(v);
+News.renderCalendar = function(){
+  const calEl = document.getElementById('news-calendar');
+  if(!calEl) return;
+  const soon = Store.all().filter(a=> a.status==='soon' && a.release).sort((x,y)=> (x.release||'').localeCompare(y.release||''));
+  if(!soon.length){
+    calEl.innerHTML = `<div class="cal-wrap"><p class="muted" style="text-align:center;padding:18px">Aucune sortie avec date. Ajoute une date de sortie à tes animes “Prochainement”.</p></div>`;
+    return;
+  }
+  // Mois en cours
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  const first = new Date(y,m,1);
+  const last = new Date(y,m+1,0);
+  const startDay = (first.getDay()+6)%7; // lundi=0
+  const daysInMonth = last.getDate();
+  const monthName = now.toLocaleDateString('fr-FR',{month:'long', year:'numeric'});
+  // Index par date
+  const byDate = {};
+  soon.forEach(a=>{
+    const d = a.release; // YYYY-MM-DD
+    if(!byDate[d]) byDate[d]=[];
+    byDate[d].push(a);
+  });
+  let html = `<div class="cal-wrap"><div class="cal-head"><div class="cal-title">📅 ${monthName} — tes sorties</div><span class="muted" style="font-size:12px">${soon.length} date(s)</span></div><div class="cal-grid">`;
+  const weekdays = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  weekdays.forEach(w=> html+=`<div style="text-align:center;font-size:11px;font-weight:800;color:var(--muted);padding:6px">${w}</div>`);
+  for(let i=0;i<startDay;i++) html+=`<div class="cal-cell muted"></div>`;
+  for(let d=1; d<=daysInMonth; d++){
+    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const items = byDate[dateStr]||[];
+    const isToday = d===now.getDate();
+    const diff = Math.ceil((new Date(dateStr+'T00:00:00') - new Date())/86400000);
+    let badge='';
+    if(items.length) badge = diff===0? 'Aujourd’hui' : diff>0? `J-${diff}` : 'Sorti';
+    html += `<div class="cal-cell ${isToday?'today':''}"><div class="cal-date"><span>${d}</span>${items.length?`<span style="font-size:10px;background:var(--pink);color:#fff;padding:2px 6px;border-radius:99px">${badge}</span>`:''}</div>`;
+    items.slice(0,3).forEach(a=>{
+      html+=`<div class="cal-item ${a.isMovie?'movie':''}" onclick="Router.go('anime/${a.id}')" title="${esc(a.title)}">${a.isMovie?'🎬':'📅'} ${esc(a.title).slice(0,22)}</div>`;
+    });
+    if(items.length>3) html+=`<div style="font-size:10px;color:var(--muted);margin-top:4px">+${items.length-3} autre(s)</div>`;
+    html+=`</div>`;
+  }
+  html+=`</div><div class="cal-legend"><span class="legend-dot" style="background:var(--pink)"></span> Sortie ce mois <span class="legend-dot" style="background:var(--cyan)"></span> Clique pour ouvrir</div></div>`;
+  // Liste à venir hors mois
+  const future = soon.filter(a=> new Date(a.release) > last);
+  if(future.length){
+    html+=`<div class="cal-wrap"><h3 style="font-size:14px;margin-bottom:8px">🗓️ À venir après ce mois (${future.length})</h3><div style="display:grid;gap:8px">`+
+      future.slice(0,8).map(a=> `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface);border:1px solid var(--stroke);border-radius:10px"><span style="font-size:12px;color:var(--muted)">${a.release}</span><b style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(a.title)}</b><button class="btn btn-sm" onclick="Router.go('anime/${a.id}')">Ouvrir</button></div>`).join('')+
+      `</div></div>`;
+  }
+  calEl.innerHTML = html;
+};
+
+const Story = {
+  preview(){
+    const modal = document.getElementById('story-modal');
+    if(modal){ modal.classList.add('open'); document.body.style.overflow='hidden'; this.renderPreview(); }
+  },
+  close(){ const m=document.getElementById('story-modal'); if(m) m.classList.remove('open'); document.body.style.overflow=''; },
+  renderPreview(){
+    const box=document.getElementById('story-preview-box');
+    if(!box) return;
+    // On génère un canvas 540x960 (ratio story) et on l'affiche en petit
+    const canvas=document.createElement('canvas');
+    canvas.width=1080; canvas.height=1920;
+    this.draw(canvas);
+    const url=canvas.toDataURL('image/png');
+    box.innerHTML=`<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:16px" />`;
+    box.dataset.url=url;
+  },
+  draw(canvas){
+    const ctx=canvas.getContext('2d');
+    const W=canvas.width, H=canvas.height;
+    // fond
+    const grad=ctx.createLinearGradient(0,0,W,H);
+    grad.addColorStop(0,'#0f0a1e'); grad.addColorStop(0.5,'#1a1030'); grad.addColorStop(1,'#08060f');
+    ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
+    // pétales décor
+    ctx.globalAlpha=0.12;
+    for(let i=0;i<18;i++){ const x=Math.random()*W, y=Math.random()*H*0.6, r=6+Math.random()*10; ctx.fillStyle='#ff3d8b'; ctx.beginPath(); ctx.ellipse(x,y,r,r*0.6, Math.random()*Math.PI,0,Math.PI*2); ctx.fill(); }
+    ctx.globalAlpha=1;
+    // logo
+    ctx.fillStyle='#fff'; ctx.font='800 64px Outfit, sans-serif'; ctx.fillText('KIOKU', 60, 140);
+    ctx.fillStyle='#ff8cbc'; ctx.font='600 28px Outfit, sans-serif'; ctx.fillText('記憶 · ANIME TRACKER', 60, 185);
+    // user
+    const user = Auth.isLogged()? Auth.getCurrent().username : 'Invité';
+    const all = Store.all();
+    const topLevel = all.filter(a=>!a.parentId);
+    const seen = topLevel.filter(a=> a.status!=='planned' && a.status!=='soon').length;
+    const planned = new Set(all.filter(a=>a.status==='planned').map(a=>a.parentId||a.id)).size;
+    const eps = all.reduce((s,a)=> s+(a.seasons||[]).reduce((t,ss)=> t+(ss.watched||[]).length,0),0);
+    const mins = all.reduce((s,a)=> s+(a.seasons||[]).reduce((t,ss)=> t+(ss.watched||[]).length*(ss.duration||22),0),0);
+    const days = (mins/1440).toFixed(1);
+    ctx.fillStyle='rgba(255,255,255,.9)'; ctx.font='700 42px Outfit, sans-serif'; ctx.fillText(user, 60, 260);
+    ctx.fillStyle='rgba(255,255,255,.6)'; ctx.font='500 22px Outfit, sans-serif'; ctx.fillText(new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'}), 60, 295);
+    // hero temps
+    ctx.fillStyle='rgba(255,255,255,.06)'; ctx.beginPath(); ctx.roundRect(40,340,W-80,220,28); ctx.fill();
+    ctx.fillStyle='#ff3d8b'; ctx.font='800 56px Outfit, sans-serif'; ctx.fillText(fmtDuration(mins), 70, 430);
+    ctx.fillStyle='rgba(255,255,255,.7)'; ctx.font='500 20px Outfit, sans-serif'; ctx.fillText(`${mins.toLocaleString('fr-FR')} min · ${eps.toLocaleString('fr-FR')} épisodes · ${days} jours`, 70, 470);
+    ctx.fillStyle='rgba(255,255,255,.5)'; ctx.font='600 18px Outfit, sans-serif'; ctx.fillText(`${seen} oeuvres vues  ·  ${planned} à regarder  ·  ${topLevel.length} oeuvres`, 70, 505);
+    // top 3
+    const top = Stats.getGroupedTop(all).slice(0,3);
+    ctx.fillStyle='#fff'; ctx.font='800 26px Outfit, sans-serif'; ctx.fillText('🏆 TOP 3', 60, 620);
+    top.forEach((a,i)=>{
+      const y = 660 + i*280;
+      ctx.fillStyle='rgba(255,255,255,.07)'; ctx.beginPath(); ctx.roundRect(40,y,W-80,240,18); ctx.fill();
+      // rang
+      ctx.fillStyle= i===0?'#ffd700': i===1?'#c0c0c0':'#cd7f32'; ctx.font='800 32px Outfit, sans-serif'; ctx.fillText(i===0?'🥇':i===1?'🥈':'🥉', 70, y+50);
+      ctx.fillStyle='#fff'; ctx.font='700 22px Outfit, sans-serif';
+      const title = a.title.length>34? a.title.slice(0,34)+'…' : a.title;
+      ctx.fillText(title, 70, y+90);
+      ctx.fillStyle='rgba(255,255,255,.65)'; ctx.font='500 18px Outfit, sans-serif'; ctx.fillText(`${fmtDuration(a.watchedMin)} · ${a.watchedEps} ép.`, 70, y+125);
+      // barre
+      const max = top[0]?.watchedMin||1;
+      const pct = Math.max(0.06, a.watchedMin/max);
+      ctx.fillStyle='rgba(255,255,255,.08)'; ctx.beginPath(); ctx.roundRect(70,y+150,W-140,16,8); ctx.fill();
+      const grad2=ctx.createLinearGradient(70,0,W-70,0); grad2.addColorStop(0,'#ff3d8b'); grad2.addColorStop(1,'#35e6ff');
+      ctx.fillStyle=grad2; ctx.beginPath(); ctx.roundRect(70,y+150,(W-140)*pct,16,8); ctx.fill();
+    });
+    // footer
+    ctx.fillStyle='rgba(255,255,255,.35)'; ctx.font='600 18px Outfit, sans-serif'; ctx.fillText('batmanmiyuki.github.io/kioku', 60, H-60);
+    ctx.fillStyle='rgba(255,61,139,.9)'; ctx.font='800 18px Outfit, sans-serif'; ctx.fillText('Généré avec KIOKU ✨', W-320, H-60);
+  },
+  export(){
+    const canvas=document.createElement('canvas');
+    canvas.width=1080; canvas.height=1920;
+    this.draw(canvas);
+    const a=document.createElement('a');
+    a.href=canvas.toDataURL('image/png');
+    a.download=`kioku-story-${new Date().toISOString().slice(0,10)}.png`;
+    a.click();
+    toast('Story exportée ✨');
+  }
+};
+
+const Theme = {
+  init(){
+    try{
+      const t = localStorage.getItem('kioku.theme') || 'dark';
+      const accent = localStorage.getItem('kioku.accent') || '#ff3d8b';
+      document.documentElement.setAttribute('data-theme', t);
+      document.documentElement.style.setProperty('--pink', accent);
+      this.renderGrid();
+    }catch(e){}
+  },
+  setTheme(name){
+    document.documentElement.setAttribute('data-theme', name);
+    localStorage.setItem('kioku.theme', name);
+    this.renderGrid();
+    toast(name==='light'?'☀️ Thème clair':'🌙 Thème sombre');
+  },
+  setAccent(color){
+    document.documentElement.style.setProperty('--pink', color);
+    localStorage.setItem('kioku.accent', color);
+    toast('Accent mis à jour');
+  },
+  renderGrid(){
+    const grid=document.getElementById('theme-grid');
+    if(!grid) return;
+    const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+    grid.innerHTML = `
+      <div class="theme-card ${cur==='dark'?'active':''}" onclick="Theme.setTheme('dark')">
+        <div class="theme-dot" style="background:#08060f; border-color:#ff3d8b"></div>
+        <b>Sombre</b><br><small style="color:var(--muted)">Actuel</small>
+      </div>
+      <div class="theme-card ${cur==='light'?'active':''}" onclick="Theme.setTheme('light')">
+        <div class="theme-dot" style="background:#ffffff; border-color:#9b5cff"></div>
+        <b>Clair</b><br><small style="color:var(--muted)">Lumineux</small>
+      </div>
+    `;
+  }
+};
+
+/* ------------------------------------------------------------
+   9. Page « Détail »
 /* ------------------------------------------------------------
    9. Page « Détail » (Saisons, Section Autre & Re-visionnages)
 ------------------------------------------------------------ */
@@ -6049,6 +6326,7 @@ function boot() {
   if (prefs.defaultDur) DEFAULT_DUR = prefs.defaultDur;
   if (prefs.perfMode === true) document.body.classList.add('perf-mode');
   
+  try{ Theme.init(); }catch(e){}
   Signature.render();
   if (prefs.petals !== false && prefs.perfMode !== true) {
     spawnPetals();
@@ -6088,6 +6366,9 @@ function boot() {
   document.getElementById('assist-btn').addEventListener('click', () => UI.assistSearch());
   document.getElementById('assist-q').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); UI.assistSearch(); }
+  });
+  document.getElementById('story-modal')?.addEventListener('mousedown', e => {
+    if (e.target.id === 'story-modal') Story.close();
   });
   document.getElementById('cloud-modal')?.addEventListener('mousedown', e => {
     if (e.target.id === 'cloud-modal') Settings.closeCloudModal();
@@ -6139,6 +6420,7 @@ function boot() {
       Friends.closeCompare();
       Auth.closeDropdown();
       Settings.closeCloudModal();
+      Story.close();
     }
     const formOpen = document.getElementById('form-modal')?.classList.contains('open');
     const linkOpen = document.getElementById('link-modal')?.classList.contains('open');
