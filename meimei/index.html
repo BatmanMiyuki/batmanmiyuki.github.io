@@ -519,6 +519,31 @@ function showToast(msg, ms){
   if(ms){setTimeout(function(){el.classList.remove('show');},ms);}
 }
 
+function blobToDataURL(blob){
+  return new Promise(function(resolve){
+    var r=new FileReader();
+    r.onload=function(){resolve(r.result||'');};
+    r.onerror=function(){resolve('');};
+    r.readAsDataURL(blob);
+  });
+}
+
+function isAnimatedBlob(blob){
+  if(!blob)return Promise.resolve(false);
+  if(blob.type==='image/gif')return Promise.resolve(true);
+  if(blob.type==='image/webp'||blob.type==='image/png'||!blob.type){
+    return blob.slice(0,4096).arrayBuffer().then(function(buf){
+      var bytes=new Uint8Array(buf),str='';
+      for(var i=0;i<bytes.length;i++)str+=String.fromCharCode(bytes[i]);
+      if(str.indexOf('GIF87a')===0||str.indexOf('GIF89a')===0)return true;
+      if(str.indexOf('RIFF')===0&&str.indexOf('WEBP')!==-1&&str.indexOf('ANIM')!==-1)return true;
+      if(bytes[0]===137&&bytes[1]===80&&bytes[2]===78&&bytes[3]===71&&str.indexOf('acTL')!==-1)return true;
+      return false;
+    }).catch(function(){return false;});
+  }
+  return Promise.resolve(false);
+}
+
 function compressImageToDataURL(src){
   return new Promise(function(resolve){
     var img=new Image();
@@ -538,6 +563,17 @@ function compressImageToDataURL(src){
     };
     img.onerror=function(){resolve('');};
     img.src=src;
+  });
+}
+
+function prepareImageForExport(src){
+  return fetch(src).then(function(res){return res.blob();}).then(function(blob){
+    return isAnimatedBlob(blob).then(function(anim){
+      if(anim)return blobToDataURL(blob);
+      return compressImageToDataURL(src);
+    });
+  }).catch(function(){
+    return compressImageToDataURL(src);
   });
 }
 
@@ -571,7 +607,7 @@ function enableEditMode(){
       Promise.all(keys.map(function(k){
         var s=getPhotoSrc(k);
         if(s.indexOf('photos/')===0 || s.indexOf('data:image/')===0){out[k]=s;return Promise.resolve();}
-        return compressImageToDataURL(s).then(function(d){if(d)out[k]=d;});
+        return prepareImageForExport(s).then(function(d){if(d)out[k]=d;});
       })).then(function(){
         var blob=new Blob([JSON.stringify(out)],{type:'application/json'});
         var a=document.createElement('a');
@@ -712,5 +748,5 @@ fetch('photos.json?v='+Date.now())
   .catch(function(){});
 })();
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5b6ecb5bba7bb22',t:'MTc5NDgzNjYwNg=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5b6ecb5bba7bb22',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
