@@ -137,9 +137,23 @@ body.edit-mode .pg-actions{display:flex;position:absolute;left:10px;bottom:10px;
 .pgact.del{background:rgba(155,44,44,.9)}
 .pgact.del:hover{background:#b91c1c}
 
-/* Toast d'export */
-.toast{position:fixed;bottom:76px;left:max(16px,env(safe-area-inset-left,0px));z-index:60;background:rgba(28,32,39,.95);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:12px 16px;font:500 13px/1.45 system-ui,sans-serif;max-width:360px;box-shadow:0 12px 32px rgba(0,0,0,.45);display:none}
+/* Toast & Fenêtre d'export multi-fichiers */
+.toast{position:fixed;bottom:76px;left:max(16px,env(safe-area-inset-left,0px));z-index:60;background:rgba(28,32,39,.95);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:12px 16px;font:500 13px/1.45 system-ui,sans-serif;max-width:380px;box-shadow:0 12px 32px rgba(0,0,0,.45);display:none}
 .toast.show{display:block}
+.expmodal{position:fixed;inset:0;z-index:80;background:rgba(12,16,22,.72);display:none;align-items:center;justify-content:center;padding:16px}
+.expmodal.show{display:flex}
+.expbox{background:#1C2027;color:#E8EBEF;border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:20px;max-width:420px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.6);font:500 14px/1.5 system-ui,sans-serif}
+.expbox h3{margin:0 0 8px;font:600 17px/1.3 system-ui,sans-serif;color:#fff}
+.expbox p{margin:0 0 14px;font-size:13px;color:#BAC3CD}
+.expfiles{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;max-height:50vh;overflow:auto}
+.exprow{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 12px}
+.exprow b{font-size:13px;color:#fff}
+.exprow span{font-size:12px;color:#BAC3CD}
+.expdl{border:0;border-radius:999px;background:#3b82f6;color:#fff;padding:7px 14px;font:600 12px/1 system-ui,sans-serif;cursor:pointer}
+.expdl:hover{background:#2563eb}
+.expdl.done{background:#16a34a}
+.expclose{width:100%;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:transparent;color:#fff;padding:9px;font:600 13px/1 system-ui,sans-serif;cursor:pointer}
+.expclose:hover{background:rgba(255,255,255,.08)}
 
 :focus-visible{outline:3px solid #9FB0C6;outline-offset:2px}
 @media (max-width:759px){.arrow{width:46px;height:46px}.book{border-radius:12px}}
@@ -164,6 +178,14 @@ body.edit-mode .pg-actions{display:flex;position:absolute;left:10px;bottom:10px;
 </button>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="expmodal" id="expmodal" role="dialog" aria-modal="true" aria-label="Exporter les fichiers pour GitHub">
+  <div class="expbox">
+    <h3>Fichiers prêts pour GitHub</h3>
+    <p>Pour rester sous la limite de 25 Mo par fichier sur GitHub, l'album a été découpé automatiquement. Téléchargez chaque fichier et déposez-les tous ensemble sur GitHub :</p>
+    <div class="expfiles" id="expfiles"></div>
+    <button class="expclose" id="expclose" type="button">Fermer</button>
+  </div>
+</div>
 
 <!-- Bouton pour quitter le mode cinéma -->
 <button class="exit-cinema" id="exitcinema" type="button" title="Retourner à l'album">
@@ -550,7 +572,7 @@ function compressImageToDataURL(src){
     var img=new Image();
     img.crossOrigin='anonymous';
     img.onload=function(){
-      var maxSide=1400;
+      var maxSide=1200;
       var w=img.naturalWidth, h=img.naturalHeight;
       if(w>maxSide||h>maxSide){
         if(w>=h){h=Math.round(h*(maxSide/w));w=maxSide;}
@@ -560,7 +582,7 @@ function compressImageToDataURL(src){
       c.width=w; c.height=h;
       var ctx=c.getContext('2d');
       ctx.drawImage(img,0,0,w,h);
-      resolve(c.toDataURL('image/jpeg',0.84));
+      resolve(c.toDataURL('image/jpeg',0.80));
     };
     img.onerror=function(){resolve('');};
     img.src=src;
@@ -601,31 +623,84 @@ function enableEditMode(){
     expBtn.type='button';
     expBtn.title='Exporter toutes vos photos et pages pour que tout le monde les voie sur GitHub';
     expBtn.textContent='Exporter photos.json';
+    var expCloseBtn=document.getElementById('expclose');
+    if(expCloseBtn){expCloseBtn.addEventListener('click',function(){document.getElementById('expmodal').classList.remove('show');});}
+
     expBtn.addEventListener('click',function(){
       var keys=getAllSlotsList().filter(function(k){return Boolean(getPhotoSrc(k));});
       if(!keys.length && !extraPages.length){showToast('Aucune photo trouvée dans cet album. Ajoutez des photos avec + d’abord.',4500);return;}
       showToast('Préparation de '+keys.length+' photo(s)...');
-      var out={}, animCount=0;
-      if(extraPages.length) out.__pages = extraPages;
+      var entries=[], animCount=0;
       Promise.all(keys.map(function(k){
         var s=getPhotoSrc(k);
         if(s.indexOf('photos/')===0 || s.indexOf('data:image/')===0){
-          out[k]=s;
           if(s.indexOf('data:image/gif')===0||s.indexOf('data:image/webp')===0)animCount++;
+          entries.push({k:k, v:s});
           return Promise.resolve();
         }
         return prepareImageForExport(k,s).then(function(res){
-          if(res&&res.data){out[k]=res.data;if(res.anim)animCount++;}
+          if(res&&res.data){if(res.anim)animCount++;entries.push({k:k, v:res.data});}
         });
       })).then(function(){
-        var blob=new Blob([JSON.stringify(out)],{type:'application/json'});
-        var a=document.createElement('a');
-        a.href=URL.createObjectURL(blob);
-        a.download='photos.json';
-        a.click();
-        setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
-        var mb=(blob.size/1048576).toFixed(1);
-        showToast('photos.json téléchargé ('+keys.length+' photos dont '+animCount+' animée(s), '+mb+' Mo) ! Déposez-le sur GitHub.',8000);
+        var MAX_CHUNK_BYTES = 14 * 1024 * 1024;
+        var chunks = [{}], curSize = 256;
+        for(var i=0;i<entries.length;i++){
+          var e = entries[i];
+          var itemSize = e.k.length + e.v.length + 8;
+          if(curSize > 256 && curSize + itemSize > MAX_CHUNK_BYTES){
+            chunks.push({});
+            curSize = 2;
+          }
+          chunks[chunks.length - 1][e.k] = e.v;
+          curSize += itemSize;
+        }
+        if(extraPages.length) chunks[0].__pages = extraPages;
+        if(chunks.length > 1){
+          var chunkNames = [];
+          for(var c=1;c<chunks.length;c++) chunkNames.push('photos_'+(c+1)+'.json');
+          chunks[0].__chunks = chunkNames;
+        }
+        var files = chunks.map(function(obj, idx){
+          var name = idx===0 ? 'photos.json' : ('photos_'+(idx+1)+'.json');
+          return { name:name, blob:new Blob([JSON.stringify(obj)],{type:'application/json'}) };
+        });
+        if(files.length === 1){
+          var a=document.createElement('a');
+          a.href=URL.createObjectURL(files[0].blob);
+          a.download=files[0].name;
+          a.click();
+          setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+          var mb=(files[0].blob.size/1048576).toFixed(1);
+          showToast('photos.json téléchargé ('+entries.length+' photos dont '+animCount+' animée(s), '+mb+' Mo) ! Déposez-le sur GitHub.',8000);
+        }else{
+          var listEl=document.getElementById('expfiles');
+          listEl.innerHTML='';
+          files.forEach(function(f){
+            var row=document.createElement('div');
+            row.className='exprow';
+            var mb=(f.blob.size/1048576).toFixed(1);
+            var info=document.createElement('div');
+            info.innerHTML='<b>'+f.name+'</b><br><span>'+mb+' Mo</span>';
+            var btn=document.createElement('button');
+            btn.type='button';
+            btn.className='expdl';
+            btn.textContent='Télécharger';
+            btn.addEventListener('click',function(){
+              var a=document.createElement('a');
+              a.href=URL.createObjectURL(f.blob);
+              a.download=f.name;
+              a.click();
+              setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+              btn.textContent='Téléchargé ✓';
+              btn.classList.add('done');
+            });
+            row.appendChild(info);
+            row.appendChild(btn);
+            listEl.appendChild(row);
+          });
+          document.getElementById('toast').classList.remove('show');
+          document.getElementById('expmodal').classList.add('show');
+        }
       });
     });
     toolsEl.appendChild(expBtn);
@@ -734,29 +809,40 @@ vi=0;
 render();
 initBackground();
 
+function applyLoadedJson(data){
+  if(!data || typeof data!=='object')return;
+  if(Array.isArray(data.__pages) && data.__pages.length > extraPages.length){
+    extraPages=data.__pages.slice();
+  }
+  var hasAny=false;
+  for(var k in data){
+    if(k==='__pages'||k==='__chunks')continue;
+    publicUrls[k]=data[k];
+    hasAny=true;
+  }
+  if(hasAny || extraPages.length){
+    syncBookViews();
+    render();
+  }
+}
+
 fetch('photos.json?v='+Date.now())
   .then(function(r){return r.ok?r.json():{};})
   .then(function(data){
     if(data&&typeof data==='object'){
-      if(Array.isArray(data.__pages) && data.__pages.length > extraPages.length){
-        extraPages=data.__pages.slice();
-      }
-      var copy={};
-      var hasAny=false;
-      for(var k in data){
-        if(k==='__pages')continue;
-        copy[k]=data[k];
-        hasAny=true;
-      }
-      if(hasAny || extraPages.length){
-        publicUrls=copy;
-        syncBookViews();
-        render();
+      applyLoadedJson(data);
+      if(Array.isArray(data.__chunks) && data.__chunks.length){
+        return Promise.all(data.__chunks.map(function(url){
+          return fetch(url+'?v='+Date.now())
+            .then(function(r){return r.ok?r.json():{};})
+            .then(function(chunk){applyLoadedJson(chunk);})
+            .catch(function(){});
+        }));
       }
     }
   })
   .catch(function(){});
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5b743fc791ff120',t:'MTc5NDg0MDE4MQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5b743fc791ff120',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5b969337b56965d',t:'MTc5NDg2MjY3Nw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5b969337b56965d',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
