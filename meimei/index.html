@@ -262,16 +262,18 @@ var EXTRA_TEMPLATES = {
   grid3hero:function(p){ return {h:g('1.25fr 1fr',E2,slot(p+'a','b','grid-row:span 2')+slot(p+'b','')+slot(p+'c','c'))}; },
   grid3rows:function(p){ return {h:g(ONE,E3,slot(p+'a','')+slot(p+'b','b')+slot(p+'c','c'))}; },
   pol2:     function(p){ return {h:pol('left:10%;top:8%;width:68%;transform:rotate(-3deg)',p+'a','')+pol('right:6%;bottom:8%;width:44%;transform:rotate(5deg)',p+'b','b')}; },
+  pol2_alt: function(p){ return {h:pol('right:9%;top:8%;width:66%;transform:rotate(3deg)',p+'a','')+pol('left:7%;bottom:8%;width:46%;transform:rotate(-4deg)',p+'b','b')}; },
   pol3:     function(p){ return {h:pol('left:7%;top:6%;width:52%;transform:rotate(-5deg)',p+'a','')+pol('right:5%;top:31%;width:50%;transform:rotate(4deg)',p+'b','b')+pol('left:9%;bottom:6%;width:46%;transform:rotate(-2deg)',p+'c','c')}; },
+  pol3_alt: function(p){ return {h:pol('right:7%;top:6%;width:51%;transform:rotate(4deg)',p+'a','')+pol('left:6%;top:30%;width:50%;transform:rotate(-5deg)',p+'b','b')+pol('right:9%;bottom:6%;width:46%;transform:rotate(2deg)',p+'c','c')}; },
   collage3: function(p){ return {h:'<div class="abs" style="inset:var(--pad)">'+slot(p+'a','','position:absolute;left:0;top:0;width:78%;height:70%;flex:none')+slot(p+'b','','position:absolute;right:0;bottom:0;width:56%;height:46%;flex:none','framed')+slot(p+'c','c','position:absolute;right:0;top:7%;width:30%;height:24%;flex:none','framed')+'</div>'}; },
   grid4:    function(p){ return {h:g(E2,E2,slot(p+'a','')+slot(p+'b','b')+slot(p+'c','c')+slot(p+'d',''))}; },
   grid4mix: function(p){ return {h:g(E2,E3,slot(p+'a','b','grid-row:span 2')+slot(p+'b','')+slot(p+'c','c')+slot(p+'d','c','grid-column:span 2'))}; },
   grid6:    function(p){ return {h:g(E2,E3,slot(p+'a','')+slot(p+'b','b')+slot(p+'c','c')+slot(p+'d','b')+slot(p+'e','c')+slot(p+'f',''))}; }
 };
-var TEMPLATE_KEYS = Object.keys(EXTRA_TEMPLATES);
+var POLAROID_KEYS = ['pol3', 'pol2', 'pol3_alt', 'pol2_alt'];
 
-function pickRandomTemplate(excludeKey){
-  var pool = TEMPLATE_KEYS.filter(function(k){ return k !== excludeKey; });
+function pickPolaroidTemplate(excludeKey){
+  var pool = POLAROID_KEYS.filter(function(k){ return k !== excludeKey; });
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
@@ -322,7 +324,7 @@ function addPageBoxHtml(){
   return '<div class="addpage-wrap"><button class="addpage-btn" type="button" data-addpage aria-label="Ajouter une nouvelle page">'+
     '<span class="addpage-plus">+</span>'+
     '<span class="addpage-lbl">Ajouter une page</span>'+
-    '<span class="addpage-sub">Disposition aléatoire (page '+(N+1)+')</span>'+
+    '<span class="addpage-sub">Disposition Polaroïd (page '+(N+1)+')</span>'+
     '</button></div>';
 }
 function pageEl(it,side){
@@ -332,7 +334,7 @@ function pageEl(it,side){
   var extraActions='';
   if(IS_EDIT && it>BASE_PAGES){
     extraActions='<div class="pg-actions">'+
-      '<button class="pgact" type="button" data-shuffle="'+it+'" title="Changer aléatoirement la disposition">🎲 Disposition</button>'+
+      '<button class="pgact" type="button" data-shuffle="'+it+'" title="Alterner entre 2 et 3 polaroïds">Polaroïd 2/3</button>'+
       (it===N?'<button class="pgact del" type="button" data-delpage="'+it+'" title="Supprimer cette page">Supprimer</button>':'')+
       '</div>';
   }
@@ -480,7 +482,7 @@ function getAllSlotsList(){
 
 function addRandomPage(){
   var prevTpl = extraPages.length ? extraPages[extraPages.length - 1].tpl : '';
-  var tpl = pickRandomTemplate(prevTpl);
+  var tpl = pickPolaroidTemplate(prevTpl);
   extraPages.push({ tpl: tpl });
   idbPut('__pages', JSON.stringify(extraPages));
   var newNum = BASE_PAGES + extraPages.length;
@@ -493,7 +495,8 @@ function addRandomPage(){
 function shuffleExtraPage(num){
   var idx = num - BASE_PAGES - 1;
   if(idx < 0 || idx >= extraPages.length) return;
-  extraPages[idx].tpl = pickRandomTemplate(extraPages[idx].tpl);
+  var curIdx = POLAROID_KEYS.indexOf(extraPages[idx].tpl);
+  extraPages[idx].tpl = POLAROID_KEYS[(curIdx + 1) % POLAROID_KEYS.length];
   idbPut('__pages', JSON.stringify(extraPages));
   render();
 }
@@ -588,7 +591,7 @@ function enableEditMode(){
     var addPageBtn=document.createElement('button');
     addPageBtn.className='tbtn pill';
     addPageBtn.type='button';
-    addPageBtn.title='Ajouter une nouvelle page à la fin avec disposition aléatoire';
+    addPageBtn.title='Ajouter une nouvelle page Polaroïd à la fin';
     addPageBtn.textContent='+ Page';
     addPageBtn.addEventListener('click', addRandomPage);
     toolsEl.appendChild(addPageBtn);
@@ -755,5 +758,5 @@ fetch('photos.json?v='+Date.now())
   .catch(function(){});
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5b70a06dd8dbb22',t:'MTc5NDgzNzgwNw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5b70a06dd8dbb22',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5b743fc791ff120',t:'MTc5NDg0MDE4MQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5b743fc791ff120',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
