@@ -209,7 +209,7 @@ body.edit-mode .pg-actions{display:flex;position:absolute;left:10px;bottom:10px;
     <div id="pubsetup">
       <ol class="ghsteps">
         <li>Sur GitHub : <b>Profil → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token</b>.</li>
-        <li>Dans <b>Repository access</b>, choisissez <b>Only select repositories → meimei</b>.</li>
+        <li>Dans <b>Repository access</b>, choisissez <b>Only select repositories → batmanmiyuki.github.io</b>.</li>
         <li>Dans <b>Permissions → Repository permissions</b>, mettez <b>Contents : Read and write</b>.</li>
         <li>Copiez le token (<code>github_pat_...</code>) et collez-le ci-dessous :</li>
       </ol>
@@ -834,13 +834,28 @@ function enableEditMode(){
       });
     }
 
-    function detectRepo(){
-      var host=window.location.hostname||'';
+    function detectTarget(token){
+      var host=window.location.hostname||'batmanmiyuki.github.io';
       var parts=(window.location.pathname||'/').split('/').filter(Boolean);
-      if(host.endsWith('.github.io') && parts.length>=1){
-        return host.replace('.github.io','')+'/'+parts[0];
+      if(host.endsWith('.github.io')){
+        var owner=host.replace('.github.io','');
+        if(parts.length>=1){
+          var sub=parts[0];
+          return ghApi('/repos/'+owner+'/'+sub, token).then(function(repoInfo){
+            return { repo: owner+'/'+sub, prefix: '', branch: repoInfo.default_branch || 'main' };
+          }).catch(function(){
+            return ghApi('/repos/'+owner+'/'+host, token).then(function(repoInfo){
+              return { repo: owner+'/'+host, prefix: sub+'/', branch: repoInfo.default_branch || 'main' };
+            });
+          });
+        }
+        return ghApi('/repos/'+owner+'/'+host, token).then(function(repoInfo){
+          return { repo: owner+'/'+host, prefix: '', branch: repoInfo.default_branch || 'main' };
+        });
       }
-      return 'batmanmiyuki/meimei';
+      return ghApi('/repos/batmanmiyuki/batmanmiyuki.github.io', token).then(function(repoInfo){
+        return { repo: 'batmanmiyuki/batmanmiyuki.github.io', prefix: 'meimei/', branch: repoInfo.default_branch || 'main' };
+      });
     }
 
     pubGoBtn.addEventListener('click',function(){
@@ -854,51 +869,60 @@ function enableEditMode(){
       pubGoBtn.textContent='Publication…';
       pubStatus.textContent='Préparation des photos et pages…';
 
-      var repo=detectRepo();
-      var branch='main', latestCommitSha='', newFiles=[];
+      var target={repo:'',prefix:'',branch:'main'}, latestCommitSha='', baseTreeSha='', newFiles=[], existingJsons=[];
       buildExportChunks().then(function(res){
         if(res.empty) throw new Error('Aucune photo trouvée dans cet album.');
         newFiles=res.files;
-        pubStatus.textContent='Connexion à GitHub ('+repo+')…';
-        return ghApi('/repos/'+repo, token);
-      }).then(function(repoInfo){
-        branch = repoInfo.default_branch || 'main';
-        return ghApi('/repos/'+repo+'/git/ref/heads/'+branch, token);
+        pubStatus.textContent='Connexion à GitHub…';
+        return detectTarget(token);
+      }).then(function(t){
+        target=t;
+        pubStatus.textContent='Lecture du dépôt '+target.repo+'…';
+        return ghApi('/repos/'+target.repo+'/git/ref/heads/'+target.branch, token);
       }).then(function(refInfo){
         latestCommitSha = refInfo.object.sha;
-        return ghApi('/repos/'+repo+'/git/commits/'+latestCommitSha, token);
+        return ghApi('/repos/'+target.repo+'/git/commits/'+latestCommitSha, token);
       }).then(function(commitInfo){
-        return ghApi('/repos/'+repo+'/git/trees/'+commitInfo.tree.sha, token);
-      }).then(function(treeInfo){
-        var kept = (treeInfo.tree || []).filter(function(item){
-          return !/^photos(_\d+)?\.json$/.test(item.path);
-        }).map(function(item){
-          return {path:item.path, mode:item.mode, type:item.type, sha:item.sha};
+        baseTreeSha = commitInfo.tree.sha;
+        var folder = target.prefix.replace(/\/$/, '');
+        return ghApi('/repos/'+target.repo+'/contents/'+(folder||''), token).catch(function(){return [];});
+      }).then(function(dirItems){
+        if(Array.isArray(dirItems)){
+          existingJsons = dirItems.map(function(it){return it.name;}).filter(function(nm){
+            return /^photos(_\d+)?\.json$/.test(nm);
+          });
+        }
+        var treeItems = [];
+        var newNames = newFiles.map(function(f){return f.name;});
+        existingJsons.forEach(function(nm){
+          if(newNames.indexOf(nm) === -1){
+            treeItems.push({path: target.prefix+nm, mode:'100644', type:'blob', sha:null});
+          }
         });
         var uploaded = 0;
         return newFiles.reduce(function(chain, f){
           return chain.then(function(){
             uploaded++;
             pubStatus.textContent='Envoi de '+f.name+' ('+uploaded+'/'+newFiles.length+')…';
-            return ghApi('/repos/'+repo+'/git/blobs', token, 'POST', {
+            return ghApi('/repos/'+target.repo+'/git/blobs', token, 'POST', {
               content: strToBase64(f.text),
               encoding: 'base64'
             }).then(function(blobRes){
-              kept.push({path:f.name, mode:'100644', type:'blob', sha:blobRes.sha});
+              treeItems.push({path: target.prefix+f.name, mode:'100644', type:'blob', sha:blobRes.sha});
             });
           });
-        }, Promise.resolve()).then(function(){ return kept; });
-      }).then(function(newTree){
+        }, Promise.resolve()).then(function(){ return treeItems; });
+      }).then(function(treeItems){
         pubStatus.textContent='Création de la mise à jour sur GitHub…';
-        return ghApi('/repos/'+repo+'/git/trees', token, 'POST', {tree:newTree});
+        return ghApi('/repos/'+target.repo+'/git/trees', token, 'POST', {base_tree: baseTreeSha, tree: treeItems});
       }).then(function(createdTree){
-        return ghApi('/repos/'+repo+'/git/commits', token, 'POST', {
+        return ghApi('/repos/'+target.repo+'/git/commits', token, 'POST', {
           message: 'Mise à jour album Mei Mei ('+N+' pages)',
           tree: createdTree.sha,
           parents: [latestCommitSha]
         });
       }).then(function(newCommit){
-        return ghApi('/repos/'+repo+'/git/refs/heads/'+branch, token, 'PATCH', {
+        return ghApi('/repos/'+target.repo+'/git/refs/heads/'+target.branch, token, 'PATCH', {
           sha: newCommit.sha
         });
       }).then(function(){
@@ -1175,5 +1199,5 @@ fetchJsonRetry('photos.json', {cache:'no-cache'}, 2)
   });
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5be0d56bf859ee8',t:'MTc5NDkxMTM0Mw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5be0d56bf859ee8',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5be27575ca79ee8',t:'MTc5NDkxMjQwOA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5be27575ca79ee8',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
