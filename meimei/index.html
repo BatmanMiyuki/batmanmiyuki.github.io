@@ -111,6 +111,11 @@ body.cinema-mode .tools{opacity:0;pointer-events:none}
 .pol{position:absolute;background:#fff;padding:1.8vmin 1.8vmin 5.4vmin;box-shadow:0 3px 14px rgba(32,36,43,.3)}
 .pol .sq{aspect-ratio:1/1;overflow:hidden;display:flex}
 .pol .sq .slot{border-radius:0}
+.pol .cap,.pol .cap-in{position:absolute;left:1.5vmin;right:1.5vmin;bottom:0;height:5.4vmin;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-weight:600;font-size:clamp(10px,2.05vmin,18px);line-height:1.1;color:#262D39;text-align:center}
+.pol .cap{padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.pol .cap-in{width:calc(100% - 3vmin);border:0;border-bottom:1.5px dashed transparent;background:transparent;outline:none;padding:0 4px;user-select:text}
+.pol .cap-in::placeholder{color:#9aa4b2;font-weight:500;font-size:clamp(9px,1.65vmin,14px)}
+.pol .cap-in:hover,.pol .cap-in:focus{border-bottom-color:#566377;background:rgba(86,99,119,.06);border-radius:4px}
 
 /* Boutons d'ajout/suppression visibles uniquement en mode édition (?edit=1) */
 .slotbtn,.slotclr,.pg-actions,.addpage-wrap{display:none}
@@ -249,9 +254,17 @@ var allPages = [];        /* utilisé si allPagesMode = true */
 var extraPages = [];      /* compatibilité ancien format __pages (>= 19) */
 var N = BASE_PAGES;
 
-var publicUrls={}, publicBlobs={}, publicAnim={};
-var userUrls={}, userBlobs={}, userAnim={};
+var publicUrls={}, publicBlobs={}, publicAnim={}, publicCaptions={};
+var userUrls={}, userBlobs={}, userAnim={}, userCaptions={};
 var pending=null, bgVideoElement=null;
+
+function escHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function getCaption(id){
+  if (IS_EDIT && Object.prototype.hasOwnProperty.call(userCaptions, id)) return userCaptions[id];
+  return publicCaptions[id] || '';
+}
 
 function getPhotoSrc(id){
   if (IS_EDIT && userUrls[id]) return userUrls[id];
@@ -292,7 +305,16 @@ function slot(id,tone,style,cls){
     '<button class="slotclr" type="button" data-clear="'+id+'" aria-label="Retirer la photo de cet emplacement">×</button></div>';
 }
 function bleed(id){return slot(id,'','position:absolute;inset:0;flex:none;border-radius:0');}
-function pol(style,id,tone){return '<div class="pol" style="'+style+'"><div class="sq">'+slot(id,tone,'')+'</div></div>';}
+function pol(style,id,tone){
+  var cap=getCaption(id);
+  var capHtml='';
+  if(IS_EDIT){
+    capHtml='<input class="cap-in" type="text" data-cap="'+id+'" value="'+escHtml(cap)+'" placeholder="Nommer Mei Mei…" maxlength="60" aria-label="Nom de la photo">';
+  }else if(cap){
+    capHtml='<div class="cap" title="'+escHtml(cap)+'">'+escHtml(cap)+'</div>';
+  }
+  return '<div class="pol" style="'+style+'"><div class="sq">'+slot(id,tone,'')+'</div>'+capHtml+'</div>';
+}
 function pano(side){
   var s=getPhotoSrc('pano');
   var has=Boolean(s);
@@ -463,7 +485,7 @@ function go(i){
 var isDragging=false,startX=0,currentX=0,turnDiv=null,turnDir=0;
 
 book.addEventListener('pointerdown',function(e){
-  if(e.target.closest('button')||e.target.closest('.slotbtn')||e.target.closest('.slotclr'))return;
+  if(e.target.closest('button')||e.target.closest('input')||e.target.closest('.slotbtn')||e.target.closest('.slotclr'))return;
   isDragging=true;startX=e.clientX;currentX=startX;
   book.setPointerCapture(e.pointerId);
 });
@@ -684,7 +706,10 @@ function deleteLastExtraPage(num){
     var k='p'+num+suf[j];
     if(userUrls[k]){URL.revokeObjectURL(userUrls[k]);delete userUrls[k];delete userBlobs[k];delete userAnim[k];idbDel(k);}
     if(publicUrls[k]){URL.revokeObjectURL(publicUrls[k]);delete publicUrls[k];delete publicBlobs[k];delete publicAnim[k];}
+    delete userCaptions[k];
+    delete publicCaptions[k];
   }
+  idbPut('__captions', JSON.stringify(userCaptions));
   if(allPagesMode) allPages.pop();
   else extraPages.pop();
   savePagesToIdb();
@@ -770,6 +795,12 @@ function enableEditMode(){
         chunks[0].__v = String(Math.floor(Date.now()/1000));
         if(allPagesMode) chunks[0].__allPages = allPages;
         else if(extraPages.length) chunks[0].__pages = extraPages;
+        var capsOut = {}, hasCaps = false;
+        getAllSlotsList().forEach(function(k){
+          var txt = (getCaption(k) || '').trim();
+          if(txt){ capsOut[k] = txt; hasCaps = true; }
+        });
+        if(hasCaps) chunks[0].__captions = capsOut;
         if(chunks.length > 1){
           var chunkNames = [];
           for(var c=1;c<chunks.length;c++) chunkNames.push('photos_'+(c+1)+'.json');
@@ -1004,6 +1035,13 @@ function enableEditMode(){
             }catch(e){}
             continue;
           }
+          if(k==='__captions'){
+            try{
+              var c=JSON.parse(all[k]);
+              if(c&&typeof c==='object'){userCaptions=c;any=true;}
+            }catch(e){}
+            continue;
+          }
           if(all[k] instanceof Blob){
             userBlobs[k]=all[k];
             userUrls[k]=URL.createObjectURL(all[k]);
@@ -1053,7 +1091,28 @@ photoin.addEventListener('change',function(){
   });
   render();
 });
+document.addEventListener('input',function(e){
+  if(!IS_EDIT)return;
+  var inp=e.target.closest&&e.target.closest('.cap-in');
+  if(!inp)return;
+  var id=inp.getAttribute('data-cap');
+  if(!id)return;
+  userCaptions[id]=inp.value;
+  idbPut('__captions', JSON.stringify(userCaptions));
+});
 document.addEventListener('keydown',function(e){
+  if(e.target && (e.target.tagName==='INPUT' || e.target.tagName==='TEXTAREA')){
+    if(e.key==='Enter' && e.target.classList.contains('cap-in')){
+      e.preventDefault();
+      var inputs=Array.prototype.slice.call(book.querySelectorAll('.cap-in'));
+      var idx=inputs.indexOf(e.target);
+      if(idx>=0 && idx+1<inputs.length) inputs[idx+1].focus();
+      else e.target.blur();
+    }else if(e.key==='Escape'){
+      e.target.blur();
+    }
+    return;
+  }
   if(e.key==='ArrowRight')go(vi+1);
   if(e.key==='ArrowLeft')go(vi-1);
   if(e.key==='Escape')exitCinemaMode();
@@ -1124,8 +1183,14 @@ function applyLoadedJson(data){
     extraPages=data.__pages.slice();
   }
   var hasAny=false;
+  if(data.__captions && typeof data.__captions==='object'){
+    for(var ck in data.__captions){
+      publicCaptions[ck]=String(data.__captions[ck]);
+      hasAny=true;
+    }
+  }
   for(var k in data){
-    if(k==='__pages'||k==='__chunks'||k==='__allPages'||k==='__v')continue;
+    if(k==='__pages'||k==='__chunks'||k==='__allPages'||k==='__v'||k==='__captions')continue;
     var val=data[k];
     if(typeof val==='string' && val.indexOf('data:image/')===0){
       try{
@@ -1199,5 +1264,5 @@ fetchJsonRetry('photos.json', {cache:'no-cache'}, 2)
   });
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5be27575ca79ee8',t:'MTc5NDkxMjQwOA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5be27575ca79ee8',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5bfc6f0de6d7838',t:'MTc5NDkyOTQzMQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5bfc6f0de6d7838',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
