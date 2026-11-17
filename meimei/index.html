@@ -19,8 +19,8 @@ html,body{height:100%;margin:0}
 body{background:var(--desk);color:var(--text);font-family:system-ui,sans-serif;overflow:hidden;user-select:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-/* Fond vidéo vivant & Mode Cinéma */
-#bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:var(--desk)}
+/* Fond vidéo vivant & Mode Cinéma (isolé pour éviter les bugs de rendu GPU) */
+#bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:var(--desk);isolation:isolate}
 #bg canvas,#bg video{position:absolute;inset:0;width:100%;height:100%;display:block;transition:transform 1.5s cubic-bezier(0.4, 0, 0.2, 1), filter 1.5s ease}
 #bg video{object-fit:cover;transform:translateZ(0)}
 #bg.media::after{content:"";position:absolute;inset:0;background:rgba(16,20,26,.28);transition:background 1.5s ease;pointer-events:none}
@@ -29,14 +29,14 @@ body{background:var(--desk);color:var(--text);font-family:system-ui,sans-serif;o
 body.cinema-mode #bg video{transform:scale(1.02);filter:saturate(1.08) contrast(1.02)}
 body.cinema-mode #bg.media::after{background:rgba(16,20,26,.04)}
 
-.stage{position:relative;z-index:1;height:100%;container-type:size;display:flex;align-items:center;justify-content:center;padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+.stage{position:relative;z-index:1;height:100%;container-type:size;display:flex;align-items:center;justify-content:center;padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));transform:translateZ(0)}
 
-/* Le livre 3D avec transition fondu/zoom */
+/* Le livre avec transition fondu/zoom (sans preserve-3d permanent pour éviter les pages blanches) */
 .bk{position:relative;flex:none;width:min(100cqw,calc(100cqh*1.5));aspect-ratio:3/2;perspective:2500px;transition:opacity 1s ease, transform 1s ease}
 .bk.single,.bk.closed{width:min(100cqw,calc(100cqh*.75));aspect-ratio:3/4}
 body.cinema-mode .bk{opacity:0;transform:scale(0.92);pointer-events:none}
 
-.book{width:100%;height:100%;display:flex;align-items:stretch;background:var(--book);padding:clamp(8px,1.6vmin,16px);border-radius:16px;box-shadow:0 30px 60px rgba(0,0,0,.55);position:relative;transform-style:preserve-3d;touch-action:none}
+.book{width:100%;height:100%;display:flex;align-items:stretch;background:var(--book);padding:clamp(8px,1.6vmin,16px);border-radius:16px;box-shadow:0 30px 60px rgba(0,0,0,.55);position:relative;touch-action:none}
 .book.closed{background:none;box-shadow:none;padding:0}
 .sw{width:2px;background:var(--book);flex:none}
 
@@ -94,7 +94,8 @@ body.cinema-mode .tools{opacity:0;pointer-events:none}
 /* Emplacements photo */
 .slot{position:relative;overflow:hidden;background:var(--mist);border-radius:3px;flex:1;min-height:0;min-width:0;display:flex;align-items:center;justify-content:center;color:var(--slate)}
 .slot.b{background:var(--mist2)} .slot.c{background:var(--mist3)}
-.slot .bgimg{position:absolute;left:-12%;top:-12%;width:124%;height:124%;object-fit:cover;filter:blur(22px) saturate(1.1);opacity:.75}
+.slot.anim-slot{background:#232832}
+.slot .bgimg{position:absolute;left:-12%;top:-12%;width:124%;height:124%;object-fit:cover;filter:blur(16px) saturate(1.1);opacity:.72}
 .slot .fg{position:relative;width:100%;height:100%;object-fit:contain;display:block}
 .slot>svg{width:clamp(20px,3.4vmin,32px);height:clamp(20px,3.4vmin,32px);opacity:.45}
 .framed{border:clamp(6px,1.2vmin,12px) solid #fff;box-shadow:0 2px 12px rgba(32,36,43,.28)}
@@ -104,14 +105,14 @@ body.cinema-mode .tools{opacity:0;pointer-events:none}
 .pano{height:56%;position:relative;overflow:hidden;background:var(--mist2);margin:calc(-1*var(--pad)) calc(-1*var(--pad)) 0;flex:none;display:flex;align-items:center;justify-content:center;color:var(--slate)}
 .pano>svg{width:clamp(20px,3.4vmin,32px);height:clamp(20px,3.4vmin,32px);opacity:.45}
 .pano .bgimg,.pano .fg{position:absolute;top:0;height:100%;width:200%;max-width:none}
-.pano .bgimg{object-fit:cover;filter:blur(22px);opacity:.75}
+.pano .bgimg{object-fit:cover;filter:blur(16px);opacity:.72}
 .pano .fg{object-fit:contain}
 .pano.l .bgimg,.pano.l .fg{left:0} .pano.r .bgimg,.pano.r .fg{left:-100%}
 .pol{position:absolute;background:#fff;padding:1.8vmin 1.8vmin 5.4vmin;box-shadow:0 3px 14px rgba(32,36,43,.3)}
 .pol .sq{aspect-ratio:1/1;overflow:hidden;display:flex}
 .pol .sq .slot{border-radius:0}
 
-/* Boutons d'ajout/suppression visibles uniquement en mode édition */
+/* Boutons d'ajout/suppression visibles uniquement en mode édition (?edit=1) */
 .slotbtn,.slotclr,.pg-actions,.addpage-wrap{display:none}
 body.edit-mode .slotbtn,body.edit-mode .slotclr{display:block}
 body.edit-mode .slotbtn{position:absolute;inset:0;width:100%;height:100%;z-index:4;border:2px dashed #2F3745;background:rgba(244,242,237,.25);cursor:pointer;padding:0}
@@ -130,12 +131,18 @@ body.edit-mode .addpage-wrap{display:flex;flex:1;align-items:center;justify-cont
 .addpage-lbl{font-family:var(--serif);font-weight:600;font-size:clamp(18px,2.8vmin,24px);letter-spacing:.03em;text-align:center}
 .addpage-sub{font:500 12px/1.4 system-ui,sans-serif;color:#566377;text-align:center}
 
-/* Contrôles discrets sur les pages ajoutées (>18) en mode édition */
+/* Contrôles discrets sur les pages en mode édition */
 body.edit-mode .pg-actions{display:flex;position:absolute;left:10px;bottom:10px;z-index:12;gap:6px}
 .pgact{height:28px;padding:0 10px;border-radius:999px;border:0;background:rgba(32,36,43,.86);color:#fff;cursor:pointer;font:600 11px/1 system-ui,sans-serif;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .pgact:hover{background:#20242B}
 .pgact.del{background:rgba(155,44,44,.9)}
 .pgact.del:hover{background:#b91c1c}
+
+/* Indicateur de chargement discret en bas à droite */
+.loadpill{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:45;background:rgba(28,32,39,.88);color:#E8EBEF;border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:8px 14px;font:500 12px/1 system-ui,sans-serif;display:none;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.loadpill.show{display:flex}
+.loaddot{width:8px;height:8px;border-radius:50%;background:#60a5fa;animation:pulse 1s infinite alternate}
+@keyframes pulse{from{opacity:.4}to{opacity:1}}
 
 /* Toast & Fenêtre d'export multi-fichiers */
 .toast{position:fixed;bottom:76px;left:max(16px,env(safe-area-inset-left,0px));z-index:60;background:rgba(28,32,39,.95);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:12px 16px;font:500 13px/1.45 system-ui,sans-serif;max-width:380px;box-shadow:0 12px 32px rgba(0,0,0,.45);display:none}
@@ -154,6 +161,14 @@ body.edit-mode .pg-actions{display:flex;position:absolute;left:10px;bottom:10px;
 .expdl.done{background:#16a34a}
 .expclose{width:100%;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:transparent;color:#fff;padding:9px;font:600 13px/1 system-ui,sans-serif;cursor:pointer}
 .expclose:hover{background:rgba(255,255,255,.08)}
+.tbtn.pub{background:rgba(22,163,74,.92);border-color:rgba(134,239,172,.5)}
+.tbtn.pub:hover{background:#15803d}
+.ghinp{width:100%;box-sizing:border-box;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:10px 12px;color:#fff;font:500 13px/1.4 monospace;margin-bottom:10px;user-select:text}
+.ghsteps{margin:0 0 12px;padding-left:18px;font-size:12px;color:#BAC3CD;line-height:1.55}
+.ghsteps b{color:#fff}
+.ghbtns{display:flex;gap:8px;margin-bottom:8px}
+.ghbtns .expdl{flex:1;padding:10px 14px;font-size:13px}
+.ghlink{background:none;border:0;color:#93c5fd;font:500 12px/1 system-ui,sans-serif;cursor:pointer;padding:4px 0;text-decoration:underline;margin-bottom:8px;display:inline-block}
 
 :focus-visible{outline:3px solid #9FB0C6;outline-offset:2px}
 @media (max-width:759px){.arrow{width:46px;height:46px}.book{border-radius:12px}}
@@ -177,6 +192,7 @@ body.edit-mode .pg-actions{display:flex;position:absolute;left:10px;bottom:10px;
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
 </button>
 </div>
+<div class="loadpill" id="loadpill"><span class="loaddot"></span><span id="loadtxt">Chargement des photos…</span></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="expmodal" id="expmodal" role="dialog" aria-modal="true" aria-label="Exporter les fichiers pour GitHub">
   <div class="expbox">
@@ -184,6 +200,30 @@ body.edit-mode .pg-actions{display:flex;position:absolute;left:10px;bottom:10px;
     <p>Pour rester sous la limite de 25 Mo par fichier sur GitHub, l'album a été découpé automatiquement. Téléchargez chaque fichier et déposez-les tous ensemble sur GitHub :</p>
     <div class="expfiles" id="expfiles"></div>
     <button class="expclose" id="expclose" type="button">Fermer</button>
+  </div>
+</div>
+<div class="expmodal" id="pubmodal" role="dialog" aria-modal="true" aria-label="Publier directement sur GitHub">
+  <div class="expbox">
+    <h3>Publier directement sur le site</h3>
+    <p id="pubdesc">Pour envoyer vos photos directement sur GitHub en 1 clic (sans rien télécharger), collez votre clé GitHub personnelle une seule fois. Elle reste enregistrée uniquement sur cet appareil.</p>
+    <div id="pubsetup">
+      <ol class="ghsteps">
+        <li>Sur GitHub : <b>Profil → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token</b>.</li>
+        <li>Dans <b>Repository access</b>, choisissez <b>Only select repositories → meimei</b>.</li>
+        <li>Dans <b>Permissions → Repository permissions</b>, mettez <b>Contents : Read and write</b>.</li>
+        <li>Copiez le token (<code>github_pat_...</code>) et collez-le ci-dessous :</li>
+      </ol>
+      <input class="ghinp" id="ghtoken" type="password" placeholder="github_pat_..." autocomplete="off">
+    </div>
+    <div id="pubready" style="display:none">
+      <p style="color:#86efac;margin-bottom:8px">Clé GitHub enregistrée sur cet appareil ✓</p>
+      <button class="ghlink" id="ghreset" type="button">Changer de clé GitHub</button>
+    </div>
+    <div class="ghbtns">
+      <button class="expdl" id="pubgo" type="button">Publier maintenant</button>
+    </div>
+    <p id="pubstatus" style="margin:6px 0 10px;font-size:12px;color:#93c5fd;min-height:16px"></p>
+    <button class="expclose" id="pubclose" type="button">Fermer</button>
   </div>
 </div>
 
@@ -199,17 +239,19 @@ body.edit-mode .pg-actions{display:flex;position:absolute;left:10px;bottom:10px;
 var BACKGROUND_SRC = 'video_1.mp4';
 var COVER_IMG = 'cover.png';
 
-/* Option alternative : chemins manuels, ou laissez vide et utilisez photos.json */
 var PUBLIC_PHOTOS = {};
-
 var IS_EDIT = new URLSearchParams(window.location.search).has('edit');
 var editToolsAdded = false;
 
 var BASE_PAGES = 18;
-var extraPages = []; /* Tableau d'objets { tpl: 'grid4', ... } pour les pages >= 19 */
+var allPagesMode = false; /* true quand __allPages gère toutes les pages 1..N en Polaroïd */
+var allPages = [];        /* utilisé si allPagesMode = true */
+var extraPages = [];      /* compatibilité ancien format __pages (>= 19) */
 var N = BASE_PAGES;
 
-var publicUrls={}, userUrls={}, userBlobs={}, pending=null, bgVideoElement=null;
+var publicUrls={}, publicBlobs={}, publicAnim={};
+var userUrls={}, userBlobs={}, userAnim={};
+var pending=null, bgVideoElement=null;
 
 function getPhotoSrc(id){
   if (IS_EDIT && userUrls[id]) return userUrls[id];
@@ -217,10 +259,15 @@ function getPhotoSrc(id){
   if (PUBLIC_PHOTOS[id]) return PUBLIC_PHOTOS[id];
   return '';
 }
+function isSlotAnim(id){
+  if (IS_EDIT && userUrls[id]) return Boolean(userAnim[id]);
+  if (publicUrls[id]) return Boolean(publicAnim[id]);
+  return false;
+}
 
-/* Stockage local (utilisé en mode édition) */
+/* Stockage local v5 (propre, sans conflit avec les anciennes dispositions) */
 var idb=null;
-function idbOpen(cb){try{var r=indexedDB.open('mei-album-v4',1);r.onupgradeneeded=function(){r.result.createObjectStore('kv');};r.onsuccess=function(){idb=r.result;cb();};r.onerror=function(){cb();};}catch(e){cb();}}
+function idbOpen(cb){try{var r=indexedDB.open('mei-album-v5',1);r.onupgradeneeded=function(){r.result.createObjectStore('kv');};r.onsuccess=function(){idb=r.result;cb();};r.onerror=function(){cb();};}catch(e){cb();}}
 function idbPut(k,v){if(!idb)return;try{idb.transaction('kv','readwrite').objectStore('kv').put(v,k);}catch(e){}}
 function idbDel(k){if(!idb)return;try{idb.transaction('kv','readwrite').objectStore('kv').delete(k);}catch(e){}}
 function idbAll(cb){if(!idb){cb({});return;}var out={};try{var c=idb.transaction('kv').objectStore('kv').openCursor();c.onsuccess=function(){var cur=c.result;if(cur){out[cur.key]=cur.value;cur.continue();}else cb(out);};c.onerror=function(){cb(out);};}catch(e){cb(out);}}
@@ -230,8 +277,17 @@ var ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-widt
 function slot(id,tone,style,cls){
   var s=getPhotoSrc(id);
   var has=Boolean(s);
-  var inner=has?('<img class="bgimg" src="'+s+'" alt="" aria-hidden="true"><img class="fg" src="'+s+'" alt="Photo de l’album">'):ICON;
-  return '<div class="slot '+(tone||'')+' '+(cls||'')+(has?' has-photo':'')+'" data-slot="'+id+'"'+(style?' style="'+style+'"':'')+'>'+inner+
+  var anim=has && isSlotAnim(id);
+  var inner;
+  if(!has){
+    inner=ICON;
+  }else if(anim){
+    /* Pas de double décodage flouté pour les GIF/WebP animés : évite les crashs sur mobile/tablette */
+    inner='<img class="fg" src="'+s+'" loading="lazy" alt="Photo animée de l’album">';
+  }else{
+    inner='<img class="bgimg" src="'+s+'" loading="lazy" alt="" aria-hidden="true"><img class="fg" src="'+s+'" loading="lazy" alt="Photo de l’album">';
+  }
+  return '<div class="slot '+(tone||'')+' '+(cls||'')+(has?' has-photo':'')+(anim?' anim-slot':'')+'" data-slot="'+id+'"'+(style?' style="'+style+'"':'')+'>'+inner+
     '<button class="slotbtn" type="button" data-pick="'+id+'" aria-label="Ajouter une photo à cet emplacement"></button>'+
     '<button class="slotclr" type="button" data-clear="'+id+'" aria-label="Retirer la photo de cet emplacement">×</button></div>';
 }
@@ -248,7 +304,6 @@ function pano(side){
 function g(cols,rows,inner){return '<div class="grid" style="grid-template-columns:'+cols+';grid-template-rows:'+rows+'">'+inner+'</div>';}
 var E2='repeat(2,minmax(0,1fr))',E3='repeat(3,minmax(0,1fr))',ONE='minmax(0,1fr)';
 
-/* Modèles fixes des 18 premières pages */
 var P={
   1:function(){return {cls:'bleed',h:bleed('p1')};},
   2:function(){return {cls:'mat',h:slot('p2','','','framed')};},
@@ -273,7 +328,6 @@ var P={
   18:function(){return {cls:'mat',h:'<div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center">'+slot('p18','','flex:none;height:86%;aspect-ratio:3/4;max-width:100%','framed')+'</div>'};}
 };
 
-/* Catalogue de dispositions aléatoires pour les pages supplémentaires (>= 19) */
 var EXTRA_TEMPLATES = {
   bleed1:   function(p){ return {cls:'bleed', h:bleed(p)}; },
   mat1:     function(p){ return {cls:'mat', h:slot(p,'','','framed')}; },
@@ -294,15 +348,21 @@ var EXTRA_TEMPLATES = {
 };
 var POLAROID_KEYS = ['pol3', 'pol2', 'pol3_alt', 'pol2_alt'];
 
-function pickPolaroidTemplate(excludeKey){
-  var pool = POLAROID_KEYS.filter(function(k){ return k !== excludeKey; });
-  return pool[Math.floor(Math.random() * pool.length)];
+function pickNextPolaroidTemplate(pageNum){
+  /* Alterne 3 polaroïds et 2 polaroïds pour faire max 5 images sur 2 pages */
+  var cycle = ['pol3', 'pol2', 'pol3_alt', 'pol2_alt'];
+  return cycle[(pageNum - 1) % cycle.length];
 }
 
 function getPageData(num){
+  if (allPagesMode) {
+    var m = allPages[num - 1];
+    var t = (m && EXTRA_TEMPLATES[m.tpl]) ? m.tpl : 'pol3';
+    return EXTRA_TEMPLATES[t]('p' + num);
+  }
   if (num <= BASE_PAGES) return P[num]();
   var meta = extraPages[num - BASE_PAGES - 1];
-  var tpl = (meta && EXTRA_TEMPLATES[meta.tpl]) ? meta.tpl : 'grid4';
+  var tpl = (meta && EXTRA_TEMPLATES[meta.tpl]) ? meta.tpl : 'pol3';
   return EXTRA_TEMPLATES[tpl]('p' + num);
 }
 
@@ -316,30 +376,30 @@ function buildViews(){
   var v=[{k:'front',n:0}],i;
   if(single()){
     for(i=1;i<=N;i++)v.push({l:i,n:i});
-    if(IS_EDIT)v.push({k:'add',n:98});
+    if(IS_EDIT)v.push({k:'add',n:9998});
   }else{
     v.push({l:'E',r:1,n:1});
     for(i=2;i<=N-1;i+=2)v.push({l:i,r:i+1,n:i});
     if(N%2===0){
       v.push({l:N,r:(IS_EDIT?'ADD':'E'),n:N});
     }else if(IS_EDIT){
-      v.push({k:'add',n:98});
+      v.push({k:'add',n:9998});
     }
   }
-  v.push({k:'back',n:99});
+  v.push({k:'back',n:9999});
   return v;
 }
 function syncBookViews(){
-  N = BASE_PAGES + extraPages.length;
+  N = allPagesMode ? allPages.length : (BASE_PAGES + extraPages.length);
   views = buildViews();
   vi = viewFor(curNum);
 }
 function viewFor(n){
   for(var i=0;i<views.length;i++){var v=views[i];
     if(n===0&&v.k==='front')return i;
-    if(n===98&&v.k==='add')return i;
-    if(n===99&&v.k==='back')return i;
-    if(n>0&&n<98&&(v.l===n||v.r===n))return i;}
+    if(n===9998&&v.k==='add')return i;
+    if(n===9999&&v.k==='back')return i;
+    if(n>0&&n<9998&&(v.l===n||v.r===n))return i;}
   return 0;
 }
 function addPageBoxHtml(){
@@ -354,10 +414,10 @@ function pageEl(it,side){
   if(it==='ADD')return '<article class="pg '+side+' endp" aria-label="Ajouter une page">'+addPageBoxHtml()+'</article>';
   var p=getPageData(it);
   var extraActions='';
-  if(IS_EDIT && it>BASE_PAGES){
+  if(IS_EDIT && (allPagesMode || it>BASE_PAGES)){
     extraActions='<div class="pg-actions">'+
       '<button class="pgact" type="button" data-shuffle="'+it+'" title="Alterner entre 2 et 3 polaroïds">Polaroïd 2/3</button>'+
-      (it===N?'<button class="pgact del" type="button" data-delpage="'+it+'" title="Supprimer cette page">Supprimer</button>':'')+
+      (it===N && it>1?'<button class="pgact del" type="button" data-delpage="'+it+'" title="Supprimer cette page">Supprimer</button>':'')+
       '</div>';
   }
   return '<article class="pg '+side+' '+(p.cls||'')+'" aria-label="Page '+it+'">'+p.h+extraActions+'<span class="num">'+it+'</span></article>';
@@ -492,56 +552,15 @@ function exitCinemaMode() {
 cinemabtn.addEventListener('click', enterCinemaMode);
 exitcinema.addEventListener('click', exitCinemaMode);
 
-/* Gestion des pages ajoutées & export photos.json */
-function getAllSlotsList(){
-  var list=['p1','p2','p3a','p3b','p3c','p4a','p4b','p4c','p4d','p5','p6a','p6b','p6c','p7a','p7b','pano','p8a','p8b','p8c','p9a','p9b','p9c','p10a','p10b','p10c','p10d','p11','p12a','p12b','p13a','p13b','p13c','p14a','p14b','p14c','p14d','p14e','p14f','p15','p16a','p16b','p16c','p17a','p17b','p17c','p17d','p18'];
-  var suf=['','a','b','c','d','e','f'];
-  for(var p=BASE_PAGES+1;p<=N;p++){
-    for(var j=0;j<suf.length;j++)list.push('p'+p+suf[j]);
-  }
-  return list;
-}
-
-function addRandomPage(){
-  var prevTpl = extraPages.length ? extraPages[extraPages.length - 1].tpl : '';
-  var tpl = pickPolaroidTemplate(prevTpl);
-  extraPages.push({ tpl: tpl });
-  idbPut('__pages', JSON.stringify(extraPages));
-  var newNum = BASE_PAGES + extraPages.length;
-  curNum = newNum;
-  syncBookViews();
-  render();
-  showToast('Page '+newNum+' ajoutée !', 2500);
-}
-
-function shuffleExtraPage(num){
-  var idx = num - BASE_PAGES - 1;
-  if(idx < 0 || idx >= extraPages.length) return;
-  var curIdx = POLAROID_KEYS.indexOf(extraPages[idx].tpl);
-  extraPages[idx].tpl = POLAROID_KEYS[(curIdx + 1) % POLAROID_KEYS.length];
-  idbPut('__pages', JSON.stringify(extraPages));
-  render();
-}
-
-function deleteLastExtraPage(num){
-  if(num !== N || num <= BASE_PAGES) return;
-  var suf=['','a','b','c','d','e','f'];
-  for(var j=0;j<suf.length;j++){
-    var k='p'+num+suf[j];
-    if(userUrls[k]){URL.revokeObjectURL(userUrls[k]);delete userUrls[k];idbDel(k);}
-    if(publicUrls[k])delete publicUrls[k];
-  }
-  extraPages.pop();
-  idbPut('__pages', JSON.stringify(extraPages));
-  curNum = num - 1;
-  syncBookViews();
-  render();
-}
-
-function showToast(msg, ms){
-  var el=document.getElementById('toast');
-  el.textContent=msg; el.classList.add('show');
-  if(ms){setTimeout(function(){el.classList.remove('show');},ms);}
+/* Conversion data:image -> Blob URL pour alléger la mémoire navigateur */
+function dataUrlToBlob(dataUrl){
+  var parts = dataUrl.split(',');
+  var mime = (parts[0].match(/:(.*?);/) || [])[1] || 'image/jpeg';
+  var bin = atob(parts[1]);
+  var len = bin.length;
+  var arr = new Uint8Array(len);
+  for(var i=0;i<len;i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], {type: mime});
 }
 
 function blobToDataURL(blob){
@@ -590,16 +609,94 @@ function compressImageToDataURL(src){
 }
 
 function prepareImageForExport(k, src){
-  var directBlob = userBlobs[k];
+  var directBlob = userBlobs[k] || publicBlobs[k];
   var blobPromise = directBlob ? Promise.resolve(directBlob) : fetch(src).then(function(res){return res.blob();});
   return blobPromise.then(function(blob){
     return isAnimatedBlob(blob).then(function(anim){
       if(anim)return blobToDataURL(blob).then(function(d){return {data:d,anim:true};});
+      if(publicBlobs[k] && !userBlobs[k]) return blobToDataURL(blob).then(function(d){return {data:d,anim:false};});
       return compressImageToDataURL(src).then(function(d){return {data:d,anim:false};});
     });
   }).catch(function(){
     return compressImageToDataURL(src).then(function(d){return {data:d,anim:false};});
   });
+}
+
+/* Gestion des pages & export photos.json */
+function getAllSlotsList(){
+  var list=[];
+  var suf=['','a','b','c','d','e','f'];
+  if(!allPagesMode){
+    list=['p1','p2','p3a','p3b','p3c','p4a','p4b','p4c','p4d','p5','p6a','p6b','p6c','p7a','p7b','pano','p8a','p8b','p8c','p9a','p9b','p9c','p10a','p10b','p10c','p10d','p11','p12a','p12b','p13a','p13b','p13c','p14a','p14b','p14c','p14d','p14e','p14f','p15','p16a','p16b','p16c','p17a','p17b','p17c','p17d','p18'];
+    for(var p=BASE_PAGES+1;p<=N;p++){
+      for(var j=0;j<suf.length;j++)list.push('p'+p+suf[j]);
+    }
+  }else{
+    for(var q=1;q<=N;q++){
+      for(var jj=0;jj<suf.length;jj++)list.push('p'+q+suf[jj]);
+    }
+  }
+  return list;
+}
+
+function savePagesToIdb(){
+  if(allPagesMode) idbPut('__allPages', JSON.stringify(allPages));
+  else idbPut('__pages', JSON.stringify(extraPages));
+}
+
+function addRandomPage(){
+  var targetNum = N + 1;
+  var tpl = pickNextPolaroidTemplate(targetNum);
+  if(allPagesMode){
+    allPages.push({ tpl: tpl });
+  }else{
+    extraPages.push({ tpl: tpl });
+  }
+  savePagesToIdb();
+  curNum = targetNum;
+  syncBookViews();
+  render();
+  showToast('Page '+targetNum+' ajoutée !', 2500);
+}
+
+function shuffleExtraPage(num){
+  if(allPagesMode){
+    var i = num - 1;
+    if(i < 0 || i >= allPages.length) return;
+    var curI = POLAROID_KEYS.indexOf(allPages[i].tpl);
+    allPages[i].tpl = POLAROID_KEYS[(curI + 1) % POLAROID_KEYS.length];
+  }else{
+    var idx = num - BASE_PAGES - 1;
+    if(idx < 0 || idx >= extraPages.length) return;
+    var curIdx = POLAROID_KEYS.indexOf(extraPages[idx].tpl);
+    extraPages[idx].tpl = POLAROID_KEYS[(curIdx + 1) % POLAROID_KEYS.length];
+  }
+  savePagesToIdb();
+  render();
+}
+
+function deleteLastExtraPage(num){
+  if(num !== N) return;
+  if(!allPagesMode && num <= BASE_PAGES) return;
+  if(allPagesMode && num <= 1) return;
+  var suf=['','a','b','c','d','e','f'];
+  for(var j=0;j<suf.length;j++){
+    var k='p'+num+suf[j];
+    if(userUrls[k]){URL.revokeObjectURL(userUrls[k]);delete userUrls[k];delete userBlobs[k];delete userAnim[k];idbDel(k);}
+    if(publicUrls[k]){URL.revokeObjectURL(publicUrls[k]);delete publicUrls[k];delete publicBlobs[k];delete publicAnim[k];}
+  }
+  if(allPagesMode) allPages.pop();
+  else extraPages.pop();
+  savePagesToIdb();
+  curNum = num - 1;
+  syncBookViews();
+  render();
+}
+
+function showToast(msg, ms){
+  var el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  if(ms){setTimeout(function(){el.classList.remove('show');},ms);}
 }
 
 function enableEditMode(){
@@ -621,17 +718,33 @@ function enableEditMode(){
     var expBtn=document.createElement('button');
     expBtn.className='tbtn pill';
     expBtn.type='button';
-    expBtn.title='Exporter toutes vos photos et pages pour que tout le monde les voie sur GitHub';
-    expBtn.textContent='Exporter photos.json';
+    expBtn.title='Télécharger les fichiers JSON manuellement';
+    expBtn.textContent='Exporter fichiers';
+
+    var pubBtn=document.createElement('button');
+    pubBtn.className='tbtn pill pub';
+    pubBtn.type='button';
+    pubBtn.title='Envoyer directement vos modifications sur le site public GitHub';
+    pubBtn.textContent='Publier sur le site';
+
     var expCloseBtn=document.getElementById('expclose');
     if(expCloseBtn){expCloseBtn.addEventListener('click',function(){document.getElementById('expmodal').classList.remove('show');});}
 
-    expBtn.addEventListener('click',function(){
+    function strToBase64(str){
+      var bytes=new TextEncoder().encode(str), bin='', chunk=0x8000;
+      for(var i=0;i<bytes.length;i+=chunk){
+        bin+=String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
+      }
+      return btoa(bin);
+    }
+
+    function buildExportChunks(){
       var keys=getAllSlotsList().filter(function(k){return Boolean(getPhotoSrc(k));});
-      if(!keys.length && !extraPages.length){showToast('Aucune photo trouvée dans cet album. Ajoutez des photos avec + d’abord.',4500);return;}
-      showToast('Préparation de '+keys.length+' photo(s)...');
+      if(!keys.length && !allPages.length && !extraPages.length){
+        return Promise.resolve({empty:true});
+      }
       var entries=[], animCount=0;
-      Promise.all(keys.map(function(k){
+      return Promise.all(keys.map(function(k){
         var s=getPhotoSrc(k);
         if(s.indexOf('photos/')===0 || s.indexOf('data:image/')===0){
           if(s.indexOf('data:image/gif')===0||s.indexOf('data:image/webp')===0)animCount++;
@@ -642,19 +755,21 @@ function enableEditMode(){
           if(res&&res.data){if(res.anim)animCount++;entries.push({k:k, v:res.data});}
         });
       })).then(function(){
-        var MAX_CHUNK_BYTES = 14 * 1024 * 1024;
-        var chunks = [{}], curSize = 256;
+        var MAX_CHUNK_BYTES = 13 * 1024 * 1024;
+        var chunks = [{}], curSize = 4096;
         for(var i=0;i<entries.length;i++){
           var e = entries[i];
           var itemSize = e.k.length + e.v.length + 8;
-          if(curSize > 256 && curSize + itemSize > MAX_CHUNK_BYTES){
+          if(curSize > 4096 && curSize + itemSize > MAX_CHUNK_BYTES){
             chunks.push({});
             curSize = 2;
           }
           chunks[chunks.length - 1][e.k] = e.v;
           curSize += itemSize;
         }
-        if(extraPages.length) chunks[0].__pages = extraPages;
+        chunks[0].__v = String(Math.floor(Date.now()/1000));
+        if(allPagesMode) chunks[0].__allPages = allPages;
+        else if(extraPages.length) chunks[0].__pages = extraPages;
         if(chunks.length > 1){
           var chunkNames = [];
           for(var c=1;c<chunks.length;c++) chunkNames.push('photos_'+(c+1)+'.json');
@@ -662,8 +777,148 @@ function enableEditMode(){
         }
         var files = chunks.map(function(obj, idx){
           var name = idx===0 ? 'photos.json' : ('photos_'+(idx+1)+'.json');
-          return { name:name, blob:new Blob([JSON.stringify(obj)],{type:'application/json'}) };
+          var jsonStr = JSON.stringify(obj);
+          return { name:name, text:jsonStr, blob:new Blob([jsonStr],{type:'application/json'}) };
         });
+        return {empty:false, files:files, total:entries.length, animCount:animCount};
+      });
+    }
+
+    /* Fenêtre Publication Directe sur GitHub */
+    var TOKEN_KEY = 'mei_gh_token';
+    var pubModal=document.getElementById('pubmodal');
+    var pubSetup=document.getElementById('pubsetup');
+    var pubReady=document.getElementById('pubready');
+    var pubStatus=document.getElementById('pubstatus');
+    var ghTokenInput=document.getElementById('ghtoken');
+    var pubGoBtn=document.getElementById('pubgo');
+    var pubCloseBtn=document.getElementById('pubclose');
+    var ghResetBtn=document.getElementById('ghreset');
+
+    function refreshPubModalUi(){
+      var saved='';
+      try{saved=localStorage.getItem(TOKEN_KEY)||'';}catch(e){}
+      if(saved){pubSetup.style.display='none';pubReady.style.display='block';}
+      else{pubSetup.style.display='block';pubReady.style.display='none';}
+      pubStatus.textContent='';
+      pubGoBtn.disabled=false;
+      pubGoBtn.textContent='Publier maintenant';
+      pubGoBtn.classList.remove('done');
+    }
+
+    pubBtn.addEventListener('click',function(){
+      refreshPubModalUi();
+      pubModal.classList.add('show');
+    });
+    pubCloseBtn.addEventListener('click',function(){pubModal.classList.remove('show');});
+    ghResetBtn.addEventListener('click',function(){
+      try{localStorage.removeItem(TOKEN_KEY);}catch(e){}
+      ghTokenInput.value='';
+      refreshPubModalUi();
+    });
+
+    function ghApi(path, token, method, body){
+      return fetch('https://api.github.com'+path, {
+        method: method || 'GET',
+        headers: {
+          'Authorization': 'Bearer '+token,
+          'Accept': 'application/vnd.github+json',
+          'Content-Type': 'application/json'
+        },
+        body: body ? JSON.stringify(body) : undefined
+      }).then(function(r){
+        return r.json().catch(function(){return {};}).then(function(d){
+          if(!r.ok) throw new Error(d.message || ('Erreur GitHub HTTP '+r.status));
+          return d;
+        });
+      });
+    }
+
+    function detectRepo(){
+      var host=window.location.hostname||'';
+      var parts=(window.location.pathname||'/').split('/').filter(Boolean);
+      if(host.endsWith('.github.io') && parts.length>=1){
+        return host.replace('.github.io','')+'/'+parts[0];
+      }
+      return 'batmanmiyuki/meimei';
+    }
+
+    pubGoBtn.addEventListener('click',function(){
+      var token='';
+      try{token=localStorage.getItem(TOKEN_KEY)||'';}catch(e){}
+      if(!token){
+        token=(ghTokenInput.value||'').trim();
+        if(!token){pubStatus.textContent='Collez votre clé GitHub d’abord.';return;}
+      }
+      pubGoBtn.disabled=true;
+      pubGoBtn.textContent='Publication…';
+      pubStatus.textContent='Préparation des photos et pages…';
+
+      var repo=detectRepo();
+      var branch='main', latestCommitSha='', newFiles=[];
+      buildExportChunks().then(function(res){
+        if(res.empty) throw new Error('Aucune photo trouvée dans cet album.');
+        newFiles=res.files;
+        pubStatus.textContent='Connexion à GitHub ('+repo+')…';
+        return ghApi('/repos/'+repo, token);
+      }).then(function(repoInfo){
+        branch = repoInfo.default_branch || 'main';
+        return ghApi('/repos/'+repo+'/git/ref/heads/'+branch, token);
+      }).then(function(refInfo){
+        latestCommitSha = refInfo.object.sha;
+        return ghApi('/repos/'+repo+'/git/commits/'+latestCommitSha, token);
+      }).then(function(commitInfo){
+        return ghApi('/repos/'+repo+'/git/trees/'+commitInfo.tree.sha, token);
+      }).then(function(treeInfo){
+        var kept = (treeInfo.tree || []).filter(function(item){
+          return !/^photos(_\d+)?\.json$/.test(item.path);
+        }).map(function(item){
+          return {path:item.path, mode:item.mode, type:item.type, sha:item.sha};
+        });
+        var uploaded = 0;
+        return newFiles.reduce(function(chain, f){
+          return chain.then(function(){
+            uploaded++;
+            pubStatus.textContent='Envoi de '+f.name+' ('+uploaded+'/'+newFiles.length+')…';
+            return ghApi('/repos/'+repo+'/git/blobs', token, 'POST', {
+              content: strToBase64(f.text),
+              encoding: 'base64'
+            }).then(function(blobRes){
+              kept.push({path:f.name, mode:'100644', type:'blob', sha:blobRes.sha});
+            });
+          });
+        }, Promise.resolve()).then(function(){ return kept; });
+      }).then(function(newTree){
+        pubStatus.textContent='Création de la mise à jour sur GitHub…';
+        return ghApi('/repos/'+repo+'/git/trees', token, 'POST', {tree:newTree});
+      }).then(function(createdTree){
+        return ghApi('/repos/'+repo+'/git/commits', token, 'POST', {
+          message: 'Mise à jour album Mei Mei ('+N+' pages)',
+          tree: createdTree.sha,
+          parents: [latestCommitSha]
+        });
+      }).then(function(newCommit){
+        return ghApi('/repos/'+repo+'/git/refs/heads/'+branch, token, 'PATCH', {
+          sha: newCommit.sha
+        });
+      }).then(function(){
+        try{localStorage.setItem(TOKEN_KEY, token);}catch(e){}
+        refreshPubModalUi();
+        pubGoBtn.textContent='Publié ✓';
+        pubGoBtn.classList.add('done');
+        pubStatus.textContent='En ligne dans ~1 minute ! Vos anciens fichiers ont été remplacés automatiquement.';
+      }).catch(function(err){
+        pubGoBtn.disabled=false;
+        pubGoBtn.textContent='Réessayer';
+        pubStatus.textContent='Erreur : '+(err && err.message ? err.message : 'Vérifiez votre clé GitHub.');
+      });
+    });
+
+    expBtn.addEventListener('click',function(){
+      showToast('Préparation des fichiers...');
+      buildExportChunks().then(function(res){
+        if(res.empty){showToast('Aucune photo trouvée dans cet album. Ajoutez des photos avec + d’abord.',4500);return;}
+        var files=res.files;
         if(files.length === 1){
           var a=document.createElement('a');
           a.href=URL.createObjectURL(files[0].blob);
@@ -671,7 +926,7 @@ function enableEditMode(){
           a.click();
           setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
           var mb=(files[0].blob.size/1048576).toFixed(1);
-          showToast('photos.json téléchargé ('+entries.length+' photos dont '+animCount+' animée(s), '+mb+' Mo) ! Déposez-le sur GitHub.',8000);
+          showToast('photos.json téléchargé ('+res.total+' photos dont '+res.animCount+' animée(s), '+mb+' Mo) ! Déposez-le sur GitHub.',8000);
         }else{
           var listEl=document.getElementById('expfiles');
           listEl.innerHTML='';
@@ -703,6 +958,7 @@ function enableEditMode(){
         }
       });
     });
+    toolsEl.appendChild(pubBtn);
     toolsEl.appendChild(expBtn);
   }
   if (!idb) {
@@ -710,6 +966,13 @@ function enableEditMode(){
       idbAll(function(all){
         var any=false;
         for(var k in all){
+          if(k==='__allPages'){
+            try{
+              var ap=JSON.parse(all[k]);
+              if(Array.isArray(ap)&&ap.length>=allPages.length){allPagesMode=true;allPages=ap;any=true;}
+            }catch(e){}
+            continue;
+          }
           if(k==='__pages'){
             try{
               var p=JSON.parse(all[k]);
@@ -717,7 +980,14 @@ function enableEditMode(){
             }catch(e){}
             continue;
           }
-          if(all[k] instanceof Blob){userBlobs[k]=all[k];userUrls[k]=URL.createObjectURL(all[k]);any=true;}
+          if(all[k] instanceof Blob){
+            userBlobs[k]=all[k];
+            userUrls[k]=URL.createObjectURL(all[k]);
+            isAnimatedBlob(all[k]).then((function(slotId){
+              return function(isA){ if(isA){userAnim[slotId]=true;render();} };
+            })(k));
+            any=true;
+          }
         }
         if(any){syncBookViews();render();}
       });
@@ -740,15 +1010,24 @@ document.addEventListener('click',function(e){
   if(t.hasAttribute('data-delpage')){deleteLastExtraPage(Number(t.getAttribute('data-delpage')));return;}
   if(t.hasAttribute('data-pick')){pending=t.getAttribute('data-pick');photoin.click();return;}
   var id=t.getAttribute('data-clear');
-  if(userUrls[id]){URL.revokeObjectURL(userUrls[id]);delete userUrls[id];delete userBlobs[id];idbDel(id);}
-  if(publicUrls[id])delete publicUrls[id];
+  if(userUrls[id]){URL.revokeObjectURL(userUrls[id]);delete userUrls[id];delete userBlobs[id];delete userAnim[id];idbDel(id);}
+  if(publicUrls[id]){URL.revokeObjectURL(publicUrls[id]);delete publicUrls[id];delete publicBlobs[id];delete publicAnim[id];}
   render();
 });
 photoin.addEventListener('change',function(){
   var f=photoin.files&&photoin.files[0];photoin.value='';
   if(!f||!pending)return;
-  if(userUrls[pending])URL.revokeObjectURL(userUrls[pending]);
-  userBlobs[pending]=f;userUrls[pending]=URL.createObjectURL(f);idbPut(pending,f);pending=null;render();
+  var slotId=pending; pending=null;
+  if(userUrls[slotId])URL.revokeObjectURL(userUrls[slotId]);
+  userBlobs[slotId]=f;
+  userUrls[slotId]=URL.createObjectURL(f);
+  idbPut(slotId,f);
+  isAnimatedBlob(f).then(function(isA){
+    if(isA)userAnim[slotId]=true;
+    else delete userAnim[slotId];
+    render();
+  });
+  render();
 });
 document.addEventListener('keydown',function(e){
   if(e.key==='ArrowRight')go(vi+1);
@@ -791,7 +1070,7 @@ function initBackground(){
     v.muted=true;
     v.defaultMuted=true;
     v.playsInline=true;
-    v.preload='auto';
+    v.preload='metadata';
     v.setAttribute('playsinline','');
     v.addEventListener('error', startFallbackParticles);
     bgEl.appendChild(v);
@@ -803,46 +1082,98 @@ function initBackground(){
   }
 }
 
-/* Démarrage : mode lecture seule pour les visiteurs, édition uniquement via ?edit=1 */
-syncBookViews();
-vi=0;
-render();
-initBackground();
+/* Chargement fiable avec cache HTTP intelligent, conversions Blob légères et retries */
+var loadPill=document.getElementById('loadpill'), loadTxt=document.getElementById('loadtxt');
+function setLoadStatus(txt){
+  if(txt){loadTxt.textContent=txt;loadPill.classList.add('show');}
+  else{loadPill.classList.remove('show');}
+}
 
 function applyLoadedJson(data){
   if(!data || typeof data!=='object')return;
-  if(Array.isArray(data.__pages) && data.__pages.length > extraPages.length){
+  if(Array.isArray(data.__allPages) && data.__allPages.length){
+    if(!allPagesMode || data.__allPages.length > allPages.length){
+      allPagesMode=true;
+      allPages=data.__allPages.slice();
+    }
+  }else if(Array.isArray(data.__pages) && data.__pages.length > extraPages.length){
     extraPages=data.__pages.slice();
   }
   var hasAny=false;
   for(var k in data){
-    if(k==='__pages'||k==='__chunks')continue;
-    publicUrls[k]=data[k];
-    hasAny=true;
+    if(k==='__pages'||k==='__chunks'||k==='__allPages'||k==='__v')continue;
+    var val=data[k];
+    if(typeof val==='string' && val.indexOf('data:image/')===0){
+      try{
+        var b=dataUrlToBlob(val);
+        if(publicUrls[k])URL.revokeObjectURL(publicUrls[k]);
+        publicBlobs[k]=b;
+        publicUrls[k]=URL.createObjectURL(b);
+        if(b.type==='image/gif'||b.type==='image/webp') publicAnim[k]=true;
+        hasAny=true;
+      }catch(e){
+        publicUrls[k]=val;
+        hasAny=true;
+      }
+    }else if(val){
+      publicUrls[k]=val;
+      hasAny=true;
+    }
   }
-  if(hasAny || extraPages.length){
+  if(hasAny || allPages.length || extraPages.length){
     syncBookViews();
     render();
   }
 }
 
-fetch('photos.json?v='+Date.now())
-  .then(function(r){return r.ok?r.json():{};})
+function fetchJsonRetry(url, opts, retries){
+  return fetch(url, opts).then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
+  }).catch(function(err){
+    if(retries > 0){
+      return new Promise(function(res){setTimeout(res, 900);}).then(function(){
+        return fetchJsonRetry(url, opts, retries - 1);
+      });
+    }
+    throw err;
+  });
+}
+
+syncBookViews();
+vi=0;
+render();
+initBackground();
+
+setLoadStatus('Chargement de l’album…');
+fetchJsonRetry('photos.json', {cache:'no-cache'}, 2)
   .then(function(data){
     if(data&&typeof data==='object'){
       applyLoadedJson(data);
       if(Array.isArray(data.__chunks) && data.__chunks.length){
-        return Promise.all(data.__chunks.map(function(url){
-          return fetch(url+'?v='+Date.now())
-            .then(function(r){return r.ok?r.json():{};})
-            .then(function(chunk){applyLoadedJson(chunk);})
-            .catch(function(){});
-        }));
+        var total = data.__chunks.length + 1;
+        var done = 1;
+        var ver = data.__v ? ('?v='+encodeURIComponent(data.__v)) : '';
+        setLoadStatus('Chargement… (1/'+total+')');
+        return data.__chunks.reduce(function(chain, url){
+          return chain.then(function(){
+            return fetchJsonRetry(url + ver, {cache:'force-cache'}, 2)
+              .then(function(chunk){
+                done++;
+                setLoadStatus('Chargement… ('+done+'/'+total+')');
+                applyLoadedJson(chunk);
+              })
+              .catch(function(){});
+          });
+        }, Promise.resolve());
       }
     }
   })
-  .catch(function(){});
+  .catch(function(){})
+  .then(function(){
+    setLoadStatus('');
+  });
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5b969337b56965d',t:'MTc5NDg2MjY3Nw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5b969337b56965d',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5be0d56bf859ee8',t:'MTc5NDkxMTM0Mw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5be0d56bf859ee8',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
