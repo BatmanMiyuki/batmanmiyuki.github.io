@@ -149,8 +149,11 @@ a { color: inherit; text-decoration: none; }
 }
 .topbar-in {
   max-width: 1540px; margin: 0 auto; height: var(--nav-h);
-  padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  padding: 0 24px; display: flex; align-items: center; gap: 18px;
 }
+.topbar-in .brand{ flex-shrink:0 }
+.topbar-in .tabs{ flex:1; display:flex; align-items:center; justify-content:center; gap:8px; margin:0 }
+.topbar-in .topbar-actions{ flex-shrink:0; display:flex; align-items:center; gap:10px }
 .brand { display: flex; align-items: center; gap: 12px; flex-shrink: 0; text-decoration: none; }
 .brand-mark {
   width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center;
@@ -1205,7 +1208,8 @@ input:checked + .slider::before { transform: translateX(22px); }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
-  .tabs, .topbar .btn-add, .ma-photo { display: none; }
+  /* ancien hide tabs annulé — nav centrée garde Vus/À voir/Ajouter */
+  .ma-photo { display: none !important; }
   .mobilebar { display: flex; }
   body { padding-bottom: calc(env(safe-area-inset-bottom) + 88px); }
   main { padding: 22px 14px 30px; }
@@ -1498,16 +1502,16 @@ input:checked + .slider::before { transform: translateX(22px); }
 }
 .burger-overlay.open{ opacity:1; pointer-events:auto }
 .burger-panel{
-  position:fixed; top:0; right:0; bottom:0; z-index:80; width:340px; max-width:88vw;
-  background:#14102a; border-left:1px solid rgba(255,255,255,.08); box-shadow:-18px 0 44px rgba(0,0,0,.45);
+  position:fixed; top:0; right:0; bottom:0; z-index:80; width:360px; max-width:88vw;
+  background:linear-gradient(180deg, #14102a 0%, #0f0a1e 100%); border-left:1px solid rgba(255,255,255,.10); box-shadow:-18px 0 44px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04) inset;
   transform:translateX(100%); transition:transform .28s var(--ease); overflow-y:auto; padding:0;
-  display:flex; flex-direction:column;
+  display:flex; flex-direction:column; backdrop-filter:blur(12px);
 }
 .burger-panel.open{ transform:translateX(0) }
 .burger-head{
-  padding:18px 18px 14px; display:flex; align-items:center; gap:12px;
-  border-bottom:1px solid var(--stroke); background:linear-gradient(135deg, rgba(255,61,139,.08), rgba(53,230,255,.06));
-  position:sticky; top:0; backdrop-filter:blur(8px);
+  padding:20px 18px 16px; display:flex; align-items:center; gap:12px;
+  border-bottom:1px solid rgba(255,255,255,.08); background:linear-gradient(135deg, rgba(255,61,139,.12), rgba(155,92,255,.08) 50%, rgba(53,230,255,.08));
+  position:sticky; top:0; backdrop-filter:blur(12px);
 }
 .burger-head b{ font-size:15px }
 .burger-head small{ color:var(--muted); font-size:12px }
@@ -1515,10 +1519,11 @@ input:checked + .slider::before { transform: translateX(22px); }
 .burger-section{ padding:12px 10px; }
 .burger-label{ font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--muted-2); padding:6px 10px 8px }
 .burger-item{
-  display:flex; align-items:center; gap:12px; padding:12px 12px; border-radius:12px;
-  color:var(--text); font-weight:600; font-size:14px; transition:background .15s; cursor:pointer; text-decoration:none;
+  display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:14px;
+  color:var(--text); font-weight:600; font-size:14px; transition:background .15s, transform .15s, border-color .15s; cursor:pointer; text-decoration:none;
+  border:1px solid transparent;
 }
-.burger-item:hover{ background:var(--surface) }
+.burger-item:hover{ background:var(--surface); transform:translateX(2px); border-color:rgba(255,255,255,.04) }
 .burger-item.active{ background:var(--surface-2); border:1px solid var(--stroke-2); box-shadow:inset 0 0 0 1px rgba(255,255,255,.04) }
 .burger-item .ico{ width:36px; height:36px; border-radius:10px; display:grid; place-items:center; font-size:18px; background:var(--surface); border:1px solid var(--stroke); flex-shrink:0 }
 .burger-item.active .ico{ background:var(--grad); color:#fff; border-color:transparent }
@@ -1568,6 +1573,23 @@ input:checked + .slider::before { transform: translateX(22px); }
 
 /* Hide old mobilebar tabs that are now in burger — we keep only 4 + burger */
 .mobilebar-legacy{ display:none !important }
+
+
+/* Nav centrée avec Ajouter */
+.topbar .tabs{ flex:1; justify-content:center; margin:0 }
+.topbar .tabs .tab{ flex-shrink:0 }
+@media (max-width: 900px){
+  .topbar .tabs{ justify-content:flex-start; flex:1; margin-left:6px }
+}
+
+
+/* Ajouter in center nav */
+.tabs .btn-add{ padding:9px 16px; border-radius:99px; font-size:14px; font-weight:700; white-space:nowrap; flex-shrink:0; box-shadow: var(--glow-pink) }
+.tabs .btn-add:hover{ transform: translateY(-1px) }
+@media (max-width: 900px){
+  .tabs .btn-add{ display:inline-flex !important; padding:8px 12px; font-size:13px; margin-left:4px !important; align-items:center; gap:6px }
+  .tabs .btn-add span{ display:inline !important }
+}
 
 </style>
 
@@ -1640,7 +1662,7 @@ if(window.USE_FIREBASE){
         <span class="brand-icon-fallback" style="display:none">🌸</span>
       </div>
       <div class="brand-txt">
-        <img src="logo.png" alt="KIOKU" class="brand-logo-img" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';" />
+        <img src="kioku.png" alt="KIOKU" class="brand-logo-img" onerror="this.onerror=null;this.src='logo.png';this.onerror=()=>{this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';}" />
         <div class="brand-name" style="display:none">KIOKU</div>
         <div class="brand-sub">記憶 · ANIME</div>
       </div>
@@ -1649,10 +1671,10 @@ if(window.USE_FIREBASE){
     <nav class="tabs" id="tabs">
       <a class="tab" href="#seen"><span class="tab-ico">📺</span> Vus</a>
       <a class="tab" href="#plan"><span class="tab-ico">🔖</span> À regarder</a>
+      <button class="btn btn-primary btn-add" onclick="UI.openForm()" style="margin-left:8px"><span>＋</span> Ajouter</button>
     </nav>
 
     <div class="topbar-actions">
-      <button class="btn btn-primary btn-add" onclick="UI.openForm()"><span>＋</span> Ajouter</button>
       <div class="topbar-auth" id="topbar-auth"></div>
       <button class="burger-btn" id="burger-btn" onclick="Burger.toggle()" aria-label="Menu" title="Menu">☰</button>
       <img src="signature.png" alt="Signature" class="ma-photo" id="top-sig-img" onclick="Router.go('settings')" title="Signature (Cliquer pour gérer dans les paramètres)" onerror="Signature.handleImgError(this)" />
