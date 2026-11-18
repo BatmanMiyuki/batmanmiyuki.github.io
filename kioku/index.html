@@ -1971,11 +1971,12 @@ if(window.USE_FIREBASE){
         <div class="setting-row">
           <div>
             <div class="setting-name">🎬 Durée par défaut des films</div>
-            <div class="setting-desc">Durée utilisée quand un film n'a pas de durée AniList (100 min avant, 120 min maintenant).</div>
+            <div class="setting-desc">Fallback uniquement si AniList n'a aucune durée. Sinon la vraie durée AniList est utilisée (comme pour les épisodes).</div>
           </div>
           <input type="number" id="set-default-film-dur" min="1" max="600" value="120" class="input" style="width:100px" onchange="Settings.setDefaultFilmDur(this.value)" />
         </div>
-        <button class="btn btn-sm" onclick="Settings.fixExistingFilmDurations()" style="margin-top:8px">🔧 Corriger mes films actuels à 100 min → <span id="fix-film-target">120</span> min</button>
+        <button class="btn btn-sm" onclick="Settings.fixExistingFilmDurations()" style="margin-top:8px">🔧 Corriger mes films à 100 min → <span id="fix-film-target">120</span> min (fallback)</button>
+        <button class="btn btn-sm btn-primary" onclick="Settings.refreshAllFilmDurations()" style="margin-top:8px;margin-left:8px">✨ Récupérer les vraies durées AniList pour tous mes films</button>
         <div class="muted" style="font-size:12px;margin-top:6px" id="fix-film-hint"></div>
       </div>
 
@@ -4108,13 +4109,26 @@ const News = {
     </article>`;
   },
 
-  import(idx) {
+  async import(idx) {
     const cache = Store.data.settings.newsCache;
     const items = this.filter === 'season' ? cache.season : cache.upcoming;
     const m = items[idx];
     if (!m) return;
     const planned = this.filter === 'season';
     const isMovie = m.format === 'MOVIE';
+    let realDur = m.duration;
+    if (isMovie && !realDur && m.id) {
+      try {
+        const q2 = `query($id:Int){ Media(id:$id, type:ANIME){ duration } }`;
+        const r2 = await fetch('https://graphql.anilist.co', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ query: q2, variables: { id: m.id } })
+        });
+        const j2 = await r2.json();
+        realDur = j2.data?.Media?.duration || null;
+      } catch(e) {}
+    }
     Store.add(normalize({
       id: uid(),
       anilistId: m.id,
@@ -4132,11 +4146,11 @@ const News = {
         id: uid(),
         name: isMovie ? 'Film' : 'Saison 1',
         episodes: m.episodes || 1,
-        duration: m.duration || (isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR),
+        duration: realDur || (isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR),
         watched: []
       }],
     }));
-    toast(`${m.title} ajouté à ${planned ? 'ta watchlist' : 'tes sorties'}`);
+    toast(`${m.title} ajouté à ${planned ? 'ta watchlist' : 'tes sorties'}${realDur ? ' ('+realDur+' min)' : ''}`);
     this.render();
   },
 
@@ -6035,7 +6049,7 @@ const UI = {
     }
   },
 
-  assistPick(i) {
+  async assistPick(i) {
     const m = this._results?.[i]; if (!m) return;
     const isMovie = (m.format === 'MOVIE');
     const set = (id, val) => { document.getElementById(id).value = val ?? ''; };
@@ -6050,20 +6064,37 @@ const UI = {
     this._cover = m.coverImage?.extraLarge || m.coverImage?.large || '';
     this._anilistId = m.id;
 
+    let realDur = m.duration;
+    // Si film sans durée (AniList renvoie null), on refetch le détail pour avoir la vraie durée
+    if (isMovie && !realDur) {
+      try {
+        const q2 = `query($id:Int){ Media(id:$id, type:ANIME){ duration } }`;
+        const r2 = await fetch('https://graphql.anilist.co', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ query: q2, variables: { id: m.id } })
+        });
+        const j2 = await r2.json();
+        realDur = j2.data?.Media?.duration || null;
+        if (realDur) toast(`Durée réelle récupérée : ${realDur} min`);
+      } catch(e) {}
+    }
+
     const box = document.getElementById('f-seasons');
     box.innerHTML = '';
     this.addSeasonRow({
       id: uid(),
       name: isMovie ? 'Film' : 'Saison 1',
       episodes: m.episodes || 1,
-      duration: m.duration || (isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR),
+      duration: realDur || (isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR),
       watched: []
     }, isMovie);
 
     this.syncMovieFields();
     this.previewBanner();
     document.getElementById('assist-res').innerHTML = '';
-    toast('Champs pré-remplis avec succès');
+    if (!realDur && isMovie) toast('AniList n\'a pas la durée — vérifie et corrige la durée du film (\u2192 '+DEFAULT_FILM_DUR+' min par défaut)', 'info');
+    else toast('Champs pré-remplis avec succès');
   }
 };
 
@@ -6328,13 +6359,35 @@ const Settings = {
       });
     });
     if(!fixed){
-      // also check for 100 in any season duration regardless
       toast(total?`Aucun film à 100 min trouvé (${total} saisons films)`:`Aucun film dans ta collection`,'info');
       return;
     }
     Store.save();
     Router.refresh();
     toast(`✅ ${fixed} film(s) corrigé(s) : 100 → ${target} min`);
+  },
+
+  async refreshAllFilmDurations(){
+    const films = Store.all().filter(a=> a.isMovie && a.anilistId);
+    if(!films.length){ toast('Aucun film avec ID AniList à mettre à jour','info'); return; }
+    if(!confirm(`Mettre à jour la durée de ${films.length} film(s) avec la vraie durée AniList ?`)) return;
+    let ok=0, fail=0;
+    toast(`Récupération des vraies durées pour ${films.length} films…`);
+    for(const a of films){
+      try{
+        const q=`query($id:Int){ Media(id:$id, type:ANIME){ duration } }`;
+        const r=await fetch('https://graphql.anilist.co',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({query:q,variables:{id:a.anilistId}})});
+        const j=await r.json();
+        const dur=j.data?.Media?.duration;
+        if(dur && dur!==a.seasons?.[0]?.duration){
+          a.seasons.forEach(s=> s.duration=dur);
+          ok++;
+        }
+        await new Promise(res=> setTimeout(res, 220));
+      }catch(e){ fail++; }
+    }
+    if(ok){ Store.save(); Router.refresh(); }
+    toast(ok?`✅ ${ok} film(s) mis à jour avec la vraie durée${fail?` (${fail} échecs)`:''}`:`Aucune durée à mettre à jour`);
   },
 
   copyJsonToClipboard() {
