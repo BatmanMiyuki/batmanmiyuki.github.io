@@ -1968,16 +1968,6 @@ if(window.USE_FIREBASE){
           </div>
           <input type="number" id="set-default-dur" min="1" max="300" value="22" class="input" style="width:100px" onchange="Settings.setDefaultDur(this.value)" />
         </div>
-        <div class="setting-row">
-          <div>
-            <div class="setting-name">🎬 Durée par défaut des films</div>
-            <div class="setting-desc">Fallback uniquement si AniList n'a aucune durée. Sinon la vraie durée AniList est utilisée (comme pour les épisodes).</div>
-          </div>
-          <input type="number" id="set-default-film-dur" min="1" max="600" value="120" class="input" style="width:100px" onchange="Settings.setDefaultFilmDur(this.value)" />
-        </div>
-        <button class="btn btn-sm" onclick="Settings.fixExistingFilmDurations()" style="margin-top:8px">🔧 Corriger mes films à 100 min → <span id="fix-film-target">120</span> min (fallback)</button>
-        <button class="btn btn-sm btn-primary" onclick="Settings.refreshAllFilmDurations()" style="margin-top:8px;margin-left:8px">✨ Récupérer les vraies durées AniList pour tous mes films</button>
-        <div class="muted" style="font-size:12px;margin-top:6px" id="fix-film-hint"></div>
       </div>
 
       <!-- Bloc Sauvegarde & Exportation -->
@@ -2248,7 +2238,6 @@ if(window.USE_FIREBASE){
 const KEY = 'kioku.v1';
 const KEY_PREFS = 'kioku.prefs';
 let DEFAULT_DUR = 22;
-let DEFAULT_FILM_DUR = 120;
 
 function debounce(fn, ms = 100) {
   let timer;
@@ -2421,7 +2410,7 @@ function normalize(a) {
     s.id       = s.id || uid();
     s.name     = s.name || (a.isMovie ? 'Film' : `Saison ${i + 1}`);
     s.episodes = Math.max(0, parseInt(s.episodes, 10) || 0);
-    s.duration = Math.max(1, parseInt(s.duration, 10) || (a.isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR));
+    s.duration = Math.max(1, parseInt(s.duration, 10) || (a.isMovie ? 100 : DEFAULT_DUR));
     
     // Support watched en tant que nombre (ex: 12), booléen ou tableau
     if (typeof s.watched === 'number' && !isNaN(s.watched)) {
@@ -3767,10 +3756,10 @@ const Calc = {
     if (item.status === 'completed' && s.episodes > 0) return n + s.episodes;
     return n;
   }, 0), 0),
-  totalMin:   a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + (s.episodes || 0) * (s.duration || (item.isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR)), 0), 0),
+  totalMin:   a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + (s.episodes || 0) * (s.duration || (item.isMovie ? 100 : DEFAULT_DUR)), 0), 0),
   // Temps total regardé (multiplié par le nombre de visionnages de chaque épisode)
   watchedMin: a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => {
-    const dur = s.duration || (item.isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR);
+    const dur = s.duration || (item.isMovie ? 100 : DEFAULT_DUR);
     const w = s.watched || [];
     if (w.length > 0) return n + w.length * dur;
     if (item.status === 'completed' && s.episodes > 0) return n + s.episodes * dur;
@@ -3940,7 +3929,7 @@ const Plan = {
     
     // Tous les animes prévus dans la watchlist (y compris suites et films liés)
     const allPlanned = Store.all().filter(a => a.status === 'planned');
-    const totalPlannedMins = allPlanned.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes * (s.duration || (a.isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR)), 0), 0);
+    const totalPlannedMins = allPlanned.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes * (s.duration || (a.isMovie ? 100 : DEFAULT_DUR)), 0), 0);
     const totalPlannedEps  = allPlanned.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes, 0), 0);
 
     // Affiche le premier anime à regarder et débloque les suites dès que la saison 1 a été vue
@@ -3957,38 +3946,13 @@ const Plan = {
       long:   (x, y) => Calc.totalMin(y) - Calc.totalMin(x),
     }[sort]);
 
-    const visibleMins = list.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes * (s.duration || (a.isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR)), 0), 0);
+    const visibleMins = list.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes * (s.duration || (a.isMovie ? 100 : DEFAULT_DUR)), 0), 0);
     const visibleEps  = list.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes, 0), 0);
     const hiddenCount = allPlanned.length - list.length;
     const hiddenMins  = Math.max(0, totalPlannedMins - visibleMins);
 
     const summaryEl = document.getElementById('plan-summary');
-    if (summaryEl) {
-      if (!allPlanned.length && !list.length) {
-        summaryEl.innerHTML = '';
-      } else {
-        const displayDuration = q ? visibleMins : totalPlannedMins;
-        const displayEps = q ? visibleEps : totalPlannedEps;
-        const displayCount = q ? list.length : allPlanned.length;
-
-        const uniquePlannedCount = new Set(allPlanned.map(a => a.parentId || a.id)).size;
-        const displayAnimes = q ? list.length : uniquePlannedCount;
-
-        summaryEl.innerHTML = `
-          <div class="hero-stat" style="padding:22px 24px;margin-bottom:20px">
-            <div class="eyebrow" style="margin-bottom:4px">Temps total prévu (Watchlist)</div>
-            <div class="hero-time" style="font-size:clamp(26px,4.5vw,42px)">
-              <span>${fmtDuration(displayDuration)}</span>
-            </div>
-            <div class="hero-sub" style="margin-top:6px">
-              <b>${displayAnimes} anime${displayAnimes > 1 ? 's' : ''} à regarder</b> ${(!q && allPlanned.length !== uniquePlannedCount) ? `(${allPlanned.length} œuvres au total avec les suites)` : ''} · ${displayEps.toLocaleString('fr-FR')} épisodes prévus · ${fmtHours(displayDuration)} h de visionnage
-              ${(!q && hiddenCount > 0) ? `<div style="margin-top:8px;font-size:13px;color:var(--cyan-lt);padding:6px 12px;background:rgba(53,230,255,.08);border:1px solid rgba(53,230,255,.25);border-radius:var(--r-sm)">
-                ✨ <b>${list.length} anime${list.length > 1 ? 's' : ''} débloqué${list.length > 1 ? 's' : ''} immédiatement</b> (${fmtDuration(visibleMins)}) · ${hiddenCount} suite${hiddenCount > 1 ? 's' : ''} masquée${hiddenCount > 1 ? 's' : ''} (${fmtDuration(hiddenMins)}) qui apparaîtront dès que vous aurez vu leur saison 1
-              </div>` : ''}
-            </div>
-          </div>`;
-      }
-    }
+    if (summaryEl) summaryEl.innerHTML = '';
 
     const el = document.getElementById('plan-grid');
     if (!list.length) {
@@ -4109,26 +4073,13 @@ const News = {
     </article>`;
   },
 
-  async import(idx) {
+  import(idx) {
     const cache = Store.data.settings.newsCache;
     const items = this.filter === 'season' ? cache.season : cache.upcoming;
     const m = items[idx];
     if (!m) return;
     const planned = this.filter === 'season';
     const isMovie = m.format === 'MOVIE';
-    let realDur = m.duration;
-    if (isMovie && !realDur && m.id) {
-      try {
-        const q2 = `query($id:Int){ Media(id:$id, type:ANIME){ duration } }`;
-        const r2 = await fetch('https://graphql.anilist.co', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ query: q2, variables: { id: m.id } })
-        });
-        const j2 = await r2.json();
-        realDur = j2.data?.Media?.duration || null;
-      } catch(e) {}
-    }
     Store.add(normalize({
       id: uid(),
       anilistId: m.id,
@@ -4146,11 +4097,11 @@ const News = {
         id: uid(),
         name: isMovie ? 'Film' : 'Saison 1',
         episodes: m.episodes || 1,
-        duration: realDur || (isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR),
+        duration: m.duration || (isMovie ? 100 : DEFAULT_DUR),
         watched: []
       }],
     }));
-    toast(`${m.title} ajouté à ${planned ? 'ta watchlist' : 'tes sorties'}${realDur ? ' ('+realDur+' min)' : ''}`);
+    toast(`${m.title} ajouté à ${planned ? 'ta watchlist' : 'tes sorties'}`);
     this.render();
   },
 
@@ -4323,7 +4274,7 @@ const Ranking = {
     } else {
       items = all.map(a => {
         const tEps = (a.seasons || []).reduce((sum, s) => sum + (s.episodes || 0), 0);
-        const dur  = a.isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR;
+        const dur  = a.isMovie ? 100 : DEFAULT_DUR;
         const tMin = (a.seasons || []).reduce((sum, s) => sum + (s.episodes || 0) * (s.duration || dur), 0);
         const wEps = (a.seasons || []).reduce((sum, s) => {
           const w = s.watched || [];
@@ -4862,7 +4813,7 @@ const Stats = {
       let watchedMin=0, watchedEps=0, totalEps=0;
       family.forEach(item=>{
         (item.seasons||[]).forEach(s=>{
-          const dur=s.duration|| (item.isMovie?DEFAULT_FILM_DUR:DEFAULT_DUR);
+          const dur=s.duration|| (item.isMovie?100:DEFAULT_DUR);
           const w=s.watched||[];
           totalEps += s.episodes||0;
           if(w.length) { watchedEps+=w.length; watchedMin+=w.length*dur; }
@@ -5909,7 +5860,7 @@ const UI = {
       const durInput = rows[0].querySelector('.s-dur');
       if (nameInput && nameInput.value.startsWith('Saison')) nameInput.value = 'Film';
       if (epsInput) epsInput.value = 1;
-      if (durInput && durInput.value === '22') durInput.value = DEFAULT_FILM_DUR;
+      if (durInput && durInput.value === '22') durInput.value = 100;
     }
   },
 
@@ -5935,7 +5886,7 @@ const UI = {
     row.dataset.watched = JSON.stringify(s?.watched || []);
     const defaultName = isMovie ? 'Film' : (s?.name || `Saison ${n}`);
     const defaultEps = isMovie ? 1 : (s?.episodes ?? 12);
-    const defaultDur = isMovie ? DEFAULT_FILM_DUR : (s?.duration ?? DEFAULT_DUR);
+    const defaultDur = isMovie ? 100 : (s?.duration ?? DEFAULT_DUR);
 
     row.innerHTML = `
       <div class="field"><label>Nom</label>
@@ -5963,7 +5914,7 @@ const UI = {
         id: row.dataset.sid || uid(),
         name: row.querySelector('.s-name').value.trim() || (isMovie ? 'Film' : `Saison ${i + 1}`),
         episodes: eps,
-        duration: Math.max(1, parseInt(row.querySelector('.s-dur').value, 10) || (isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR)),
+        duration: Math.max(1, parseInt(row.querySelector('.s-dur').value, 10) || (isMovie ? 100 : DEFAULT_DUR)),
         watched,
       };
     });
@@ -6049,7 +6000,7 @@ const UI = {
     }
   },
 
-  async assistPick(i) {
+  assistPick(i) {
     const m = this._results?.[i]; if (!m) return;
     const isMovie = (m.format === 'MOVIE');
     const set = (id, val) => { document.getElementById(id).value = val ?? ''; };
@@ -6064,37 +6015,20 @@ const UI = {
     this._cover = m.coverImage?.extraLarge || m.coverImage?.large || '';
     this._anilistId = m.id;
 
-    let realDur = m.duration;
-    // Si film sans durée (AniList renvoie null), on refetch le détail pour avoir la vraie durée
-    if (isMovie && !realDur) {
-      try {
-        const q2 = `query($id:Int){ Media(id:$id, type:ANIME){ duration } }`;
-        const r2 = await fetch('https://graphql.anilist.co', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ query: q2, variables: { id: m.id } })
-        });
-        const j2 = await r2.json();
-        realDur = j2.data?.Media?.duration || null;
-        if (realDur) toast(`Durée réelle récupérée : ${realDur} min`);
-      } catch(e) {}
-    }
-
     const box = document.getElementById('f-seasons');
     box.innerHTML = '';
     this.addSeasonRow({
       id: uid(),
       name: isMovie ? 'Film' : 'Saison 1',
       episodes: m.episodes || 1,
-      duration: realDur || (isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR),
+      duration: m.duration || (isMovie ? 100 : DEFAULT_DUR),
       watched: []
     }, isMovie);
 
     this.syncMovieFields();
     this.previewBanner();
     document.getElementById('assist-res').innerHTML = '';
-    if (!realDur && isMovie) toast('AniList n\'a pas la durée — vérifie et corrige la durée du film (\u2192 '+DEFAULT_FILM_DUR+' min par défaut)', 'info');
-    else toast('Champs pré-remplis avec succès');
+    toast('Champs pré-remplis avec succès');
   }
 };
 
@@ -6335,59 +6269,6 @@ const Settings = {
     DEFAULT_DUR = v;
     this.savePrefs({ defaultDur: v });
     toast(`Durée par défaut : ${v} min`);
-  },
-
-  setDefaultFilmDur(dur) {
-    const v = Math.max(1, parseInt(dur, 10) || 120);
-    DEFAULT_FILM_DUR = v;
-    this.savePrefs({ defaultFilmDur: v });
-    const el=document.getElementById('fix-film-target'); if(el) el.textContent=v;
-    toast(`Durée films par défaut : ${v} min`);
-  },
-
-  fixExistingFilmDurations(){
-    const target = DEFAULT_FILM_DUR;
-    let fixed=0, total=0;
-    Store.all().forEach(a=>{
-      if(!a.isMovie) return;
-      (a.seasons||[]).forEach(s=>{
-        total++;
-        if(s.duration===100){
-          s.duration=target;
-          fixed++;
-        }
-      });
-    });
-    if(!fixed){
-      toast(total?`Aucun film à 100 min trouvé (${total} saisons films)`:`Aucun film dans ta collection`,'info');
-      return;
-    }
-    Store.save();
-    Router.refresh();
-    toast(`✅ ${fixed} film(s) corrigé(s) : 100 → ${target} min`);
-  },
-
-  async refreshAllFilmDurations(){
-    const films = Store.all().filter(a=> a.isMovie && a.anilistId);
-    if(!films.length){ toast('Aucun film avec ID AniList à mettre à jour','info'); return; }
-    if(!confirm(`Mettre à jour la durée de ${films.length} film(s) avec la vraie durée AniList ?`)) return;
-    let ok=0, fail=0;
-    toast(`Récupération des vraies durées pour ${films.length} films…`);
-    for(const a of films){
-      try{
-        const q=`query($id:Int){ Media(id:$id, type:ANIME){ duration } }`;
-        const r=await fetch('https://graphql.anilist.co',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({query:q,variables:{id:a.anilistId}})});
-        const j=await r.json();
-        const dur=j.data?.Media?.duration;
-        if(dur && dur!==a.seasons?.[0]?.duration){
-          a.seasons.forEach(s=> s.duration=dur);
-          ok++;
-        }
-        await new Promise(res=> setTimeout(res, 220));
-      }catch(e){ fail++; }
-    }
-    if(ok){ Store.save(); Router.refresh(); }
-    toast(ok?`✅ ${ok} film(s) mis à jour avec la vraie durée${fail?` (${fail} échecs)`:''}`:`Aucune durée à mettre à jour`);
   },
 
   copyJsonToClipboard() {
@@ -6682,10 +6563,6 @@ function boot() {
   try{ Auth.renderTopbar(); Auth.updateBadges(); }catch(e){}
   const prefs = Settings.getPrefs();
   if (prefs.defaultDur) DEFAULT_DUR = prefs.defaultDur;
-  if (prefs.defaultFilmDur) DEFAULT_FILM_DUR = prefs.defaultFilmDur;
-  const filmDurInput = document.getElementById('set-default-film-dur'); if (filmDurInput) filmDurInput.value = DEFAULT_FILM_DUR;
-  const fixTarget=document.getElementById('fix-film-target'); if(fixTarget) fixTarget.textContent=DEFAULT_FILM_DUR;
-  const epDurInput = document.getElementById('set-default-dur'); if (epDurInput) epDurInput.value = DEFAULT_DUR;
   if (prefs.perfMode === true) document.body.classList.add('perf-mode');
   
   try{ Theme.init(); }catch(e){}
