@@ -1968,6 +1968,15 @@ if(window.USE_FIREBASE){
           </div>
           <input type="number" id="set-default-dur" min="1" max="300" value="22" class="input" style="width:100px" onchange="Settings.setDefaultDur(this.value)" />
         </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-name">🎬 Durée par défaut des films</div>
+            <div class="setting-desc">Durée utilisée quand un film n'a pas de durée AniList (100 min avant, 120 min maintenant).</div>
+          </div>
+          <input type="number" id="set-default-film-dur" min="1" max="600" value="120" class="input" style="width:100px" onchange="Settings.setDefaultFilmDur(this.value)" />
+        </div>
+        <button class="btn btn-sm" onclick="Settings.fixExistingFilmDurations()" style="margin-top:8px">🔧 Corriger mes films actuels à 100 min → <span id="fix-film-target">120</span> min</button>
+        <div class="muted" style="font-size:12px;margin-top:6px" id="fix-film-hint"></div>
       </div>
 
       <!-- Bloc Sauvegarde & Exportation -->
@@ -2238,6 +2247,7 @@ if(window.USE_FIREBASE){
 const KEY = 'kioku.v1';
 const KEY_PREFS = 'kioku.prefs';
 let DEFAULT_DUR = 22;
+let DEFAULT_FILM_DUR = 120;
 
 function debounce(fn, ms = 100) {
   let timer;
@@ -2410,7 +2420,7 @@ function normalize(a) {
     s.id       = s.id || uid();
     s.name     = s.name || (a.isMovie ? 'Film' : `Saison ${i + 1}`);
     s.episodes = Math.max(0, parseInt(s.episodes, 10) || 0);
-    s.duration = Math.max(1, parseInt(s.duration, 10) || (a.isMovie ? 100 : DEFAULT_DUR));
+    s.duration = Math.max(1, parseInt(s.duration, 10) || (a.isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR));
     
     // Support watched en tant que nombre (ex: 12), booléen ou tableau
     if (typeof s.watched === 'number' && !isNaN(s.watched)) {
@@ -3756,10 +3766,10 @@ const Calc = {
     if (item.status === 'completed' && s.episodes > 0) return n + s.episodes;
     return n;
   }, 0), 0),
-  totalMin:   a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + (s.episodes || 0) * (s.duration || (item.isMovie ? 100 : DEFAULT_DUR)), 0), 0),
+  totalMin:   a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => n + (s.episodes || 0) * (s.duration || (item.isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR)), 0), 0),
   // Temps total regardé (multiplié par le nombre de visionnages de chaque épisode)
   watchedMin: a => getFamilyMembers(a).reduce((sum, item) => sum + (item.seasons || []).reduce((n, s) => {
-    const dur = s.duration || (item.isMovie ? 100 : DEFAULT_DUR);
+    const dur = s.duration || (item.isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR);
     const w = s.watched || [];
     if (w.length > 0) return n + w.length * dur;
     if (item.status === 'completed' && s.episodes > 0) return n + s.episodes * dur;
@@ -3929,7 +3939,7 @@ const Plan = {
     
     // Tous les animes prévus dans la watchlist (y compris suites et films liés)
     const allPlanned = Store.all().filter(a => a.status === 'planned');
-    const totalPlannedMins = allPlanned.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes * (s.duration || (a.isMovie ? 100 : DEFAULT_DUR)), 0), 0);
+    const totalPlannedMins = allPlanned.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes * (s.duration || (a.isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR)), 0), 0);
     const totalPlannedEps  = allPlanned.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes, 0), 0);
 
     // Affiche le premier anime à regarder et débloque les suites dès que la saison 1 a été vue
@@ -3946,7 +3956,7 @@ const Plan = {
       long:   (x, y) => Calc.totalMin(y) - Calc.totalMin(x),
     }[sort]);
 
-    const visibleMins = list.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes * (s.duration || (a.isMovie ? 100 : DEFAULT_DUR)), 0), 0);
+    const visibleMins = list.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes * (s.duration || (a.isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR)), 0), 0);
     const visibleEps  = list.reduce((n, a) => n + (a.seasons || []).reduce((sSum, s) => sSum + s.episodes, 0), 0);
     const hiddenCount = allPlanned.length - list.length;
     const hiddenMins  = Math.max(0, totalPlannedMins - visibleMins);
@@ -4122,7 +4132,7 @@ const News = {
         id: uid(),
         name: isMovie ? 'Film' : 'Saison 1',
         episodes: m.episodes || 1,
-        duration: m.duration || (isMovie ? 100 : DEFAULT_DUR),
+        duration: m.duration || (isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR),
         watched: []
       }],
     }));
@@ -4299,7 +4309,7 @@ const Ranking = {
     } else {
       items = all.map(a => {
         const tEps = (a.seasons || []).reduce((sum, s) => sum + (s.episodes || 0), 0);
-        const dur  = a.isMovie ? 100 : DEFAULT_DUR;
+        const dur  = a.isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR;
         const tMin = (a.seasons || []).reduce((sum, s) => sum + (s.episodes || 0) * (s.duration || dur), 0);
         const wEps = (a.seasons || []).reduce((sum, s) => {
           const w = s.watched || [];
@@ -4838,7 +4848,7 @@ const Stats = {
       let watchedMin=0, watchedEps=0, totalEps=0;
       family.forEach(item=>{
         (item.seasons||[]).forEach(s=>{
-          const dur=s.duration|| (item.isMovie?100:DEFAULT_DUR);
+          const dur=s.duration|| (item.isMovie?DEFAULT_FILM_DUR:DEFAULT_DUR);
           const w=s.watched||[];
           totalEps += s.episodes||0;
           if(w.length) { watchedEps+=w.length; watchedMin+=w.length*dur; }
@@ -5885,7 +5895,7 @@ const UI = {
       const durInput = rows[0].querySelector('.s-dur');
       if (nameInput && nameInput.value.startsWith('Saison')) nameInput.value = 'Film';
       if (epsInput) epsInput.value = 1;
-      if (durInput && durInput.value === '22') durInput.value = 100;
+      if (durInput && durInput.value === '22') durInput.value = DEFAULT_FILM_DUR;
     }
   },
 
@@ -5911,7 +5921,7 @@ const UI = {
     row.dataset.watched = JSON.stringify(s?.watched || []);
     const defaultName = isMovie ? 'Film' : (s?.name || `Saison ${n}`);
     const defaultEps = isMovie ? 1 : (s?.episodes ?? 12);
-    const defaultDur = isMovie ? 100 : (s?.duration ?? DEFAULT_DUR);
+    const defaultDur = isMovie ? DEFAULT_FILM_DUR : (s?.duration ?? DEFAULT_DUR);
 
     row.innerHTML = `
       <div class="field"><label>Nom</label>
@@ -5939,7 +5949,7 @@ const UI = {
         id: row.dataset.sid || uid(),
         name: row.querySelector('.s-name').value.trim() || (isMovie ? 'Film' : `Saison ${i + 1}`),
         episodes: eps,
-        duration: Math.max(1, parseInt(row.querySelector('.s-dur').value, 10) || (isMovie ? 100 : DEFAULT_DUR)),
+        duration: Math.max(1, parseInt(row.querySelector('.s-dur').value, 10) || (isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR)),
         watched,
       };
     });
@@ -6046,7 +6056,7 @@ const UI = {
       id: uid(),
       name: isMovie ? 'Film' : 'Saison 1',
       episodes: m.episodes || 1,
-      duration: m.duration || (isMovie ? 100 : DEFAULT_DUR),
+      duration: m.duration || (isMovie ? DEFAULT_FILM_DUR : DEFAULT_DUR),
       watched: []
     }, isMovie);
 
@@ -6294,6 +6304,37 @@ const Settings = {
     DEFAULT_DUR = v;
     this.savePrefs({ defaultDur: v });
     toast(`Durée par défaut : ${v} min`);
+  },
+
+  setDefaultFilmDur(dur) {
+    const v = Math.max(1, parseInt(dur, 10) || 120);
+    DEFAULT_FILM_DUR = v;
+    this.savePrefs({ defaultFilmDur: v });
+    const el=document.getElementById('fix-film-target'); if(el) el.textContent=v;
+    toast(`Durée films par défaut : ${v} min`);
+  },
+
+  fixExistingFilmDurations(){
+    const target = DEFAULT_FILM_DUR;
+    let fixed=0, total=0;
+    Store.all().forEach(a=>{
+      if(!a.isMovie) return;
+      (a.seasons||[]).forEach(s=>{
+        total++;
+        if(s.duration===100){
+          s.duration=target;
+          fixed++;
+        }
+      });
+    });
+    if(!fixed){
+      // also check for 100 in any season duration regardless
+      toast(total?`Aucun film à 100 min trouvé (${total} saisons films)`:`Aucun film dans ta collection`,'info');
+      return;
+    }
+    Store.save();
+    Router.refresh();
+    toast(`✅ ${fixed} film(s) corrigé(s) : 100 → ${target} min`);
   },
 
   copyJsonToClipboard() {
@@ -6588,6 +6629,10 @@ function boot() {
   try{ Auth.renderTopbar(); Auth.updateBadges(); }catch(e){}
   const prefs = Settings.getPrefs();
   if (prefs.defaultDur) DEFAULT_DUR = prefs.defaultDur;
+  if (prefs.defaultFilmDur) DEFAULT_FILM_DUR = prefs.defaultFilmDur;
+  const filmDurInput = document.getElementById('set-default-film-dur'); if (filmDurInput) filmDurInput.value = DEFAULT_FILM_DUR;
+  const fixTarget=document.getElementById('fix-film-target'); if(fixTarget) fixTarget.textContent=DEFAULT_FILM_DUR;
+  const epDurInput = document.getElementById('set-default-dur'); if (epDurInput) epDurInput.value = DEFAULT_DUR;
   if (prefs.perfMode === true) document.body.classList.add('perf-mode');
   
   try{ Theme.init(); }catch(e){}
