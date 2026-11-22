@@ -6,7 +6,7 @@
       "label": "BATMAN_Miyukii",
       "version": 1,
       "locale": "fr-FR",
-      "generatedAt": "2026-11-15T12:43:54.241Z",
+      "generatedAt": "2026-11-22T13:20:24.424Z",
       "profile": {
         "onlineId": "BATMAN_Miyukii",
         "avatarUrl": "",
@@ -14,24 +14,9 @@
       },
       "playStats": {
         "totalTitles": 223,
-        "totalDurationSeconds": 22460911,
-        "totalPlayCount": 5498,
+        "totalDurationSeconds": 22516370,
+        "totalPlayCount": 5514,
         "games": [
-          {
-            "titleId": "PPSA01923_00",
-            "conceptId": 228748,
-            "name": "Fortnite",
-            "originalName": "Fortnite",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202610/2822/9540e915e26a7168ee5dfc697d8fa756b6a6343b8969d6e5.png",
-            "platform": "PS5",
-            "category": "ps5_native_game",
-            "service": "none(purchased)",
-            "playCount": 927,
-            "playDuration": "PT920H46M28S",
-            "durationSeconds": 3314788,
-            "firstPlayedDateTime": "2023-09-03T12:13:55.000000Z",
-            "lastPlayedDateTime": "2026-11-15T12:29:20.880000Z"
-          },
           {
             "titleId": "PPSA10990_00",
             "conceptId": 223118,
@@ -41,11 +26,41 @@
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
-            "playCount": 326,
-            "playDuration": "PT669H17M2S",
-            "durationSeconds": 2409422,
+            "playCount": 335,
+            "playDuration": "PT676H11M2S",
+            "durationSeconds": 2434262,
             "firstPlayedDateTime": "2026-04-17T11:18:57.630000Z",
-            "lastPlayedDateTime": "2026-11-15T12:28:50.170000Z"
+            "lastPlayedDateTime": "2026-11-21T19:36:03.540000Z"
+          },
+          {
+            "titleId": "PPSA01923_00",
+            "conceptId": 228748,
+            "name": "Fortnite",
+            "originalName": "Fortnite",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202610/2822/9540e915e26a7168ee5dfc697d8fa756b6a6343b8969d6e5.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 932,
+            "playDuration": "PT924H42M40S",
+            "durationSeconds": 3328960,
+            "firstPlayedDateTime": "2023-09-03T12:13:55.000000Z",
+            "lastPlayedDateTime": "2026-11-21T18:05:58.580000Z"
+          },
+          {
+            "titleId": "PPSA22327_00",
+            "conceptId": 10010647,
+            "name": "Forza Horizon 5",
+            "originalName": "Forza Horizon 5",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202501/2717/42b3ee6b1b2094212231b0b0a82824f687fc5c4dc9bde31c.png",
+            "platform": "PS5",
+            "category": "ps5_native_game",
+            "service": "none(purchased)",
+            "playCount": 10,
+            "playDuration": "PT13H53M38S",
+            "durationSeconds": 50018,
+            "firstPlayedDateTime": "2026-10-18T15:06:50.850000Z",
+            "lastPlayedDateTime": "2026-11-21T16:36:24.690000Z"
           },
           {
             "titleId": "CUSA04099_00",
@@ -61,21 +76,6 @@
             "durationSeconds": 256469,
             "firstPlayedDateTime": "2023-02-22T08:22:39.630000Z",
             "lastPlayedDateTime": "2026-11-07T15:06:03.750000Z"
-          },
-          {
-            "titleId": "PPSA22327_00",
-            "conceptId": 10010647,
-            "name": "Forza Horizon 5",
-            "originalName": "Forza Horizon 5",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202501/2717/42b3ee6b1b2094212231b0b0a82824f687fc5c4dc9bde31c.png",
-            "platform": "PS5",
-            "category": "ps5_native_game",
-            "service": "none(purchased)",
-            "playCount": 8,
-            "playDuration": "PT9H19M31S",
-            "durationSeconds": 33571,
-            "firstPlayedDateTime": "2026-10-18T15:06:50.850000Z",
-            "lastPlayedDateTime": "2026-10-31T17:12:36.870000Z"
           },
           {
             "titleId": "PPSA15724_00",
@@ -1822,7 +1822,7 @@
             "conceptId": 10005318,
             "name": "THE FIRST DESCENDANT",
             "originalName": "THE FIRST DESCENDANT",
-            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202608/2007/e1261f08c8722cadb4f52177b1de3ad1b558d1a47ca54ee7.png",
+            "coverUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202611/1705/e6438f5442f65647a46c2840f7503aabf4400bf41cdb3549.png",
             "platform": "PS5",
             "category": "ps5_native_game",
             "service": "none(purchased)",
@@ -3378,5 +3378,5 @@
       "errors": []
     }
   ],
-  "generatedAt": "2026-11-15T12:43:54.242Z"
+  "generatedAt": "2026-11-22T13:20:24.425Z"
 }
